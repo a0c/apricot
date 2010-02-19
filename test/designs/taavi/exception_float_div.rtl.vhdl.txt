@@ -1,0 +1,40 @@
+VHDL: float_div.rtl.vhdl
+RTL level recognition (LEVEL 1): success
+RTL level recognition (LEVEL 2): success
+
+Error type: Unhandled Error
+
+null
+
+ENTITY.DP_entity.createAdditionalVariable(DP_entity.java:224)
+ENTITY.DP_entity.readStructure(DP_entity.java:179)
+ENTITY.DP_entity.<init>(DP_entity.java:59)
+ENTITY.RTL_VHDL.readDP(RTL_VHDL.java:190)
+ENTITY.RTL_VHDL.readVHDL(RTL_VHDL.java:58)
+ENTITY.RTL_VHDL.<init>(RTL_VHDL.java:31)
+ui.ApplicationFrame.actionPerformed(ApplicationFrame.java:164)
+javax.swing.AbstractButton.fireActionPerformed(Unknown Source)
+javax.swing.AbstractButton$Handler.actionPerformed(Unknown Source)
+javax.swing.DefaultButtonModel.fireActionPerformed(Unknown Source)
+javax.swing.DefaultButtonModel.setPressed(Unknown Source)
+javax.swing.plaf.basic.BasicButtonListener.mouseReleased(Unknown Source)
+java.awt.Component.processMouseEvent(Unknown Source)
+javax.swing.JComponent.processMouseEvent(Unknown Source)
+java.awt.Component.processEvent(Unknown Source)
+java.awt.Container.processEvent(Unknown Source)
+java.awt.Component.dispatchEventImpl(Unknown Source)
+java.awt.Container.dispatchEventImpl(Unknown Source)
+java.awt.Component.dispatchEvent(Unknown Source)
+java.awt.LightweightDispatcher.retargetMouseEvent(Unknown Source)
+java.awt.LightweightDispatcher.processMouseEvent(Unknown Source)
+java.awt.LightweightDispatcher.dispatchEvent(Unknown Source)
+java.awt.Container.dispatchEventImpl(Unknown Source)
+java.awt.Window.dispatchEventImpl(Unknown Source)
+java.awt.Component.dispatchEvent(Unknown Source)
+java.awt.EventQueue.dispatchEvent(Unknown Source)
+java.awt.EventDispatchThread.pumpOneEventForFilters(Unknown Source)
+java.awt.EventDispatchThread.pumpEventsForFilter(Unknown Source)
+java.awt.EventDispatchThread.pumpEventsForHierarchy(Unknown Source)
+java.awt.EventDispatchThread.pumpEvents(Unknown Source)
+java.awt.EventDispatchThread.pumpEvents(Unknown Source)
+java.awt.EventDispatchThread.run(Unknown Source)

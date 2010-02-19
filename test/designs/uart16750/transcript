@@ -1,0 +1,241 @@
+# //  QuestaSim 6.1d Jan 23 2006 SunOS 5.9
+# //
+# //  Copyright 2006 Mentor Graphics Corporation
+# //              All Rights Reserved.
+# //
+# //  THIS WORK CONTAINS TRADE SECRET AND 
+# //  PROPRIETARY INFORMATION WHICH IS THE PROPERTY
+# //  OF MENTOR GRAPHICS CORPORATION OR ITS LICENSORS
+# //  AND IS SUBJECT TO LICENSE TERMS.
+# //
+vlib work
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/slib_clock_div.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity slib_clock_div
+# -- Compiling architecture rtl of slib_clock_div
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/slib_counter.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity slib_counter
+# -- Compiling architecture rtl of slib_counter
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/slib_edge_detect.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity slib_edge_detect
+# -- Compiling architecture rtl of slib_edge_detect
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/slib_fifo.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity slib_fifo
+# -- Compiling architecture rtl of slib_fifo
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/slib_input_filter.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity slib_input_filter
+# -- Compiling architecture rtl of slib_input_filter
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/slib_input_sync.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity slib_input_sync
+# -- Compiling architecture rtl of slib_input_sync
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/slib_mv_filter.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity slib_mv_filter
+# -- Compiling architecture rtl of slib_mv_filter
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/uart_baudgen.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity uart_baudgen
+# -- Compiling architecture rtl of uart_baudgen
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/uart_interrupt.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity uart_interrupt
+# -- Compiling architecture rtl of uart_interrupt
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/uart_receiver.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity uart_receiver
+# -- Compiling architecture rtl of uart_receiver
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/uart_transmitter.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity uart_transmitter
+# -- Compiling architecture rtl of uart_transmitter
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/rtl/uart_16750.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Compiling entity uart_16750
+# -- Compiling architecture rtl of uart_16750
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/bench/txt_util.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package textio
+# -- Compiling package txt_util
+# -- Compiling package body txt_util
+# -- Loading package txt_util
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/bench/uart_package.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package textio
+# -- Loading package txt_util
+# -- Compiling package uart_package
+# -- Compiling package body uart_package
+# -- Loading package uart_package
+vcom -reportprogress 300 -work work /home/maksim/APRICOT/DESIGNS/opencores/uart16750/bench/uart_transactor.vhd
+# QuestaSim vcom 6.1d Compiler 2006.01 Jan 23 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package textio
+# -- Loading package txt_util
+# -- Loading package uart_package
+# -- Compiling entity uart_transactor
+# -- Compiling architecture tb of uart_transactor
+vsim work.uart_transactor(tb)
+# vsim work.uart_transactor(tb) 
+# Loading /cad/questasim/sunos5v9/../std.standard
+# Loading /cad/questasim/sunos5v9/../ieee.std_logic_1164(body)
+# Loading /cad/questasim/sunos5v9/../std.textio(body)
+# Loading work.txt_util(body)
+# Loading work.uart_package(body)
+# Loading work.uart_transactor(tb)
+# ** Error: (vsim-7) Failed to open VHDL file "uart_stim.dat" in r mode.
+# No such file or directory. (errno = ENOENT)
+#    Time: 0 ns  Iteration: 0  Region: /uart_transactor  File: /home/maksim/APRICOT/DESIGNS/opencores/uart16750/bench/uart_transactor.vhd
+# Loading /cad/questasim/sunos5v9/../ieee.numeric_std(body)
+# Loading work.slib_clock_div(rtl)
+# Loading work.uart_16750(rtl)
+# Loading work.slib_edge_detect(rtl)
+# Loading work.slib_input_sync(rtl)
+# Loading work.slib_input_filter(rtl)
+# Loading work.uart_interrupt(rtl)
+# Loading work.uart_baudgen(rtl)
+# Loading work.slib_fifo(rtl)
+# Loading work.uart_transmitter(rtl)
+# Loading work.uart_receiver(rtl)
+# Loading work.slib_counter(rtl)
+# Loading work.slib_mv_filter(rtl)
+quit -sim
+vsim work.uart_transactor(tb)
+# vsim work.uart_transactor(tb) 
+# Loading /cad/questasim/sunos5v9/../std.standard
+# Loading /cad/questasim/sunos5v9/../ieee.std_logic_1164(body)
+# Loading /cad/questasim/sunos5v9/../std.textio(body)
+# Loading work.txt_util(body)
+# Loading work.uart_package(body)
+# Loading work.uart_transactor(tb)
+# ** Error: (vsim-7) Failed to open VHDL file "uart_stim.dat" in r mode.
+# No such file or directory. (errno = ENOENT)
+#    Time: 0 ns  Iteration: 0  Region: /uart_transactor  File: /home/maksim/APRICOT/DESIGNS/opencores/uart16750/bench/uart_transactor.vhd
+# Loading /cad/questasim/sunos5v9/../ieee.numeric_std(body)
+# Loading work.slib_clock_div(rtl)
+# Loading work.uart_16750(rtl)
+# Loading work.slib_edge_detect(rtl)
+# Loading work.slib_input_sync(rtl)
+# Loading work.slib_input_filter(rtl)
+# Loading work.uart_interrupt(rtl)
+# Loading work.uart_baudgen(rtl)
+# Loading work.slib_fifo(rtl)
+# Loading work.uart_transmitter(rtl)
+# Loading work.uart_receiver(rtl)
+# Loading work.slib_counter(rtl)
+# Loading work.slib_mv_filter(rtl)
+quit -sim
+vsim work.uart_transactor(tb)
+# vsim work.uart_transactor(tb) 
+# Loading /cad/questasim/sunos5v9/../std.standard
+# Loading /cad/questasim/sunos5v9/../ieee.std_logic_1164(body)
+# Loading /cad/questasim/sunos5v9/../std.textio(body)
+# Loading work.txt_util(body)
+# Loading work.uart_package(body)
+# Loading work.uart_transactor(tb)
+# Loading /cad/questasim/sunos5v9/../ieee.numeric_std(body)
+# Loading work.slib_clock_div(rtl)
+# Loading work.uart_16750(rtl)
+# Loading work.slib_edge_detect(rtl)
+# Loading work.slib_input_sync(rtl)
+# Loading work.slib_input_filter(rtl)
+# Loading work.uart_interrupt(rtl)
+# Loading work.uart_baudgen(rtl)
+# Loading work.slib_fifo(rtl)
+# Loading work.uart_transmitter(rtl)
+# Loading work.uart_receiver(rtl)
+# Loading work.slib_counter(rtl)
+# Loading work.slib_mv_filter(rtl)
+view wave
+# .main_pane.mdi.interior.cs.vm.paneset.cli_0.wf.clip.cs.pw.wf
+run
+# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /uart_transactor/dut/uart_rxff
+# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /uart_transactor/dut/uart_txff
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run

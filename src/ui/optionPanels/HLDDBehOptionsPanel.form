@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ui.optionPanels.HLDDBehOptionsPanel">
+  <grid id="27dc6" binding="mainPanel" layout-manager="FormLayout">
+    <rowspec value="center:d:noGrow"/>
+    <colspec value="fill:406px:grow"/>
+    <constraints>
+      <xy x="20" y="20" width="406" height="143"/>
+    </constraints>
+    <properties>
+      <visible value="false"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="13d79" default-binding="true" layout-manager="FormLayout">
+        <rowspec value="center:d:noGrow"/>
+        <rowspec value="top:4dlu:noGrow"/>
+        <rowspec value="center:43px:noGrow"/>
+        <colspec value="fill:183px:noGrow"/>
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="7fa2e" layout-manager="FormLayout">
+            <rowspec value="center:d:noGrow"/>
+            <colspec value="fill:169px:noGrow"/>
+            <constraints>
+              <grid row="0" column="0" row-span="3" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties/>
+            <border type="none" title="Model Compactness" title-justification="2"/>
+            <children>
+              <component id="ed9ef" class="javax.swing.JCheckBox" binding="trimTerminalNodesCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <background color="-1"/>
+                  <enabled value="false"/>
+                  <opaque value="false"/>
+                  <selected value="false"/>
+                  <text value="&amp;Trim Terminal Nodes"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

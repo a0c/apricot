@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ui.optionPanels.VHDLBehDdOptionsPanel">
+  <grid id="27dc6" binding="mainPanel" layout-manager="FormLayout">
+    <rowspec value="top:d:noGrow"/>
+    <colspec value="fill:367px:grow"/>
+    <constraints>
+      <xy x="20" y="20" width="367" height="130"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="5d4f" default-binding="true" layout-manager="FormLayout">
+        <rowspec value="center:d:noGrow"/>
+        <rowspec value="top:130px:noGrow"/>
+        <colspec value="fill:183px:noGrow"/>
+        <colspec value="left:4dlu:noGrow"/>
+        <colspec value="fill:max(d;4px):noGrow"/>
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="975ee" layout-manager="FormLayout">
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <colspec value="fill:169px:noGrow"/>
+            <constraints>
+              <grid row="0" column="0" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties/>
+            <border type="none" title="Model Compactness" title-justification="2"/>
+            <children>
+              <component id="ff070" class="javax.swing.JRadioButton" default-binding="true">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="&amp;Full-tree"/>
+                </properties>
+              </component>
+              <component id="1e95b" class="javax.swing.JRadioButton" binding="reducedRadioButton" default-binding="true">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="&amp;Reduced"/>
+                </properties>
+              </component>
+              <component id="b6845" class="javax.swing.JRadioButton" binding="minimizedRadioButton" default-binding="true">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <selected value="true"/>
+                  <text value="&amp;Minimized"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="debc4" layout-manager="FormLayout">
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:0dlu:noGrow"/>
+            <rowspec value="center:22px:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <colspec value="fill:177px:noGrow"/>
+            <constraints>
+              <grid row="0" column="2" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties/>
+            <border type="none" title="Optimizations" title-justification="2"/>
+            <children>
+              <component id="aef65" class="javax.swing.JCheckBox" binding="simplifyCheckBox">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <background color="-1"/>
+                  <foreground color="-16777216"/>
+                  <hideActionText value="true"/>
+                  <opaque value="false"/>
+                  <selected value="true"/>
+                  <text value="&amp;Pre-Simplify HIF structure"/>
+                  <toolTipText value="&lt;html&gt;1) Removes redundant &lt;i&gt;Elsif&lt;/i&gt;-s.&lt;br&gt;2) Simplifies &lt;i&gt;IfNode&lt;/i&gt;-s and &lt;i&gt;CaseNode&lt;/i&gt;-s&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="29912" class="javax.swing.JCheckBox" binding="reuseConstantsCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <background color="-1"/>
+                  <enabled value="true"/>
+                  <opaque value="false"/>
+                  <selected value="false"/>
+                  <text value="Reuse &amp;Constants"/>
+                  <visible value="false"/>
+                </properties>
+              </component>
+              <grid id="c4f22" layout-manager="FormLayout">
+                <rowspec value="center:22px:noGrow"/>
+                <rowspec value="top:4dlu:noGrow"/>
+                <rowspec value="center:max(d;4px):noGrow"/>
+                <colspec value="fill:177px:noGrow"/>
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+                <border type="empty" title="Conditional Statements"/>
+                <children>
+                  <component id="e95" class="javax.swing.JRadioButton" binding="expandCSCheckBox">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms/>
+                    </constraints>
+                    <properties>
+                      <background color="-1"/>
+                      <foreground color="-16777216"/>
+                      <hideActionText value="true"/>
+                      <opaque value="false"/>
+                      <selected value="false"/>
+                      <text value="&amp;Expand"/>
+                    </properties>
+                  </component>
+                  <component id="b07c1" class="javax.swing.JRadioButton">
+                    <constraints>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms/>
+                    </constraints>
+                    <properties>
+                      <selected value="true"/>
+                      <text value="Co&amp;llapse"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+  <buttonGroups>
+    <group name="modelCompactnessGroup">
+      <member id="ff070"/>
+      <member id="1e95b"/>
+      <member id="b6845"/>
+    </group>
+    <group name="conditionStatementsBGroup">
+      <member id="e95"/>
+      <member id="b07c1"/>
+    </group>
+  </buttonGroups>
+</form>

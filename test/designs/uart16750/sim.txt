@@ -1,0 +1,23 @@
+
+Order: UART16750 sources:
+slib_clock_div.vhd
+slib_counter.vhd
+slib_edge_detect.vhd
+slib_fifo.vhd
+slib_input_filter.vhd
+slib_input_sync.vhd
+slib_mv_filter.vhd
+uart_baudgen.vhd
+uart_interrupt.vhd
+uart_receiver.vhd
+uart_transmitter.vhd
+uart_16750.vhd
+
+Order: Testbench source:
+txt_util.vhd
+uart_package.vhd
+uart_transactor.vhd
+
+Must have: 
+uart_stim.dat 
+  (or generate it by  uart_test_stim.pl)
