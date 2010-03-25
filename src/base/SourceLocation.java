@@ -57,6 +57,14 @@ public class SourceLocation {
 		return linesByFile.get(file);
 	}
 
+	public int getTotalLinesNum() {
+		int total = 0;
+		for (TreeSet<Integer> linesInFile : linesByFile.values()) {
+			total += linesInFile.size();
+		}
+		return total;
+	}
+
 	@Override
 	public String toString() {
 

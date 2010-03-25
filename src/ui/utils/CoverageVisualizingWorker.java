@@ -1,6 +1,9 @@
 package ui.utils;
 
 import base.SourceLocation;
+import ui.BusinessLogicCoverageAnalyzer;
+import ui.base.SplitCoverage;
+import ui.graphics.CoveragePanel;
 import ui.utils.uiWithWorker.TaskSwingWorker;
 import ui.io.HLDD2VHDLMappingReader;
 import ui.io.CoverageReader;
@@ -40,7 +43,7 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 			public void run() {
 				try {
 					/* Read HLDD-2-VHDL mapping */
-					consoleWriter.write("Mapping HLDD to VHDL..."); //todo: is there sense in  concealing the fact of manual mapping?
+					consoleWriter.write("Mapping HLDD to VHDL...");
 					HLDD2VHDLMapping hldd2VHDLMapping = new HLDD2VHDLMappingReader(mappingFile).getMapping();
 					consoleWriter.done();
 
@@ -62,6 +65,13 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 						Collection<Integer> highlightedLines = uncoveredSources == null ? null : uncoveredSources.getLinesForFile(sourceFile);
 						applicationForm.addFileViewerTabFromFile(sourceFile, highlightedLines, null, null);    
 					}
+
+					/* Add coverage */
+					int total = hldd2VHDLMapping.getAllSources().getTotalLinesNum();
+					int uncovered = uncoveredSources == null ? 0 : uncoveredSources.getTotalLinesNum();
+					CoveragePanel coveragePanel = new CoveragePanel(new SplitCoverage(total - uncovered, total, SplitCoverage.STATEMENT_COVERAGE));
+					applicationForm.addCoverage(BusinessLogicCoverageAnalyzer.generateTabTitle(vhdlFile),
+							BusinessLogicCoverageAnalyzer.generateTabTooltip(vhdlFile), true, coveragePanel);
 
 					isProcessFinished = true;
 				} catch (Exception e) {

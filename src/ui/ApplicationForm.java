@@ -1,5 +1,6 @@
 package ui;
 
+import ui.graphics.CoveragePanel;
 import ui.optionPanels.VHDLBehOptionsPanel;
 import ui.optionPanels.VHDLBehDdOptionsPanel;
 import ui.optionPanels.HLDDBehOptionsPanel;
@@ -830,7 +831,7 @@ public class ApplicationForm implements ActionListener {
 		pictureTabPane.setSelectedIndex(insertionIndex);
 	}
 
-	public void addCoverage(String tabTitle, String tabToolTip, JComponent component) {
+	public void addCoverage(String tabTitle, String tabToolTip, boolean isVHDLCoverage, JComponent component) {
 		/* Search for equal existing tab */
 		int insertionIndex = getIdenticalTabIndex(upperRightTabbedPane, tabToolTip);
 		if (insertionIndex == -1) {
@@ -840,8 +841,17 @@ public class ApplicationForm implements ActionListener {
 			upperRightTabbedPane.setTabComponentAt(insertionIndex, new TabComponent(upperRightTabbedPane, tabTitle, tabToolTip, upperRightTabbedPaneAdapter));
 		} else {
 			/* Previously existing tab is found. Replace its component with a new one (the specified one). */
-			upperRightTabbedPane.setComponentAt(insertionIndex, component);
-			System.gc();
+			if (!isVHDLCoverage) { // HLDD coverage
+				upperRightTabbedPane.setComponentAt(insertionIndex, component);
+			} else { // VHDL coverage
+				Component existComp = upperRightTabbedPane.getComponentAt(insertionIndex);
+				if (existComp instanceof CoveragePanel && component instanceof CoveragePanel) {
+					CoveragePanel existCoveragePanel = (CoveragePanel) existComp;
+					existCoveragePanel.addVHDLCoverageFrom(((CoveragePanel) component));
+				} else {
+					upperRightTabbedPane.setComponentAt(insertionIndex, component);
+				}
+			}
 		}
 		/* Activate new tab */
 		upperRightTabbedPane.setSelectedIndex(insertionIndex);

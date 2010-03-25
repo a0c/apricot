@@ -4,6 +4,11 @@ package ui.base;
  * @author Anton Chepurov
  */
 public class SplitCoverage extends AbstractCoverage {
+
+	public static final String NODE_COVERAGE = "Node coverage";
+	public static final String EDGE_COVERAGE = "Edge coverage";
+	public static final String TOGGLE_COVERAGE = "Toggle coverage";
+	public static final String STATEMENT_COVERAGE = "Statement coverage";
 	
 	private int covered;
 	private int total;

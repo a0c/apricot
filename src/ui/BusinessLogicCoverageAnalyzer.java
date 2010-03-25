@@ -1,11 +1,11 @@
 package ui;
 
 import ui.utils.CoverageVisualizingUI;
+import ui.graphics.CoveragePanel;
 import ui.utils.uiWithWorker.UIWithWorker;
 import ui.utils.CoverageAnalyzingUI;
 import ui.utils.CoverageAnalyzingWorker;
 import ui.utils.CoverageVisualizingWorker;
-import ui.graphics.CoverageFrame;
 import ui.io.CoverageParser;
 import io.ConsoleWriter;
 
@@ -98,18 +98,25 @@ public class BusinessLogicCoverageAnalyzer {
 	public void displayCoverage() {
 
 		CoverageParser parser = new CoverageParser(byteArrayOutputStream.toString());
-		CoverageFrame coverageFrame = new CoverageFrame(
+		CoveragePanel coveragePanel = new CoveragePanel(
 				parser.getNodeCoverage(),
 				parser.getEdgeCoverage(),
-				parser.getToggleCoverage(),
-				generateTabTitle(hlddFile));
-		applicationForm.addCoverage(generateTabTitle(hlddFile), hlddFile.getAbsolutePath(), coverageFrame.getMainPanel());
+				parser.getToggleCoverage());
+		applicationForm.addCoverage(generateTabTitle(hlddFile), generateTabTooltip(hlddFile), false, coveragePanel);
+//		applicationForm.addFileViewerTab(generateTabTitle(hlddFile), hlddFile.getAbsolutePath(), coveragePanel.getMainPanel());
 	}
 
-	private String generateTabTitle(File hlddFile) {
-		StringBuilder sb = new StringBuilder(hlddFile.getName());
+	public static String generateTabTitle(File aFile) {
+		StringBuilder sb = new StringBuilder(aFile.getName());
 		sb.delete(sb.lastIndexOf("."), sb.length());
 		sb.append(":Coverage");
+		return sb.toString();
+	}
+
+	public static String generateTabTooltip(File aFile) {
+		StringBuilder sb = new StringBuilder(aFile.getAbsolutePath());
+		sb.delete(sb.lastIndexOf("."), sb.length());
+		sb.append("  (agm/vhd)");
 		return sb.toString();
 	}
 

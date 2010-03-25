@@ -35,15 +35,15 @@ public class CoverageParser {
 
 				if (checkNodes && line.startsWith(NODES_START)) {
 					SplitCoverageHolder covHolder = new SplitCoverageHolder(line);
-					nodeCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), "Node coverage");
+					nodeCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), SplitCoverage.NODE_COVERAGE);
 					checkNodes = false;
 				} else if (checkEdges && line.startsWith(EDGES_START)) {
 					SplitCoverageHolder covHolder = new SplitCoverageHolder(line);
-					edgeCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), "Edge coverage");
+					edgeCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), SplitCoverage.EDGE_COVERAGE);
 					checkEdges = false;
 				} else if (line.startsWith(TOTAL_START)) {
 					SplitCoverageHolder covHolder = new SplitCoverageHolder(line);
-					toggleCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), "Toggle coverage");
+					toggleCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), SplitCoverage.TOGGLE_COVERAGE);
 					break;
 				}
 			}
