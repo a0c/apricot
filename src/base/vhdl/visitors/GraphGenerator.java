@@ -271,8 +271,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
             *  If not, then set graphVariable to this transition variable. */
             String transitionVarName = transitionNode.getTargetOperand().toString();
             if (!processedGraphVars.contains(transitionVarName)) {
-                graphVariable = modelCollector.getVariable(transitionVarName);
-                if (graphVariable == null) {
+				setGraphVariable(modelCollector.getVariable(transitionVarName));
+				if (graphVariable == null) {
                     return false;//todo: commented for DEMO. (Informs that the initial variable of partedSetting variables is not found or the like... In any way, has smth to do with partedSetting variables)  
 //                    Exception exception = new Exception("GraphVariable to process could not be set:" +
 //                            "\nModel collector does not contain the requested variable: " + transitionVarName +
@@ -411,8 +411,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
                base.hldd.structure.nodes.Node, boolean)} throw an Exception
      */
     protected boolean couldProcessNextGraphVariable(AbstractVariable initGraphVariable, AbstractNode rootNode) throws Exception {
-        graphVariable = initGraphVariable;
-        graphVariableRootNode = null;
+		setGraphVariable(initGraphVariable);
+		graphVariableRootNode = null;
         contextManager.clear();
         rootNode.traverse(this);
         if (graphVariableRootNode != null) {
@@ -426,7 +426,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
         } else return false;
     }
 
-    protected abstract boolean isDelay(String variableName);
+	private void setGraphVariable(AbstractVariable newGraphVariable) {
+		graphVariable = newGraphVariable;
+	}
+
+	protected abstract boolean isDelay(String variableName);
 
     protected void processPartialSettings(Process process) throws Exception {
         /* For each partially set variable in process, traverse the tree once for each partial setting variable */
@@ -440,8 +444,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
             List<GraphVariable> partialSetVarsList = new LinkedList<GraphVariable>();
             for (OperandImpl partSetOperand : partSetOperandsSet) {
                 /* Create new variable */ //todo: may be substitute with couldProcessNextGraphVariable(). Check ModelCollector.replace() to act equally to modelCollector.addVariable() met below:
-                graphVariable = new PartedVariable(partSetOperand.getName(), wholeVariable.getType(), partSetOperand.getPartedIndices());
-                graphVariableRootNode = null;
+				setGraphVariable(new PartedVariable(partSetOperand.getName(), wholeVariable.getType(), partSetOperand.getPartedIndices()));
+				graphVariableRootNode = null;
                 process.getRootNode().traverse(this);
                 if (graphVariableRootNode != null) {
                     GraphVariable newGraphVariable = new GraphVariable(graphVariable, graphVariableRootNode);
@@ -751,26 +755,26 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
             for (int awaitedCondition : awaitedConditions) {
                 Node currentAwaitedNode = controlNode.getSuccessors()[awaitedCondition];
-                if (fillingNode.isTerminalNode() || currentAwaitedNode == null || currentAwaitedNode.isTerminalNode()) {
+//                if (fillingNode.isTerminalNode() || currentAwaitedNode == null || currentAwaitedNode.isTerminalNode()) {
                     /* Override the current node or fill the empty place */
                     controlNode.setSuccessor(awaitedCondition, fillingNode instanceof CompositeNode ?
                             ((CompositeNode) fillingNode).getRootNode() : fillingNode);
-                } else {
-                    /* todo:        */
-                    Node[] curAwaitedSuccessors = currentAwaitedNode.getSuccessors();
-                    for (int i = 0; i < curAwaitedSuccessors.length; i++) {
-                        Node curAwaitedSuccessor = curAwaitedSuccessors[i];
-                        /* Clone filling node */
-                        Node fillingNodeCopy = Node.clone(fillingNode);
-                        /* Fill missing successors of fillingNode with the successor of current Awaited Node */
-                        if (curAwaitedSuccessor != null) {
-                            fillingNodeCopy.fillEmptySuccessorsWith(curAwaitedSuccessor);//todo: make this method recursive!!! Consider 3 subsequent conditions
-                        }
-                        /* Replace the current successor with a copy of fillingNode */
-                        currentAwaitedNode.setSuccessor(i, fillingNodeCopy);
-                    }
-
-                }
+//                } else {
+//                    /* todo:        */
+//                    Node[] curAwaitedSuccessors = currentAwaitedNode.getSuccessors();
+//                    for (int i = 0; i < curAwaitedSuccessors.length; i++) {
+//                        Node curAwaitedSuccessor = curAwaitedSuccessors[i];
+//                        /* Clone filling node */
+//                        Node fillingNodeCopy = Node.clone(fillingNode);
+//                        /* Fill missing successors of fillingNode with the successor of current Awaited Node */
+//                        if (curAwaitedSuccessor != null) {
+//                            fillingNodeCopy.fillEmptySuccessorsWith(curAwaitedSuccessor);//todo: make this method recursive!!! Consider 3 subsequent conditions
+//                        }
+//                        /* Replace the current successor with a copy of fillingNode */
+//                        currentAwaitedNode.setSuccessor(i, fillingNodeCopy);
+//                    }
+//
+//                }
             }
 
         }
