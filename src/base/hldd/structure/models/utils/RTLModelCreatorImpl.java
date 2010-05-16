@@ -7,6 +7,8 @@ import base.hldd.structure.models.Model;
 import base.hldd.structure.models.BehModel;
 import parsers.Beh2RtlTransformer.ControlPartManager;
 
+import java.util.List;
+
 /**
  * <br><br>User: Anton Chepurov
  * <br>Date: 20.02.2008
@@ -22,6 +24,7 @@ public class RTLModelCreatorImpl extends AbstractModelCreator {
     }
 
     protected void doIndexGraphs(int varIndex, int graphIndex, int nodeIndex) {
+		List<GraphVariable> sortedGraphList = new GraphVariablesSorter().sort(variables);
 
         /* Index STATE variable */
         for (AbstractVariable absVariable : variables) {
@@ -54,10 +57,10 @@ public class RTLModelCreatorImpl extends AbstractModelCreator {
         }
 
         /* Index GRAPHS but outputs */
-        for (AbstractVariable absVariable : variables) {
+        for (AbstractVariable absVariable : sortedGraphList) {
             if (absVariable instanceof GraphVariable) {
                 GraphVariable graphVariable = (GraphVariable) absVariable;
-                if (graphVariable.isFSM() || graphVariable.isOutput()) continue;
+                if (graphVariable.isOutput()) continue;
                 graphVariable.forceSetIndex(varIndex++);
                 graphVariable.getGraph().setIndex(graphIndex++);
                 graphVariable.getGraph().getRootNode().indexate(nodeIndex);
@@ -66,7 +69,7 @@ public class RTLModelCreatorImpl extends AbstractModelCreator {
         }
 
         /* Index OUTPUT GRAPHS */
-        for (AbstractVariable absVariable : variables) {
+        for (AbstractVariable absVariable : sortedGraphList) {
             if (absVariable instanceof GraphVariable) {
                 GraphVariable graphVariable = (GraphVariable) absVariable;
                 if (graphVariable.isOutput()) {

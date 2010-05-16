@@ -29,9 +29,55 @@
     <option name="USER" value="" />
   </component>
   <component name="ChangeListManager" verified="true">
-    <list default="true" id="fe24fc54-7d70-4f9c-9e9a-b4d21f55ffe4" name="Default" comment="&#10;# Brief commit desciption here&#10;&#10;# Full commit description here (comment lines starting with '#' will not be included)&#10;&#10;">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" afterPath="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" />
+    <list default="true" readonly="true" id="fe24fc54-7d70-4f9c-9e9a-b4d21f55ffe4" name="Default" comment="&#10;# Brief commit desciption here&#10;&#10;# Full commit description here (comment lines starting with '#' will not be included)&#10;&#10;">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/TGMModelCreatorImpl.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/TGMModelCreatorImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/utils/PPGLibraryGraphVariableCreator.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/utils/PPGLibraryGraphVariableCreator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VertigoInterfaceParsers.ipr" afterPath="$PROJECT_DIR$/VertigoInterfaceParsers.ipr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/base/hldd/structure/nodes/NodeTest.java" afterPath="$PROJECT_DIR$/test/base/hldd/structure/nodes/NodeTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/visitors/ResetInspector.java" afterPath="$PROJECT_DIR$/src/base/hldd/visitors/ResetInspector.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/visitors/FsmGraphCreator.java" afterPath="$PROJECT_DIR$/src/base/hldd/visitors/FsmGraphCreator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/AbstractVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/AbstractVariable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/Beh2RtlTransformer.java" afterPath="$PROJECT_DIR$/src/parsers/Beh2RtlTransformer.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/base/hldd/structure/nodes/utils/ConditionTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/base/IndicesTest.java" afterPath="$PROJECT_DIR$/test/base/IndicesTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Condition.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/BehModel.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/BehModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/visitors/VHDLLinesMerger.java" afterPath="$PROJECT_DIR$/src/base/hldd/visitors/VHDLLinesMerger.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/RTLModelCreatorImpl.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/RTLModelCreatorImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/base/hldd/structure/nodes/utils/MaxRelativeIndexCounterTest.java" afterPath="$PROJECT_DIR$/test/base/hldd/structure/nodes/utils/MaxRelativeIndexCounterTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/ConstantVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/ConstantVariable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/Indices.java" afterPath="$PROJECT_DIR$/src/base/Indices.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/base/hldd/structure/nodes/TemporalNodeTest.java" afterPath="$PROJECT_DIR$/test/base/hldd/structure/nodes/TemporalNodeTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" afterPath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" afterPath="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/base/HLDDException.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/BehModelCreatorImpl.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/BehModelCreatorImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/utils/DefaultGraphVariableCreator.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/utils/DefaultGraphVariableCreator.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/parsers/hldd/NameAndPartedIndicesHolder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/Variable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/Variable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Utility.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Utility.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/visitors/ObsoleteResetRemoverImpl.java" afterPath="$PROJECT_DIR$/src/base/hldd/visitors/ObsoleteResetRemoverImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Successors.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Successors.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/designs/TestCases.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java" afterPath="$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VertigoInterfaceParsers.iml" afterPath="$PROJECT_DIR$/VertigoInterfaceParsers.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java" afterPath="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/nodes/Node.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/Node.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/hldd/Collector.java" afterPath="$PROJECT_DIR$/src/parsers/hldd/Collector.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/MaxRelativeIndexCounter.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/MaxRelativeIndexCounter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/visitors/TerminalNodeCollector.java" afterPath="$PROJECT_DIR$/src/base/hldd/visitors/TerminalNodeCollector.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/PartedVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/PartedVariable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/logging.properties" afterPath="$PROJECT_DIR$/src/logging.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/psl/ModelManager.java" afterPath="$PROJECT_DIR$/src/parsers/psl/ModelManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/GraphVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/GraphVariable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/nodes/CompositeNode.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/CompositeNode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java" afterPath="$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/base/hldd/structure/variables/ConstantVariableTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/AbstractModelCreator.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/AbstractModelCreator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureBuilder.java" afterPath="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureBuilder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SETUP/HLDDTools.jar" afterPath="$PROJECT_DIR$/SETUP/HLDDTools.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/nodes/TemporalNode.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/TemporalNode.java" />
     </list>
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -93,7 +139,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/parsers/psl/ModelManager.java" line="87" class="parsers.psl.ModelManager" package="parsers.psl">
+      <breakpoint url="file://$PROJECT_DIR$/src/parsers/psl/ModelManager.java" line="88" class="parsers.psl.ModelManager" package="parsers.psl">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -145,7 +191,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="417" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
+      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="451" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
         <option name="ENABLED" value="false" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -171,7 +217,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="460" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
+      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="495" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -210,7 +256,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="338" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
+      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="377" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
         <option name="ENABLED" value="false" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -223,7 +269,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="429" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
+      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="480" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -284,8 +330,8 @@
       <property name="field_breakpoints_groupByClasses" value="true" />
       <property name="method_breakpoints_groupByClasses" value="true" />
       <property name="exception_breakpoints_viewId" value="TABLE" />
-      <property name="field_breakpoints_viewId" value="TABLE" />
       <property name="exception_breakpoints_groupByClasses" value="true" />
+      <property name="field_breakpoints_viewId" value="TABLE" />
       <property name="method_breakpoints_groupByMethods" value="false" />
     </ui_properties>
   </component>
@@ -310,235 +356,28 @@
   <component name="FileColors" enabled="true" enabledForTabs="true" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ConvertingWorker.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="ApplicationForm.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="188" column="0" selection-start="8111" selection-end="8111" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConvertingWorker.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="113" column="0" selection-start="4503" selection-end="4503" vertical-scroll-proportion="0.0">
+            <state line="128" column="61" selection-start="5417" selection-end="5417" vertical-scroll-proportion="0.020023556">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VHDLStructureParser.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/VHDLStructureParser.java">
+      <file leaf-file-name="AssertionCheckReader.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ui/io/AssertionCheckReader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="202" column="31" selection-start="10532" selection-end="10532" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VHDLStructureBuilder.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/VHDLStructureBuilder.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="191" column="40" selection-start="7861" selection-end="7861" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VariableNameReplacerImplTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/base/vhdl/visitors/VariableNameReplacerImplTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="77" selection-start="491" selection-end="491" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AbstractPackageBuilder.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/AbstractPackageBuilder.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="22" selection-start="415" selection-end="415" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Successors.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Successors.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="0" selection-start="155" selection-end="155" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GraphGenerator.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="758" column="20" selection-start="39150" selection-end="39150" vertical-scroll-proportion="0.17042607">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Node.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/Node.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="340" column="17" selection-start="11905" selection-end="11905" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CompositeNode.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/CompositeNode.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="89" column="24" selection-start="4050" selection-end="4050" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Utility.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Utility.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="135" column="0" selection-start="4859" selection-end="4859" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BehDDGraphGenerator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehDDGraphGenerator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="12" selection-start="1059" selection-end="1059" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BehGraphGenerator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="18" selection-start="1103" selection-end="1103" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Beh2RtlTransformer.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/parsers/Beh2RtlTransformer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="215" column="59" selection-start="9901" selection-end="9901" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GraphVariable.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/variables/GraphVariable.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="18" selection-start="870" selection-end="870" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Signal.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Signal.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="13" selection-start="254" selection-end="254" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Entity.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Entity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="83" column="0" selection-start="2094" selection-end="2094" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Architecture.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Architecture.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="82" column="0" selection-start="2112" selection-end="2112" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FlagsTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/base/hldd/structure/FlagsTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="136" column="22" selection-start="3687" selection-end="3687" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Graph.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/Graph.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="44" selection-start="619" selection-end="619" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HLDDStructureParser.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="120" column="0" selection-start="6822" selection-end="6822" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VHDLLinesMerger.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/hldd/visitors/VHDLLinesMerger.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="0" selection-start="466" selection-end="466" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NodeTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/base/hldd/structure/nodes/NodeTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="72" column="8" selection-start="2944" selection-end="2944" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Package.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Package.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="0" selection-start="730" selection-end="730" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TransitionNode.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="55" column="0" selection-start="1529" selection-end="1529" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BehModelCreatorImpl.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/BehModelCreatorImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="122" column="67" selection-start="5070" selection-end="5070" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ModelManager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/parsers/psl/ModelManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="426" column="28" selection-start="18788" selection-end="18788" vertical-scroll-proportion="0.0">
+            <state line="251" column="8" selection-start="8981" selection-end="8981" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -554,8 +393,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
+        <option value="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/variables/GraphVariable.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/BehModel.java" />
+        <option value="$PROJECT_DIR$/src/parsers/Beh2RtlTransformer.java" />
+        <option value="$PROJECT_DIR$/src/base/Indices.java" />
+        <option value="$PROJECT_DIR$/test/base/IndicesTest.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/AbstractModelCreator.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/nodes/CompositeNode.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/nodes/Node.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Condition.java" />
         <option value="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Utility.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/variables/ConstantVariable.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/visitors/TerminalNodeCollector.java" />
         <option value="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" />
+        <option value="$PROJECT_DIR$/src/base/HLDDException.java" />
       </list>
     </option>
   </component>
@@ -576,7 +429,21 @@
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
-      <profile-state />
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id>Inspections</id>
+          </State>
+          <State>
+            <id>Naming conventions</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>BooleanMethodNameMustStartWithQuestion</id>
+          </State>
+        </selected-state>
+      </profile-state>
     </entry>
   </component>
   <component name="ProjectLevelVcsManager">
@@ -623,7 +490,7 @@
     <option name="lastEditedConfigurable" value="Project 'VertigoInterfaceParsers'" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+    <navigator proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -635,100 +502,75 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Favorites" />
       <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="VertigoInterfaceParsers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="VertigoInterfaceParsers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="VertigoInterfaceParsers9" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="VertigoInterfaceParsers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="VertigoInterfaceParsers9" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="VertigoInterfaceParsers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="VertigoInterfaceParsers9" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="base" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
+        <subPane />
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Favorites" />
       <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="112" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="project.structure.proportion" value="0.15" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="141" />
+    <property name="OverrideImplement.combined" value="true" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="RunManagerConfig.showSettingsBeforeRunnig" value="true" />
-    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
-    <property name="MemberChooser.sorted" value="false" />
     <property name="recentsLimit" value="5" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="134" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="last_opened_file_path" value="D:\Programming\C\Apricot\designs\branch\hc11\modified\MIN\tr" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="136" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="808" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="816" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="129" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="134" />
     <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="GoToAction.allIncluded" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
     <property name="RunManagerConfig.compileBeforeRunning" value="true" />
-    <property name="options.lastSelected" value="project.propVCSSupport.vcses" />
-    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="options.lastSelected" value="preferences.sourceCode.General" />
     <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="false" />
     <property name="GenerateAntBuildDialog.backupFiles" value="true" />
-    <property name="dynamic.classpath" value="false" />
     <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="base.hldd.structure.variables" />
+      <recent name="base.hldd.structure.models.utils" />
+      <recent name="base.hldd.structure.nodes.utils" />
+    </key>
     <key name="IntroduceConstantDialog.RECENTS_KEY">
       <recent name="" />
     </key>
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="base.hldd.structure.nodes.utils" />
       <recent name="base.vhdl.visitors" />
       <recent name="base.hldd.visitors" />
       <recent name="parsers.vhdl" />
       <recent name="ui.utils" />
-      <recent name="io.visual.utils.uiWithWorker" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="base" />
@@ -740,6 +582,158 @@
   </component>
   <component name="RegexUtilComponent" text="1900-01-01 2007/08/13 1900.01.01 1900 01 01 1900-01.01 1900 13 01 1900 02 31" flags="0" regex="(19|20)\d\d([- /.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])" mode="0" />
   <component name="RunManager" selected="Application.Application Frame">
+    <configuration default="false" name="ConditionTest" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="base.hldd.structure.nodes.utils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="VertigoInterfaceParsers" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="base.hldd.structure.nodes.utils" />
+      <option name="MAIN_CLASS_NAME" value="base.hldd.structure.nodes.utils.ConditionTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ConstantVariableTest.testSubRange" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="base.hldd.structure.variables.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="VertigoInterfaceParsers" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="base.hldd.structure.variables" />
+      <option name="MAIN_CLASS_NAME" value="base.hldd.structure.variables.ConstantVariableTest" />
+      <option name="METHOD_NAME" value="testSubRange" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3521" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ConstantVariableTest" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="base.hldd.structure.variables.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="VertigoInterfaceParsers" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="base.hldd.structure.variables" />
+      <option name="MAIN_CLASS_NAME" value="base.hldd.structure.variables.ConstantVariableTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="IndicesTest.absoluteFor" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="base.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="VertigoInterfaceParsers" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="base" />
+      <option name="MAIN_CLASS_NAME" value="base.IndicesTest" />
+      <option name="METHOD_NAME" value="absoluteFor" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="4335" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="TransitionNodeTest.correctIsTransitionOf" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="base.vhdl.structure.nodes.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="VertigoInterfaceParsers" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="base.vhdl.structure.nodes" />
+      <option name="MAIN_CLASS_NAME" value="base.vhdl.structure.nodes.TransitionNodeTest" />
+      <option name="METHOD_NAME" value="correctIsTransitionOf" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -749,6 +743,41 @@
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" />
+      <extension name="snapshooter" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -766,6 +795,7 @@
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
         <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -786,6 +816,7 @@
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
         <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
@@ -811,13 +842,14 @@
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
         <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
     <configuration default="false" name="Application Frame" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="emma" />
       <extension name="snapshooter" />
       <option name="MAIN_CLASS_NAME" value="ui.ApplicationForm" />
-      <option name="VM_PARAMETERS" value="-Xmx384m -Djava.util.logging.config.file=&quot;D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers8\src\logging.properties&quot;" />
+      <option name="VM_PARAMETERS" value="-Xmx384m -Djava.util.logging.config.file=&quot;D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\src\logging.properties&quot;" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -837,8 +869,13 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <list size="1">
-      <item index="0" class="java.lang.String" itemvalue="Application.Application Frame" />
+    <list size="6">
+      <item index="0" class="java.lang.String" itemvalue="JUnit.ConditionTest" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.ConstantVariableTest.testSubRange" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.ConstantVariableTest" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.IndicesTest.absoluteFor" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.TransitionNodeTest.correctIsTransitionOf" />
+      <item index="5" class="java.lang.String" itemvalue="Application.Application Frame" />
     </list>
   </component>
   <component name="ScopeChooserConfigurable.UI">
@@ -899,8 +936,12 @@
     <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
     <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
     <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="DETECT_NESTED_COPIES" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
     <configuration useDefault="true">C:\Documents and Settings\Randy\Application Data\Subversion</configuration>
     <myIsUseDefaultProxy>true</myIsUseDefaultProxy>
+    <supportedVersion>125</supportedVersion>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -934,23 +975,23 @@
     <frame x="-4" y="-4" width="1288" height="1032" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30786517" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921347" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.083333336" sideWeight="0.73024833" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32903865" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24978317" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24935733" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39821574" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3341424" sideWeight="0.7314607" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921347" sideWeight="0.0" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26067415" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921347" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32903865" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24935733" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39821574" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33333334" sideWeight="0.69213486" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26067415" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22815534" sideWeight="0.73024833" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
-      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Regex Tester" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Repositories" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3295711" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Maven projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32957503" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -960,13 +1001,13 @@
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30022573" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Slice" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30786517" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
+      <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Duplicates" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3992095" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -1085,114 +1126,104 @@
     <option name="myLastEditedConfigurable" value="Project Default" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Entity.java">
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Successors.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="83" column="0" selection-start="2094" selection-end="2094" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="128" column="23" selection-start="4067" selection-end="4067" vertical-scroll-proportion="0.020432692" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Architecture.java">
+    <entry file="file://$PROJECT_DIR$/src/parsers/hldd/HLDDStructureBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="82" column="0" selection-start="2112" selection-end="2112" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="19" column="13" selection-start="488" selection-end="488" vertical-scroll-proportion="-3.4939904" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/base/hldd/structure/FlagsTest.java">
+    <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="136" column="22" selection-start="3687" selection-end="3687" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/Graph.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="44" selection-start="619" selection-end="619" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="188" column="0" selection-start="8111" selection-end="8111" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="120" column="0" selection-start="6822" selection-end="6822" vertical-scroll-proportion="0.0">
+        <state line="136" column="94" selection-start="7500" selection-end="7500" vertical-scroll-proportion="-0.052884616">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/visitors/VHDLLinesMerger.java">
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/nodes/IfNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="0" selection-start="466" selection-end="466" vertical-scroll-proportion="0.0">
+        <state line="57" column="0" selection-start="2014" selection-end="2014" vertical-scroll-proportion="1.1237981">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/base/hldd/structure/nodes/NodeTest.java">
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/nodes/WhenNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="72" column="8" selection-start="2944" selection-end="2944" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Package.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="0" selection-start="730" selection-end="730" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/BehModelCreatorImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="122" column="67" selection-start="5070" selection-end="5070" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="51" column="0" selection-start="1547" selection-end="1547" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/parsers/psl/ModelManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="426" column="28" selection-start="18788" selection-end="18788" vertical-scroll-proportion="0.0">
+        <state line="191" column="40" selection-start="9112" selection-end="9112" vertical-scroll-proportion="-4.141827">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Utility.java">
+    <entry file="file://$PROJECT_DIR$/test/base/hldd/structure/nodes/utils/MaxRelativeIndexCounterTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="135" column="0" selection-start="4859" selection-end="4859" vertical-scroll-proportion="0.0">
+        <state line="15" column="13" selection-start="369" selection-end="369" vertical-scroll-proportion="-0.08618654">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/Indices.java">
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="504" column="0" selection-start="27956" selection-end="27956" vertical-scroll-proportion="0.5108173">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/AbstractPackageBuilder.java">
+    <entry file="file://$PROJECT_DIR$/src/base/HLDDException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="22" selection-start="415" selection-end="415" vertical-scroll-proportion="0.0">
+        <state line="12" column="4" selection-start="211" selection-end="211" vertical-scroll-proportion="0.24085006">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/Type.java">
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/nodes/CaseNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="22" selection-start="319" selection-end="319" vertical-scroll-proportion="0.2982456">
+        <state line="39" column="0" selection-start="973" selection-end="973" vertical-scroll-proportion="0.3900463">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java">
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/FSMNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="0" selection-start="1529" selection-end="1529" vertical-scroll-proportion="0.0">
+        <state line="11" column="0" selection-start="197" selection-end="197" vertical-scroll-proportion="0.019675925">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/fsm/Transitions.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="758" column="20" selection-start="39150" selection-end="39150" vertical-scroll-proportion="0.17042607">
+        <state line="62" column="0" selection-start="2205" selection-end="2205" vertical-scroll-proportion="0.8229167">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ui/io/AssertionCheckReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="251" column="8" selection-start="8981" selection-end="8981" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehDDGraphGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="69" column="38" selection-start="2896" selection-end="2896" vertical-scroll-proportion="0.019675925">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="128" column="61" selection-start="5417" selection-end="5417" vertical-scroll-proportion="0.020023556">
           <folding />
         </state>
       </provider>
@@ -1203,8 +1234,16 @@
       <state key="ArtifactsStructureConfigurable.UI">
         <UIState>
           <splitter-proportions>
-            <SplitterProportionsDataImpl />
+            <SplitterProportionsDataImpl>
+              <option name="proportions">
+                <list>
+                  <option value="0.2" />
+                  <option value="0.5" />
+                </list>
+              </option>
+            </SplitterProportionsDataImpl>
           </splitter-proportions>
+          <last-edited>HLDDTools</last-edited>
           <settings />
         </UIState>
       </state>

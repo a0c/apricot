@@ -1,5 +1,8 @@
 package base.hldd.structure.nodes;
 
+import base.HLDDException;
+import base.hldd.structure.nodes.utils.Successors;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.PartedVariable;
 import base.hldd.structure.nodes.utils.Utility;
@@ -23,7 +26,7 @@ public class Node implements Visitable, Cloneable {
     /**
      * Successors of CONTROL node. For TERMINAL node successors == null.
      */
-    protected Node[] successors;
+	private Successors successors;
 
     /**
      * Parted indices of {@link #dependentVariable}. <p> todo: consider using a ready {@link PartedVariable} as {@link #dependentVariable} and removing this field (partedIndices) at all  
@@ -46,7 +49,7 @@ public class Node implements Visitable, Cloneable {
      */
     private int relativeIndex = -1; // '-1' is used during indexation of the Graph (if a node has already been indexed, then it won't be indexed again (and the index won't be incremented))
 
-    /**
+	/**
      * Constructor for OVERRIDING in inherited classes (FSMNode)
      */
     protected Node() {}
@@ -57,7 +60,7 @@ public class Node implements Visitable, Cloneable {
      */
     protected Node(Builder builder) {
         dependentVariable = builder.dependentVariable;
-        successors = builder.successors;
+		successors = builder.successors;
         partedIndices = builder.partedIndices;
         vhdlLines = builder.vhdlLines;
     }
@@ -86,18 +89,13 @@ public class Node implements Visitable, Cloneable {
     }
 
     private String indicesToString(Indices indices, boolean mergeIndices) {
-        if (indices == null) {
-            if (dependentVariable instanceof PartedVariable) {
-                return ((PartedVariable) dependentVariable).getPartedIndices().toStringAngular(mergeIndices);
-            } else
-                return "";
-        } else {
-            return indices.toStringAngular(mergeIndices);
-        }
+		return indices == null ? "" : indices.toStringAngular(mergeIndices);
     }
 
     /**
-     * TemporalNode adds a Range window to the name, e.g. "p1@[1..END-4]" 
+     * TemporalNode adds a Range window to the name, e.g. "p1@[1..END-4]".<br>
+	 * PartedVariable adds indices "(8 DOWNTO 3)", but via its
+	 * {@link base.hldd.structure.variables.PartedVariable#getName()} method.
      * @return name of the variable (must be overriden for different formatting)
      */
     protected String depVarName() {
@@ -107,60 +105,8 @@ public class Node implements Visitable, Cloneable {
     protected String transitionsToString() {
 
         if (isTerminalNode()) return "(\t0\t0)";
-        // if there are only 2 successors - separate with TABS; if more than 2 - separate with SPACES:
-        String delim = successors.length == 2 ? "\t" : " ";
-        StringBuffer strBuf;
-        if (false) {
-            strBuf = new StringBuffer("(");
-            for (int index = 0; index < successors.length; index++) {
-                Node successor = successors[index];
-                if (successor != null) {
-                    strBuf.append(index).append("=>").append(successor.getRelativeIndex()).append(delim);
-                }
-            }
-        } else {
-            /* Transitions merging */
-            int curStart = -1, curEnd = -1, curRelIdx = -1;
-            strBuf = new StringBuffer("(");
-            for (int index = 0; index < successors.length; index++) {
-                Node successor = successors[index];
 
-                if (successor != null) {
-                    if (curRelIdx == -1) {
-                        curStart = curEnd = index;
-                        curRelIdx = successor.getRelativeIndex();
-                        continue;
-                    }
-                    if (successor.getRelativeIndex() == curRelIdx) {
-                        /* Cotinue collecting identical nodes into one transition */
-                        curEnd = index;
-                    } else {
-                        /* Print previously collected identical transitions */
-                        strBuf.append(curStart);
-                        if (curStart != curEnd) strBuf.append("-").append(curEnd);
-                        strBuf.append("=>").append(curRelIdx).append(delim);
-                        /* Start collecting a new set of identical transitions */
-                        curStart = curEnd = index;
-                        curRelIdx = successor.getRelativeIndex();
-                    }
-                } else {
-                    /* Print previously collected identical transitions */
-                    if (curRelIdx != -1) {
-                        strBuf.append(curStart);
-                        if (curStart != curEnd) strBuf.append("-").append(curEnd);
-                        strBuf.append("=>").append(curRelIdx).append(delim);
-                    }
-                    curStart = curEnd = curRelIdx = -1;
-                }
-            }
-            /* Print previously collected identical transitions */
-            if (curRelIdx != -1) {
-                strBuf.append(curStart);
-                if (curStart != curEnd) strBuf.append("-").append(curEnd);
-                strBuf.append("=>").append(curRelIdx).append(delim);
-            }
-        }
-        return strBuf.append(")").toString();
+		return successors.toString();
     }
 
     protected String nodeTypeToString() {
@@ -181,13 +127,7 @@ public class Node implements Visitable, Cloneable {
         if (!dependentVariable.isIdenticalTo(comparedNode.getDependentVariable())) return false;
         /* Compare SUCCESSORS */
         if (isControlNode()) {
-            /* Compare NUMBER OF SUCCESSORS */
-            Node[] comparedSuccessors = comparedNode.getSuccessors();
-            if (successors.length != comparedSuccessors.length) return false;
-            /* Compare SUCCESSORS */
-            for (int index = 0; index < successors.length; index++) {
-                if (!successors[index].isIdenticalTo(comparedSuccessors[index])) return false;
-            }
+			if (!successors.isIdenticalTo(comparedNode.successors)) return false;
         }
 
         /* Compare PARTED INDICES */
@@ -205,39 +145,19 @@ public class Node implements Visitable, Cloneable {
         if (isTerminalNode()) {
             return new Builder(dependentVariable).partedIndices(partedIndices).vhdlLines(vhdlLines).build();
         } else {
-            Node clonedNode = new Builder(dependentVariable).partedIndices(partedIndices).successorsCount(successors.length).vhdlLines(vhdlLines).build();
-            for (int i = 0; i < successors.length; i++) {
-                try {
-                    clonedNode.setSuccessor(i, clone(successors[i]));
-                } catch (Exception e) {
-                    throw new RuntimeException("Unexpected bug while cloning the following node:\n" +
-                            toString() + "\nCannot set successor.");
-                }
-            }
+            Node clonedNode = new Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(successors.getConditionValuesCount()).vhdlLines(vhdlLines).build();
+			clonedNode.successors.cloneFrom(successors);
             return clonedNode;
         }
     }
 
-    /**
-     *
-     * @param controlCondition condition that points to the added successor
-     * @param successor successor node to be added
-     * @throws  Exception if the successor is being added to a TERMINAL node
-     *          or successor INDEX exceeds the number of successors in this ControlNode
-     */
-    public void setSuccessor(int controlCondition, Node successor) throws Exception {
-        if (isControlNode()) {
-            if (controlCondition > successors.length - 1) {
-                throw new Exception("While adding a successor to ControlNode, control CONDITION exceeded the number of successors in ControlNode:" +
-                        "\nControl condition: " + controlCondition +
-                        "\nNumber of successors: " + successors.length);
-            }
-            successors[controlCondition] = successor;
-
-        } else throw new Exception("A SUCCESSOR is being added to a TERMINAL node:" +
-                "\nSuccessor: " + successor.toString() +
-                "\nTerminal: " + this.toString());
-    }
+	public void setSuccessor(Condition condition, Node successor) throws HLDDException {
+		if (isControlNode()) {
+			successors.setSuccessor(condition, successor);
+		} else throw new HLDDException("A SUCCESSOR is being added to a TERMINAL node:" +
+				"\nSuccessor: " + successor.toString() +
+				"\nTerminal: " + this.toString());
+	}
 
     /* Getters START */
 
@@ -261,8 +181,28 @@ public class Node implements Visitable, Cloneable {
         return dependentVariable;
     }
 
-    public Node[] getSuccessors() {
-        return successors;
+	public Node getSuccessorInternal(Condition condition) throws HLDDException {
+		return successors.getSuccessorInternal(condition);
+	}
+
+	public int getConditionValuesCount() {
+		return successors.getConditionValuesCount();
+	}
+
+	public int getConditionsCount() {
+		return successors.getConditionsCount();
+	}
+
+	public Condition getCondition(int idx) throws HLDDException {
+		return successors.getCondition(idx);
+	}
+
+	public Node getSuccessor(Condition condition) {
+		return successors.getSuccessor(condition);
+	}
+
+	public Collection<Node> getSuccessors() {
+        return successors.asCollection();
     }
 
     public Indices getPartedIndices() {
@@ -309,19 +249,43 @@ public class Node implements Visitable, Cloneable {
      *
      * @return  <code>true</code> if NONE of the node's successors IS filled.
      *          Otherwise <code>false</code> is returned.
-     * @throws Exception if a TERMINAL node is being checked for emptiness
+     * @throws HLDDException if a TERMINAL node is being checked for emptiness
      */
-    public boolean isEmptyControlNode() throws Exception {
+    public boolean isEmptyControlNode() throws HLDDException {
         if (isTerminalNode()) {
-            throw new Exception("TERMINAL node is being checked for emptiness: " + toString());
+            throw new HLDDException("TERMINAL node is being checked for emptiness: " + toString());
         }
-        for (Node successor : successors) {
-            if (successor != null) return false;
-        }
-        return true;
+		return successors.isEmpty();
     }
 
-    public void indexate(int startingIndex) {
+	public Condition getOthers() throws HLDDException {
+		return successors.getOthers();
+	}
+
+	public void compact() throws HLDDException {
+		if (isTerminalNode()) {
+			return;
+		}
+		successors.compact();
+	}
+
+	/**
+	 * Splits complex conditions like {0-2,8,19} into separate 'decompacted' conditions {0},{1},{2},{8},{19}.
+	 * @param condition whose holder (complex condition) is to be decompacted
+	 * @throws HLDDException if array-condition is specified as a parameter, or if called on a terminal node,
+	 * 		or if this node doesn't contain the specified condition
+	 */
+	public void decompact(Condition condition) throws HLDDException {
+		if (condition.isArray()) {
+			throw new HLDDException("Node: decompact(): scalar-condition expected, found: " + condition);
+		}
+		if (isTerminalNode()) {
+			throw new HLDDException("Node: decompact(): trying to decompact a terminal node");
+		}
+		successors.decompact(condition);
+	}
+
+	public void indexate(int startingIndex) {
         Utility.indexate(this, startingIndex);
     }
 
@@ -335,10 +299,18 @@ public class Node implements Visitable, Cloneable {
 
     /**
      * @param fillingNode node to fill missing successors with
-     * @throws Exception {@link base.hldd.structure.nodes.utils.Utility#fillEmptySuccessorsWith(Node, Node)}.
      */
-    public void fillEmptySuccessorsWith(Node fillingNode) throws Exception {
-        Utility.fillEmptySuccessorsWith(this, fillingNode);
+    public void fillEmptySuccessorsWith(Node fillingNode) {
+		/* Check the node to be a CONTROL node*/
+		if (isTerminalNode()) return;
+		/* Don't fill emptyNodes */
+		try {
+			if (isEmptyControlNode()) return;
+		} catch (HLDDException e) {
+			throw new RuntimeException(e); // Should not occur
+		}
+
+		successors.fillEmptyWith(fillingNode, getVhdlLines());
     }
 
     /**
@@ -366,7 +338,7 @@ public class Node implements Visitable, Cloneable {
         if (stringArray[relativeIndex] == null) {
             stringArray[relativeIndex] = toString();
             if (isControlNode()) {
-                for (Node successorNode : successors) {
+                for (Node successorNode : getSuccessors()) {
                     successorNode.toStringArray(stringArray);
                 }
             }
@@ -381,7 +353,7 @@ public class Node implements Visitable, Cloneable {
         if (nodeArray[relativeIndex] == null) {
             nodeArray[relativeIndex] = this;
             if (isControlNode()) {
-                for (Node successorNode : successors) {
+                for (Node successorNode : getSuccessors()) {
                     successorNode.toArray(nodeArray);
                 }
             }
@@ -393,15 +365,19 @@ public class Node implements Visitable, Cloneable {
         visitor.visitNode(this);
     }
 
-    public static class Builder {
+	public boolean hasIdenticalConditionsWith(Node second) {
+		return successors.hasIdenticalConditionsWith(second.successors);
+	}
+
+	public static class Builder {
         // Required parameters
         private final AbstractVariable dependentVariable;
         // Optional parameters -- initialized to default values
-        private Node[] successors = null;
+        private Successors successors = null;
         private Indices partedIndices = null;
         private Set<Integer> vhdlLines = new TreeSet<Integer>();
 
-        public Builder(AbstractVariable dependentVariable) {
+		public Builder(AbstractVariable dependentVariable) {
             this.dependentVariable = dependentVariable;
         }
 
@@ -409,11 +385,10 @@ public class Node implements Visitable, Cloneable {
             return new Node(this);
         }
 
-        public Builder successorsCount(int successorsCount) {
-            if (successorsCount != 0)
-                successors = new Node[successorsCount];
-            return this;
-        }
+        public Builder createSuccessors(int conditionValuesCount) {
+			successors = new Successors(conditionValuesCount);
+			return this;
+		}
 
         public Builder partedIndices(Indices partedIndices) {
             this.partedIndices = partedIndices;

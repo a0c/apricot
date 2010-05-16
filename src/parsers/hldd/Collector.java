@@ -1,11 +1,13 @@
 package parsers.hldd;
 
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.GraphVariable;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.FunctionVariable;
 import base.Indices;
 
 import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -63,7 +65,7 @@ public class Collector {
         currentNodes = new NodeData[graphLength];
     }
 
-    void addNodeData(int relativeNodeIndex, int depVarIndex, Indices depVarPartedIndices, int[] successors, String[] windowPlaceholders) {
+    void addNodeData(int relativeNodeIndex, int depVarIndex, Indices depVarPartedIndices, TreeMap<Condition,Integer> successors, String[] windowPlaceholders) {
         currentGraphLength--;
         currentNodes[relativeNodeIndex] = new NodeData(depVarIndex, depVarPartedIndices, successors, windowPlaceholders);
         if (currentGraphLength == 0) {
@@ -133,10 +135,10 @@ public class Collector {
     public class NodeData {
         public final int depVarIndex;
         public Indices depVarPartedIndices;
-        public final int[] successors;
+        public final TreeMap<Condition, Integer> successors;
         public final String[] windowPlaceholders;
 
-        public NodeData(int depVarIndex, Indices depVarPartedIndices, int[] successors, String[] windowPlaceholders) {
+        public NodeData(int depVarIndex, Indices depVarPartedIndices, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
             this.depVarIndex = depVarIndex;
             this.depVarPartedIndices = depVarPartedIndices;
             this.successors = successors;

@@ -1,5 +1,7 @@
 package base.vhdl.visitors;
 
+import base.HLDDException;
+import base.hldd.structure.nodes.utils.Condition;
 import base.vhdl.structure.nodes.*;
 import base.vhdl.structure.Process;
 import base.vhdl.structure.*;
@@ -17,7 +19,6 @@ import base.VHDL2HLDDMapping;
 
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import parsers.vhdl.VHDLStructureParser;
 
@@ -159,7 +160,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
      *
      * @param ifNode        IfNode being visited
      * @throws Exception    {@link base.hldd.structure.nodes.Node#isEmptyControlNode() cause1 }
-     *                      {@link base.hldd.structure.models.utils.ModelManager#getConditionsCount(AbstractVariable)  cause 2 }
+     *                      {@link base.hldd.structure.models.utils.ModelManager#getConditionValuesCount(AbstractVariable)  cause 2 }
      */
     public void visitIfNode(IfNode ifNode) throws Exception {
 
@@ -172,13 +173,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
         AbstractVariable dependentVariable = depVariableHolder.getVariable();
         Indices partedIndices = depVariableHolder.getPartedIndices();
         int conditionValueInt = depVariableHolder.getTrueValue(); /*modelCollector.getConditionValue(dependentVariable, expression);*/
-        /* Count possible conditions of dependentVariable */
-        int conditionsCount = 2 /*modelCollector.getConditionsCount(dependentVariable)*/;
 
         /* Create ControlNode */
         Node controlNode = dependentVariable instanceof CompositeFunctionVariable
                 ? new CompositeNode((CompositeFunctionVariable) dependentVariable)
-                : new Node.Builder(dependentVariable).partedIndices(partedIndices).successorsCount(conditionsCount).build();
+                : new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(2).build();
         /* Add VHDL lines the node's been created from */
         controlNode.setVhdlLines(vhdl2hlddMapping.getLinesForNode(ifNode));
 
@@ -187,7 +186,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
         * #################################################*/
         /* Extract condition of dependentVariable: already DONE above using depVariableHolder */
         /* Create new Current Context and push it to Context Stack */
-        contextManager.addContext(new Context(controlNode, new int[]{conditionValueInt} ));
+        contextManager.addContext(new Context(controlNode, Condition.createCondition(conditionValueInt)));
         /* Process TRUE PART */
         doCheckTruePart(ifNode);
         ifNode.getTruePart().traverse(this);
@@ -202,7 +201,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
             /* Get false condition of dependentVariable */
             conditionValueInt = ModelManager.invertBit(conditionValueInt);
             /* Create new Current Context and push it to Context Stack */
-            contextManager.addContext(new Context(controlNode, new int[]{conditionValueInt} ));
+            contextManager.addContext(new Context(controlNode, Condition.createCondition(conditionValueInt) ));
             /* Process FALSE PART */
             ifNode.getFalsePart().traverse(this);
             /* Remove Current Context from stack */
@@ -212,12 +211,29 @@ public abstract class GraphGenerator extends AbstractVisitor {
         /*#################################################
         *       F I N A L I Z E    C O N T R O L  N O D E
         * #################################################*/
+		finalizeControlNode(controlNode);
         contextManager.fillCurrentContextWith(controlNode);
 
 
     }
 
-    @Deprecated
+	/**
+	 * Adds all missing conditions so that all the control values become present in the node.
+	 * Missing successors can be safely filled after this method has been invoked.
+	 * @param controlNode node to finalize
+	 * @throws HLDDException if 'others' could not be obtained
+	 */
+	private void finalizeControlNode(Node controlNode) throws HLDDException {
+		if (controlNode.isTerminalNode() || controlNode.isEmptyControlNode()) return;
+
+		Condition others = controlNode.getOthers();
+		if (others == null) return;
+
+		controlNode.setSuccessor(others, null);
+
+	}
+
+	@Deprecated
     /* Beh DD tree can have multiple nodes (partial setting variables).
     Though, it still cannot set multiple variable in one process tree. */
     protected abstract void doCheckTruePart(IfNode ifNode) throws Exception;
@@ -245,14 +261,32 @@ public abstract class GraphGenerator extends AbstractVisitor {
             Indices partedIndices = dependentVariable instanceof FunctionVariable && ((FunctionVariable) dependentVariable).getOperator() == Operator.INV
                     ? null : transitionNode.getValueOperandPartedIndices();
             if (graphVariable instanceof PartedVariable && !transitionNode.isNull()) {
-                /* Subtract indices (get Absolute indices out of relative) */
-                partedIndices = ((PartedVariable) graphVariable).getPartedIndices().absoluteFor(
-                                transitionNode.getTargetOperand().getPartedIndices(),
-                                partedIndices);
-//                partedIndices = Indices.extractAbsIndicesFor(partedIndices,
-//                        ((PartedVariable) graphVariable).getPartedIndices(),
-//                        transitionNode.getTargetOperand().getPartedIndices());
-            }
+				Indices graphPartedIndices = ((PartedVariable) graphVariable).getPartedIndices();
+				/* Adjust partedIndices, if only a part of the valueOperand (including its partedIndices) is used:
+				* in2(8) := '0';
+				* in2 := "000000001";			// graphVariable is parted, e.g. in(3)
+				* in2 := d_in;					// graphVariable is parted, e.g. in(3)
+				* in2 := d_in3(9 downto 2) ;	// graphVariable is parted, e.g. in(3)
+				* in2(3) := d_in3(5) ;
+				* in2(3 downto 0) := d_in3(5 downto 2) ;
+				* */
+				if (isDirectPartialAssignment(graphPartedIndices, transitionNode.getTargetOperand().getPartedIndices())) {
+					// in2(8) := '0';
+					// in2(3 downto 0) := d_in3(5 downto 2) ;  // graphVariable is "in2(3 downto 0)"
+					// Actually, absoluteFor() below covers this also, however constant's extractSubConstant() does not.
+				} else {
+					if (dependentVariable instanceof ConstantVariable) {
+						/* v_out <= "0000"; // and looking for 'v_out(1)' */
+						dependentVariable = modelCollector.extractSubConstant((ConstantVariable) dependentVariable, graphPartedIndices);
+						partedIndices = null;
+					} else {
+						/* Subtract indices (get Absolute indices out of relative) */
+						partedIndices = graphPartedIndices.absoluteFor(
+										transitionNode.getTargetOperand().getPartedIndices(),
+										partedIndices);
+					}
+				}
+			}
             /* Create TerminalNode */
             Node terminalNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).build();
             /* Add VHDL lines the node's been created from */
@@ -262,6 +296,10 @@ public abstract class GraphGenerator extends AbstractVisitor {
             contextManager.fillCurrentContextWith(terminalNode);
         }
     }
+
+	private boolean isDirectPartialAssignment(Indices partedGraph, Indices target) {
+		return partedGraph.equals(target);
+	}
 
     private boolean isGraphVariableSetIn(TransitionNode transitionNode) throws Exception {
         if (graphVariable == null) {
@@ -301,17 +339,17 @@ public abstract class GraphGenerator extends AbstractVisitor {
         Indices partedIndices = variableOperand.getPartedIndices();
         /* Count possible conditions of dependentVariable */
         //todo: suspicious action: dependentVariable.isState() ? caseNode.getConditions().size(). May be "when => others", may be "when A | B | C =>" ... consider these...
-//        int conditionsCount = dependentVariable.isState() ? caseNode.getConditions().size() : modelCollector.getConditionsCount(dependentVariable);
-        int conditionsCount = modelCollector.getConditionsCount(dependentVariable);
+//        int conditionValuesCount = dependentVariable.isState() ? caseNode.getConditions().size() : modelCollector.getConditionValuesCount(dependentVariable);
+        int conditionValuesCount = modelCollector.getConditionValuesCount(dependentVariable);
         /* Create Control Node */
-        Node controlNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).successorsCount(conditionsCount).build();
+        Node controlNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(conditionValuesCount).build();
         /* Add VHDL lines the node's been created from */
         controlNode.setVhdlLines(vhdl2hlddMapping.getLinesForNode(caseNode));
 
         /*#################################################
         *       P R O C E S S     C O N D I T I O N S
         * #################################################*/
-        /* Create new Current Context (without awaitedConditions) and add it to Context Stack */
+        /* Create new Current Context (without awaitedCondition) and add it to Context Stack */
         contextManager.addContext(new Context(controlNode));
         for (WhenNode whenNode : caseNode.getConditions()) {
             /* Traverse When Condition */
@@ -324,6 +362,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
         /*#################################################
         *       F I N A L I Z E    C O N T R O L  N O D E
         * #################################################*/
+		finalizeControlNode(controlNode);
         contextManager.fillCurrentContextWith(controlNode);
 
     }
@@ -337,12 +376,9 @@ public abstract class GraphGenerator extends AbstractVisitor {
         if (!whenNode.isOthers()) {
             /* Extract whenConditions */
             int[] conditionValuesInt = modelCollector.getConditionValues(whenNode.getConditionOperands() /*conditionString*/);
-
-            /* Register processed condition values in the caseContext */
-            contextManager.registerProcessedConditions(conditionValuesInt);
-            /* Get controlNode from Current Context.
+			/* Get controlNode from Current Context.
              * Create new Context and add it to Context Stack */
-            contextManager.addContext(new Context(contextManager.getCurrentContext().getControlNode(), conditionValuesInt));
+            contextManager.addContext(new Context(contextManager.getCurrentContext().getControlNode(), Condition.createCondition(conditionValuesInt)));
 
             /*#################################################
             *       P R O C E S S     T R A N S I T I O N S
@@ -352,14 +388,12 @@ public abstract class GraphGenerator extends AbstractVisitor {
             contextManager.removeContext();
         } else {
             /* For OTHERS, substitute OTHERS in whenNode with ALL UNPROCESSED conditions and process the node */
-            boolean[] processedConditions = contextManager.getCurrentContext().getProcessedConditions();
-            for (int i = 0; i < processedConditions.length; i++) {
-                if (!processedConditions[i]) {
-                    /* Temporarily replace the condition with a numeric value */
-                    whenNode.setConditions(String.valueOf(i));
-                    visitWhenNode(whenNode);
-                }
-            }
+			String[] conditionsAsString = contextManager.getCurrentContext().getOthersConditions();
+			if (conditionsAsString == null) {
+				return;
+			}
+			whenNode.setConditions(conditionsAsString);
+			visitWhenNode(whenNode);
             /* Restore condition */
             whenNode.setConditions("OTHERS");
         }
@@ -446,6 +480,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
                 /* Create new variable */ //todo: may be substitute with couldProcessNextGraphVariable(). Check ModelCollector.replace() to act equally to modelCollector.addVariable() met below:
 				setGraphVariable(new PartedVariable(partSetOperand.getName(), wholeVariable.getType(), partSetOperand.getPartedIndices()));
 				graphVariableRootNode = null;
+				contextManager.clear();
                 process.getRootNode().traverse(this);
                 if (graphVariableRootNode != null) {
                     GraphVariable newGraphVariable = new GraphVariable(graphVariable, graphVariableRootNode);
@@ -471,7 +506,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
         /* Add all inputs to the expression */
         for (GraphVariable partialGraphVariable : partialSetVarsList) {
             PartedVariable baseVariable = ((PartedVariable) partialGraphVariable.getBaseVariable());
-            catExpession.addOperand(new OperandImpl(baseVariable.getName(), baseVariable.getPartedIndices(), false));
+            catExpession.addOperand(new OperandImpl(baseVariable.getPureName(), baseVariable.getPartedIndices(), false));
         }
         /* Add the Expression to ModelCollector */
         return modelCollector.convertOperandToVariable(catExpession, null, true);
@@ -558,12 +593,16 @@ public abstract class GraphGenerator extends AbstractVisitor {
         public void removeContext() throws Exception {
             /* Remove Default Value, if its Context is getting removed */
             removeDefaultValue();
+			/* Keep track of condition, even if it's empty (!wasFilled()), to preserve the original VHDL structure.
+			* For branches like 'WHEN PREFIX_Y | PREFIX_D | PREFIX_D_Y =>'), that don't have a transition in them,
+			* missing successor will be further filled once for the whole Condition,
+			* not for every separate value. Keep track by initializing to null (Condition will be stored). */
+			Context currentContext = getCurrentContext();
+			if (currentContext != null && !currentContext.isCaseContext() && !currentContext.wasFilled()) {
+				currentContext.fill(null);
+			}
             /* Remove Current Context */
             contextStack.pop();
-        }
-
-        public void registerProcessedConditions(int... processedCondition) {
-            contextStack.peek().registerProcessedConditions(processedCondition);
         }
 
         public Context getCurrentContext() {
@@ -610,7 +649,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
             /* For terminal node, replace the previous Default Value completely. */
             /* For control node, fill empty successors with previous Default Value
              * and only then replace the Default Value with the new one. */
-            if (fillingNode.isControlNode()) {
+            if (fillingNode.isControlNode()) { // todo: obsolete check
                 fillEmptySuccessorsFor(fillingNode);
             }
             /* Replace the Default Value */
@@ -633,7 +672,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
                 /* When leaving the context and discarding Default Value, before leaving fill missing
                 * successors of Current Context Awaited Nodes with the Default Value being removed.*/
                 if (!contextStack.isEmpty()) {
-                    fillEmptySuccessorsFor(getCurrentContext().getAwaitedNodes());
+                    fillEmptySuccessorsFor(getCurrentContext().getAwaitedNode());
                 }
                 /* Remove Default Value */
                 defaultValueStack.pop();
@@ -646,18 +685,16 @@ public abstract class GraphGenerator extends AbstractVisitor {
          * 2) when initializing the root node (namely, when filling an <u>empty</u> Current Context stack with a node).<br>
          * TODO: number of usages can be reduced to 1, when used only upon leaving context.
          * TODO: For this, create a special empty context for graphVarRootNode when entering !process! 
-         * @param nodesToFill where to fill empty successors
+         * @param nodeToFill where to fill empty successors
          * @throws Exception {@link base.hldd.structure.nodes.Node#isEmptyControlNode()},
          *                   {@link Node#fillEmptySuccessorsWith(base.hldd.structure.nodes.Node)}
          */
-        private void fillEmptySuccessorsFor(Node... nodesToFill) throws Exception {
-            for (Node nodeToFill : nodesToFill) {
+        private void fillEmptySuccessorsFor(Node nodeToFill) throws Exception {
                 /* For non-empty ControlNodes fill the missing successors with the latest defaultValue */
                 if (nodeToFill != null &&
                         nodeToFill.isControlNode() && !nodeToFill.isEmptyControlNode()) { // todo: consider removing 2nd and 3rd condition from here, if previous checks filter "bad" nodes out 
                     nodeToFill.fillEmptySuccessorsWith(getDefaultValueNode());
                 }
-            }
         }
 
         private GraphGenerator.Context getDefaultValueContext() {
@@ -692,12 +729,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
     protected class Context {
         private final Node controlNode;
-        private final int[] awaitedConditions;
-        private boolean[] processedConditions;
+        private final Condition awaitedCondition;
 
-        public Context(Node controlNode, int[] awaitedConditions) {
+		public Context(Node controlNode, Condition awaitedCondition) {
             this.controlNode = controlNode;
-            this.awaitedConditions = awaitedConditions;
+            this.awaitedCondition = awaitedCondition;
         }
 
         /**
@@ -706,91 +742,44 @@ public abstract class GraphGenerator extends AbstractVisitor {
          */
         public Context(Node controlNode) {
             this.controlNode = controlNode;
-            awaitedConditions = null;
+            awaitedCondition = null;
         }
 
         public Node getControlNode() {
             return controlNode;
         }
 
-        public boolean[] getProcessedConditions() {
-            return processedConditions;
-        }
-
         /**
-         * @return nodes that are being filled
+         * @return node that is being filled
          */
-        public Node[] getAwaitedNodes() {
-            Node[] nodes = new Node[awaitedConditions.length];
-            for (int i = 0; i < awaitedConditions.length; i++) {
-                nodes[i] = controlNode.getSuccessors()[awaitedConditions[i]];
-            }
-            return nodes;
-        }
+        public Node getAwaitedNode() {
+			return controlNode.getSuccessor(awaitedCondition);
+		}
 
         /**
          *
          * @param fillingNode node to fill the current context with
-         * @throws Exception cause {@link base.hldd.structure.nodes.Node#setSuccessor(int, base.hldd.structure.nodes.Node) cause }
+         * @throws Exception cause {@link base.hldd.structure.nodes.Node#setSuccessor(Condition, base.hldd.structure.nodes.Node) cause }
          */
         public void fill(Node fillingNode) throws Exception {
+			/* Override the current node or fill the empty place */
+			controlNode.setSuccessor(awaitedCondition, (fillingNode != null && fillingNode instanceof CompositeNode) ?
+					((CompositeNode) fillingNode).getRootNode() : fillingNode);
+		}
 
-            /* Filling node is added differently depending on the
-           * 1) type of the node being filled and
-           * 2) type of the node currently at the awaited position.
-           *
-           * If filling node is a TERMINAL NODE, then it
-           *    overrides everything at the awaited position that has been set so far.
-           * If filling node is a CONTROL NODE, then it
-           *    overrides everything at the awaited position but a CONTROL NODE:
-           *      a) If node at the awaited position is CONTROL NODE, then:
-           *            x) a copy of the filling node both gets placed instead of every successor of CONTROL NODE
-           *               and gets filled with the successor, if it's available.
-           *
-           * todo: When FILLING, consider the 3rd subsequent condition!!!
-           *
-           * todo: When changing the algorithm of merging sequential conditional statements (2 or more parallel If-s),
-           * todo: change this method and updateDefaultValue() ==> if (n.isControlNode())
-           * */
+		public boolean wasFilled() throws HLDDException {
+			return !controlNode.isEmptyControlNode() && getAwaitedNode() != null; // check for emptiness in order to avoid useless LOGGING in Node.getSuccessor()  
+		}
 
-            for (int awaitedCondition : awaitedConditions) {
-                Node currentAwaitedNode = controlNode.getSuccessors()[awaitedCondition];
-//                if (fillingNode.isTerminalNode() || currentAwaitedNode == null || currentAwaitedNode.isTerminalNode()) {
-                    /* Override the current node or fill the empty place */
-                    controlNode.setSuccessor(awaitedCondition, fillingNode instanceof CompositeNode ?
-                            ((CompositeNode) fillingNode).getRootNode() : fillingNode);
-//                } else {
-//                    /* todo:        */
-//                    Node[] curAwaitedSuccessors = currentAwaitedNode.getSuccessors();
-//                    for (int i = 0; i < curAwaitedSuccessors.length; i++) {
-//                        Node curAwaitedSuccessor = curAwaitedSuccessors[i];
-//                        /* Clone filling node */
-//                        Node fillingNodeCopy = Node.clone(fillingNode);
-//                        /* Fill missing successors of fillingNode with the successor of current Awaited Node */
-//                        if (curAwaitedSuccessor != null) {
-//                            fillingNodeCopy.fillEmptySuccessorsWith(curAwaitedSuccessor);//todo: make this method recursive!!! Consider 3 subsequent conditions
-//                        }
-//                        /* Replace the current successor with a copy of fillingNode */
-//                        currentAwaitedNode.setSuccessor(i, fillingNodeCopy);
-//                    }
-//
-//                }
-            }
+		public boolean isCaseContext() {
+			return awaitedCondition == null;
+		}
 
-        }
-
-        public void registerProcessedConditions(int... processedConditions) {
-            if (this.processedConditions == null) {
-                this.processedConditions = new boolean[controlNode.getSuccessors().length];
-                /* Mark all conditions as UNPROCESSED */
-                Arrays.fill(this.processedConditions, false);
-            }
-            for (int processedCondition : processedConditions) {
-                this.processedConditions[processedCondition] = true;
-            }
-        }
-
-    }
+		public String[] getOthersConditions() throws HLDDException {
+			Condition others = controlNode.getOthers();
+			return others == null ? null : others.toStringArray();
+		}
+	}
 
     /**
      * Adjusts CONSTANT LENGTHS to the lengths of the variables that use these constants directly.<br>

@@ -41,7 +41,7 @@ public class TemporalNodeTest {
         Indices partedIndices = new Indices(9, 2);
         Set<Integer> vhdlLines = Collections.singleton(1991);
         node = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags()))
-                .successorsCount(2)
+                .createSuccessors(2)
                 .partedIndices(partedIndices)
                 .vhdlLines(vhdlLines).build();
         assertTrue(node instanceof TemporalNode);
@@ -53,7 +53,7 @@ public class TemporalNodeTest {
         assertTrue(node.getVhdlLines().contains(new Integer(1991)));
 
         // Check class of the chained builder
-        Node.Builder builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).successorsCount(2);
+        Node.Builder builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2);
         assertTrue(builder instanceof TemporalNode.Builder);
         builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).partedIndices(partedIndices);
         assertTrue(builder instanceof TemporalNode.Builder);

@@ -1,6 +1,8 @@
 package base.hldd.visitors;
 
+import base.HLDDException;
 import base.hldd.structure.nodes.Node;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.GraphVariable;
 
 /**
@@ -20,14 +22,20 @@ public class VHDLLinesMerger implements HLDDVisitor {
         node.addVhdlLines(secondNode.getVhdlLines());
         /* For ControlNodes, merge the subtree as well */
         if (node.isControlNode()) {
-            Node[] successors = node.getSuccessors();
-            Node[] secondSuccessors = secondNode.getSuccessors();
-            for (int i = 0; i < successors.length; i++) {
-                /* Update secondNode */
-                secondNode = secondSuccessors[i];
-                /* Traverse successor (secondNode is now updated) */
-                visitNode(successors[i]);
-            }
+			int conditionsCount = node.getConditionsCount();
+            for (int idx = 0; idx < conditionsCount; idx++) {
+				try {
+					Condition condition = node.getCondition(idx);
+					Node backupSecond = secondNode; // BACKUP
+					/* Update secondNode */
+					secondNode = secondNode.getSuccessor(condition);
+					/* Traverse successor (secondNode is now updated) */
+					visitNode(node.getSuccessor(condition));
+					secondNode = backupSecond; // RESTORE
+				} catch (HLDDException e) {
+					throw new RuntimeException(e); // should not happen
+				}
+			}
         }
     }
 

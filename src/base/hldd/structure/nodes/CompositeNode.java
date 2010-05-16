@@ -1,17 +1,20 @@
 package base.hldd.structure.nodes;
 
+import base.HLDDException;
 import base.hldd.structure.models.utils.ModelManager.CompositeFunctionVariable;
-import static base.hldd.structure.models.utils.ModelManager.invertBit;
 import base.hldd.structure.models.utils.PartedVariableHolder;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.AbstractVariable;
-import base.hldd.structure.nodes.utils.Utility;
 import base.vhdl.structure.Operator;
 import base.Indices;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
 /**
+ * Represents conditions like <tt>if tre = '0' or dsr = '0' then</tt>, i.e. composite conditions made of OR-s or AND-s.
+ * <p>
  * Objects of this class exist only temporarily, during creation of a complex
  * ControlNode.
  * That's why it doesn't correspond to the whole Node's interface,
@@ -25,15 +28,15 @@ public class CompositeNode extends Node {
     private Node rootNode;
     private Node lastNode;
     /* Auxiliary fields */
-    private Map<Node, Integer> trueValuesByNodes;
+    private Map<Node, Condition> trueValuesByNodes;
 
-    public CompositeNode(CompositeFunctionVariable depCompositeVariable) {
-        trueValuesByNodes = new LinkedHashMap<Node, Integer>(depCompositeVariable.getFunctionVariables().length);
+    public CompositeNode(CompositeFunctionVariable depCompositeVariable) throws HLDDException {
+        trueValuesByNodes = new LinkedHashMap<Node, Condition>(depCompositeVariable.getFunctionVariables().length);
         rootNode = getNode(depCompositeVariable);
         lastNode = getLastControlNode(rootNode);
     }
 
-    private Node getNode(CompositeFunctionVariable compositeFunctionVar) {
+    private Node getNode(CompositeFunctionVariable compositeFunctionVar) throws HLDDException {
         Node rootNode = null;
         Node previousNode = null;
         Operator compositeOperator = compositeFunctionVar.getCompositeOperator();
@@ -44,8 +47,10 @@ public class CompositeNode extends Node {
             /* Create newControlNode */
             Node controlNode = funcVar instanceof CompositeFunctionVariable 
                     ? getNode((CompositeFunctionVariable) funcVar)
-                    : new Builder(funcVar).partedIndices(partedIndices).successorsCount(2).build(); /* Condition Function has 2 values/successors only */
-            trueValuesByNodes.put(controlNode, trueValue);/* Actually, can check, if doesn't contain... */
+                    : new Builder(funcVar).partedIndices(partedIndices).createSuccessors(2).build(); /* Condition Function has 2 values/successors only */
+			controlNode.setSuccessor(Condition.TRUE, null); // init all conditions (TRUE and FALSE), so that in setSuccessor(Condition, Node)
+			controlNode.setSuccessor(Condition.FALSE, null);// we could simply iterate conditions, w/o fine-tuning (getSuccessorInternal()).
+            trueValuesByNodes.put(controlNode, Condition.createCondition(trueValue));/* Actually, can check, if doesn't contain... */ //todo: make funcVarHolder.getTrueValue() return Condition instead of int
 
             /* If rootNode is null, then controlNode is the first controlNode in CompositeNode */
             if (rootNode == null) {
@@ -56,9 +61,9 @@ public class CompositeNode extends Node {
             } else {
                 /* controlNode is not the first one.
                  * Add it as a successor to the previousNode */
-                int controlCondition = compositeOperator == Operator.AND
+                Condition controlCondition = compositeOperator == Operator.AND
                         ? trueValuesByNodes.get(previousNode)               // previously was 1
-                        : invertBit(trueValuesByNodes.get(previousNode));   // previously was 0
+                        : trueValuesByNodes.get(previousNode).invert();   // previously was 0
                 try {
                     previousNode.setSuccessor(controlCondition, controlNode); 
                     /* Set new previousNode */
@@ -79,56 +84,56 @@ public class CompositeNode extends Node {
         return lastNode;
     }
 
-    public boolean isEmptyControlNode() throws Exception {
+    public boolean isEmptyControlNode() throws HLDDException {
         return lastNode.isEmptyControlNode();
     }
 
-    public void fillEmptySuccessorsWith(Node fillingNode/*AbstractVariable dependentVariable, GraphGenerator graphGenerator*/) throws Exception {
+    public void fillEmptySuccessorsWith(Node fillingNode/*AbstractVariable dependentVariable, GraphGenerator graphGenerator*/) {
         fillEmptySuccessorsWith(rootNode, fillingNode/*dependentVariable, graphGenerator*/);
     }
 
     private static void fillEmptySuccessorsWith(Node node, Node fillingNode /*AbstractVariable dependentVariable, GraphGenerator graphGenerator*/) {
         if (node.isControlNode()) {
-            try {
-                node.fillEmptySuccessorsWith(fillingNode /*dependentVariable, graphGenerator*/);
-            } catch (Exception e) { throw new RuntimeException(e);/* Do nothing. Exception is guaranteed not to be thrown here. */ }
+			node.fillEmptySuccessorsWith(fillingNode /*dependentVariable, graphGenerator*/);
             for (Node successor : node.getSuccessors()) {
                 fillEmptySuccessorsWith(successor, fillingNode/*dependentVariable, graphGenerator*/);
             }
         }
     }
 
-    public void setSuccessor(int controlCondition, Node successor) throws Exception {
-        propagateSuccessor(rootNode, controlCondition, successor);
+    public void setSuccessor(Condition condition, Node successor) throws HLDDException {
+        propagateSuccessor(rootNode, condition, successor);
     }
 
-    private void propagateSuccessor(Node node, int controlCondition, Node successor) {
+    private void propagateSuccessor(Node node, Condition controlCondition, Node newSuccessor) throws HLDDException {
         /* Set successors for ControlNodes only and only for nodes that are
          * part of CompositeCondition, i.e. skip control nodes that are
          * "terminal" nodes for CompositeCondition. */
         if (node.isControlNode() && trueValuesByNodes.containsKey(node)) {
-            int adjustedCondition = adjustCondition(node, controlCondition);
-            Node[] successors = node.getSuccessors();
-            for (int condition = 0; condition < successors.length; condition++) {
+            Condition adjustedCondition = adjustCondition(node, controlCondition);
+			int conditionsCount = node.getConditionsCount();
+			for (int idx = 0; idx < conditionsCount; idx++) {
+				Condition condition = node.getCondition(idx);
+				Node successor = node.getSuccessor(condition);
                 /* If condition successor is missing, then:
                  * if the successor's condition complies with (adjusted) controlCondition,
-                 *    then fill it with successor;
+                 *    then fill it with newSuccessor;
                  * */
-                if (successors[condition] == null) {
-                    if (condition == adjustedCondition) { // previously was controlCondition
+				if (successor == null) {
+                    if (condition.equals(adjustedCondition)) { // previously was controlCondition
                         try {
-                            node.setSuccessor(condition, successor);
+                            node.setSuccessor(condition, newSuccessor);
                         } catch (Exception e) { throw new RuntimeException(e);/* Do nothing. Exception is guaranteed not to be thrown here. */ }
                     }
                 } else {
-                    propagateSuccessor(successors[condition], controlCondition, successor.isTerminalNode() ? successor : Utility.clone(successor));
+                    propagateSuccessor(successor, controlCondition, Node.clone(newSuccessor));
                 }
             }
         }
     }
 
-    private int adjustCondition(Node node, int controlCondition) {
-        return controlCondition == trueValuesByNodes.get(node) ? 1 : 0;
+    private Condition adjustCondition(Node node, Condition controlCondition) {
+        return controlCondition.equals(trueValuesByNodes.get(node)) ? Condition.TRUE : Condition.FALSE;
     }
 
     public Node clone() {
@@ -147,7 +152,17 @@ public class CompositeNode extends Node {
         return false;
     }
 
-    public Node[] getSuccessors() {
+    public Collection<Node> getSuccessors() {
         return lastNode.getSuccessors();
     }
+
+	@Override
+	public Node getSuccessor(Condition condition) {
+		return lastNode.getSuccessor(condition);
+	}
+
+	@Override
+	public Condition getOthers() throws HLDDException {
+		return lastNode.getOthers();
+	}
 }

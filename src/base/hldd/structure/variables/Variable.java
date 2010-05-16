@@ -47,7 +47,7 @@ public class Variable extends AbstractVariable {
     }
 
     public String toString() {
-        return "VAR#\t" + index + ":  " + flagsToString() + "\t\"" + name + "\"\t" + lengthToString();
+        return "VAR#\t" + index + ":  " + flagsToString() + "\t\"" + getName() + "\"\t" + lengthToString();
     }
 
     public boolean isIdenticalTo(AbstractVariable comparedAbsVariable) {
@@ -58,7 +58,7 @@ public class Variable extends AbstractVariable {
         Variable comparedVariable = (Variable) comparedAbsVariable;
         
         /* Compare NAMES */
-        if (!name.equals(comparedVariable.getName())) return false;
+        if (!name.equals(comparedVariable.name)) return false;
         /* Compare TYPE */
         if (type == null ^ comparedVariable.type == null) return false;
         if (type != null) {
@@ -85,6 +85,10 @@ public class Variable extends AbstractVariable {
 
     public String getName() {
         return name;
+    }
+
+    public String getPureName() {
+        return getName();
     }
 
     public Type getType() {

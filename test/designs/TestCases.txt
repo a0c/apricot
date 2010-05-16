@@ -1,0 +1,38 @@
+>>>>>>>>>>>> b10
+117:					v_out(0) <= voto0 ;
+118:					v_out(1) <= voto1 ;
+119:					v_out(2) <= voto2 ;
+129:					v_out(3) <= voto3 ;
+
+>>>>>>>>>>>> b09
+			if  d_in(8 downto 1) = old then
+				d_in <= Zero_9;
+				y <= Bit_idle;
+				stato := LOAD_OLD;
+			else
+				y <= Bit_start;
+				d_out <= d_in(8 downto 1);
+				d_in <= Bit_start & Zero_8;
+				stato := EXECUTE;
+			end if;
+
+>>>>>>>>>>>> hc11rtl_edit_M.vhd
+    case alu_in2 is
+    when ZERO =>
+      in2 := "000000000";
+    when ONE =>
+      in2 := "000000001";
+    when ACCA =>
+      in2 := "0" & unsigned(A);
+    when ACCB =>
+      in2 := "0" & unsigned(B);
+    when IMM8 =>
+      in2 := "0" & unsigned(datain);
+    when ANT_IMM8 =>
+      in2 := "0" & unsigned(prev_data);
+    when ALU_REG =>
+      in2 := "0" & alureg(7 downto 0);
+
+    when DEC_ADJ =>
+      in2(8) := '0';
+	  

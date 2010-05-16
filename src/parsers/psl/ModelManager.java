@@ -2,6 +2,7 @@ package parsers.psl;
 
 import static base.hldd.structure.models.utils.ModelManager.adjustBooleanCondition;
 
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.models.utils.VariableManager;
 import base.hldd.structure.models.utils.PartedVariableHolder;
@@ -121,20 +122,21 @@ public class ModelManager {
             PartedVariableHolder depVarHolder = hlddModelManager.extractBooleanDependentVariable(booleanOperand, true); //todo: false?
             TemporalNode replacingControlNode = new TemporalNode.Builder(depVarHolder.getVariable())
                     .partedIndices(depVarHolder.getPartedIndices())
-                    .successorsCount(2)
+                    .createSuccessors(2)
                     .window(contextManager.getCurrentWindow()).build();
 
             /* Fill Control Node with successors (MAP nodes): TRUE and FALSE values; CHECKING value is removed. */
-            Node[] operandSuccessors = operandNodeToReplace.getSuccessors();
-            for (int condition = 0; condition < operandSuccessors.length; condition++) {
-                /* If operandNodeToReplace is TOP (3 port node), skip condition 2 (Boolean Expression has no CHECKING value */
-                if (operandSuccessors.length == 3 && condition == 2) continue;
+			int conditionsCount = operandNodeToReplace.getConditionsCount();
+			for (int idx = 0; idx < conditionsCount; idx++) {
+				Condition condition = operandNodeToReplace.getCondition(idx);
+				/* If operandNodeToReplace is TOP (3 port node), skip condition 2 (Boolean Expression has no CHECKING value */
+                if (conditionsCount == 3 && condition.getValue() == 2) continue;
 
                 /* Get Successor, from current context */
-                int relativeIndex = operandSuccessors[condition].getRelativeIndex();
+                int relativeIndex = operandNodeToReplace.getSuccessor(condition).getRelativeIndex();
                 Node newSuccessorNode = contextManager.getNodeByIndex(relativeIndex);
                 /* Adjust condition, depending on inversion state of replacingExpression */
-                int adjustedCondition = adjustBooleanCondition(condition, depVarHolder.isInversed());
+                Condition adjustedCondition = Condition.createCondition(adjustBooleanCondition(condition.getValue(), depVarHolder.isInversed()));
 
                 /* Postpone missing successor (met in CYCLIC HLDDs) */
                 if (newSuccessorNode == null) {
@@ -186,13 +188,14 @@ public class ModelManager {
             Range parentWindow = contextManager.getParentWindow();
             if (parentWindow != null) { //todo: Chaing merging of windows when "next next"
                 /* Add the window via creation of a TemporalNode on the basis of the rootNode */
-                Node[] successors = rootNode.getSuccessors();
-                TemporalNode temporalRootNode = new TemporalNode.Builder(rootNode.getDependentVariable())
+				int conditionsCount = rootNode.getConditionsCount();
+				TemporalNode temporalRootNode = new TemporalNode.Builder(rootNode.getDependentVariable())
                         .partedIndices(rootNode.getPartedIndices())
-                        .successorsCount(successors.length)
+                        .createSuccessors(rootNode.getConditionValuesCount())
                         .window(parentWindow).build();
-                for (int condition = 0; condition < successors.length; condition++) {
-                    temporalRootNode.setSuccessor(condition, successors[condition]);
+                for (int idx = 0; idx < conditionsCount; idx++) {
+					Condition condition = rootNode.getCondition(idx);
+					temporalRootNode.setSuccessor(condition, rootNode.getSuccessor(condition));
                 }
                 addNode(0, temporalRootNode);
                 rootNode = temporalRootNode;
@@ -307,9 +310,8 @@ public class ModelManager {
                     "operandNodeToReplace is a TERMINAL NODE. Cannot extract condition successor from it.");
 
             /* Get RELATIVE index of port successor node */
-            Node[] successors = operandNodeToReplace.getSuccessors();
-            if (portValue > successors.length - 1) return; // Skip CHECKING value of BOOLEAN operand
-            int relativeIndex = successors[portValue].getRelativeIndex();
+            if (portValue > operandNodeToReplace.getConditionValuesCount() - 1) return; // Skip CHECKING value of BOOLEAN operand
+            int relativeIndex = operandNodeToReplace.getSuccessor(Condition.createCondition(portValue)).getRelativeIndex();
 
             /* Get Port Successor Node by relative index from previous context */
             Context currentContext = removeCurrentContext(true);
@@ -337,7 +339,7 @@ public class ModelManager {
             }
         }
 
-        public void postpone(int adjustedCondition, int relativeIndex, TemporalNode controlNode) {
+        public void postpone(Condition adjustedCondition, int relativeIndex, TemporalNode controlNode) {
             Context currentContext = getCurrentContext();
             if (currentContext != null) {
                 currentContext.postpone(adjustedCondition, relativeIndex, controlNode);
@@ -397,7 +399,7 @@ public class ModelManager {
                 nodeByRelativeIndex.put(relativeIndex, node);
             }
 
-            public void postpone(int adjustedCondition, int relativeIndex, TemporalNode controlNode) {
+            public void postpone(Condition adjustedCondition, int relativeIndex, TemporalNode controlNode) {
                 postponedHashings.postpone(adjustedCondition, relativeIndex, controlNode);
             }
 
@@ -420,7 +422,7 @@ public class ModelManager {
             private class PostponedHashings {
                 private List<PostponedHashing> postHashsList = new LinkedList<PostponedHashing>();
 
-                public void postpone(int adjustedCondition, int relativeIndex, TemporalNode controlNode) {
+                public void postpone(Condition adjustedCondition, int relativeIndex, TemporalNode controlNode) {
                     postHashsList.add(new PostponedHashing(adjustedCondition, relativeIndex, controlNode));
                 }
 
@@ -435,11 +437,11 @@ public class ModelManager {
                 }
 
                 private class PostponedHashing {
-                    private final int adjustedCondition;
+                    private final Condition adjustedCondition;
                     private final int relativeIndex;
                     private final TemporalNode controlNode;
 
-                    public PostponedHashing(int adjustedCondition, int relativeIndex, TemporalNode controlNode) {
+                    public PostponedHashing(Condition adjustedCondition, int relativeIndex, TemporalNode controlNode) {
                         this.adjustedCondition = adjustedCondition;
                         this.relativeIndex = relativeIndex;
                         this.controlNode = controlNode;

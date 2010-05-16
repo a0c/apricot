@@ -54,46 +54,51 @@ public final class Indices implements Comparable<Indices> {
      * <br>
      * Different situations:<br>
      * 1) <code>valueIndices</code> may be missing or not.<br>
-     * 2) <code>variableIndices</code> may be missing or not.
+     * 2) <code>targetIndices</code> may be missing or not.
      * <p>
      * See the different situations in corresponding JUnit test.
      *
      * @param valueIndices where to extract absolute indices from (indices of
      *        <b>valueOperand</b> of {@link base.vhdl.structure.nodes.TransitionNode})
-     * @param variableIndices indices of <b>variableOperand</b> of {@link base.vhdl.structure.nodes.TransitionNode}.
+     * @param targetIndices indices of <b>targetOperand</b> of {@link base.vhdl.structure.nodes.TransitionNode}.
      *        <b>NB!</b> Note that method checks curTransitionIndices to contain the Indices this method is called on
      *        and throws an Exception if they don't.
      * @return corresponding absolute indices of these Indices ( the ones method is invoked on ),
      *         extracted from targetIndices.
      */
-    public Indices absoluteFor(Indices variableIndices, Indices valueIndices) {
-        /* Calculations require both variableIndices and valueIndices,
+    public Indices absoluteFor(Indices targetIndices, Indices valueIndices) {
+        /* Calculations require both targetIndices and valueIndices,
          * so the missing indices must be derived. */
 
-        if (variableIndices == null && valueIndices == null) {
-            /* If both indices are missing, it means that variableOperand and valueOperand
+        if (targetIndices == null && valueIndices == null) {
+            /* If both indices are missing, it means that targetOperand and valueOperand
             * have the same length, and all derivations will be truncated at the end anyway.
             * So simply return the parted indices themselves. */
             return this;
         } else {
-            /* Here at least one of the indices is not null. */
-            /* Derive the missing indices from the present one: */
-            variableIndices = variableIndices == null ? deriveLength(valueIndices) : variableIndices;
-            valueIndices = valueIndices == null ? deriveLength(variableIndices) : valueIndices;
+			/* If parted indices are the same as target indices,
+			* it means that this is a direct assignment, where valueIndices should be preserved (incl. null). */
+			if (this.equals(targetIndices)) {
+				return valueIndices;
+			}
+			/* Here at least one of the indices is not null. */
+			/* Derive the missing indices from the present one: */
+			targetIndices = targetIndices == null ? deriveLength(valueIndices) : targetIndices;
+			valueIndices = valueIndices == null ? deriveLength(targetIndices) : valueIndices;
 
-            /* Here both variableIndices and valueIndices are available. */
-            /* Check variableIndices to contain these indices: */
-            if (!variableIndices.contain(this)) throw new RuntimeException("Unexpected bug while obtaining absolute " +
-                    "indices:\nvariableIndices don't contain indices of PartedVariable." +
-                    "\nProbable source of error: incorrect splitting of PartedVariales into non-interlapping regions");
-            /* Calculate difference: */
-            Indices difference = new Indices(
-                    variableIndices.highest - this.highest,
-                    this.lowest - variableIndices.lowest);
-            return new Indices(
-                    valueIndices.highest - difference.highest,
-                    valueIndices.lowest + difference.lowest);
-        }
+			/* Here both targetIndices and valueIndices are available. */
+			/* Check targetIndices to contain these indices: */
+			if (!targetIndices.contain(this)) throw new RuntimeException("Unexpected bug while obtaining absolute " +
+					"indices:\ntargetIndices don't contain indices of PartedVariable." +
+					"\nProbable source of error: incorrect splitting of PartedVariales into non-interlapping regions");
+			/* Calculate difference: */
+			Indices difference = new Indices(
+					targetIndices.highest - this.highest,
+					this.lowest - targetIndices.lowest);
+			return new Indices(
+					valueIndices.highest - difference.highest,
+					valueIndices.lowest + difference.lowest);
+		}
     }
 
     private Indices deriveLength(Indices availableIndices) {

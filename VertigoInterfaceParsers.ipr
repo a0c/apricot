@@ -99,7 +99,7 @@
           <option name="m_maxLength" value="64" />
         </inspection_tool>
         <inspection_tool class="BooleanMethodNameMustStartWithQuestion" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="questionString" value="is,can,has,should,could,will,shall,check,contains,equals,add,put,remove,startsWith,endsWith" />
+          <option name="questionString" value="is,can,has,should,could,will,shall,check,contains,equals,add,put,remove,startsWith,endsWith,was,are" />
         </inspection_tool>
         <inspection_tool class="ClassNamePrefixedWithPackageName" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ClassNameSameAsAncestorName" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -156,7 +156,7 @@
         </inspection_tool>
         <inspection_tool class="NonExceptionNameEndsWithException" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="OverloadedMethodsWithSameNumberOfParameters" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="OverloadedVarargsMethod" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="OverloadedVarargsMethod" enabled="true" level="INFO" enabled_by_default="true" />
         <inspection_tool class="ParameterNameDiffersFromOverriddenParameter" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignoreSingleCharacterNames" value="false" />
           <option name="m_ignoreOverridesOfLibraryMethods" value="false" />
@@ -177,7 +177,7 @@
         </inspection_tool>
         <inspection_tool class="StaticVariableNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="checkMutableFinals" value="false" />
-          <option name="m_regex" value="s_[a-z][A-Za-z\d]*" />
+          <option name="m_regex" value="[a-z][A-Za-z\d]*" />
           <option name="m_minLength" value="5" />
           <option name="m_maxLength" value="32" />
         </inspection_tool>
@@ -340,6 +340,14 @@
   <component name="ProjectDetails">
     <option name="projectName" value="VertigoInterfaceParsers" />
   </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="Randy">
+      <words>
+        <w>delim</w>
+        <w>indices</w>
+      </words>
+    </dictionary>
+  </component>
   <component name="ProjectKey">
     <option name="state" value="project://D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers8\VertigoInterfaceParsers.ipr" />
   </component>
@@ -348,7 +356,7 @@
       <module fileurl="file://$PROJECT_DIR$/VertigoInterfaceParsers.iml" filepath="$PROJECT_DIR$/VertigoInterfaceParsers.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 (2)" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/classes" />
   </component>
   <component name="ResourceManagerContainer">
@@ -364,6 +372,7 @@
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myVersion" value="123" />
+    <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />

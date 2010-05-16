@@ -130,7 +130,7 @@ public class IndicesTest {
         assertEquals(new Indices(24, 10), new Indices(24, 10).absoluteFor(null, null));
 
         /* ############## 2 ##############
-        * variableIndices are missing */
+        * targetIndices are missing */
         // "DATA_HELD <= DATAIN(18 DOWNTO 3);" DATA_HELD(7 DOWNTO 0) ===> DATAIN(10 DOWNTO 3) ----- DATA_HELD is actually (15 DOWNTO 0) -- DERIVE IT
         assertEquals(new Indices(10, 3), new Indices(7, 0).absoluteFor(null, new Indices(18, 3)));
         // "DATA_HELD <= DATAIN(18 DOWNTO 3);" DATA_HELD(7 DOWNTO 5) ===> DATAIN(10 DOWNTO 8) ----- DATA_HELD is actually (15 DOWNTO 0) -- DERIVE IT
@@ -147,6 +147,13 @@ public class IndicesTest {
         assertEquals(new Indices(6, 4), new Indices(6, 4).absoluteFor(new Indices(8, 0), null));
         // "DATA_HELD(8 DOWNTO 3) <= DATAIN;" DATA_HELD(6 DOWNTO 4) ===> DATAIN(3 DOWNTO 1) ----- DATAIN is actually (5 DOWNTO 0) -- DERIVE IT
         assertEquals(new Indices(3, 1), new Indices(6, 4).absoluteFor(new Indices(8, 3), null));
+		/* ############## 3 (*) ##############
+        * valueIndices are missing, but targetIndices are equal to the (base) object */
+		// "V_OUT(1) <= VOTO1;" V_OUT(1) ===> VOTO1 ----- VOTO1 is actually (0 DOWNTO 0) -- DERIVE IT
+        assertNull(new Indices(1, 1).absoluteFor(new Indices(1, 1), null)); // no indices!!!
+        /* valueIndices are present, but targetIndices are equal to the (base) object */
+		// "V_OUT(1) <= VOTO1(3);" V_OUT(1) ===> VOTO1(3) ----- VOTO1 is actually (3 DOWNTO 0) -- DERIVE IT
+        assertEquals(new Indices(3, 3), new Indices(1, 1).absoluteFor(new Indices(1, 1), new Indices(3, 3)));
 
         /* ############## 4 ##############
         * Both variableIndices and valueIndices are present */

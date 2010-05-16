@@ -5,6 +5,7 @@ import base.hldd.structure.models.BehModel;
 import base.hldd.structure.models.utils.RTLModelCreatorImpl;
 import base.hldd.structure.models.utils.ModelCreator;
 import base.hldd.structure.models.Model;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
 import base.hldd.visitors.ResetInspector;
 import base.hldd.visitors.TerminalNodeCollector;
@@ -47,7 +48,7 @@ public class Beh2RtlTransformer {
             modelCollector = new ModelManager(false);
         }
 
-        /* Trim */
+        /* Minimize */
         behModel.minimize();
 
         /* Copy CONSTANTS */
@@ -75,7 +76,6 @@ public class Beh2RtlTransformer {
 
         /* Create FSM Graph */
         createFsmGraph(controlPartManager);
-        System.out.println("CONTROL size (UNINDEXED): " + ((GraphVariable) modelCollector.getVariable("CONTROL")).getGraph().getRootNode().getUnindexedSize());
 
         /* Create Graphs */
         createGraphs(resetInspector, controlPartManager);
@@ -99,9 +99,9 @@ public class Beh2RtlTransformer {
                 /* Create RESET if needed */
                 if (resetInspector.isResettableVariable(graphVariable)) {
                     /* Create var_RESET Control Node */
-                    rootNode = new Node.Builder(modelCollector.getVariable(graphVariable.getName() + ControlPartManager.SUFFIX_RESET)).successorsCount(2).build();
+                    rootNode = new Node.Builder(modelCollector.getVariable(graphVariable.getName() + ControlPartManager.SUFFIX_RESET)).createSuccessors(2).build();
                     /* Fill Control Node with resetting successor */
-                    rootNode.setSuccessor(1, new Node.Builder(resetInspector.getResettingVariable(graphVariable)).build());
+                    rootNode.setSuccessor(Condition.TRUE, new Node.Builder(resetInspector.getResettingVariable(graphVariable)).build());
                 }
 
                 /* Create ENABLE and MUX_ADDR if needed:
@@ -119,16 +119,16 @@ public class Beh2RtlTransformer {
                     Node enableNode = null;
                     if (valueRetainingCount == 1) {
                         /* (2) (3) */
-                        enableNode = new Node.Builder(modelCollector.getVariable(graphVariable.getName() + ControlPartManager.SUFFIX_ENABLE)).successorsCount(2).build();
+                        enableNode = new Node.Builder(modelCollector.getVariable(graphVariable.getName() + ControlPartManager.SUFFIX_ENABLE)).createSuccessors(2).build();
                         /* Fill ENABLE with VALUE RETAINING node */
-                        enableNode.setSuccessor(0, new Node.Builder(graphVariable).build());
+                        enableNode.setSuccessor(Condition.FALSE, new Node.Builder(graphVariable).build());
                     }
 
                     /* Create MUX_ADDR if needed */
                     Node muxAddrNode = null;
                     if (terminalNodesCount > 1) {
                         /* (3) (4) */
-                        muxAddrNode = new Node.Builder(modelCollector.getVariable(graphVariable.getName() + ControlPartManager.SUFFIX_MUX_ADDR)).successorsCount(terminalNodesCount).build();
+                        muxAddrNode = new Node.Builder(modelCollector.getVariable(graphVariable.getName() + ControlPartManager.SUFFIX_MUX_ADDR)).createSuccessors(terminalNodesCount).build();
                         /* Fill Mux_Addr with Terminal Nodes */
                         controlPartManager.fillMuxAddrNode(graphVariable, muxAddrNode);
                     }
@@ -143,12 +143,12 @@ public class Beh2RtlTransformer {
                             /* ENABLE */
                             /* Fill ENABLE with the only Terminal Node */
                             Node theOnlyTerminalNode = new Node.Builder(controlPartManager.termNodeCollector.getTerminalNodes(graphVariable).get(0).getDependentVariable()).build();
-                            enableNode.setSuccessor(1, theOnlyTerminalNode);
+                            enableNode.setSuccessor(Condition.TRUE, theOnlyTerminalNode);
                             
                         } else {
                             /* ENABLE + MUX_ADDR */
                             /* Fill ENABLE with MUX_ADDR node */
-                            enableNode.setSuccessor(1, muxAddrNode);
+                            enableNode.setSuccessor(Condition.TRUE, muxAddrNode);
 
                         }
                     }
@@ -167,7 +167,7 @@ public class Beh2RtlTransformer {
                 if (rootNode == null) {
                     rootNode = nodeForRoot;
                 } else {
-                    rootNode.setSuccessor(0, nodeForRoot);
+                    rootNode.setSuccessor(Condition.FALSE, nodeForRoot);
                 }
 
 
@@ -209,7 +209,7 @@ public class Beh2RtlTransformer {
 					"\n\"VHDL Beh => HLDD Beh\" and \"HLDD Beh => HLDD RTL\" converters.");
 		}
         /* Traverse all graphs */
-		int i = 1, total = behModel.getVars().size() - 1; // -1 ---> STATE graph
+		int i = 1, total = behModel.getGraphCount() - 1; // -1 ---> STATE graph
         for (AbstractVariable absVariable : behModel.getVars().values()) {
 			if (absVariable instanceof GraphVariable) {
 				GraphVariable graphVariable = (GraphVariable) absVariable;

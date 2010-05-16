@@ -1,6 +1,7 @@
 package base.hldd.visitors;
 
 import base.hldd.structure.nodes.Node;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.GraphVariable;
 import base.hldd.structure.Graph;
 
@@ -41,9 +42,9 @@ public class ObsoleteResetRemoverImpl implements HLDDVisitor {
                 if (node.getDependentVariable().isReset()) {
                     /* If resetting value actually retains the value of GraphVariable,
                      * then it's a redundant RESETTING control node. */
-                    if (node.getSuccessors()[1].getDependentVariable() == currentGraphVariable) {
+                    if (node.getSuccessor(Condition.TRUE).getDependentVariable() == currentGraphVariable) {
                         /* Set new rootNode */
-                        currentGraphVariable.setGraph(new Graph(node.getSuccessors()[0]));
+                        currentGraphVariable.setGraph(new Graph(node.getSuccessor(Condition.FALSE)));
                         /* Check the new rootNode as well */
                         node = currentGraphVariable.getGraph().getRootNode();
                         doRemove = true;

@@ -1,6 +1,7 @@
 package base.hldd.visitors;
 
 import base.hldd.structure.nodes.Node;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.GraphVariable;
 
@@ -28,7 +29,7 @@ public class ResetInspector implements HLDDVisitor {
 
         if (node.isControlNode()) {
             if (node.getDependentVariable().isReset()) {
-                resetMap.put(graphVariable, node.getSuccessors()[1].getDependentVariable());
+                resetMap.put(graphVariable, node.getSuccessor(Condition.TRUE).getDependentVariable());
                 doVisit = false;
                 return;
             }

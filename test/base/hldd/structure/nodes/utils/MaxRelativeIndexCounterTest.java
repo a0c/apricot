@@ -36,17 +36,17 @@ public class MaxRelativeIndexCounterTest {
     static {
         try {
             /* UNIQUE */
-            uniqueNode = new Node.Builder(createVariable("U1", 1, new Flags())).successorsCount(2).build();
+            uniqueNode = new Node.Builder(createVariable("U1", 1, new Flags())).createSuccessors(2).build();
 
-            Node nodeU2 = new Node.Builder(createVariable("U2", 1, new Flags())).successorsCount(2).build();
+            Node nodeU2 = new Node.Builder(createVariable("U2", 1, new Flags())).createSuccessors(2).build();
             Node nodeU3 = new Node.Builder(createVariable("U3", 1, new Flags())).partedIndices(nullArray).build();
-            uniqueNode.setSuccessor(0, nodeU2);
-            uniqueNode.setSuccessor(1, nodeU3);
+            uniqueNode.setSuccessor(Condition.FALSE, nodeU2);
+            uniqueNode.setSuccessor(Condition.TRUE, nodeU3);
 
             Node nodeU4 = new Node.Builder(createVariable("U4", 1, new Flags())).partedIndices(nullArray).build();
             Node nodeU5 = new Node.Builder(createVariable("U5", 1, new Flags())).partedIndices(nullArray).build();
-            nodeU2.setSuccessor(0, nodeU4);
-            nodeU2.setSuccessor(1, nodeU5);
+            nodeU2.setSuccessor(Condition.FALSE, nodeU4);
+            nodeU2.setSuccessor(Condition.TRUE, nodeU5);
 
             uniqueNode.setRelativeIndex(0);
             nodeU2.setRelativeIndex(1);
@@ -60,16 +60,16 @@ public class MaxRelativeIndexCounterTest {
             nodeU5.setAbsoluteIndex(4);
 
             /* DUPLICATE */
-            duplicateNode = new Node.Builder(createVariable("D1", 2, new Flags())).successorsCount(2).build();
+            duplicateNode = new Node.Builder(createVariable("D1", 2, new Flags())).createSuccessors(2).build();
 
-            Node nodeD2 = new Node.Builder(createVariable("D2", 2, new Flags())).successorsCount(2).build();
+            Node nodeD2 = new Node.Builder(createVariable("D2", 2, new Flags())).createSuccessors(2).build();
             Node nodeD3 = new Node.Builder(createVariable("D3", 2, new Flags())).partedIndices(nullArray).build();
-            duplicateNode.setSuccessor(0, nodeD2);
-            duplicateNode.setSuccessor(1, nodeD3);
+            duplicateNode.setSuccessor(Condition.FALSE, nodeD2);
+            duplicateNode.setSuccessor(Condition.TRUE, nodeD3);
 
             Node nodeD4 = new Node.Builder(createVariable("D4", 2, new Flags())).partedIndices(nullArray).build();
-            nodeD2.setSuccessor(0, nodeD3);
-            nodeD2.setSuccessor(1, nodeD4);
+            nodeD2.setSuccessor(Condition.FALSE, nodeD3);
+            nodeD2.setSuccessor(Condition.TRUE, nodeD4);
 
             duplicateNode.setRelativeIndex(0);
             nodeD2.setRelativeIndex(1);
@@ -81,14 +81,14 @@ public class MaxRelativeIndexCounterTest {
             nodeD4.setAbsoluteIndex(3);
 
             /* CYCLIC + DUPLICATE*/
-            cyclicNode = new Node.Builder(createVariable("C1", 3, new Flags())).successorsCount(2).build();
-            Node nodeC2 = new Node.Builder(createVariable("C2", 2, new Flags())).successorsCount(2).build();
+            cyclicNode = new Node.Builder(createVariable("C1", 3, new Flags())).createSuccessors(2).build();
+            Node nodeC2 = new Node.Builder(createVariable("C2", 2, new Flags())).createSuccessors(2).build();
             Node nodeC3 = new Node.Builder(createVariable("C3", 2, new Flags())).partedIndices(nullArray).build();
-            cyclicNode.setSuccessor(0, nodeC2);
-            cyclicNode.setSuccessor(1, nodeC3);
+            cyclicNode.setSuccessor(Condition.FALSE, nodeC2);
+            cyclicNode.setSuccessor(Condition.TRUE, nodeC3);
 
-            nodeC2.setSuccessor(0, cyclicNode);
-            nodeC2.setSuccessor(1, nodeC3);
+            nodeC2.setSuccessor(Condition.FALSE, cyclicNode);
+            nodeC2.setSuccessor(Condition.TRUE, nodeC3);
 
             cyclicNode.setRelativeIndex(0);
             nodeC2.setRelativeIndex(1);

@@ -53,14 +53,15 @@ public class TemporalNode extends Node {
             return new TemporalNode(this);
         }
 
-        /**
-         * Override superclass method and return this builder (not the one of the superclass)
-         */
-        public Builder successorsCount(int successorsCount) {
-            super.successorsCount(successorsCount);
-            return this;
-        }
-        /**
+		/**
+		 * Override superclass method and return this builder (not the one of the superclass)
+		 */
+		@Override
+		public Builder createSuccessors(int conditionValuesCount) {
+			super.createSuccessors(conditionValuesCount);
+			return this;
+		}
+		/**
          * Override superclass method and return this builder (not the one of the superclass)
          */
         public Builder partedIndices(Indices partedIndices) {

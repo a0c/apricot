@@ -1,5 +1,6 @@
 package base.hldd.structure.variables.utils;
 
+import base.hldd.structure.nodes.utils.Condition;
 import parsers.hldd.Collector;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.variables.AbstractVariable;
@@ -9,6 +10,8 @@ import base.Indices;
 import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.TreeMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import ui.ExtendedException;
@@ -40,7 +43,7 @@ public class DefaultGraphVariableCreator implements GraphVariableCreator{
                     /* Get data from holders */
                     Collector.NodeData nodeDatum = nodeData[i];
                     Object depVarObject = collector.getVarObject(nodeDatum.depVarIndex);
-                    int[] successors = nodeDatum.successors;
+                    TreeMap<Condition,Integer> successors = nodeDatum.successors;
                     Indices depVarPartedIndices = nodeDatum.depVarPartedIndices;
                     AbstractVariable dependentVariable;
                     if (depVarObject instanceof AbstractVariable) {
@@ -51,21 +54,24 @@ public class DefaultGraphVariableCreator implements GraphVariableCreator{
                             "\nDependent variable for a node is neither an AbstractVariable nor a GraphVariableData");
                     /* Create and hash node */
                     Node newNode = successors == null ? new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).build()
-                            : new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).successorsCount(successors.length).build();
+                            : new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).createSuccessors(Condition.countValues(successors.keySet())).build();
                     nodeByIndex.put(i, newNode);
                     /* Index node manually */
                     newNode.setRelativeIndex(i);
                     newNode.setAbsoluteIndex(startingIndex + i);
                     /* For control nodes, fill successors */
                     if (successors != null) {
-                        for (int j = 0; j < successors.length; j++) {
-							Node newSuccessor = nodeByIndex.get(successors[j]);
+                        for (Map.Entry<Condition, Integer> entry : successors.entrySet()) {
+							Condition condition = entry.getKey();
+							Integer successorIndex = entry.getValue();
+
+							Node newSuccessor = nodeByIndex.get(successorIndex);
 							/* Note that cycles are allowed here, so remember missing successors for further setting */
 							if (newSuccessor == null) {
 								// For cyclic HLDDs, remember missing successors data
-								cyclicNodes.add(new CyclicNode(newNode, j, successors[j]));
+								cyclicNodes.add(new CyclicNode(newNode, condition, successorIndex));
 							}
-							newNode.setSuccessor(j, newSuccessor);
+							newNode.setSuccessor(condition, newSuccessor);
                         }
                     }
                 }
@@ -98,10 +104,10 @@ public class DefaultGraphVariableCreator implements GraphVariableCreator{
 
 	private class CyclicNode {
 		private Node baseNode;
-		private int controlCondition;
+		private Condition controlCondition;
 		private int missingNodeRelIndex;
 
-		public CyclicNode(Node baseNode, int controlCondition, int missingNodeRelIndex) {
+		public CyclicNode(Node baseNode, Condition controlCondition, int missingNodeRelIndex) {
 			this.baseNode = baseNode;
 			this.controlCondition = controlCondition;
 			this.missingNodeRelIndex = missingNodeRelIndex;

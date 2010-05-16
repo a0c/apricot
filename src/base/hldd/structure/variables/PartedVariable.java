@@ -13,10 +13,13 @@ public class PartedVariable extends Variable {
     private final Indices partedIndices;
 
     public PartedVariable(String varName, Type baseType, Indices partedIndices) {
-//        super(varName, partedIndices.highestSB(), new Flags());
-        super(varName, baseType.derivePartedType(partedIndices), new Flags());
-        this.partedIndices = partedIndices;
+		this(varName, baseType, partedIndices, new Flags());
     }
+
+	public PartedVariable(String varName, Type baseType, Indices partedIndices, Flags flags) {
+		super(varName, baseType.derivePartedType(partedIndices), flags);
+		this.partedIndices = partedIndices;
+	}
 
     public Indices getPartedIndices() {
         return partedIndices;
@@ -32,11 +35,12 @@ public class PartedVariable extends Variable {
         return super.isIdenticalTo(comparedAbsVariable);
     }
 
-    public String toString() {
-        return "VAR#\t" + index + ":  " + flagsToString() + "\t\"" + getUniqueName() + "\"\t" + lengthToString();
-    }
+    public String getPureName() {
+		return super.getName();
+	}
 
-    public String getUniqueName() {
-        return name + partedIndices.toString();
+	@Override
+	public String getName() {
+        return getPureName() + partedIndices.toString();
     }
 }

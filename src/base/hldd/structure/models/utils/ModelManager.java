@@ -1,5 +1,6 @@
 package base.hldd.structure.models.utils;
 
+import base.HLDDException;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.variables.Variable;
 import base.hldd.visitors.DependentVariableReplacer;
@@ -44,6 +45,7 @@ public class ModelManager {
             throw new Exception("ConstantVariable cannot be replaced currently. Implementation is simply missing.");
         }
         if (variableToReplace instanceof GraphVariable && replacingVariable instanceof Variable) {
+			/* todo: this situation never occurs, because replace() is only called with replacingVariable being instanceof GraphVariable */
             /* Remove old variable from hash */
             removeVariable(variableToReplace);
             /* Remove replacing variable from hash */
@@ -499,7 +501,14 @@ public class ModelManager {
         return null;
     }
 
-    private class ValueAndIndexHolder {
+	public ConstantVariable extractSubConstant(ConstantVariable baseConstant, Indices rangeToExtract) throws HLDDException {
+		
+		ConstantVariable subConstant = baseConstant.subRange(rangeToExtract);
+		
+		return ConstantVariable.getConstByValue(subConstant.getValue(), subConstant.getLength(), variableManager.getConsts(), useSameConstants);
+	}
+
+	private class ValueAndIndexHolder {
         private final BigInteger value;
         private final int index;
         public ValueAndIndexHolder(BigInteger value, int index) {
@@ -598,7 +607,7 @@ public class ModelManager {
      * @throws  Exception if number of conditions is being calculated for a variable that doesn't belong
      *          neither to FunctionVariable nor to Variable class
      */
-    public int getConditionsCount(AbstractVariable  variable) throws Exception {
+    public int getConditionValuesCount(AbstractVariable  variable) throws Exception {
         int order;
         if (variable.getClass() == FunctionVariable.class) {
             order = 1;
@@ -738,6 +747,7 @@ public class ModelManager {
     }
 
     /**
+	 * todo: remove this method. use a separate visitor in VHDL preprocessing. consider: v_out <= "0000"; // v_out may be 3:0 and may be 0:3
      * Sets all the lengths for the specified operand and its sub-operands.
      * @param operand to set length for
      * @throws Exception {@link parsers.vhdl.OperandLengthSetter#OperandLengthSetter(ModelManager , AbstractOperand)}.

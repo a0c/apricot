@@ -1,5 +1,6 @@
 package base.hldd.structure.variables.utils;
 
+import base.hldd.structure.nodes.utils.Condition;
 import parsers.hldd.Collector;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.TemporalNode;
@@ -10,7 +11,8 @@ import base.Indices;
 import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
-import java.lang.reflect.Constructor;
+import java.util.TreeMap;
+import java.util.Map;
 
 /**
  * GraphVariableCreator for PPG Library.
@@ -42,7 +44,7 @@ public class PPGLibraryGraphVariableCreator implements GraphVariableCreator {
                 /* Get data from holders */
                 Collector.NodeData nodeDatum = nodeData[i];
                 Object depVarObject = collector.getVarObject(nodeDatum.depVarIndex);
-                int[] successors = nodeDatum.successors;
+                TreeMap<Condition,Integer> successors = nodeDatum.successors;
                 Indices depVarPartedIndices = nodeDatum.depVarPartedIndices;
                 String[] windowPlaceholders = nodeDatum.windowPlaceholders;
                 AbstractVariable dependentVariable;
@@ -56,12 +58,12 @@ public class PPGLibraryGraphVariableCreator implements GraphVariableCreator {
                 Node newNode;
                 if (windowPlaceholders != null) {
                     if (successors != null) {
-                        newNode = new TemporalNode.Builder(dependentVariable).partedIndices(depVarPartedIndices).successorsCount(successors.length).windowPlaceholders(windowPlaceholders).build(); 
+                        newNode = new TemporalNode.Builder(dependentVariable).partedIndices(depVarPartedIndices).createSuccessors(Condition.countValues(successors.keySet())).windowPlaceholders(windowPlaceholders).build();
                     } else throw new Exception("Error while creating nodes for GraphVariable in PPG Library:" +
                             "\nWindow is assigned to Terminal node! Notion of window is applicable to Control nodes (Boolean expressions or PSL Property) only");
                 } else {
                     newNode = successors == null ? new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).build()
-                            : new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).successorsCount(successors.length).build();
+                            : new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).createSuccessors(Condition.countValues(successors.keySet())).build();
                 }
                 nodeByIndex.put(i, newNode);
                 /* Index node manually */
@@ -69,13 +71,16 @@ public class PPGLibraryGraphVariableCreator implements GraphVariableCreator {
                 newNode.setAbsoluteIndex(startingIndex + i);
                 /* For control nodes, fill successors */
                 if (successors != null) {
-                    for (int j = 0; j < successors.length; j++) {
-                        /* Note that cycles are allowed here, so nodeByIndex.get(successors[j]) may return null */
-                        Node successor = nodeByIndex.get(successors[j]);
+                    for (Map.Entry<Condition, Integer> entry : successors.entrySet()) {
+						Condition condition = entry.getKey();
+						Integer successorIndex = entry.getValue();
+
+						/* Note that cycles are allowed here, so nodeByIndex.get(successors[j]) may return null */
+                        Node successor = nodeByIndex.get(successorIndex);
                         if (successor != null) {
-                            newNode.setSuccessor(j, successor);
+                            newNode.setSuccessor(condition, successor);
                         } else {
-                            cyclicNodes.postponeCyclicNode(newNode, j, successors[j]);
+                            cyclicNodes.postponeCyclicNode(newNode, condition, successorIndex);
                         }
                     }
                 }
@@ -97,7 +102,7 @@ public class PPGLibraryGraphVariableCreator implements GraphVariableCreator {
     private class CyclicNodes {
         private List<CyclicNode> cyclicNodeList = new LinkedList<CyclicNode>();
 
-        public void postponeCyclicNode(Node cyclicNode, int successorCondition, int successorIndex) {
+        public void postponeCyclicNode(Node cyclicNode, Condition successorCondition, int successorIndex) {
             cyclicNodeList.add(new CyclicNode(cyclicNode, successorCondition, successorIndex));
         }
 
@@ -109,10 +114,10 @@ public class PPGLibraryGraphVariableCreator implements GraphVariableCreator {
 
         private class CyclicNode {
             private final Node cyclicNode;
-            private final int successorCondition;
+            private final Condition successorCondition;
             private final int successorIndex;
 
-            public CyclicNode(Node cyclicNode, int successorCondition, int successorIndex) {
+            public CyclicNode(Node cyclicNode, Condition successorCondition, int successorIndex) {
                 this.cyclicNode = cyclicNode;
                 this.successorCondition = successorCondition;
                 this.successorIndex = successorIndex;

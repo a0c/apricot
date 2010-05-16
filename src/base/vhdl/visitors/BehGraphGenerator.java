@@ -35,7 +35,7 @@ public class BehGraphGenerator extends GraphGenerator {
             if (!couldProcessNextGraphVariable(null, process.getRootNode()))
                 break;
             else
-                processedGraphVars.add(graphVariable.getName()); //todo: when partial settings are introduced, graphVariable may have to be substituted with newGraphVariable
+                processedGraphVars.add(graphVariable.getName());
 
         }
 

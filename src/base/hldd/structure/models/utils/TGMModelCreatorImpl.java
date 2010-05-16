@@ -40,7 +40,7 @@ public class TGMModelCreatorImpl implements ModelCreator {
      * <p>
      * In case of <b>CYCLIC HLDDs</b>, not all of the successors are available
      * at the time when the Control Node is reached. The addition of the missing successors is <b>postponed</b>
-     * ({@link ModelManager.ContextManager#postpone(int, int, base.hldd.structure.nodes.TemporalNode)}) and performed after
+     * ({@link ModelManager.ContextManager#postpone(base.hldd.structure.nodes.utils.Condition,int,base.hldd.structure.nodes.TemporalNode)}) and performed after
      * all the nodes in property graph are added to collector.
      * <p>
      * Traversal of property graphs has a sligh difference between processing

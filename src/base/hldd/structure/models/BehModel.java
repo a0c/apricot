@@ -97,10 +97,8 @@ public class BehModel {
     }
 
     public void setVariableByIndex(int index, AbstractVariable absVariable) {
-        //todo: consider overriding Variable.getName() in PartedVariable and using functionality of PartedVariable.getUniqueName(). Check all usages of getName() method!!! 
-        String varName = absVariable instanceof GraphVariable && ((GraphVariable) absVariable).getBaseVariable() instanceof PartedVariable
-                ? ((PartedVariable) ((GraphVariable) absVariable).getBaseVariable()).getUniqueName()
-                : absVariable.getName();
+
+        String varName = absVariable.getName();
         if (!(absVariable instanceof ConstantVariable)) {
             vars.put(varName, absVariable);
         } else {

@@ -1,6 +1,7 @@
 package parsers.hldd;
 
 import base.hldd.structure.models.BehModel;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.variables.utils.GraphVariableCreator;
 import base.hldd.structure.Flags;
@@ -9,6 +10,7 @@ import base.Indices;
 import base.Type;
 
 import java.math.BigInteger;
+import java.util.TreeMap;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -199,19 +201,21 @@ public class HLDDStructureBuilder {
         collector.addFunctionData(functionType, name, index, inputIndices, inputPartedIndices, length);
     }
 
-    public void buildGraph(int index, Flags flags, String name, Indices length, int graphLength, int graphIndex) {
+    public void buildGraph(int index, Flags flags, String name, Indices partedIndices, Indices length, int graphLength, int graphIndex) {
         varCount--;
         graphCount--;
-        /* Create new Variable (base variable for GraphVariable) */
-        Variable newVariable = new Variable(name, new Type(length), flags);
-        newVariable.forceSetIndex(index);
-        if (newVariable.isOutput()) outpCount--;
-        GraphVariable newGraphVariable = new GraphVariable(newVariable, null);
+        /* Create base variable for GraphVariable */
+        Variable baseVariable = partedIndices == null
+				? new Variable(name, new Type(length), flags)
+				: new PartedVariable(name, new Type(length), partedIndices, flags);
+        baseVariable.forceSetIndex(index);
+        if (baseVariable.isOutput()) outpCount--;
+        GraphVariable newGraphVariable = new GraphVariable(baseVariable, null);
         /* Collect GraphVariable */
         collector.addGraphVariableData(newGraphVariable, graphLength, graphIndex);
     }
 
-    public void buildNode(int relativeNodeIndex, int depVarIndex, Indices depVarPartedIndices, int[] successors, String[] windowPlaceholders) {
+    public void buildNode(int relativeNodeIndex, int depVarIndex, Indices depVarPartedIndices, TreeMap<Condition,Integer> successors, String[] windowPlaceholders) {
         nodeCount--;
         /* Collect NodeData */
         collector.addNodeData(relativeNodeIndex, depVarIndex, depVarPartedIndices, successors, windowPlaceholders);

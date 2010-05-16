@@ -1,13 +1,14 @@
 package base.hldd.visitors;
 
 import base.hldd.structure.nodes.Node;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.nodes.utils.Utility;
 import base.hldd.structure.variables.GraphVariable;
 
 import java.util.*;
 
 /**
- * <b>NB!</b> Class assumes that the model under traversal has been trimmed.
+ * <b>NB!</b> Class assumes that the model under traversal has been minimized.
  *
  * <br><br>User: Anton Chepurov
  * <br>Date: 15.02.2008
@@ -41,12 +42,11 @@ public class TerminalNodeCollector implements HLDDVisitor {
                 terminalNodes.add(node);
             }
         } else {
-            Node[] successors = node.getSuccessors();
             if (node.getDependentVariable().isReset()) {
                 /* Traverse the subtree of inactive reset */
-                successors[0].traverse(this);
+                node.getSuccessor(Condition.FALSE).traverse(this);
             } else {
-                for (Node successor : successors) {
+                for (Node successor : node.getSuccessors()) {
                     successor.traverse(this);
                 }
             }
@@ -102,7 +102,7 @@ public class TerminalNodeCollector implements HLDDVisitor {
 
         List<Node> terminalNodes = muxAddrValueMap.get(graphVariable);
         for (int index = 0; index < terminalNodes.size(); index++) {
-            muxAddrNode.setSuccessor(index, Utility.clone(terminalNodes.get(index))); /* new Node(terminalNodes.get(index).getDependentVariable()) */
+            muxAddrNode.setSuccessor(Condition.createCondition(index), Node.clone(terminalNodes.get(index)));
         }
     }
 }

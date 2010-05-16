@@ -1,5 +1,6 @@
 package base.hldd.structure.nodes.utils;
 
+import base.HLDDException;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.visitors.VHDLLinesMerger;
@@ -35,7 +36,7 @@ public class Utility {
     private static int cntControlNodes(Node node) {
         int count = 0;
         if (processedControlNodesSet.contains(node)) return count;
-        if (!node.isTerminalNode()) {
+        if (node.isControlNode()) {
             count++;
             processedControlNodesSet.add(node);
             for (Node successorNode : node.getSuccessors()) {
@@ -53,7 +54,7 @@ public class Utility {
     }
     private static int cntUniqueControlNodes(Node node) {
         int count = 0;
-        if (!node.isTerminalNode() && !containsIdenticalControlNode(node)) {
+        if (node.isControlNode() && !containsIdenticalControlNode(node)) {
             uniqueControlNodes.add(node);
             count++;
             for (Node successorNode : node.getSuccessors()) {
@@ -106,48 +107,6 @@ public class Utility {
         return new MaxRelativeIndexCounter(rootNode).count() + 1;
     }
 
-    public static Node clone(Node nodeToClone) {
-        return nodeToClone == null ? null : nodeToClone.clone();        
-    }
-
-    /**
-     * Fills all missing (empty) successors with the node built from a
-     * variable received as a parameter.
-     *
-     * @param nodeToFill node to be filled
-     * @param fillingNode node to fill empty successors with
-     * @throws Exception if empty successors are being filled for a TERMINAL node
-     */
-    public static void fillEmptySuccessorsWith(Node nodeToFill, Node fillingNode) throws Exception {
-        /* Check the node to be a CONTROL node*/
-        if (nodeToFill.isTerminalNode()) {
-            throw new Exception("Empty successors are being filled for a TERMINAL node: " + nodeToFill.toString() +
-                    "\nFilling node variable: " + fillingNode.getDependentVariable());
-        }
-        /* Don't fill emptyNodes */
-        if (nodeToFill.isEmptyControlNode()) return;
-
-        /* Iterate successors... */
-        Node[] nodeToFillSuccessors = nodeToFill.getSuccessors();
-        for (int i = 0; i < nodeToFillSuccessors.length; i++) {
-            Node successor = nodeToFillSuccessors[i];
-            if (successor == null) {
-                /* Fill missing successor with a copy of filling node, to be unique */
-                nodeToFillSuccessors[i] = Node.clone(fillingNode); // #### COPY OF FILLING_NODE!!! ###
-                /** If the fillingNode is artificially created and doesn't have corresponding VHDL Lines
-                * (i.e. node is obtained from
-                * {@link base.vhdl.visitors.GraphGenerator.ContextManager#getDefaultValueNode()}), then copy lines from
-                * nodeToFill Control Node. It means that ControlNode is not fully covered when calculating coverage. */
-                if (fillingNode.getVhdlLines().isEmpty()) {
-                    nodeToFillSuccessors[i].setVhdlLines(new TreeSet<Integer>(nodeToFill.getVhdlLines())); // not a shallow copy!
-                }
-            } else if (successor.isControlNode() /*&& !successor.isIdenticalTo(fillingNode)*/) {
-                /* Fill recursively every non-empty successor, that is a Control Node ((, but not the filling node)) */
-                fillEmptySuccessorsWith(successor, fillingNode);
-            }
-        }
-    }
-
     /**
      * Reuses identical nodes with the following steps:<br>
      * 1) Simplifies (minimizes) the rootNode tree with the use of a usedNodes set.<br>
@@ -159,16 +118,24 @@ public class Utility {
      */
     public static void minimize(Node nodeToTrim, int rootNodeAbsIndex) {
         /* Simplify (minimize) the rootNode tree */
-        new Minimizer(nodeToTrim).minimize(); // todo: move next step (stripping indices) into the Minimizer, to traverse the tree once only. Bad idea (code clarity deteriorates). 
-        /* Reindex the node's tree */
+		try {
+			new Minimizer(nodeToTrim).minimize(); // todo: move next step (stripping indices) into the Minimizer, to traverse the tree once only. Bad idea (code clarity deteriorates).
+		} catch (HLDDException e) {
+			throw new RuntimeException(e);
+		}
+		/* Reindex the node's tree */
         indexate(nodeToTrim, rootNodeAbsIndex);
     }
 
     public static Node reduce(Node nodeToReduce, int rootNodeAbsIndex) {
         /* Reduce rootNode */
         Reducer reducer = new Reducer(nodeToReduce);
-        reducer.reduce();
-        /* Get new root node */
+		try {
+			reducer.reduce();
+		} catch (HLDDException e) {
+			throw new RuntimeException(e);
+		}
+		/* Get new root node */
         Node rootNode = reducer.getRootNode();
         /* Reindex the rootNode's tree */
         indexate(rootNode, rootNodeAbsIndex);
@@ -185,9 +152,7 @@ public class Utility {
 
     public static int getUnindexedSize(Node node) {
         collectedNodesSet = new HashSet<Node>();
-        System.out.print("Counting size of node tree...  ");
         getUnSize(node);
-        System.out.println("Counting done.");
         return collectedNodesSet.size();
     }
 
@@ -237,7 +202,7 @@ public class Utility {
             if (node.getRelativeIndex() != -1) return;
 
             setNewIndex(node);
-            if (!node.isTerminalNode()) {
+            if (node.isControlNode()) {
                 for (Node successorNode : node.getSuccessors()) {
                     detectLoop(successorNode, node);
                     setIndices(successorNode);
@@ -350,7 +315,7 @@ public class Utility {
 
             private void reindexTheRest(Node nodeToReindex, int lowestBoundIndex, int highestBoundIndex, int indexOffset) {
                 /* Reindex CONTROL NODES only */
-                if (!nodeToReindex.isTerminalNode()) {
+                if (nodeToReindex.isControlNode()) {
                     /* Reindex controlNodes whose index is between
                      * the lowestBoundIndex and highestBoundIndex */
                     int relativeIndex = nodeToReindex.getRelativeIndex();
@@ -367,7 +332,7 @@ public class Utility {
             }
 
             private void reindexLoop(Node nodeInsideLoop) {
-                if (!nodeInsideLoop.isTerminalNode() && !reindexedNodes.contains(nodeInsideLoop)) {
+                if (nodeInsideLoop.isControlNode() && !reindexedNodes.contains(nodeInsideLoop)) {
                     setIndex(nodeInsideLoop, nextIndex++);
                     reindexedNodes.add(nodeInsideLoop);
                     for (Node successor : nodeInsideLoop.getSuccessors()) {
@@ -389,7 +354,7 @@ public class Utility {
     private static class Reducer {
         private Node rootNode;
         private final Stack<Node> parentNodesStack = new Stack<Node>();
-        private final Stack<Integer> parentConditionsStack = new Stack<Integer>();
+        private final Stack<Condition> parentConditionsStack = new Stack<Condition>();
 
         public Reducer(Node rootNode) {
             this.rootNode = rootNode;
@@ -399,7 +364,7 @@ public class Utility {
             return rootNode;
         }
 
-        public void reduce() {
+        public void reduce() throws HLDDException {
             doPush(null, null);
             reduceNode(rootNode);
             doPop();
@@ -411,37 +376,34 @@ public class Utility {
             }
         }
 
-        private void reduceNode(Node node) {
+        private void reduceNode(Node node) throws HLDDException {
             if (node.isControlNode()) {
                 /* Reduce each successor */
-                Node[] successors = node.getSuccessors();
-                for (int condition = 0; condition < successors.length; condition++) {
-                    doPush(node, condition);
-                    reduceNode(successors[condition]);
+				int conditionsCount = node.getConditionsCount();
+                for (int idx = 0; idx < conditionsCount; idx++) {
+					Condition condition = node.getCondition(idx);
+					doPush(node, condition);
+                    reduceNode(node.getSuccessor(condition));
                     doPop();
                 }
                 /* After all successors are reduced, check the node for redundancy. */
                 if (isRedundant(node)) {
                     /* Reduce redundant node (Reduction rule 1) */
                     Node parentNode = parentNodesStack.peek();
-                    Integer parentCondition = parentConditionsStack.peek();
-                    Node firstSuccessor = node.getSuccessors()[0];
+                    Condition parentCondition = parentConditionsStack.peek();
+                    Node firstSuccessor = node.getSuccessor(node.getCondition(0));
                     /* Collect VHDL lines from all successors into the firstSuccessor */
                     firstSuccessor.setVhdlLines(collectSuccessorLines(node.getSuccessors()));
                     if (parentNode == null) {
                         rootNode = firstSuccessor;
                     } else {
-                        try {
-                            parentNode.setSuccessor(parentCondition, firstSuccessor);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
+						parentNode.setSuccessor(parentCondition, firstSuccessor);
                     }
                 }
             }
         }
 
-        private Set<Integer> collectSuccessorLines(Node[] successors) {
+        private Set<Integer> collectSuccessorLines(Collection<Node> successors) {
             Set<Integer> newVHDLLines = new TreeSet<Integer>();
             for (Node successor : successors) newVHDLLines.addAll(successor.getVhdlLines());
             return newVHDLLines;
@@ -452,7 +414,7 @@ public class Utility {
             parentConditionsStack.pop();
         }
 
-        private void doPush(Node parentNode, Integer parentCondition) {
+        private void doPush(Node parentNode, Condition parentCondition) {
             parentNodesStack.push(parentNode);
             parentConditionsStack.push(parentCondition);            
         }
@@ -487,16 +449,21 @@ public class Utility {
             usedNodes = new LinkedHashSet<Node>();
         }
 
-        public void minimize() {
+        public void minimize() throws HLDDException {
             minimizeNode(rootNode);
+            compactNode(rootNode); // compact nodes in a separate tree traversal, to keep getIdenticalNode() correct (otherwise, a complex comparison will impair performance)
         }
 
-        private void minimizeNode(Node nodeToTrim) {
+        private void minimizeNode(Node nodeToTrim) throws HLDDException {
             if (nodeToTrim.isControlNode()) {
-                Node[] successors = nodeToTrim.getSuccessors();
-                for (int i = 0; i < successors.length; i++) {
-                    successors[i] = getIdenticalNode(successors[i]);
-                    minimizeNode(successors[i]);
+				int conditionsCount = nodeToTrim.getConditionsCount();
+                for (int idx = 0; idx < conditionsCount; idx++) {
+					Condition condition = nodeToTrim.getCondition(idx);
+					Node successor = nodeToTrim.getSuccessor(condition);
+					
+					successor = getIdenticalNode(successor);
+					nodeToTrim.setSuccessor(condition, successor);
+                    minimizeNode(successor);
                 }
             }
         }
@@ -514,6 +481,19 @@ public class Utility {
 			usedNodes.add(node);
 			return node;
 		}
+
+        private void compactNode(Node nodeToCompact) throws HLDDException {
+            if (nodeToCompact.isControlNode()) {
+                nodeToCompact.compact();
+                int conditionsCount = nodeToCompact.getConditionsCount();
+                for (int idx = 0; idx < conditionsCount; idx++) {
+                    Condition condition = nodeToCompact.getCondition(idx);
+                    Node successor = nodeToCompact.getSuccessor(condition);
+
+                    compactNode(successor);
+                }
+            }
+        }
     }
 
     private static class NodeIndexStripper {

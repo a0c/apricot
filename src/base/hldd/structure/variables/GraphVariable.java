@@ -134,6 +134,10 @@ public class GraphVariable extends AbstractVariable implements Visitable /*exten
         return baseVariable.getName();
     }
 
+	public String getPureName() {
+		return baseVariable.getPureName();
+	}
+
     public void forceSetIndex(int index) {
         baseVariable.forceSetIndex(index);
     }
@@ -151,6 +155,7 @@ public class GraphVariable extends AbstractVariable implements Visitable /*exten
     }
 
     //todo: simply setBaseVariable()! Not sure, think carefully...
+	//todo: remove this, for it is never called! (see the only usage and todo-comment there)
     public void replaceBaseVariable(AbstractVariable newBaseVariable) {
         this.baseVariable = new Variable(newBaseVariable.getName(), newBaseVariable.getType(), ((Variable) newBaseVariable).getFlags().merge(((Variable) baseVariable).getFlags())); // (((Variable) newBaseVariable).flagsToString() + ((Variable) this.baseVariable).flagsToString()).toUpperCase()
     }

@@ -25,11 +25,11 @@ public class NodeTest {
         assertEquals("someVar", node.depVarName());
 
         // Control node
-        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).successorsCount(2).build();
+        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2).build();
         assertTrue(node.isControlNode());
         assertEquals("someVar", node.depVarName());
         assertNotNull(node.getSuccessors());
-        assertEquals(2, node.getSuccessors().length);
+        assertEquals(2, node.getConditionValuesCount());
 
         // Terminal node with parted indices
         Indices partedIndices = new Indices(7, 0);
@@ -40,10 +40,10 @@ public class NodeTest {
 
         // Control node with parted indices
         partedIndices = new Indices(2, 1);
-        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).successorsCount(2).partedIndices(partedIndices).build();
+        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2).partedIndices(partedIndices).build();
         assertTrue(node.isControlNode());
         assertNotNull(node.getSuccessors());
-        assertEquals(2, node.getSuccessors().length);
+        assertEquals(2, node.getConditionValuesCount());
         assertNotNull(node.getPartedIndices());
         assertEquals(partedIndices, node.getPartedIndices());
 
@@ -56,10 +56,10 @@ public class NodeTest {
 
         // Control node with parted indices and vhdl lines
         partedIndices = new Indices(2, 1);
-        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).successorsCount(2).partedIndices(partedIndices).vhdlLines(Collections.singleton(199)).build();
+        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2).partedIndices(partedIndices).vhdlLines(Collections.singleton(199)).build();
         assertTrue(node.isControlNode());
         assertNotNull(node.getSuccessors());
-        assertEquals(2, node.getSuccessors().length);
+        assertEquals(2, node.getConditionValuesCount());
         assertNotNull(node.getPartedIndices());
         assertEquals(partedIndices, node.getPartedIndices());
         assertNotNull(node.getVhdlLines());

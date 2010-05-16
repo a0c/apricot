@@ -33,7 +33,7 @@ public class MaxRelativeIndexCounter {
         int maxIndex = rootNode.getRelativeIndex();
         if (!checkedIndices.contains(maxIndex)) {
             checkedIndices.add(maxIndex);
-            if (!rootNode.isTerminalNode()) {
+            if (rootNode.isControlNode()) {
                 for (Node successor : rootNode.getSuccessors()) {
 					int succMaxIndex = getMaxRelativeIndex(successor);
 					if (succMaxIndex > maxIndex) {

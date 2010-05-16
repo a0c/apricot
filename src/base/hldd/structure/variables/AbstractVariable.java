@@ -25,6 +25,8 @@ public abstract class AbstractVariable {
 
     public abstract String getName();
 
+    public abstract String getPureName();
+
     public abstract Type getType();
 
     public abstract Indices getLength();

@@ -1,5 +1,6 @@
 package base.hldd.structure.variables;
 
+import base.HLDDException;
 import base.Type;
 import base.Indices;
 
@@ -79,16 +80,26 @@ public class ConstantVariable extends Variable {
             }
         }
         // EXISTENT constant is not found, so create a new one
-        ConstantVariable newConstantVariable = new ConstantVariable("CONST_" + constValueToFind + "_BW" + targetLength.length(), constValueToFind); /*targetLength +1*/
-        if (targetLength != null && !newConstantVariable.getLength().equals(targetLength))
-            newConstantVariable.setLength(targetLength);
+        ConstantVariable newConstantVariable = createNamedConstant(constValueToFind, targetLength); /*targetLength +1*/
         consts.put(newConstantVariable.getName(), newConstantVariable);
         return newConstantVariable;
 
     }
 
+	public static ConstantVariable createNamedConstant(BigInteger value, Indices forcedLength) {
+
+		int length = forcedLength != null ? forcedLength.length() : Indices.deriveLengthForValues(value.intValue(), 0).length();
+
+		ConstantVariable newConstant = new ConstantVariable("CONST_" + value + "_BW" + length, value);
+
+		if (forcedLength != null && !newConstant.getLength().equals(forcedLength))
+			newConstant.setLength(forcedLength);
+
+		return newConstant;
+	}
+
     public boolean isIdenticalTo(AbstractVariable comparedAbsVariable) {
-        return comparedAbsVariable instanceof ConstantVariable && value.equals(((ConstantVariable) comparedAbsVariable).getValue());
+        return comparedAbsVariable instanceof ConstantVariable && value.equals(((ConstantVariable) comparedAbsVariable).value);
     }
 
     /* Setters and Getters START */
@@ -99,4 +110,25 @@ public class ConstantVariable extends Variable {
 
     /* Setters and Getters END */
 
+	public ConstantVariable subRange(Indices rangeToExtract) throws HLDDException {
+		Indices length = getLength();
+		if (!length.contain(rangeToExtract)) {
+			throw new HLDDException("ConstantVariable: subRange(): rangeToExtract is out of bounds: " + rangeToExtract + " out of " + length);
+		}
+		//todo: if rangeToExtract.equals(length)...
+		/* As string, ... */
+		StringBuilder builder = new StringBuilder(value.toString(2)); // 4 -> '100'
+		/* ... , fill with '0'-s up to the desired length, ...*/
+		StringBuilder newBuilder = new StringBuilder();
+		int offset = builder.length() - 1;
+		for (int idx = length.getLowest(); idx <= length.getHighest(); idx++) { // '100' -> '0010'   (reverse + fill with '0'-s)
+			newBuilder.append(offset - idx >= 0 ? builder.charAt(offset - idx) : '0');
+		}
+		/* ..., extract,... */
+		BigInteger subRangeValue = new BigInteger(
+				new StringBuilder(newBuilder.subSequence(rangeToExtract.getLowest(), rangeToExtract.getHighest() + 1))
+						.reverse().toString(), 2);
+
+		return createNamedConstant(subRangeValue, rangeToExtract.deriveLength());
+	}
 }

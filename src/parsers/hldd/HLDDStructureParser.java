@@ -1,15 +1,13 @@
 package parsers.hldd;
 
+import base.hldd.structure.nodes.utils.Condition;
 import io.scan.HLDDScanner;
 import base.psl.structure.Range;
 import base.hldd.structure.Flags;
 import base.Indices;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.TreeMap;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -49,9 +47,11 @@ public class HLDDStructureParser {
                 /* Extract INDEX */
                 int index = Integer.parseInt(token.substring(token.indexOf("#") + 1, token.indexOf(":")).trim());
                 /* Extract FLAGS */
-                Flags flags = Flags.parse(token.substring(token.indexOf("(") + 1, token.indexOf(")")).trim());  // collectFlags(token.substring(token.indexOf("(") + 1, token.indexOf(")")).trim());
-                /* Extract NAME */
-                String name = token.substring(token.indexOf("\"") + 1, token.lastIndexOf("\"")).trim();
+                Flags flags = Flags.parse(token.substring(token.indexOf("(") + 1, token.indexOf(")")).trim());
+                /* Extract NAME and PARTED INDICES */
+                NameAndPartedIndicesHolder holder = parseNameAndIndices(token.substring(token.indexOf("\"") + 1, token.lastIndexOf("\"")).trim());
+				String name = holder.name;
+				Indices partedIndices = holder.partedIndices;
                 /* Extract HIGHEST SIGNIFICANT BIT and build LENGTH */
                 int highestSB = Integer.parseInt(token.substring(token.indexOf("<") + 1, token.lastIndexOf(":")).trim());
                 Indices length = new Indices(highestSB, 0);
@@ -98,7 +98,7 @@ public class HLDDStructureParser {
                     int graphIndex = Integer.parseInt(token.substring(token.indexOf("#") + 1, token.indexOf(":")).trim());
                     /* Extract GRAPHS LENGTH */
                     int graphLength = Integer.parseInt(token.substring(token.lastIndexOf("=") + 1, token.indexOf("-")).trim());
-                    builder.buildGraph(index, flags, name, length, graphLength, graphIndex);
+                    builder.buildGraph(index, flags, name, partedIndices, length, graphLength, graphIndex);
                     /* Read NODES */
                     for (int nodeIndex = 0; nodeIndex < graphLength; nodeIndex++) {
                         token = scanner.next();
@@ -109,34 +109,17 @@ public class HLDDStructureParser {
                         /* Extract PARTED INDICES if any */
                         Indices depVarPartedIndices = parsePartedIndices(token.substring(token.indexOf("\"") + 1, token.lastIndexOf("\"")).trim());
                         /* Extract SUCCESSORS */
-                        String successorsDecl = token.substring(token.indexOf("(", token.indexOf(")")) + 1, token.lastIndexOf(")")).trim();
-                        int[] successors;
+                        String successorsDecl = token.substring(token.indexOf("(", token.indexOf(")")) + 1, token.indexOf(")", token.indexOf(")") + 1)).trim();
+                        TreeMap<Condition, Integer> successors = null;
                         if (successorsDecl.contains("=")) {
+							successors = new TreeMap<Condition, Integer>();
                             String[] succDeclarations = successorsDecl.split("\\s");
-							List<Integer> sucList = new LinkedList<Integer>();
                             for (String successorDeclaration : succDeclarations) {
-								int condition;
 								int succRelativeIndex = Integer.parseInt(successorDeclaration.substring(successorDeclaration.indexOf(">") + 1).trim());
-								String[] condStrings = successorDeclaration.substring(0, successorDeclaration.indexOf("=")).trim().split("-"); // e.g. "1-2" or "3"
-								if (condStrings.length == 1) { // " 1 => 3 "
-									condition = Integer.parseInt(condStrings[0]);
-									sucList.add(condition, succRelativeIndex);
-								} else if (condStrings.length == 2) { // " 1-2 => 3 "
-									int end = Integer.parseInt(condStrings[1].trim());
-									for (condition = Integer.parseInt(condStrings[0].trim()); condition <= end; condition++) {
-										sucList.add(condition, succRelativeIndex);
-									}
-								} else { // ???
-									throw new Exception("HLDDStructureParser: cannot parse defective condition " + successorDeclaration.substring(0, successorDeclaration.indexOf("=")).trim());
-								}
+								Condition sucCondition = Condition.parse(successorDeclaration.substring(0, successorDeclaration.indexOf("=")).trim());
+								successors.put(sucCondition, succRelativeIndex);
 							}
-							successors = new int[sucList.size()];  // successors = new int[succDeclarations.length]; //todo: (int) Math.pow(2, depVarHsb + 1)
-							for (int condition = 0; condition < successors.length; condition++) {
-								successors[condition] = sucList.get(condition);
-							}
-						} else {
-                            successors = null;
-                        }
+						}
                         /* Extract WINDOW */
                         String[] windowPlaceholders = null;
                         if (Range.isRangeDeclaration(token)) {
@@ -152,39 +135,64 @@ public class HLDDStructureParser {
 
     private Indices parsePartedIndices(String line) throws Exception {
 
-        if (line.contains("<") && line.contains(">")) {
-            int openIndex = line.lastIndexOf("<");
-            int closeIndex = line.lastIndexOf(">");
-            line = line.substring(openIndex + 1, closeIndex);
+		return BracketType.ANGULAR.parse(line).partedIndices; /* allowed to be null */
+	}
 
-            if (line.contains(":")) {
-                try {
-                    int highestIndex = Integer.parseInt(line.substring(0, line.indexOf(":")).trim());
-                    int lowestIndex = Integer.parseInt(line.substring(line.indexOf(":") + 1).trim());
-                    return new Indices(highestIndex, lowestIndex);
-                } catch (NumberFormatException e) {
-                    throw new Exception("Could not parse the following indices to Integer: " + line);
-                }
+	private NameAndPartedIndicesHolder parseNameAndIndices(String nameAndIndices) throws Exception {
 
-            } else {
-                try {
-                    int theOnlyIndex;
-                    theOnlyIndex = Integer.parseInt(line.trim());
-                    return new Indices(theOnlyIndex, theOnlyIndex);
-                } catch (NumberFormatException e) {
-                    throw new Exception("Could not parse the following indices to Integer: " + line);
-                }
-            }
+		return BracketType.ROUND.parse(nameAndIndices);
+	}
 
-        } else return null;
+	private enum BracketType {
+		ROUND("(", " DOWNTO ", ")"), ANGULAR("<", ":", ">");
 
-    }
+		private final String open;
+		private final String close;
+		private final String delim;
 
-    private String collectFlags(String flagsString) {
-        StringBuilder strBldr = new StringBuilder();
-        for (char flagChar : flagsString.toCharArray()) {
-            if (flagChar != '_') strBldr.append(Character.toUpperCase(flagChar));
-        }
-        return strBldr.toString();
-    }
+		BracketType(String open, String delim, String close) {
+			this.open = open;
+			this.close = close;
+			this.delim = delim;
+		}
+
+		public boolean isPresentIn(String nameAndIndices) {
+			return nameAndIndices.contains(open) && nameAndIndices.contains(close);
+		}
+
+		public NameAndPartedIndicesHolder parse(String nameAndIndices) throws Exception {
+			if (isPresentIn(nameAndIndices)) {
+				int openIndex = nameAndIndices.lastIndexOf(open);
+				int closeIndex = nameAndIndices.lastIndexOf(close);
+				String name = nameAndIndices.substring(0, openIndex);
+				String line = nameAndIndices.substring(openIndex + 1, closeIndex);
+				Indices partedIndices;
+
+				if (line.contains(delim)) {
+					try {
+						int highestIndex = Integer.parseInt(line.substring(0, line.indexOf(delim)).trim());
+						int lowestIndex = Integer.parseInt(line.substring(line.indexOf(delim) + delim.length()).trim());
+						partedIndices = new Indices(highestIndex, lowestIndex);
+					} catch (NumberFormatException e) {
+						throw new Exception("Could not parse the following indices to Integer: " + line);
+					}
+
+				} else {
+					try {
+						int theOnlyIndex;
+						theOnlyIndex = Integer.parseInt(line.trim());
+						partedIndices = new Indices(theOnlyIndex, theOnlyIndex);
+					} catch (NumberFormatException e) {
+						throw new Exception("Could not parse the following indices to Integer: " + line);
+					}
+				}
+
+				return new NameAndPartedIndicesHolder(name, partedIndices);
+
+			} else {
+				return new NameAndPartedIndicesHolder(nameAndIndices, null);
+			}
+		}
+
+	}
 }

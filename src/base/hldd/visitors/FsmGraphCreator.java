@@ -1,8 +1,9 @@
 package base.hldd.visitors;
 
+import base.HLDDException;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.FSMNode;
-import base.hldd.structure.nodes.utils.Utility;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.nodes.fsm.Transitions;
 import base.hldd.structure.variables.GraphVariable;
 import base.hldd.structure.variables.AbstractVariable;
@@ -50,10 +51,11 @@ public class FsmGraphCreator implements HLDDVisitor {
 
             } else {
                 /* Create a new Control Node (Node) */
-                Node[] successors = node.getSuccessors();
-                Node newControlNode = new Node.Builder(absDepVariable).partedIndices(node.getPartedIndices()).successorsCount(successors.length).build();
-                for (int condition = 0; condition < successors.length; condition++) {
-                    Node successor = successors[condition];
+                int conditionsCount = node.getConditionsCount();
+				Node newControlNode = new Node.Builder(absDepVariable).partedIndices(node.getPartedIndices()).createSuccessors(node.getConditionValuesCount()).build();
+                for (int idx = 0; idx < conditionsCount; idx++) {
+					Condition condition = node.getCondition(idx);
+					Node successor = node.getSuccessor(condition);
                     /* Create new Context and hash it */
                     context.addContext(newControlNode, condition);
                     successor.traverse(this);
@@ -92,7 +94,7 @@ public class FsmGraphCreator implements HLDDVisitor {
             rootNode = null;
         }
 
-        public void addContext(Node controlNode, int condition) throws Exception {
+        public void addContext(Node controlNode, Condition condition) throws Exception {
             if (controlNode.isTerminalNode()) {
                 throw new Exception("Terminal node is being hashed as a CONTEXT: " + controlNode +
                         "\nOnly Control Nodes and their condition can be hashed as a context.");
@@ -127,17 +129,17 @@ public class FsmGraphCreator implements HLDDVisitor {
 
         private class ContextItem {
             private final Node controlNode;
-            private final int condition;
+            private final Condition condition;
 
 
-            public ContextItem(Node controlNode, int condition) {
+            public ContextItem(Node controlNode, Condition condition) {
                 this.controlNode = controlNode;
                 this.condition = condition;
             }
 
             /**
              * @param newNode node to fill the current context with
-             * @throws Exception Causes: {@link Node#setSuccessor(int, base.hldd.structure.nodes.Node) cause }
+             * @throws Exception Causes: {@link Node#setSuccessor(Condition, base.hldd.structure.nodes.Node) cause }
              */
             public void fillContext(Node newNode) throws Exception {
                 controlNode.setSuccessor(condition, newNode);
@@ -176,20 +178,27 @@ public class FsmGraphCreator implements HLDDVisitor {
             Node fsmNode = fsmContext.getCurrentContext().fsmNode;
 
             if (areControlNodesIdentical(node)) {
-                /* Both nodes are CONTROL nodes with the SAME CONTROL VARIABLE */
-                for (int index = 0; index < node.getSuccessors().length; index++) {
-                    Node successor = node.getSuccessors()[index];
-                    /* Traverse successors */
-                    fsmContext.addContext(fsmNode.getSuccessors()[index], index);
-                    resetTracker.trackCondition(node.getDependentVariable(), index);
-                    successor.traverse(this);
-                    resetTracker.dismissCurrentContext();
-                    fsmContext.dismissCurrentContext();
-
-                    //todo: dismiss contexts here! Always dismiss them at the place they are added,
-                    //todo: in order not to lose the control.
-                }
-            } else {
+				/* Both nodes are CONTROL nodes with the SAME CONTROL VARIABLE */
+				if (node.hasIdenticalConditionsWith(fsmNode)) { // try to benefit from complex Conditions
+					int conditionsCount = node.getConditionsCount();
+					for (int idx = 0; idx < conditionsCount; idx++) {
+						Condition condition = node.getCondition(idx);
+						Node successor = node.getSuccessor(condition);
+						/* Traverse successors */
+						traverseSuccessors(successor, fsmNode.getSuccessor(condition), condition, node);
+					}
+				} else { // no benefit from complex Conditions. process value-by-value.
+					int conditionValuesCount = node.getConditionValuesCount();
+					for (int idx = 0; idx < conditionValuesCount; idx++) {
+						Condition condition = Condition.createCondition(idx);
+						Node successor = node.getSuccessorInternal(condition);
+						/* Decompact successors */
+						fsmNode.decompact(condition);
+						/* Traverse successors */
+						traverseSuccessors(successor, fsmNode.getSuccessor(condition), condition, node); // now that fsmNode has been decompacted fsmNode.getSuccessor() can be used instead of fsmNode.getSuccessorInternal()
+					}
+				}
+			} else {
 
                 if (node.isTerminalNode() && fsmNode.isTerminalNode()) {
                     /* Both nodes are TERMINAL */
@@ -227,11 +236,21 @@ public class FsmGraphCreator implements HLDDVisitor {
 
         }
 
-        private void addControlNode(Node graphControlNode, Node fsmNode) throws Exception {
+		private void traverseSuccessors(Node successor, Node fsmSuccessor, Condition condition, Node parentNode) throws Exception {
+			fsmContext.addContext(fsmSuccessor, condition);
+			resetTracker.trackCondition(parentNode.getDependentVariable(), condition);
+			successor.traverse(this);
+			resetTracker.dismissCurrentContext();
+			fsmContext.dismissCurrentContext();
+			// dismiss contexts here! Always dismiss them at the place they are added,
+			// in order not to lose the control.
+		}
+
+		private void addControlNode(Node graphControlNode, Node fsmNode) throws Exception {
             /* Create new Control Node */
             Node newControlNode = new Node.Builder(graphControlNode.getDependentVariable())
                     .partedIndices(graphControlNode.getPartedIndices())
-                    .successorsCount(graphControlNode.getSuccessors().length).build();
+					.createSuccessors(graphControlNode.getConditionValuesCount()).build();
 
             FsmGraphCreator.FSMGraphMerger.FsmContext.Context currentContext = fsmContext.getCurrentContext();
             if (currentContext.isRootContext()) {
@@ -240,7 +259,7 @@ public class FsmGraphCreator implements HLDDVisitor {
                 fsmContext.addRootContext(newControlNode);
             } else {
                 /* In the parent of this fsmNode, replace fsmNode with new Control Node */
-                int fsmParentCondition = currentContext.nodeSourceCondition;
+                Condition fsmParentCondition = currentContext.nodeSourceCondition;
                 fsmContext.dismissCurrentContext();/* Dismiss this fsmNode */
                 Node fsmParent = fsmContext.getCurrentContext().fsmNode;
                 fsmParent.setSuccessor(fsmParentCondition, newControlNode);
@@ -248,15 +267,17 @@ public class FsmGraphCreator implements HLDDVisitor {
                 fsmContext.addContext(newControlNode, fsmParentCondition);
             }
             /* Fill new Control Node with clones of fsmNode */
-            for (int index = 0; index < graphControlNode.getSuccessors().length; index++) {
-                /* Create a clone of fsmNode */
-                Node fsmTerminalClone = Utility.clone(fsmNode); //todo: why naming fsmTerminalClone???
+			int conditionsCount = graphControlNode.getConditionsCount();
+			for (int idx = 0; idx < conditionsCount; idx++) {
+				Condition condition = graphControlNode.getCondition(idx);
+				/* Create a clone of fsmNode */
+                Node fsmTerminalClone = Node.clone(fsmNode); //todo: why naming fsmTerminalClone???
                 /* Fill new Control Node with the clone */
-                newControlNode.setSuccessor(index, fsmTerminalClone);
+                newControlNode.setSuccessor(condition, fsmTerminalClone);
                 /* Traverse the new successor of new Control Node */
-                fsmContext.addContext(fsmTerminalClone, index);
-                resetTracker.trackCondition(graphControlNode.getDependentVariable(), index);
-                graphControlNode.getSuccessors()[index].traverse(this);
+                fsmContext.addContext(fsmTerminalClone, condition);
+                resetTracker.trackCondition(graphControlNode.getDependentVariable(), condition);
+                graphControlNode.getSuccessor(condition).traverse(this);
                 resetTracker.dismissCurrentContext();
                 fsmContext.dismissCurrentContext();
 
@@ -287,7 +308,7 @@ public class FsmGraphCreator implements HLDDVisitor {
                     && fsmContext.getCurrentContext().fsmNode.getDependentVariable() == graphNode.getDependentVariable();
         }
 
-        private class FsmContext {
+		private class FsmContext {
             private Stack<Context> contextStack;
 
             public FsmContext() {
@@ -302,7 +323,7 @@ public class FsmGraphCreator implements HLDDVisitor {
              *                  parent with other nodes (method {@link FSMGraphMerger#addControlNode(Node, Node)}).
              *
              */
-            public void addContext(Node fsmNode, int nodeSourceCondition) {
+            public void addContext(Node fsmNode, Condition nodeSourceCondition) {
                 contextStack.push(new Context(fsmNode, nodeSourceCondition));
             }
 
@@ -326,21 +347,20 @@ public class FsmGraphCreator implements HLDDVisitor {
                 contextStack.pop();
             }
             private class Context {
-                private final static int ROOT_CONTEXT_CONDITION = -1;
                 private final Node fsmNode;
-                private final int nodeSourceCondition;
+                private final Condition nodeSourceCondition;
 
-                public Context(Node fsmNode, int nodeSourceCondition) {
+                public Context(Node fsmNode, Condition nodeSourceCondition) {
                     this.fsmNode = fsmNode;
                     this.nodeSourceCondition = nodeSourceCondition;
                 }
 
                 public Context(Node fsmNode) {
-                    this(fsmNode, ROOT_CONTEXT_CONDITION);
+                    this(fsmNode, null);
                 }
 
                 public boolean isRootContext() {
-                    return nodeSourceCondition == ROOT_CONTEXT_CONDITION;
+                    return nodeSourceCondition == null;
                 }
             }
         }
@@ -355,14 +375,14 @@ public class FsmGraphCreator implements HLDDVisitor {
                 contextStack = new Stack<Context>();
             }
 
-            public void trackCondition(AbstractVariable parentConditionVar, int parentCondition) {
+            public void trackCondition(AbstractVariable parentConditionVar, Condition parentCondition) {
                 contextStack.push(new Context(parentConditionVar, parentCondition));
             }
 
-            public boolean isResetingTerminalNode() {
+            public boolean isResetingTerminalNode() throws HLDDException {
                 if (contextStack.isEmpty()) return false;
                 Context currentContext = contextStack.peek();
-                return currentContext.parentConditionVariable.isReset() && currentContext.parentCondition == 1;
+                return currentContext.parentConditionVariable.isReset() && currentContext.parentCondition.getValue() == 1;
             }
 
             public void dismissCurrentContext() {
@@ -372,9 +392,9 @@ public class FsmGraphCreator implements HLDDVisitor {
 
             private class Context {
                 private final AbstractVariable parentConditionVariable;
-                private final int parentCondition;
+                private final Condition parentCondition;
 
-                public Context(AbstractVariable parentConditionVar, int parentCondition) {
+                public Context(AbstractVariable parentConditionVar, Condition parentCondition) {
                     this.parentConditionVariable = parentConditionVar;
                     this.parentCondition = parentCondition;
                 }

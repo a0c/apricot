@@ -84,7 +84,7 @@ public class TransitionNode extends AbstractNode {
         }
 
         return isNull()
-                || (getTargetOperand().getName().equals(variable.getName())
+                || (getTargetOperand().getName().equals(variable.getPureName())
                     && (!getTargetOperand().isParted() && variable.getClass() != PartedVariable.class
                     || (variable.getClass() == PartedVariable.class
                         && (!getTargetOperand().isParted()
