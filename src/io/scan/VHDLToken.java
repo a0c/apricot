@@ -38,8 +38,12 @@ public class VHDLToken {
         return value;
     }
 
+	@Override
+	public String toString() {
+		return "{" + type + "} " + value;
+	}
 
-    interface Matcheable {
+	interface Matcheable {
         boolean matches(String line);
     }
 
@@ -51,7 +55,8 @@ public class VHDLToken {
         INTEGER("(\\-?\\d+)"),
         BIT("(\"(0|1)+\")|('(0|1)+')"),
         BOOLEAN("((TRUE)|(FALSE))"),
-//        HEX("([\\dA-F]+)"), //todo: uncomment and correct the regex, now it's wrong
+        HEX("([\\da-fA-F]+)"),
+        BASED_LITERAL("(\\d+ # (" + HEX.regex + "|[\\._])+ #( [eE]\\+?\\d+)?)"),
         EXPRESSION("(\\( )?.+( \\))?"),
         TYPE("((BIT)" +
                 "|(STD_LOGIC)" +
@@ -60,8 +65,9 @@ public class VHDLToken {
                 "|(INTEGER RANGE " + EXPRESSION.regex + " ((DOWNTO)|(TO)) " + EXPRESSION.regex + ")" + //"|(INTEGER RANGE (\\( )?" + Sub.INTEGER.regex + "( \\))? ((DOWNTO)|(TO)) (\\( )?" + Sub.INTEGER.regex + "( \\))?)" +
                 "|(UNSIGNED \\( " + EXPRESSION.regex + " ((DOWNTO)|(TO)) " + EXPRESSION.regex + " \\))" +
                 "|(BOOLEAN)" +
+                "|(NATURAL)" +
                 "|(" + LBL.regex + "))"), // User declared type
-        NUMERIC_VALUE("(" + BIT.regex + "|" + INTEGER.regex + "|" + BOOLEAN.regex + ")"), /*"(("+ Sub.INTEGER.regex + ")" + "|(\'"+ Sub.INTEGER.regex + "\')" + "|(\""+ Sub.INTEGER.regex + "\"))"*/
+        NUMERIC_VALUE("(" + BIT.regex + "|" + INTEGER.regex + "|" + BOOLEAN.regex + "|" + HEX.regex + "|" + BASED_LITERAL.regex + ")"), 
         INIT("( :=" + NUMERIC_VALUE.regex + ")?"),
         MUST_INIT(" :=" + NUMERIC_VALUE.regex),
         OPERAND("((" + LBL.regex + ")" +

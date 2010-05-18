@@ -22,7 +22,8 @@ public enum LexemeType {
     GT(">"),
     OPEN_SQUARE_BRACKET("\\["),
     CLOSE_SQUARE_BRACKET("\\]"),
-    VERTICAL_LINE("\\|");
+    VERTICAL_LINE("\\|"),
+	SHARP("#");
 
     private final String regex;
 
@@ -84,6 +85,8 @@ public enum LexemeType {
             return CLOSE_SQUARE_BRACKET;
         } else if (startingChar == '|') {
             return VERTICAL_LINE;
+        } else if (startingChar == '#') {
+            return SHARP;
         } else {
             System.out.println("incorrect char: " + startingChar + ".");
             throw new Exception("Cannot diagnose LexemeType for the following first character: " + startingChar);

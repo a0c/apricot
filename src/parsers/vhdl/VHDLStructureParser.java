@@ -42,19 +42,19 @@ public class VHDLStructureParser {
                 case USE_DECL:
 					//todo: Fix package loading. For this use crc_half_modified.vhd and crc_pkg.vhd from C:\Documents and Settings\Randy\Desktop\TTU temp\Elsevier IST paper\Designs\CRC_41\CRC\
 					//todo: After fixing, uncomment the following.
-//                    /* Split to {library_name, package_name, all} */
-//                    String[] packageParts = value.substring(4, value.lastIndexOf(";")).trim().split("\\.");
-//                    if (packageParts.length == 3) {
-//                        /* USE LIBRARY_NAME.PACKAGE_NAME.ALL */
-//                        /* Process WORK library (current working directory)
-//                        * and skip IEEE library and others... */
-//                        if (packageParts[0].equalsIgnoreCase("WORK")) {
-//                            PackageParser.parse(scanner.getSourceFile(), packageParts[1], builder);
-//                        } else continue;
-//                    } else if (packageParts.length == 2) {
-//                        /* USE PACKAGE_NAME.ALL; */
-//                        PackageParser.parse(scanner.getSourceFile(), packageParts[0], builder);
-//                    } else throw new Exception("Malformed USE PACKAGE declaration: \"" + value + "\"");
+                    /* Split to {library_name, package_name, all} */
+                    String[] packageParts = value.substring(4, value.lastIndexOf(";")).trim().split("\\.");
+                    if (packageParts.length == 3) {
+                        /* USE LIBRARY_NAME.PACKAGE_NAME.ALL */
+                        /* Process WORK library (current working directory)
+                        * and skip IEEE library and others... */
+                        if (packageParts[0].equalsIgnoreCase("WORK")) {
+                            PackageParser.parse(scanner.getSourceFile(), packageParts[1], builder);
+                        } else continue;
+                    } else if (packageParts.length == 2) {
+                        /* USE PACKAGE_NAME.ALL; */
+                        PackageParser.parse(scanner.getSourceFile(), packageParts[0], builder);
+                    } else throw new Exception("Malformed USE PACKAGE declaration: \"" + value + "\"");
                     break;
                 case ENTITY_DECL:
                     name = value.split("\\s")[1];

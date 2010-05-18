@@ -144,7 +144,7 @@ public class VHDLScanner {
      * 3 following simple rules:
      * <p>
      * 1) Space characted is added after all the lexemes, excluding the following
-     * 8 characters:  - : ' " < = / >  <br>
+     * 9 characters:  - : ' " < = / > #  <br>
      * 2) The added space character is removed, if it follows a digit and
      * precedes a single/double quote (e.g. "111111 " )<br>
      * 3) The added space character is removed, if it followes a single quote<br>
@@ -162,9 +162,9 @@ public class VHDLScanner {
         if (!(lexeme.getType() == LexemeType.OP_SUBTR || lexeme.getType() == LexemeType.COLON
                 || lexeme.getType() == LexemeType.SINGLE_QUOTE || lexeme.getType() == LexemeType.DOUBLE_QUOTE
                 || lexeme.getType() == LexemeType.LT || lexeme.getType() == LexemeType.OP_EQ || lexeme.getType() == LexemeType.OP_DIV)
-                || lexeme.getType() == LexemeType.GT) {
+                || lexeme.getType() == LexemeType.GT || lexeme.getType() == LexemeType.SHARP) {
             //todo: maybe >
-            /* Don't place a SPACE character after the 8 characters as follows:   - : ' " < = / >  */
+            /* Don't place a SPACE character after the 8 characters as follows:   - : ' " < = / > #  */
             destinationStrBuf.append(" ");
             // (CLOCK 'EVENT )
             /* Remove space between CLOCK and 'EVENT */

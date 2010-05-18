@@ -168,7 +168,23 @@ public class PackageParser {
             typeString = typeString.substring(0, typeString.length() - 1).trim();
         }
 
-        if (typeString.contains(" RANGE ")) {
+        if (typeString.startsWith("ARRAY ")) {
+            /* ARRAY ((PROCESSOR_WIDTH -1) DOWNTO -1) OF STD_LOGIC; */
+			/* todo: ARRAY ( NATURAL RANGE <> ) OF STD_LOGIC_VECTOR ( 31 DOWNTO 0 ) ; */
+            /* Check subtype */
+            int ofIndex = typeString.lastIndexOf(" OF ");
+            String subType = typeString.substring(ofIndex + 4).trim();
+            if (!(subType.equals("BIT") || subType.equals("STD_LOGIC")))
+                throw new Exception("Unsupported type: \'" + typeString + "\'\n" +
+                        "Only BIT and STD_LOGIC are supported as array subtypes.");
+            /* Parse indices */
+            Indices indices = builder.buildIndices(
+                    ExpressionBuilder.trimEnclosingBrackets(typeString.substring(6, ofIndex)));
+            //todo: signed? what does the last -1 mean here: "(PROCESSOR_WIDTH -1) DOWNTO -1"
+
+            return new Type(indices);
+
+        } else if (typeString.contains(" RANGE ")) {
             /* INTEGER RANGE 32767 DOWNTO -32768 */
             /* INTEGER RANGE 0 TO 3 */
             Indices valueRange = builder.buildIndices(typeString.substring(typeString.indexOf(" RANGE ") + 7));
@@ -180,21 +196,6 @@ public class PackageParser {
             /* BIT_VECTOR ( 8 DOWNTO 0) */
             /* {IN} STD_LOGIC_VECTOR(MOD_EN_BITS-3 DOWNTO 0) */
             Indices indices = builder.buildIndices(typeString);
-
-            return new Type(indices);
-
-        } else if (typeString.startsWith("ARRAY ")) {
-            /* ARRAY ((PROCESSOR_WIDTH -1) DOWNTO -1) OF STD_LOGIC; */
-            /* Check subtype */
-            int ofIndex = typeString.lastIndexOf(" OF ");
-            String subType = typeString.substring(ofIndex + 4).trim();
-            if (!(subType.equals("BIT") || subType.equals("STD_LOGIC")))
-                throw new Exception("Unsupported type: \'" + typeString + "\'\n" +
-                        "Only BIT and STD_LOGIC are supported as array subtypes.");
-            /* Parse indices */
-            Indices indices = builder.buildIndices(
-                    ExpressionBuilder.trimEnclosingBrackets(typeString.substring(6, ofIndex)));
-            //todo: signed? what does the last -1 mean here: "(PROCESSOR_WIDTH -1) DOWNTO -1"
 
             return new Type(indices);
 
@@ -211,7 +212,7 @@ public class PackageParser {
 
 
     enum RadixEnum {
-        BINARY(2), BOOLEAN(2), HEXADECIMAL(16), DECIMAL(10);
+        BINARY(2), BOOLEAN(2), HEXADECIMAL(16), ARBITRARY(-1), DECIMAL(10);
 
         private static final Pattern HEX_PATTERN = Pattern.compile("^X \".+\"$");
 
@@ -226,31 +227,40 @@ public class PackageParser {
                 if (this == BOOLEAN) {
                     return isTrue(valueAsString) ? BigInteger.ONE : isFalse(valueAsString) ? BigInteger.ZERO : null;
                 }
+				if (this == ARBITRARY) {
+					String[] parts = valueAsString.split("#");
+					if (parts.length == 2) {
+						if (parts[1].contains(".")) {
+							throw new RuntimeException("Decimals are not supported in Based Literal (" + valueAsString + "). Missing implementation...");
+						}
+						int base = Integer.parseInt(parts[0].trim());
+						return new BigInteger(parts[1].replaceAll("_", "").trim(), base);
+					} else throw new RuntimeException("Exponent is not supported in Based Literal (" + valueAsString + "). Missing implementation...");
+				}
                 return new BigInteger(valueAsString, radixAsInt);
-//                return Integer.valueOf(valueAsString, radixAsInt);
             } catch (NumberFormatException e) {
                 return null;
             }
         }
 
         String trimConstantString(String variableString) {
-            return trimConstantString(variableString, this);
-        }
-
-        static String trimConstantString(String variableString, RadixEnum radix) {
-            switch (radix) {
-                case BINARY:
-                    return variableString.substring(1, variableString.length() - 1).trim();
-                case DECIMAL:
-                case BOOLEAN:
-                    return variableString;
-                default:
-                    return variableString.substring(3, variableString.length() - 1).trim();
-            }
+			switch (this) {
+				case BINARY:
+					return variableString.substring(1, variableString.length() - 1).trim();
+				case DECIMAL:
+				case BOOLEAN:
+				case ARBITRARY:
+					return variableString;
+				default:
+					return variableString.substring(3, variableString.length() - 1).trim();
+			}
         }
 
         static RadixEnum parseRadix(String valueAsString) {
-            return isBinary(valueAsString) ? BINARY : isBoolean(valueAsString) ? BOOLEAN : isHex(valueAsString) ? HEXADECIMAL : DECIMAL;
+            return isBinary(valueAsString) ? BINARY :
+					isBoolean(valueAsString) ? BOOLEAN :
+							isHex(valueAsString) ? HEXADECIMAL :
+									isBased(valueAsString) ? ARBITRARY : DECIMAL;
         }
 
         private static boolean isBinary(String valueAsString) {
@@ -274,6 +284,10 @@ public class PackageParser {
             return HEX_PATTERN.matcher(valueAsString).matches();
         }
 
+		private static boolean isBased(String valueAsString) {
+			return valueAsString.contains("#");
+		}
+
         private Indices lengthFor(String valueAsString) {
             switch (this) {
                 case BOOLEAN:
@@ -281,6 +295,7 @@ public class PackageParser {
                 case BINARY:
                     return new Indices(valueAsString.length() - 1, 0);
                 case DECIMAL:
+				case ARBITRARY:
                     return null;
                 default:
                     /* HEXADECIMAL */

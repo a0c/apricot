@@ -21,4 +21,8 @@ public class Lexeme {
     public LexemeType getType() {
         return type;
     }
+	@Override
+	 public String toString() {
+		return "{" + type + "} " + value;
+	}
 }

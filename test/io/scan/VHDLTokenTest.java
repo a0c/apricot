@@ -10,12 +10,23 @@ import static org.junit.Assert.*;
  */
 public class VHDLTokenTest {
     /* ############# TOKEN.SUB ############# */
-    /* BOOLEAN */
-    private static final String[] booleansMatch = { "\"0101\"", "\"0\"", "\"1\"", "\'0101\'", "\'0\'", "\'1\'" };
-    private static final String[] booleansNoMatch = { "\"\"", "\'\'", "\'01201\'", "\"8983\"" };
+    /* BIT */
+    private static final String[] bitsMatch = { "\"0101\"", "\"0\"", "\"1\"", "\'0101\'", "\'0\'", "\'1\'" };
+    private static final String[] bitsNoMatch = { "\"\"", "\'\'", "\'01201\'", "\"8983\"" };
+	/* BOOLEAN */
+	private static final String[] booleansMatch = { "TRUE", "FALSE" };
+	private static final String[] booleansNoMatch = { "BOOLEAN", "F", "T" };
     /* INTEGER */
     private static final String[] integersMatch = { "10", "2310", "-1", "0", "1", "-12342" };
     private static final String[] integersNoMatch = { "829a", "AB2", "FFF", "fff" };
+    /* HEX */
+    private static final String[] hexMatch = { "829a", "10", "AB2", "2310", "FFF", "fff", "0", "1", "ABCDEF" };
+    private static final String[] hexNoMatch = { "142ew", "-1", "-12342" };
+    /* BASED_LITERAL */
+    private static final String[] basedLiteralMatch = { "16 # 01 #", "16 # 02 #", "2 # 010010 #", "2 # 01001 # E1",
+			"3 # 012011 # E+2", "2 # 0100.101 #", "2 # 0100_1001 #"};
+	/* NUMERIC (no match) */
+	private static final String[] numericNoMatch = {"abcdefg", "23423ew"};
     /* ############# TOKEN.TYPE ############# */
     /* CONSTANT_DECL */
     private static final String[] constantDeclsMatch = {
@@ -55,6 +66,14 @@ public class VHDLTokenTest {
 
     /* ############# TOKEN.SUB ############# */
 
+	@Test
+	public void correct_BIT() {
+		/* MATCH */
+		doCheckMatch(VHDLToken.Sub.BIT, bitsMatch);
+		/* NO MATCH */
+		doCheckNoMatch(VHDLToken.Sub.BIT, bitsNoMatch);
+	}
+
     @Test
     public void correct_BOOLEAN() {
         /* MATCH */
@@ -72,14 +91,31 @@ public class VHDLTokenTest {
     }
 
     @Test
+    public void correct_HEX() {
+        /* MATCH */
+        doCheckMatch(VHDLToken.Sub.HEX, hexMatch);
+        /* NO MATCH */
+        doCheckNoMatch(VHDLToken.Sub.HEX, hexNoMatch);
+    }
+
+    @Test
+    public void correct_BASED_LITERAL() {
+        /* MATCH */
+        doCheckMatch(VHDLToken.Sub.BASED_LITERAL, basedLiteralMatch);
+    }
+
+    @Test
     public void correct_NUMERIC_VALUE() {
         /* MATCH */
+		doCheckMatch(VHDLToken.Sub.NUMERIC_VALUE, bitsMatch);
         doCheckMatch(VHDLToken.Sub.NUMERIC_VALUE, booleansMatch);
         doCheckMatch(VHDLToken.Sub.NUMERIC_VALUE, integersMatch);
+        doCheckMatch(VHDLToken.Sub.NUMERIC_VALUE, hexMatch);
+        doCheckMatch(VHDLToken.Sub.NUMERIC_VALUE, basedLiteralMatch);
 
         /* NO MATCH */
-        doCheckNoMatch(VHDLToken.Sub.NUMERIC_VALUE, integersNoMatch);
-        //todo... HEX
+        doCheckNoMatch(VHDLToken.Sub.NUMERIC_VALUE, bitsNoMatch);
+        doCheckNoMatch(VHDLToken.Sub.NUMERIC_VALUE, numericNoMatch);
     }
 
     @Test
@@ -90,7 +126,7 @@ public class VHDLTokenTest {
         doCheckMatch(VHDLToken.Sub.INIT, "", ""); // no INITialization
         doCheckMatch(VHDLToken.Sub.INIT); // no INITialization
         /* NO MATCH */
-        doCheckNoMatch(VHDLToken.Sub.INIT, createINITarray(integersNoMatch));
+        doCheckNoMatch(VHDLToken.Sub.INIT, createINITarray(numericNoMatch));
 
     }
     @Test
@@ -99,7 +135,7 @@ public class VHDLTokenTest {
         doCheckMatch(VHDLToken.Sub.MUST_INIT, createINITarray(booleansMatch));
         doCheckMatch(VHDLToken.Sub.MUST_INIT, createINITarray(integersMatch));
         /* NO MATCH */
-        doCheckNoMatch(VHDLToken.Sub.MUST_INIT, createINITarray(integersNoMatch));
+        doCheckNoMatch(VHDLToken.Sub.MUST_INIT, createINITarray(numericNoMatch));
         doCheckNoMatch(VHDLToken.Sub.MUST_INIT, "", ""); // no INITialization
         doCheckNoMatch(VHDLToken.Sub.MUST_INIT); // no INITialization
 
@@ -155,13 +191,13 @@ public class VHDLTokenTest {
     /* HELPER METHODS */
     private void doCheckMatch(VHDLToken.Matcheable matcheable, String... lines) {
         for (String line : lines) {
-            assertTrue(matcheable.matches(line));
+            assertTrue(line + " didn't match " + matcheable, matcheable.matches(line));
         }
     }
 
     private void doCheckNoMatch(VHDLToken.Matcheable matcheable, String... lines) {
         for (String line : lines) {
-            assertFalse(matcheable.matches(line));
+            assertFalse(line + " matched " + matcheable, matcheable.matches(line));
         }
     }
 

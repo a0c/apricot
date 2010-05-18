@@ -36,7 +36,13 @@ public class PackageParserTest {
             new ParsingConstant("true", 1, 1),
             new ParsingConstant("TRUE", 1, 1),
             new ParsingConstant("false", 0, 1),
-            new ParsingConstant("FALSE", 0, 1)
+            new ParsingConstant("FALSE", 0, 1),
+            new ParsingConstant("16 # 00 #", 0, 1),
+            new ParsingConstant("16 # 01 #", 1, 1),
+            new ParsingConstant("16 # 02 #", 2, 2),
+            new ParsingConstant("16 # 03 #", 3, 2),
+            new ParsingConstant("2 # 010010 #", 18, 5),
+            new ParsingConstant("3 # 012011 #", 139, 8),
     };
 
     private static final String[] correctHexes = {
