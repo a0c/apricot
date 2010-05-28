@@ -108,7 +108,12 @@ public class GraphVariable extends AbstractVariable implements Visitable /*exten
         return baseVariable.isDelay();
     }
 
-    public String lengthToString() {
+	@Override
+	public boolean isExpansion() {
+		return baseVariable.isExpansion();
+	}
+
+	public String lengthToString() {
         return baseVariable.lengthToString();
     }
 

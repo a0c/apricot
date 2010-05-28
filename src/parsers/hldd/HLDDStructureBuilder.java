@@ -57,12 +57,12 @@ public class HLDDStructureBuilder {
                         /* Try to create normal function. If failed - create User Defined Function */
                         functionVariable = new FunctionVariable(Operator.valueOf(
                                 functionData.functionType),
-                                functionData.name);
+                                functionData.nameIdx);
                     } catch (IllegalArgumentException e) {
                         /* User defined function */
                         functionVariable = new UserDefinedFunctionVariable(
                                 functionData.functionType,
-                                functionData.name,
+                                functionData.nameIdx,
                                 functionData.inputIndices.length,
                                 functionData.length);
                     }
@@ -194,11 +194,11 @@ public class HLDDStructureBuilder {
         collector.addVariable(newConstantVariable);
     }
 
-    public void buildFunction(int index, String name, String functionType, int[] inputIndices, Indices[] inputPartedIndices, Indices length) {
+    public void buildFunction(int index, int nameIdx, String functionType, int[] inputIndices, Indices[] inputPartedIndices, Indices length) {
         varCount--;
         funcCount--;
         /* Collect FunctionData */
-        collector.addFunctionData(functionType, name, index, inputIndices, inputPartedIndices, length);
+        collector.addFunctionData(functionType, nameIdx, index, inputIndices, inputPartedIndices, length);
     }
 
     public void buildGraph(int index, Flags flags, String name, Indices partedIndices, Indices length, int graphLength, int graphIndex) {

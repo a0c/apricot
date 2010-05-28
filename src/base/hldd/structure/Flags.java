@@ -26,6 +26,7 @@ public final class Flags {
     private boolean isOutput;
     private boolean isReset;
     private boolean isState;
+    private boolean isExpansion;
 
     /**
      * Empty flags.
@@ -43,6 +44,7 @@ public final class Flags {
         isOutput = flags.isOutput;
         isReset = flags.isReset;
         isState = flags.isState;
+        isExpansion = flags.isExpansion;
     }
 
     public Flags setCout(boolean isCout) {
@@ -80,7 +82,12 @@ public final class Flags {
         return this;
     }
 
-    public boolean isCout() {
+	public Flags setExpansion(boolean isExpansion) {
+		this.isExpansion = isExpansion;
+		return this;
+	}
+
+	public boolean isCout() {
         return isCout;
     }
 
@@ -108,7 +115,11 @@ public final class Flags {
         return isState;
     }
 
-    public boolean isFunction() {
+	public boolean isExpansion() {
+		return isExpansion;
+	}
+
+	public boolean isFunction() {
         return isFunction;
     }
 
@@ -136,6 +147,7 @@ public final class Flags {
         if (otherFlags.isOutput) newFlags.isOutput = true;
         if (otherFlags.isReset) newFlags.isReset = true;
         if (otherFlags.isState) newFlags.isState = true;
+        if (otherFlags.isExpansion) newFlags.isExpansion = true;
 
         return newFlags;
     }
@@ -152,6 +164,7 @@ public final class Flags {
         if (isOutput) b.setCharAt(4, 'o');
         if (isReset) b.setCharAt(2, 'r');
         if (isState) b.setCharAt(2, 's');
+        if (isExpansion) b.setCharAt(8, 'E');
 
         return b.toString();
     }
@@ -168,6 +181,7 @@ public final class Flags {
         if (flagsAsString.length() == 10){
 			if (flagsAsString.charAt(8) == 'F') flags.setFSM(true);
 			if (flagsAsString.charAt(4) == 'F') flags.setFunction(true);
+			if (flagsAsString.charAt(8) == 'E') flags.setExpansion(true);
 		} else if (flagsAsString.length() == 5) {
 			if (flagsAsString.contains("F")) flags.setFunction(true);
 		} else throw new RuntimeException("Flags: flags length is neither 10 (AGM), nor 5 (TGM)"); 

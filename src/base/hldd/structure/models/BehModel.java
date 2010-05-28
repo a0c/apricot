@@ -206,8 +206,10 @@ public class BehModel {
             AbstractVariable absVar = getVariableByIndex(index);
             if (absVar instanceof GraphVariable) {
                 GraphVariable graphVariable = (GraphVariable) absVar;
-                graphVariable.getGraph().getRootNode().minimize(rootNodeAbsIndex);
-                rootNodeAbsIndex += graphVariable.getGraph().getSize();
+				if (!graphVariable.isExpansion()) {
+					graphVariable.getGraph().getRootNode().minimize(rootNodeAbsIndex);
+				}
+				rootNodeAbsIndex += graphVariable.getGraph().getSize();
             }
         }
         /* Refresh internal state variable */
@@ -221,8 +223,10 @@ public class BehModel {
             AbstractVariable absVar = getVariableByIndex(index);
             if (absVar instanceof GraphVariable) {
                 Graph graph = ((GraphVariable) absVar).getGraph();
-                graph.setRootNode(graph.getRootNode().reduce(rootNodeAbsIndex));
-                rootNodeAbsIndex += graph.getSize();
+				if (!absVar.isExpansion()) {
+					graph.setRootNode(graph.getRootNode().reduce(rootNodeAbsIndex));
+				}
+				rootNodeAbsIndex += graph.getSize();
             }
         }
         /* Refresh internal state variable */

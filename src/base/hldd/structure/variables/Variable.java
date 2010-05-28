@@ -200,7 +200,11 @@ public class Variable extends AbstractVariable {
         return flags.isDelay();
     }
 
-    public Flags getFlags() {
+	public boolean isExpansion() {
+		return flags.isExpansion();
+	}
+
+	public Flags getFlags() {
         return flags;
     }
 

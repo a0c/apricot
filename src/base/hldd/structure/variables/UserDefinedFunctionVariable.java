@@ -22,16 +22,16 @@ public class UserDefinedFunctionVariable extends FunctionVariable {
 
     /**
      * 
-     * @param userDefinedOperator
-     * @param functionName function name
+     * @param userDefinedOperator operator defined by user (VHDL Function or Procedure)
+     * @param nameIdx function index (ordered)
      * @param expectedOperandsSize number of operands to expect. Facilitates the use of
      *        {@link java.util.ArrayList} as operands storage. Thus operands
      *        can be accessed quickly by their index.
-     * @param length
+     * @param length length to create a type from
      */
-    public UserDefinedFunctionVariable(String userDefinedOperator, String functionName,
+    public UserDefinedFunctionVariable(String userDefinedOperator, int nameIdx,
                                        int expectedOperandsSize, Indices length) {
-        super(functionName);
+        super(nameIdx);
         this.userDefinedOperator = userDefinedOperator;
         this.expectedOperandsSize = expectedOperandsSize;
         this.operands = new ArrayList<PartedVariableHolder>(expectedOperandsSize);

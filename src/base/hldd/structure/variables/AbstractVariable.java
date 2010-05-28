@@ -46,4 +46,8 @@ public abstract class AbstractVariable {
     public abstract boolean isSigned();
 
     public abstract boolean isDelay();
+
+	public boolean isExpansion() { // todo: do the same (default behavior) for other methods, where possible (e.g. FSM)
+		return false;
+	}
 }

@@ -276,9 +276,6 @@ public class Node implements Visitable, Cloneable {
 	 * 		or if this node doesn't contain the specified condition
 	 */
 	public void decompact(Condition condition) throws HLDDException {
-		if (condition.isArray()) {
-			throw new HLDDException("Node: decompact(): scalar-condition expected, found: " + condition);
-		}
 		if (isTerminalNode()) {
 			throw new HLDDException("Node: decompact(): trying to decompact a terminal node");
 		}

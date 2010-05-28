@@ -8,6 +8,7 @@ package base;
 public final class Type {
 
     public static final Type BIT_TYPE = new Type(Indices.BIT_INDICES);
+    public static final Type BOOL_TYPE = createFromValues(1, 0);
 
     /**
      * Range of possible values in case of enums; <code>null</code> if not enum.

@@ -33,12 +33,12 @@ public enum Operator {
     CAT("&", false, false, 2),
     XOR(" XOR ", false, true, 2),
     SUBTR("-", false, false, 2),
-    AND(" AND ", false, true, 2),
+    AND(" AND ", false, true, 2), // todo: consider using 2 AND-S, OR-s (INV-s?): logical and algebraical. Benefit 1) remove 3rd parameter from constructor and method isLogical(). Benefit 2) simplify code that uses objects of Operator class. Or just remove 3rd parameter and check in ConditionGraphManager operator to be AND, OR or XOR in order for them to be logical.  
     OR(" OR ", false, true, 2),
     MOD(" MOD ", false, false, 2),
     SHIFT_RIGHT(false, 2),
     SHIFT_LEFT(false, 2),
-    INV(false, 1);
+    INV(false, true, 1);
 
         
     private final String delim;
@@ -79,22 +79,34 @@ public enum Operator {
      * @param numberOfOperands number of supported operands
      */
     Operator(boolean isCondition, int numberOfOperands) {
-        delim = null;
-        this.isCondition = isCondition;
-        isLogical = false;
-        this.numberOfOperands = numberOfOperands;
+		this(isCondition, false, numberOfOperands);
     }
 
+	/**
+	 * Constructor for logical functions without delim (INV)
+	 * @param isCondition whether operator is conditional
+	 * @param isLogical whether operator is logical
+	 * @param numberOfOperands number of supported operands
+	 */
+	Operator (boolean isCondition, boolean isLogical, int numberOfOperands) {
+		delim = null;
+		this.isCondition = isCondition;
+		this.isLogical = isLogical;
+		this.numberOfOperands = numberOfOperands;
+	}
+	
     public boolean isCondition() {
         return isCondition;
     }
 
     /**
-     * Currently logical are: XOR, AND, OR
-     * @return whether operator is logical
+     * Currently logical are: XOR, AND, OR, INV
+     * @param length length of the operand
+	 * @return whether operator is logical
      */
-    public boolean isLogical(){
-        return isLogical;
+    public boolean isLogical(int length){
+		//todo: when AND (OR) operators get split into logical and arithmetical, remove length == 1 condition from here.
+        return isLogical && length == 1;
     }
 
     public String getDelim() {
@@ -104,67 +116,6 @@ public enum Operator {
     public int getNumberOfOperands() {
         return numberOfOperands;
     }
-
-    @Deprecated
-    public static String getConditionDelim(String sourceLine) throws Exception {
-        if (sourceLine.contains(NEQ.delim)) return NEQ.delim;
-        if (sourceLine.contains(GE.delim)) return GE.delim;
-        if (sourceLine.contains(LE.delim)) return LE.delim;
-        if (sourceLine.contains(EQ.delim)) return EQ.delim;
-        if (sourceLine.contains(GT.delim)) return GT.delim;
-        if (sourceLine.contains(LT.delim)) return LT.delim;
-        throw new Exception("Unsupported condition is being parsed on sourceLine: \"" + sourceLine + "\"");
-    }
-
-    @Deprecated
-    public static String getCondition(String conditionDelim) throws Exception {
-        if (conditionDelim.equals(NEQ.delim)) return NEQ.name();
-        if (conditionDelim.equals(GE.delim)) return GE.name();
-        if (conditionDelim.equals(LE.delim)) return LE.name();
-        if (conditionDelim.equals(EQ.delim)) return EQ.name();
-        if (conditionDelim.equals(GT.delim)) return GT.name();
-        if (conditionDelim.equals(LT.delim)) return LT.name();
-        throw new Exception("Unsupported delimiter is used for getting a condition type: \"" + conditionDelim + "\"");
-    }
-
-
-    public static boolean isFunctionDelim(String delim) {
-        //todo... or remove
-        return true;
-    }
-
-    //    public static boolean isCondition(String line) {
-//        return isNeq(line)
-//                || isLe(line)
-//                || isGe(line)
-//                || isEq(line)
-//                || isLt(line)
-//                || isGt(line);
-//    }
-//
-//    private static boolean isGt(String line) {
-//        return line.contains(GT.delim);
-//    }
-//
-//    private static boolean isLt(String line) {
-//        return line.contains(LT.delim);
-//    }
-//
-//    private static boolean isEq(String line) {
-//        return line.contains(EQ.delim);
-//    }
-//
-//    private static boolean isGe(String line) {
-//        return line.contains(GE.delim);
-//    }
-//
-//    private static boolean isLe(String line) {
-//        return line.contains(LE.delim);
-//    }
-//
-//    private static boolean isNeq(String line) {
-//        return line.contains(NEQ.delim);
-//    }
 
     /**
      * Checks whether the specified {@code lines} contain

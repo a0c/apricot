@@ -42,7 +42,9 @@ public class BusinessLogic {
         ParserID parserID = applicationForm.getSelectedParserId();
         boolean shouldReuseConstants = applicationForm.shouldReuseConstants();
         boolean shouldSimplify = applicationForm.shouldSimplify();
-        boolean doExpandConditions = applicationForm.shouldExpandCS();
+        boolean doFlattenConditions = applicationForm.shouldFlattenCS();
+        boolean doCreateGraphsForCS = applicationForm.shouldAsGraphCS();
+        boolean doCreateSubGraphs = applicationForm.shouldUseSubGraphs();
         HLDDRepresentationType hlddType = applicationForm.getHlddRepresentationType();
 
         /* Check files */
@@ -60,7 +62,7 @@ public class BusinessLogic {
 
         /* Perform PARSING and CONVERSIONS in a separate thread */
         new ConvertingWorker(this, parserID, consoleWriter, sourceFile, destFile, baseModelFile,
-                shouldReuseConstants, doExpandConditions, hlddType, shouldSimplify).execute();
+                shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, hlddType, shouldSimplify).execute();
 
     }
 

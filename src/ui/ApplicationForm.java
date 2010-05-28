@@ -482,16 +482,38 @@ public class ApplicationForm implements ActionListener {
 //        } else return false;
     }
 
-    public boolean shouldExpandCS() {
-        if (selectedParserId == ParserID.VhdlBeh2HlddBeh) {
-            return vhdlBehOptionsPanel.shouldExpandCS();
-        } else if (selectedParserId == ParserID.VhdlBehDd2HlddBeh) {
-            return vhdlBehDdOptionsPanel.shouldExpandCS();
-        } else return false;
-//        if (vhdlBehOptionsPanel.getMainPanel().isShowing()) {
-//            return vhdlBehOptionsPanel.shouldExpandCS();
-//        } else return false;
-    }
+    public boolean shouldFlattenCS() {
+		switch (selectedParserId) {
+			case VhdlBeh2HlddBeh:
+				return vhdlBehOptionsPanel.shouldFlattenCS();
+			case VhdlBehDd2HlddBeh:
+				return vhdlBehDdOptionsPanel.shouldExpandCS();
+			default:
+				return false;
+		}
+	}
+
+	public boolean shouldAsGraphCS() {
+		switch (selectedParserId) {
+			case VhdlBeh2HlddBeh:
+				return vhdlBehOptionsPanel.shouldAsGraphCS();
+			case VhdlBehDd2HlddBeh:
+				return false;//todo...
+			default:
+				return false;
+		}
+	}
+
+	public boolean shouldUseSubGraphs() {
+		switch (selectedParserId) {
+			case VhdlBeh2HlddBeh:
+				return vhdlBehOptionsPanel.shouldUseSubGraphs();
+			case VhdlBehDd2HlddBeh:
+				return false;//todo...
+			default:
+				return false;
+		}
+	}
 
     public boolean shouldSimplify() {
         return vhdlBehDdOptionsPanel.shouldSimplify();

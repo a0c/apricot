@@ -1,6 +1,7 @@
 package base.hldd.structure.models.utils;
 
 import base.HLDDException;
+import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.variables.Variable;
 import base.hldd.visitors.DependentVariableReplacer;
@@ -22,6 +23,8 @@ import parsers.vhdl.PackageParser;
 public class ModelManager {
     private VariableManager variableManager;
     private final boolean useSameConstants;
+	private ConstantVariable constant0;
+	private ConstantVariable constant1;
 
     public ModelManager(boolean useSameConstants) {
         this.useSameConstants = useSameConstants;
@@ -40,6 +43,20 @@ public class ModelManager {
         variableManager.removeVariable(variableToRemove);
     }
 
+	public ConstantVariable getConstant0() throws Exception {
+		if (constant0 == null) {
+			constant0 = (ConstantVariable) convertOperandToVariable(new OperandImpl("0"), Indices.BIT_INDICES, false);
+		}
+		return constant0;
+	}
+
+	public ConstantVariable getConstant1() throws Exception {
+		if (constant1 == null) {
+			constant1 = (ConstantVariable) convertOperandToVariable(new OperandImpl("1"), Indices.BIT_INDICES, false);
+		}
+		return constant1;
+	}
+	
     public void replace(AbstractVariable variableToReplace, AbstractVariable replacingVariable) throws Exception {
         if (variableToReplace instanceof ConstantVariable) {
             throw new Exception("ConstantVariable cannot be replaced currently. Implementation is simply missing.");
@@ -79,51 +96,76 @@ public class ModelManager {
 
     }
 
-    public AbstractVariable[] getFutureGraphVars() {
-        ArrayList<AbstractVariable> varList = new ArrayList<AbstractVariable>();
-
-        for (AbstractVariable variable : variableManager.getVariables()) {
-            if (!variable.isInput()) {
-                varList.add(variable);
-            }
-        }
-
-        return varList.toArray(new AbstractVariable[varList.size()]);
-    }
-
-    /**
-     * Extracts a boolean dependent variable out of an <b>expression</b>.
-     * If it's a function, then creates it and adds to variables.
-     * Otherwise searches for it amongst internal variables.
-     *
-     * @param expression
-     * @param expandCondition
-     * @return an instance of
-     *         {@link base.hldd.structure.models.utils.PartedVariableHolder}
-     * @throws Exception If an undeclared variable is used within the expression
-     *          <br>{@link #createConditionalFunction(base.vhdl.structure.Expression, boolean) cause2}
-     */
-    public PartedVariableHolder getBooleanDependentVariable(Expression expression, boolean expandCondition) throws Exception {
-
-        FunctionVariable additionalFunction = createConditionalFunction(expression, expandCondition);
-        if (additionalFunction != null) return new PartedVariableHolder(
-                additionalFunction, null, getConditionValue(additionalFunction, expression));
-        else {
-            //todo: replace Boolean expression (SOME_BOOLEAN) with artificial condition, in VHDLStructureBuilder. 
-            List<AbstractOperand> operands = expression.getOperands();
-            if (operands.size() != 2) throw new Exception("Error during extraction of DEPENDENT VARIABLE:" +
-                    "\nSupported number of operands is 2. Received number of operands: " + operands.size() +
-                    "\nExpression: " + expression);
-            AbstractVariable dependentVariable = convertOperandToVariable(operands.get(0), null, false);
-            Indices partedIndices = operands.get(0).getPartedIndices();
-            return new PartedVariableHolder(dependentVariable, partedIndices, getConditionValue(dependentVariable, expression));
-        }
-
-    }
-
+	public PartedVariableHolder convertConditionalStmt(Expression conditionalStmt, boolean flattenCondition) throws Exception {
+		boolean inverted = conditionalStmt.isInverted();
+		
+		/* Create FUNCTION */
+		FunctionVariable functionVariable;
+		if (flattenCondition && conditionalStmt.isCompositeCondition()) {
+			functionVariable = createCompositeFunction(conditionalStmt);
+			return new PartedVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
+		} else {
+			functionVariable = createFunction(conditionalStmt, false);
+			return detectTrueValueAndSimplify(functionVariable, inverted); //todo: don't represent NOT as isInverted(). Use Function instead. And remove isInverted() parameter from here and further on. But think carefully: it may be a deeply internal INV in condition (there INV-s are preserved as functions)
+		}
+	}
+	
+	/**
+	 * Both, obtains correct true value for the functionVariable (puts it into the returned object),
+	 * and tries to simplify boolean condition. Simplification is possible is EQ/NEQ compares
+	 * a variable to a 1-bit constant.
+	 *
+	 * @param functionVariable functions whose true value is to be detected
+	 * @param inverted is the source {@link base.vhdl.structure.Expression} is inverted
+	 * @return holder of a variable, its indices and its true value
+	 * @throws HLDDException if CompositeFunctionVariable is specified as a parameter
+	 */
+	private PartedVariableHolder detectTrueValueAndSimplify(FunctionVariable functionVariable, boolean inverted) throws HLDDException {
+		
+		if (functionVariable instanceof CompositeFunctionVariable) {
+			throw new HLDDException("ModelManager: detectTrueValueAndSimplify(): FunctionVariable is expected as a parameter. Received: CompositeFunctionVariable.");
+		}
+		PartedVariableHolder originalFunction = new PartedVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
+		
+		Operator operator = functionVariable.getOperator();
+		List<PartedVariableHolder> operands = functionVariable.getOperands();
+		
+		boolean isNEQ = operator == Operator.NEQ;
+		if (operator == Operator.EQ || isNEQ) {
+			ConstantVariable constantOperand;
+			PartedVariableHolder variableOperand;
+			
+			PartedVariableHolder leftOp = operands.get(0);
+			PartedVariableHolder rightOp = operands.get(1);
+			if (rightOp.getVariable() instanceof ConstantVariable) {
+				constantOperand = (ConstantVariable) rightOp.getVariable();
+				variableOperand = leftOp;
+			} else if (leftOp.getVariable() instanceof ConstantVariable) {
+				constantOperand = (ConstantVariable) leftOp.getVariable();
+				variableOperand = rightOp;
+			} else {
+				return originalFunction; // not compared to a Constant
+			}
+			
+			if (constantOperand.getLength().length() > 1) { // more than a single bit is used
+				return originalFunction;
+			}
+			
+			// Remove EQ/NEQ FunctionVariable, for it is not needed
+			removeVariable(functionVariable);
+			
+			int initialCondition = constantOperand.getValue().intValue();
+			return new PartedVariableHolder(variableOperand.getVariable(),
+					variableOperand.getPartedIndices(), adjustBooleanCondition(initialCondition, inverted ^ isNEQ));
+		} else {
+			return originalFunction;
+		}
+		
+	}
+	
     public PartedVariableHolder extractBooleanDependentVariable(AbstractOperand abstractOperand, boolean useComposites) throws Exception {
         if (abstractOperand instanceof Expression) {
-            return getBooleanDependentVariable((Expression) abstractOperand, useComposites);
+            return convertConditionalStmt((Expression) abstractOperand, useComposites);
         } else if (abstractOperand instanceof OperandImpl) {
             OperandImpl operand = (OperandImpl) abstractOperand;
             return new PartedVariableHolder(getVariable(operand.getName()), operand.getPartedIndices(), getBooleanValueFromOperand(operand));
@@ -131,80 +173,6 @@ public class ModelManager {
         throw new Exception("Dependent variable is being extracted from : " + abstractOperand +
                 "\nCurrently extraction of Dependent Variables is only supported for " +
                 Expression.class.getSimpleName() + " and " + OperandImpl.class.getSimpleName());
-    }
-
-    /**
-     *
-     * @param condition
-     * @param expandCondition
-     * @return  a FunctionVariable representing the given <code>condition</code>,
-     *          or <code>null</code> if FunctionVariable is not needed to represent it
-     * @throws Exception  Causes: {@link #convertOperandToVariable(AbstractOperand, Indices, boolean) cause1 }
-     *                      {@link #getIdenticalVariable(AbstractVariable) cause2 }
-     */
-    private FunctionVariable createConditionalFunction(Expression condition, boolean expandCondition) throws Exception {
-
-        /* Check the expression to be a CONDITION */
-        Operator operator = condition.getOperator();
-        if (operator.isCondition()) {
-            if (condition.isReducedCompositeCondition()) {
-                /* Imitate a CompositeCondition and pass it to create a CompositeFunction */
-                return createCompositeFunction(recreateCompositeCondition(condition));
-            }
-            /* Check if a new FUNCTION must be created */
-            else if (isFunctionRequired(condition/*operator, leftVariable, rightVariable, leftVarIndices*/)) {
-
-                return createFunction(condition, false);
-
-            } else return null;
-
-        } else {
-
-            /* Check for AND/OR composite conditions, if allowed */
-            if (expandCondition) {
-                if (condition.isCompositeCondition()) {
-                    /* Create CompositeFunctionVariable */
-                    return createCompositeFunction(condition);
-
-                }
-            }
-            if (condition.getOperator().isLogical() /*isFunctionRequired(condition)*/) {
-                /* todo: START experimental 16.10.2008 :  CompositeConditions are checked before checking to create Function from unConditional expression */
-                return createFunction(condition, false);
-                /* todo: END   experimental 16.10.2008 :  CompositeConditions are checked before checking to create Function from unConditional expression */
-
-            } else return createFunction(condition, false);
-            /*throw new Exception("Cannot create Conditional function from a non-conditional operator: " + operator +
-                        "\nCondition: " + condition)*/
-        }
-    }
-
-    /**
-     * <b>NB! </b> Method expects a reducedCompositeCondition ({@link Expression#isReducedCompositeCondition()}). Otherwise the
-     * method may fail.
-     *
-     * @param reducedCompCondition an Expression that is {@link Expression#isReducedCompositeCondition()}
-     * @return an extendended CompositeCondition
-     */
-    private Expression recreateCompositeCondition(Expression reducedCompCondition) {
-        Operator reducedOperator = reducedCompCondition.getOperator();
-
-        List<AbstractOperand> operands = reducedCompCondition.getOperands();
-        AbstractOperand reducedRightOperand = operands.get(1);
-        Expression leftOperand = (Expression) operands.get(0);
-        Operator compositeOperator = leftOperand.getOperator();
-        Expression compConditionExpr = new Expression(compositeOperator, reducedCompCondition.isInverted());
-        for (AbstractOperand leftExprOperand : leftOperand.getOperands()) {
-            /* Create an expanded expression out of a reduced one */
-            Expression expandedExpression = new Expression(reducedOperator, leftExprOperand.isInverted());
-            expandedExpression.addOperand(leftExprOperand);
-            expandedExpression.addOperand(reducedRightOperand); //todo: clone() may be needed
-
-            /* Add Expanded Expression to the Composite Expression */
-            compConditionExpr.addOperand(expandedExpression);
-        }
-
-        return compConditionExpr;
     }
 
     private CompositeFunctionVariable createCompositeFunction(Expression condition) throws Exception {
@@ -215,84 +183,20 @@ public class ModelManager {
             /* All operands of a CompositeCondition are Expressions, not OperandImpls */
             if (operand instanceof Expression) {
                 Expression operandExpression = (Expression) operand;
-                compositeElements.add(getBooleanDependentVariable(operandExpression, false));
+                compositeElements.add(convertConditionalStmt(operandExpression, false));
             }
         }
 
         return new CompositeFunctionVariable(compositeOperator, compositeElements.toArray(new PartedVariableHolder[compositeElements.size()]));
     }
 
-    private boolean isFunctionRequired(Expression expression/*Operator operator, AbstractVariable leftVariable, AbstractVariable rightVariable, int[] leftVarIndices*/) throws Exception {
-        doSetLengthFor(expression);
-
-        /* If expression is CONDITIONAL, apart from EQ, then an additional FUNCTION must be created. */
-        Operator operator = expression.getOperator();
-        if (operator.isCondition() && operator != Operator.EQ)
-            return true;
-
-        /*  If EQ CONDITION VARIABLE is longer than 1 bit, then it is a FUNCTION (not a NODE), since otherwise CASE condition would be used.
-            So, if condition variable is very large (long register with multiple possible values),
-            an additional FUNCTION must be created (previously, check for existent ones)
-            (Simple CONTROL node cannot be created easily, if a register is long and thus has many values... ) */
-        else if (operator == Operator.EQ) {
-            /* Get expression children. Process only 2 of them */
-            List<AbstractOperand> operands = expression.getOperands();
-            if (operands.size() != 2) throw new Exception("Error during creation of CONDITIONAL FUNCTION:" +
-                    "\nSupported number of operands is 2. Received number of operands: " + operands.size() +
-                    "\nExpression: " + expression);
-            //todo: What if operands are in the opposite order?...
-            /* Get 1st Variable and its parted indices */
-            AbstractVariable leftVariable = convertOperandToVariable(operands.get(0), null, false);
-            AbstractOperand leftOperand = operands.get(0);
-            /* Get 2nd Variable */
-            AbstractVariable rightVariable = convertOperandToVariable(operands.get(1), leftVariable.getLength(), false);
-
-            if (leftOperand.isParted()) {
-                Indices partedIndices = leftOperand.getPartedIndices();
-                // If a PART of variable is used
-                if (partedIndices.length() > 1 || !(rightVariable instanceof ConstantVariable)) {
-                    // If more than 1 bit of a variable is used, or a comparison with a variable
-                    return true;
-                }
-            } else if (leftVariable.getLength().getHighest() > 0/*vars.get(condition.getLeftOperand().getVariable()).getHighestIndex() > 0*/)
-                return true;
-            else if (!(rightVariable instanceof ConstantVariable)) /* If right operand is also a variable */ //todo: remove left-right separation.
-                return true;
-        }
-        // todo: Note! Block below ("if (!operator.isCondition())") is substituted with Operator.isLogical()
-//        /* todo: START experimental 16.10.2008 :  CompositeConditions are checked before checking to create Function from unCondition expression */
-//        /* Possible CompositeConditions have been created to this moment. */
-//        /* todo: Here Logical operators count: XOR, OR, AND. May be differentiate them  */
-//        else if (!operator.isCondition()) {
-//            return true;
-//        }
-//        /* todo: END   experimental 16.10.2008 :  CompositeConditions are checked before checking to create Function from unCondition expression */
-
-        return false;
-    }
-
-    /**
-     *
-     * todo: Add desiredHighestSB parameter to createFunction(). And to createInversionFunction().
-     * todo: This is both to solve problem of ConstantVariable-s (search below for "Problem: if one")
-     * todo: and UserDefinedFunctionVariable, which possibly may be obtained (returned) from convertOperandToVariable()
-     * todo: wherever this method is called.
-     * todo: NB! before using desiredHighestSB, call extractOperatorImposedHighestSB(operator, operands) to find
-     * todo: whether operator imposes a constraint on the highestSB.
-     * todo: extractOperatorImposedHighestSB scans operands in search for the one with fixed(!) highestSB(Variable
-     * todo: or GraphVariable(! consider what are fixed)) and depending on the operator return the fixed highestSB
-     * todo: if the operator imposes a constraint (AND/OR/etc)or return null, if operator hasn't got any constraints(
-     * todo: CAT). 
-     *
-     * todo: May be change isFunctionRequired() method to accept all AbstractOperands, not only Expressions,
-     * todo: and use isFunctionRequired() in convertOperandToVariable() at the very beginning.
-     *
+	/**
      * @param funcOperand either Expression or inverted Operand to create a Function from
      * @param isTransition flag marks whether the expression originates from transition
      *        (<code>true</code> value) or from condition (<code>false</code> value).
      *        Depending on this, <i>inversion</i> in expression is either ignored (in case
      *        of conditions), or treated as a Function (in case of transition).
-     * @return
+     * @return FunctionVariable which represents the specified operand 
      * @throws Exception cause {@link #convertOperandToVariable(AbstractOperand, Indices, boolean) cause }
      */
     private FunctionVariable createFunction(AbstractOperand funcOperand, boolean isTransition) throws Exception {
@@ -343,7 +247,7 @@ public class ModelManager {
                         operandPartedIndices = operand.getPartedIndices();
                         if (operand instanceof Expression) {
                             /* Treat operand as condition and extract dependent variable from it */
-                            PartedVariableHolder depVariableHolder = getBooleanDependentVariable((Expression) operand, false);
+                            PartedVariableHolder depVariableHolder = convertConditionalStmt((Expression) operand, false);
                             operandVariable = getIdenticalVariable(depVariableHolder.getVariable());
                             operandPartedIndices = depVariableHolder.getPartedIndices();
                             /* If extracted dependent variable is OperandImpl or an inverted Expression,
@@ -382,8 +286,7 @@ public class ModelManager {
 
     private FunctionVariable doCreateFinalInversionFunction(AbstractVariable operandVariable, Indices operandPartedIndices) {
         /* Create Function */
-        FunctionVariable invFunctionVariable =
-                new FunctionVariable(Operator.INV, generateFunctionName(Operator.INV.name()));
+        FunctionVariable invFunctionVariable = new FunctionVariable(Operator.INV, generateFunctionNameIdx(Operator.INV));
         /* Add a single operand */
         try {
             invFunctionVariable.addOperand(operandVariable, operandPartedIndices);
@@ -396,7 +299,7 @@ public class ModelManager {
 
     private FunctionVariable doCreateFinalFunction(Operator operator, PartedVariableHolder... operandVariables) throws Exception {
         /* Create new Function Variable */
-        FunctionVariable functionVariable = new FunctionVariable(operator, generateFunctionName(operator.name()));
+        FunctionVariable functionVariable = new FunctionVariable(operator, generateFunctionNameIdx(operator));
         /* Add operand variables one by one to the new Function Variable */
         for (PartedVariableHolder operandVarHolder : operandVariables) {
             try {
@@ -413,7 +316,7 @@ public class ModelManager {
                 tuneFunctionVariable(functionVariable);
                 functionVariable = (FunctionVariable) getIdenticalVariable(functionVariable);
                 /* Create new Function */
-                FunctionVariable newFunction = new FunctionVariable(operator, generateFunctionName(operator.name()));
+                FunctionVariable newFunction = new FunctionVariable(operator, generateFunctionNameIdx(operator));
                 /* Make the previously created function an operand of the new one */
                 newFunction.addOperand(functionVariable, null);
                 /* Make the operand that failed to be added an operand of the new function */
@@ -441,13 +344,13 @@ public class ModelManager {
         /* Replace DIVISION and MULTIPLICATION by power of 2 with SHIFTS */
         Operator operator = functionVariable.getOperator();
         List<PartedVariableHolder> operandHolders = functionVariable.getOperands();
-        ValueAndIndexHolder powerOf2Constant = null;
+        ValueAndIndexHolder powerOf2Constant;
         //todo: temporarily comment this for Toha (was if (false && ...))
         if (/*false && */(operator == Operator.MULT || operator == Operator.DIV)
                 && (powerOf2Constant = findPowerOf2Constant(operandHolders)) != null) {
             /* Substitute operator with SHIFT (mult -> SHIFT_LEFT, div -> SHIFT_RIGHT): */
             functionVariable.setOperator(operator == Operator.MULT ? Operator.SHIFT_LEFT : Operator.SHIFT_RIGHT);
-            functionVariable.setName(generateFunctionName(functionVariable.getOperator().name()));
+            functionVariable.setNameIdx(generateFunctionNameIdx(functionVariable.getOperator()));
             /* Create SHIFT step operand */
             AbstractVariable shiftStepOpeVariable =
                     ConstantVariable.getConstByValue(powerOf2Constant.value, null, variableManager.getConsts(), useSameConstants);
@@ -474,7 +377,7 @@ public class ModelManager {
             }
             if (wasOperator != operator) {
                 functionVariable.setOperator(operator);
-                functionVariable.setName(generateFunctionName(operator.name()));
+                functionVariable.setNameIdx(generateFunctionNameIdx(operator));
             }
         }
     }
@@ -571,12 +474,12 @@ public class ModelManager {
     /**
      * Returns either an identical variable already residing in the collector
      * or the variableToFind, previously adding it to collector. 
-     *
+     * todo: internals of this method should be moved to VariableManager
      * @param variableToFind variable to search for amongst existent variables
      * @return an existent identical variable or the desired variable if an existent is not found
      * @throws Exception cause {@link #addVariable(AbstractVariable) cause}
      */
-    private AbstractVariable getIdenticalVariable(AbstractVariable variableToFind) throws Exception {
+    AbstractVariable getIdenticalVariable(AbstractVariable variableToFind) throws Exception {
 
         if (variableToFind instanceof ConstantVariable) {
             /* Search amongst CONSTANTS */
@@ -634,54 +537,12 @@ public class ModelManager {
         return (int) Math.pow(2, order);
     }
 
-    /**
-     *
-     * @param dependentVariable variable that is generated from the <code>expression</code>
-     * @param expression base expression where the <code>dependentVariable</code> has been generated from
-     * @return value of the <code>dependentVariable</code> in the given <code>expression</code>
-     * @throws  Exception if expression value is being obtained from a variable
-                that is not an instance of neither FunctionVariable nor Variable class
-     */
-    public int getConditionValue(AbstractVariable dependentVariable, Expression expression) throws Exception {
-
-        if (dependentVariable.getClass() == FunctionVariable.class) {
-            return getBooleanValueFromOperand(expression);
-        }
-        if (dependentVariable.getClass() == Variable.class || dependentVariable.getClass() == GraphVariable.class) {
-            List<AbstractOperand> operands = expression.getOperands();
-            if (operands.size() != 2) throw new Exception("Error during extraction of CONDITION VALUE:" +
-                    "\nSupported number of operands is 2. Received number of operands: " + operands.size() +
-                    "\nExpression: " + expression);
-            /* Analyze 2nd operand */ //todo: if the order of operands is changed into an opposite one?... 
-            AbstractVariable valueVariable = convertOperandToVariable(operands.get(1), dependentVariable.getLength(), false);
-            if (!(valueVariable instanceof ConstantVariable)) {
-                throw new Exception("Error during extraction of CONDITION VALUE:" +
-                        "\nUndeclared variable (" + valueVariable + ") used in the following expression: " + expression.toString());
-            }
-            int initialBit = ((ConstantVariable) valueVariable).getValue().intValue();
-            return getBooleanValueFromOperand(expression, initialBit);
-        } else if (dependentVariable.getClass() == CompositeFunctionVariable.class) {
-            /* For both AND and OR return 1 */
-            return 1;
-        } else throw new Exception("Condition value can be obtained for " +
-                FunctionVariable.class.getSimpleName() + ", " +
-                Variable.class.getSimpleName() + " and " +
-                GraphVariable.class.getSimpleName() + " only:" +
-                "\nRequested dependent variable: \n" + dependentVariable);
-
+	public int getBooleanValueFromOperand(AbstractOperand abstractOperand) {
+        return adjustBooleanCondition(1, abstractOperand.isInverted());
     }
 
-    public int getBooleanValueFromOperand(AbstractOperand abstractOperand) {
-        return getBooleanValueFromOperand(abstractOperand, 1);
-    }
-
-
-    public static int getBooleanValueFromOperand(AbstractOperand abstractOperand, int trueBit) {
-        return abstractOperand.isInverted() ? invertBit(trueBit) : trueBit;
-    }
-
-    public static int adjustBooleanCondition(int booleanConditon, boolean isInversed) {
-        return isInversed ? invertBit(booleanConditon) : booleanConditon;
+	public static int adjustBooleanCondition(int booleanCondition, boolean inverted) {
+        return inverted ? invertBit(booleanCondition) : booleanCondition;
     }
 
     public static int invertBit(int bit) {
@@ -733,7 +594,7 @@ public class ModelManager {
             // Create User Defined Function Variable
             UserDefinedFunctionVariable udFunctionVariable =
                     new UserDefinedFunctionVariable(udFunctionName,
-                            generateFunctionName(udFunctionName),
+                            generateUDFunctionNameIdx(udFunctionName),
                             udFunctionOperands.size(), operand.getLength());
             // Create and add operands to UD Function Variable
             for (AbstractOperand udFunctionOperand : udFunctionOperands) {
@@ -758,7 +619,7 @@ public class ModelManager {
         }
     }
 
-    public int[] getConditionValues(OperandImpl[] conditionOperands) {
+    public Condition convertOperandsToCondition(OperandImpl[] conditionOperands) {
         int[] values = new int[conditionOperands.length];
         for (int i = 0; i < conditionOperands.length; i++) {
             String operandName = conditionOperands[i].getName();
@@ -766,50 +627,36 @@ public class ModelManager {
             ConstantVariable constant = variableManager.getConstantByName(operandName);
             values[i] = constant != null ? constant.getValue().intValue() : PackageParser.parseConstantValue(operandName).intValue();
         }
-        return values;
+        return Condition.createCondition(values);
     }
 
     /**
      * Generates a name for function variables ADDER, MULT, DIV etc
      * and user defined functions like f_ComputeCrc16() in crc.vhd.
      *
-     * @param operatorName type of function (ADDER, MULT, DIV etc)
-     * @return the name of the function of type "XXXX_Y", where XXXX
-     *         is ADDER/MULT/DIV and Y is an order number
+     * @param operator type of function (ADDER, MULT, DIV etc)
+     * @return the order number of the function
      */
-    private String generateFunctionName(String operatorName) {
-
-        // Go through all variables and look for the largest NAME INDEX used amongst FunctionVariables of the required type
-        int largestIndexUsed = -1;
-        for (AbstractVariable variable : variableManager.getVariables()) {
-            if (variable instanceof FunctionVariable) {
-                FunctionVariable functionVariable = (FunctionVariable) variable;
-                if (isRequiredTypeFunction(functionVariable, operatorName) ) {
-                    // if the INDEX of the function is larger, than previously read - save it to the largestFunctionIndex
-                    if (functionVariable.getNameIndex() > largestIndexUsed)
-                        largestIndexUsed = functionVariable.getNameIndex();
-                }
-            }
-        }
-
-        return largestIndexUsed == -1 ? operatorName + "____1" : operatorName + "____" + (largestIndexUsed + 1);
+    private int generateFunctionNameIdx(Operator operator) {
+		return deriveNextIdx(variableManager.getFunctions(operator));
     }
 
-    private boolean isRequiredTypeFunction(FunctionVariable functionVariable, String operatorName) {
-        if (functionVariable instanceof UserDefinedFunctionVariable) {
-            return ((UserDefinedFunctionVariable) functionVariable).getUserDefinedOperator().equals(operatorName);
-        } else {
-            Operator opNameOperator;
-            try {
-                opNameOperator = Operator.valueOf(operatorName);
-            } catch (IllegalArgumentException e) {
-                return false;
-            }
-            return functionVariable.getOperator() == opNameOperator;
-        }
-    }
+	private int generateUDFunctionNameIdx(String userDefinedOperator) {
+		return deriveNextIdx(variableManager.getUDFunctions(userDefinedOperator));
+	}
 
-    public ConstantVariable[] getConstants() {
+	private int deriveNextIdx(Collection<FunctionVariable> functions) {
+		int largestIndexUsed = -1;
+		for (FunctionVariable functionVariable : functions) {
+			int nameIndex = functionVariable.getNameIdx();
+			if (nameIndex > largestIndexUsed) {
+				largestIndexUsed = nameIndex;
+			}
+		}
+		return largestIndexUsed == -1 ? 1 : largestIndexUsed + 1;
+	}
+
+	public ConstantVariable[] getConstants() {
         return variableManager.getConstantsAsArray();
     }
 

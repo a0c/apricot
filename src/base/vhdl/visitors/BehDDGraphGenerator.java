@@ -3,7 +3,6 @@ package base.vhdl.visitors;
 import base.vhdl.structure.nodes.*;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Process;
-import base.hldd.structure.variables.AbstractVariable;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -12,8 +11,8 @@ import base.hldd.structure.variables.AbstractVariable;
  */
 public class BehDDGraphGenerator extends GraphGenerator {
 
-    public BehDDGraphGenerator(boolean useSameConstants, boolean doExpandConditions) {
-        super(useSameConstants, doExpandConditions, Type.BehDD);
+    public BehDDGraphGenerator(boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs) {
+        super(useSameConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, Type.BehDD);
     }
 
     public void visitProcess(base.vhdl.structure.Process process) throws Exception {

@@ -3,6 +3,8 @@ package base.hldd.structure.models.utils;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.utils.Utility;
+import base.hldd.visitors.UsedFunctionsCollectorImpl;
+import base.vhdl.structure.Operator;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -14,7 +16,7 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractModelCreator implements ModelCreator {
     protected static final Logger LOG = Logger.getLogger(AbstractModelCreator.class.getName());
-    protected ConstantVariable[] constants;
+    protected ConstantVariable[] constants;//todo: why array?! Collection would be better!
     protected AbstractVariable[] variables;
     protected HashMap<Integer, AbstractVariable> indexVariableHash;
 
@@ -28,6 +30,9 @@ public abstract class AbstractModelCreator implements ModelCreator {
 
         /* Remove those CONSTANTS that are not used neither in FUNCTION VARIABLES, nor in GRAPH VARIABLES */
         removeObsoleteConstants();
+
+		removeObsoleteFunctions();
+		renameFunctions();
 
         /* Perform INDEXATION */ //todo: ModelIndexator -> modelIndexator.indexate(constants, variables);
         performIndexation();
@@ -144,6 +149,61 @@ public abstract class AbstractModelCreator implements ModelCreator {
         constants = usedConstants.toArray(new ConstantVariable[usedConstants.size()]);
         LOG.exiting(LOG.getName(), "removeObsoleteConstants(1/4)");
     }
+
+	private void removeObsoleteFunctions() {
+		ArrayList<AbstractVariable> usedVars = new ArrayList<AbstractVariable>();
+
+		/* Collect function usages */
+		UsedFunctionsCollectorImpl functionsCollector = new UsedFunctionsCollectorImpl();
+		for (AbstractVariable variable : variables) {
+			if (variable instanceof GraphVariable) {
+				try {
+					((GraphVariable) variable).traverse(functionsCollector);
+				} catch (Exception e) {
+					throw new RuntimeException("Error while collecting functions used by graphs: " + e.getMessage());
+				}
+			}
+		}
+
+		/* Recollect variables, leaving out unused functions */
+		for (AbstractVariable variable : variables) {
+
+			if (variable instanceof FunctionVariable) {
+
+				FunctionVariable functionVariable = (FunctionVariable) variable;
+				if (functionsCollector.isUsed(functionVariable)) {
+					usedVars.add(variable);
+				}
+
+			} else {
+
+				usedVars.add(variable);
+
+			}
+		}
+
+		variables = usedVars.toArray(new AbstractVariable[usedVars.size()]);
+	}
+
+	private void renameFunctions() {
+		int idx = 1;
+		Operator prevOperator = null;
+
+		Collection<FunctionVariable> functions = VariableManager.getFunctions(Arrays.asList(variables), null);
+
+		for (FunctionVariable functionVariable : functions) {
+			Operator operator = functionVariable.getOperator();
+
+			if (operator != prevOperator) {
+				idx = 1;
+			}
+
+			functionVariable.setNameIdx(idx++);
+
+			prevOperator = operator;
+
+		}
+	}
 
 	/**
 	 * For Delay graphs, no order constraints exist (since their values get assigned at the end of a cycle).

@@ -12,13 +12,8 @@ import java.util.Collection;
 public class BehGraphGenerator extends GraphGenerator {
     private Collection<String> registers;
 
-    @Deprecated
-    public BehGraphGenerator(boolean useSameConstants) {
-        super(useSameConstants, true /*bla bla, filler */, Type.Beh);
-    }
-
-    public BehGraphGenerator(boolean useSameConstants, boolean doExpandConditions, Collection<String> registers) {
-        super(useSameConstants, doExpandConditions, Type.Beh);
+    public BehGraphGenerator(boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs, Collection<String> registers) {
+        super(useSameConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, Type.Beh);
         this.registers = registers;
     }
 

@@ -26,6 +26,10 @@ public class FunctionVariable extends Variable {
     * Operands
     */
     protected List<PartedVariableHolder> operands;
+	/**
+	 * Index of function (denotes order)
+	 */
+	private int nameIdx;
 
     /**
      * Constructor to override in inherited classes
@@ -36,7 +40,7 @@ public class FunctionVariable extends Variable {
 
     /**
      * General purpose constructor. Only receives <code>operator</code> and
-     * <code>functionName</code> as parameters.
+     * <code>nameIdx</code> as parameters.
      * <p>
      * Operands are filled using {@link #addOperand(AbstractVariable, Indices)}
      * method. Each <code>operator</code> knows the number of supported
@@ -44,17 +48,17 @@ public class FunctionVariable extends Variable {
      * calling {@link #addOperand(AbstractVariable, Indices)}.
      *
      * @param operator operator (from the set of supported ones)
-     * @param functionName name of the variable
+     * @param nameIdx name index of the variable
      */
-    public FunctionVariable(Operator operator, String functionName){
-        this(functionName);
+    public FunctionVariable(Operator operator, int nameIdx){
+        this(nameIdx);
         this.operator = operator;
         operands = new ArrayList<PartedVariableHolder>(INITIAL_OPERAND_COUNT);
     }
 
-    protected FunctionVariable(String functionName) {
+    protected FunctionVariable(int nameIdx) {
         this();
-        this.name = functionName;
+        this.nameIdx = nameIdx;
     }
 
     public String toString() {
@@ -62,7 +66,12 @@ public class FunctionVariable extends Variable {
                 "\nFUN#\t" + operatorToString() + "\t(" + operandsToString() + ")";
     }
 
-    protected String operatorToString() {
+	@Override
+	public String getName() {
+		return operatorToString() + "____" + nameIdx;
+	}
+
+	protected String operatorToString() {
         return operator.toString();
     }
 
@@ -119,15 +128,6 @@ public class FunctionVariable extends Variable {
     }
 
     /**
-     * Returns the index, extracted from the NAME of the function
-     * @return index of the function of its type ( e.g. returns '1' out of 'MULT_1' )
-     */
-    public int getNameIndex() {
-        String name = getName();
-        return Integer.parseInt(name.substring(name.lastIndexOf("_") + 1));
-    }
-
-    /**
      * @param operandVariable operand to add
      * @param partedIndices parted indices of the operand to add
      * @throws Exception if the operand being added exceeds the limit of the operator operands limit
@@ -167,7 +167,11 @@ public class FunctionVariable extends Variable {
         return operands;
     }
 
-    /* Getters END */
+	public int getNameIdx() {
+		return nameIdx;
+	}
+
+	/* Getters END */
 
     /* Setters START */
 
@@ -179,6 +183,28 @@ public class FunctionVariable extends Variable {
         operands.set(index, operandHolder);
     }
 
-    /* Setters END */
+	public void setNameIdx(int nameIdx) {
+		this.nameIdx = nameIdx;
+	}
 
+	/* Setters END */
+
+	public static Comparator<FunctionVariable> getComparator() {
+		return new FunctionsComparator();
+	}
+
+	public static class FunctionsComparator implements Comparator<FunctionVariable> {
+
+		@Override
+		public int compare(FunctionVariable o1, FunctionVariable o2) {
+
+			int compNames = o1.operator.name().compareTo(o2.operator.name());
+
+			if (compNames != 0) {
+				return compNames < 0 ? -1 : 1;
+			}
+
+			return new Integer(o1.nameIdx).compareTo(o2.nameIdx);
+		}
+	}
 }

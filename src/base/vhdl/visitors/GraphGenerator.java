@@ -1,6 +1,8 @@
 package base.vhdl.visitors;
 
 import base.HLDDException;
+import base.hldd.structure.models.utils.ConditionGraphManager;
+import base.hldd.structure.models.utils.ExtraConditionGraphManager;
 import base.hldd.structure.nodes.utils.Condition;
 import base.vhdl.structure.nodes.*;
 import base.vhdl.structure.Process;
@@ -44,12 +46,16 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	protected static final Logger LOG = Logger.getLogger(GraphGenerator.class.getName());
 
     protected ModelManager modelCollector;
+	private ConditionGraphManager conditionGraphManager;
+	private ExtraConditionGraphManager extraConditionGraphManager;
     protected AbstractVariable graphVariable;
     protected Node graphVariableRootNode;
     private ContextManager contextManager = new ContextManager();
 
     /* AUXILIARY fields */
-    private final boolean doExpandConditions;
+    private final boolean doFlattenConditions;
+    private final boolean doCreateGraphsForCS;
+    private final boolean doCreateSubGraphs;
     private final boolean isNullATransition;
     /* Set of processed graphVars. Used for skipping processed variables. */
     protected Set<String> processedGraphVars = new HashSet<String>();
@@ -77,13 +83,29 @@ public abstract class GraphGenerator extends AbstractVisitor {
      *          <br>todo: <b>NB!</b> <code>true</code> possibility is not implemented yet. When implementing it, either
      *          modify getModelCollector() method to perform adjustment of partedIndices of terminal nodes in GraphVariables,
      *          or make the TerminalNode set its partedIndices itself.
-     * @param doExpandConditions whether to expand Composite conditions into a set of Control Nodes (true value), or
-     *        create a single node function (false value).
-     * @param generatorType generator's type. Used for initialization of isNullTransition only.  
+	 * @param doFlattenConditions whether to inline Composite conditions into a set of Control Nodes (true value), or
+ *        create a single node function (false value).
+	 * @param doCreateGraphsForCS whether to create Conditional Graphs or not
+	 * @param doCreateSubGraphs whether to create Extra Graphs or not
+	 * @param generatorType generator's type. Used for initialization of isNullTransition only.
      */
-    protected GraphGenerator(boolean useSameConstants, boolean doExpandConditions, Type generatorType) {
-        this.doExpandConditions = doExpandConditions;
-        modelCollector = new ModelManager(useSameConstants);
+    protected GraphGenerator(boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs, Type generatorType) {
+		modelCollector = new ModelManager(useSameConstants);
+        this.doFlattenConditions = doFlattenConditions;
+        this.doCreateGraphsForCS = doCreateGraphsForCS;
+		if (this.doCreateGraphsForCS) {
+			conditionGraphManager = new ConditionGraphManager(modelCollector);
+		}
+		this.doCreateSubGraphs = doCreateSubGraphs;
+		if (this.doCreateSubGraphs) {
+			extraConditionGraphManager = new ExtraConditionGraphManager(modelCollector);
+		}
+		if (this.doCreateGraphsForCS && this.doCreateSubGraphs) { //todo: move validation to BusinessLogic. Don't pass all these booleans, use Properties instead.
+			throw new RuntimeException("Illegal combination: Extended Conditions are mixed with Extra Extended Conditions. See GG.visitIfNode()...");
+		}
+		if (this.doFlattenConditions && this.doCreateSubGraphs) {
+			throw new RuntimeException("Illegal combination: Expanded (!) Conditions are mixed with Extra Extended Conditions. See GG.visitIfNode()...");
+		}
         isNullATransition = generatorType == Type.BehDD;
     }
 
@@ -169,10 +191,15 @@ public abstract class GraphGenerator extends AbstractVisitor {
         * #################################################*/
         Expression expression = ifNode.getConditionExpression();
         /* Extract dependentVariable */
-        PartedVariableHolder depVariableHolder = modelCollector.getBooleanDependentVariable(expression, doExpandConditions);
+        PartedVariableHolder depVariableHolder = doCreateGraphsForCS
+				? conditionGraphManager.convertConditionToBooleanGraph(ifNode)
+				: modelCollector.convertConditionalStmt(expression, doFlattenConditions);
+		if (doCreateSubGraphs) {
+			extraConditionGraphManager.generateExtraGraph(ifNode);
+		}
         AbstractVariable dependentVariable = depVariableHolder.getVariable();
         Indices partedIndices = depVariableHolder.getPartedIndices();
-        int conditionValueInt = depVariableHolder.getTrueValue(); /*modelCollector.getConditionValue(dependentVariable, expression);*/
+        int conditionValueInt = depVariableHolder.getTrueValue();
 
         /* Create ControlNode */
         Node controlNode = dependentVariable instanceof CompositeFunctionVariable
@@ -335,7 +362,12 @@ public abstract class GraphGenerator extends AbstractVisitor {
         * #################################################*/
         /* Extract dependentVariable */
         AbstractOperand variableOperand = caseNode.getVariableOperand();
-        AbstractVariable dependentVariable = modelCollector.convertOperandToVariable(variableOperand, null, false);
+        AbstractVariable dependentVariable = doCreateGraphsForCS
+				? conditionGraphManager.convertConditionToGraph(caseNode)
+				: modelCollector.convertOperandToVariable(variableOperand, null, false);
+		if (doCreateSubGraphs) {
+			extraConditionGraphManager.generateExtraGraph(caseNode);
+		}
         Indices partedIndices = variableOperand.getPartedIndices();
         /* Count possible conditions of dependentVariable */
         //todo: suspicious action: dependentVariable.isState() ? caseNode.getConditions().size(). May be "when => others", may be "when A | B | C =>" ... consider these...
@@ -344,7 +376,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
         /* Create Control Node */
         Node controlNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(conditionValuesCount).build();
         /* Add VHDL lines the node's been created from */
-        controlNode.setVhdlLines(vhdl2hlddMapping.getLinesForNode(caseNode));
+        controlNode.setVhdlLines(vhdl2hlddMapping.getLinesForNode(caseNode)); //todo: inline with the creation process above...
 
         /*#################################################
         *       P R O C E S S     C O N D I T I O N S
@@ -375,10 +407,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
         if (!whenNode.isOthers()) {
             /* Extract whenConditions */
-            int[] conditionValuesInt = modelCollector.getConditionValues(whenNode.getConditionOperands() /*conditionString*/);
+            Condition whenCondition = modelCollector.convertOperandsToCondition(whenNode.getConditionOperands());
 			/* Get controlNode from Current Context.
              * Create new Context and add it to Context Stack */
-            contextManager.addContext(new Context(contextManager.getCurrentContext().getControlNode(), Condition.createCondition(conditionValuesInt)));
+			Node controlNode = contextManager.getCurrentContext().getControlNode();
+			Condition awaitedCondition = !doCreateGraphsForCS ? whenCondition
+					: conditionGraphManager.mapDirect((GraphVariable) controlNode.getDependentVariable(), whenCondition);
+			contextManager.addContext(new Context(controlNode, awaitedCondition));
 
             /*#################################################
             *       P R O C E S S     T R A N S I T I O N S
@@ -777,6 +812,9 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 		public String[] getOthersConditions() throws HLDDException {
 			Condition others = controlNode.getOthers();
+			if (doCreateGraphsForCS) {
+				others = conditionGraphManager.mapReverse(((GraphVariable) controlNode.getDependentVariable()), others);
+			}
 			return others == null ? null : others.toStringArray();
 		}
 	}

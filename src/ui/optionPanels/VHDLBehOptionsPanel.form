@@ -4,13 +4,12 @@
     <rowspec value="top:d:noGrow"/>
     <colspec value="fill:d:grow"/>
     <constraints>
-      <xy x="20" y="20" width="378" height="131"/>
+      <xy x="20" y="20" width="386" height="130"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
       <grid id="3c052" default-binding="true" layout-manager="FormLayout">
-        <rowspec value="center:d:noGrow"/>
         <rowspec value="top:130px:noGrow"/>
         <colspec value="fill:183px:noGrow"/>
         <colspec value="left:4dlu:noGrow"/>
@@ -30,7 +29,7 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:169px:noGrow"/>
             <constraints>
-              <grid row="0" column="0" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <forms/>
             </constraints>
             <properties/>
@@ -66,54 +65,66 @@
               </component>
             </children>
           </grid>
-          <grid id="ee698" layout-manager="FormLayout">
-            <rowspec value="center:d:noGrow"/>
-            <colspec value="fill:177px:noGrow"/>
+          <grid id="8577" layout-manager="FormLayout">
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <colspec value="fill:89px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
             <constraints>
-              <grid row="0" column="2" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <forms/>
             </constraints>
             <properties/>
-            <border type="none" title="Optimizations" title-justification="2"/>
+            <border type="none" title="Conditional Statements" title-justification="2"/>
             <children>
-              <grid id="8577" layout-manager="FormLayout">
-                <rowspec value="center:22px:noGrow"/>
-                <rowspec value="top:4dlu:noGrow"/>
-                <rowspec value="center:max(d;4px):noGrow"/>
-                <colspec value="fill:177px:noGrow"/>
+              <component id="538d0" class="javax.swing.JRadioButton" binding="asFunctionRadioButton">
                 <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
-                <properties/>
-                <border type="empty" title="Conditional Statements"/>
-                <children>
-                  <component id="9bfed" class="javax.swing.JRadioButton" binding="expandCSCheckBox">
-                    <constraints>
-                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                      <forms/>
-                    </constraints>
-                    <properties>
-                      <background color="-1"/>
-                      <foreground color="-16777216"/>
-                      <hideActionText value="true"/>
-                      <opaque value="false"/>
-                      <selected value="false"/>
-                      <text value="&amp;Expand"/>
-                    </properties>
-                  </component>
-                  <component id="538d0" class="javax.swing.JRadioButton">
-                    <constraints>
-                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                      <forms/>
-                    </constraints>
-                    <properties>
-                      <selected value="true"/>
-                      <text value="Co&amp;llapse"/>
-                    </properties>
-                  </component>
-                </children>
-              </grid>
+                <properties>
+                  <selected value="true"/>
+                  <text value="As F&amp;unctions"/>
+                </properties>
+              </component>
+              <component id="36a10" class="javax.swing.JRadioButton" binding="asGraphsRadioButton" default-binding="true">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="As &amp;Graphs"/>
+                </properties>
+              </component>
+              <component id="ad0d7" class="javax.swing.JCheckBox" binding="subGraphsCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="&amp;Extra-Graphs"/>
+                  <toolTipText value="Extract each boolean sub-expression as an Extra-Graph"/>
+                </properties>
+              </component>
+              <component id="9bfed" class="javax.swing.JRadioButton" binding="flattenRadioButton">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <background color="-1"/>
+                  <foreground color="-16777216"/>
+                  <hideActionText value="true"/>
+                  <opaque value="false"/>
+                  <selected value="false"/>
+                  <text value="F&amp;latten"/>
+                  <toolTipText value="Flatten/inline hierarchical CS into Sub-Graph (nodes)"/>
+                </properties>
+              </component>
             </children>
           </grid>
         </children>
@@ -129,6 +140,7 @@
     <group name="conditionalStatementsBGroup">
       <member id="9bfed"/>
       <member id="538d0"/>
+      <member id="36a10"/>
     </group>
   </buttonGroups>
 </form>

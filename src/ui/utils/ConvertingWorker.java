@@ -47,14 +47,16 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
     private File pslFile;
     private final File baseModelFile;
     private final boolean shouldReuseConstants;
-    private final boolean doExpandConditions;
-    private final HLDDRepresentationType hlddType;
+    private final boolean doFlattenConditions;
+	private final boolean doCreateGraphsForCS;
+	private final boolean doCreateSubGraphs;
+	private final HLDDRepresentationType hlddType;
     private final boolean shouldSimplify;
 
-    public ConvertingWorker(BusinessLogic businessLogic, ParserID parserId, ConsoleWriter consoleWriter,
-                               File sourceFile, File pslFile, File baseModelFile,
-                               boolean shouldReuseConstants, boolean doExpandConditions,
-                               HLDDRepresentationType hlddType, boolean shouldSimplify) {
+	public ConvertingWorker(BusinessLogic businessLogic, ParserID parserId, ConsoleWriter consoleWriter,
+							File sourceFile, File pslFile, File baseModelFile,
+							boolean shouldReuseConstants, boolean doFlattenConditions,
+							boolean doCreateGraphsForCS, boolean doCreateSubGraphs, HLDDRepresentationType hlddType, boolean shouldSimplify) {
         this.businessLogic = businessLogic;
         this.parserId = parserId;
         this.consoleWriter = consoleWriter;
@@ -62,8 +64,10 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
         this.pslFile = pslFile;
         this.baseModelFile = baseModelFile;
         this.shouldReuseConstants = shouldReuseConstants;
-        this.doExpandConditions = doExpandConditions;
-        this.hlddType = hlddType;
+        this.doFlattenConditions = doFlattenConditions;
+		this.doCreateGraphsForCS = doCreateGraphsForCS;
+		this.doCreateSubGraphs = doCreateSubGraphs;
+		this.hlddType = hlddType;
         this.shouldSimplify = shouldSimplify;
     }
 
@@ -110,7 +114,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
                     /* Generate Graphs (GraphVariables) and collect all variables */
                     consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-                    graphCreatingVisitor = new BehGraphGenerator(shouldReuseConstants, doExpandConditions, delayCollector.getDFlagNames());
+                    graphCreatingVisitor = new BehGraphGenerator(shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, delayCollector.getDFlagNames());
                     entity.traverse(graphCreatingVisitor);
                     modelCollector = graphCreatingVisitor.getModelCollector();
                     consoleWriter.done();
@@ -168,7 +172,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
                     /* Generate Graphs (GraphVariables) and collect all variables */
                     consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-                    graphCreatingVisitor = new BehDDGraphGenerator(shouldReuseConstants, doExpandConditions);
+                    graphCreatingVisitor = new BehDDGraphGenerator(shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs);
                     entity.traverse(graphCreatingVisitor);
                     modelCollector = graphCreatingVisitor.getModelCollector();
                     consoleWriter.done();

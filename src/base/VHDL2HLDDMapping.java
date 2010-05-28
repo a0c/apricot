@@ -1,7 +1,5 @@
 package base;
 
-import base.vhdl.structure.nodes.TransitionNode;
-import base.vhdl.structure.nodes.IfNode;
 import base.vhdl.structure.nodes.AbstractNode;
 import java.util.*;
 
@@ -22,7 +20,7 @@ public class VHDL2HLDDMapping {
     private static final char END_OF_FILE = 65535;
 
     /* Singleton instance */
-    private static final VHDL2HLDDMapping instance = new VHDL2HLDDMapping();
+    private static final VHDL2HLDDMapping INSTANCE = new VHDL2HLDDMapping();
     private int currentLineCount;
 
     /* Fields for the line currently under processing */
@@ -41,8 +39,8 @@ public class VHDL2HLDDMapping {
      */
     private Map<? super AbstractNode, Set<Integer>> linesByNode = new HashMap<AbstractNode, Set<Integer>>();
 
-    public static VHDL2HLDDMapping getInstance() {
-        return instance;
+	public static VHDL2HLDDMapping getInstance() {
+        return INSTANCE;
     }
 
     private VHDL2HLDDMapping() {
@@ -85,7 +83,7 @@ public class VHDL2HLDDMapping {
         linesByNode.put(node, vhdlLines);
     }
 
-    public Set<Integer> getLinesForNode(AbstractNode node) {
+    public TreeSet<Integer> getLinesForNode(AbstractNode node) {
         /* Create a real copy of set, not a shallow one.
         * The elements of the set don't need to be unique, for these are their values that matter. */
         return new TreeSet<Integer>(linesByNode.get(node));

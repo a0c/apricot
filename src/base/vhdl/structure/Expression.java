@@ -115,22 +115,8 @@ public class Expression extends AbstractOperand {
         return new CompositeConditionDetector(this).isComposite();
     }
 
-    /**
-     * Expression is a Reduced Composite Condition if it is a conditional
-     * expression with the <i>left</i> operand being an AND/OR expression
-     * with all its children being instances of {@link OperandImpl}
-     * <p>
-     * e.g.:<br>
-     * <u>b03.vhd:</u>  (fu1 or fu2 or fu3 or fu4)='1'
-     *
-     * @return whether the expression is a Reduced Composite Condition
-     */
-    public boolean isReducedCompositeCondition(){
-        return new ReducedCompositeConditionDetector(this).isReducedComposite();
-    }
 
-
-    private class CompositeConditionDetector {
+	private class CompositeConditionDetector {
         private Expression rootExpression;
 
         public CompositeConditionDetector(Expression rootExpression) {
@@ -161,31 +147,4 @@ public class Expression extends AbstractOperand {
         }
     }
 
-    private class ReducedCompositeConditionDetector {
-        private Expression rootExpression;
-
-        public ReducedCompositeConditionDetector(Expression rootExpression) {
-            this.rootExpression = rootExpression;
-        }
-
-
-        public boolean isReducedComposite() {
-            Operator rootOperator = rootExpression.getOperator();
-            if (!rootOperator.isCondition()) return false;
-
-            /* Check left operand to be a reduced expression */
-            AbstractOperand leftOperand = rootExpression.getOperands().get(0);
-            if (leftOperand instanceof Expression) {
-                Expression leftExpression = (Expression) leftOperand;
-                Operator leftExprOperator = leftExpression.getOperator();
-                if (leftExprOperator == Operator.AND || leftExprOperator == Operator.OR) {
-                    for (AbstractOperand leftExprOperand : leftExpression.getOperands()) {
-                        if (!(leftExprOperand instanceof OperandImpl)) return false;
-                    }
-                    /* All children passed the check. rootExpression is reduced composite. */
-                    return true;
-                } else return false;
-            } else return false;
-        }
-    }
 }

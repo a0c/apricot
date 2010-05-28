@@ -80,17 +80,19 @@ public class ConstantVariable extends Variable {
             }
         }
         // EXISTENT constant is not found, so create a new one
-        ConstantVariable newConstantVariable = createNamedConstant(constValueToFind, targetLength); /*targetLength +1*/
+        ConstantVariable newConstantVariable = createNamedConstant(constValueToFind, null, targetLength); /*targetLength +1*/
         consts.put(newConstantVariable.getName(), newConstantVariable);
         return newConstantVariable;
 
     }
 
-	public static ConstantVariable createNamedConstant(BigInteger value, Indices forcedLength) {
+	public static ConstantVariable createNamedConstant(BigInteger value, String name, Indices forcedLength) {
 
 		int length = forcedLength != null ? forcedLength.length() : Indices.deriveLengthForValues(value.intValue(), 0).length();
 
-		ConstantVariable newConstant = new ConstantVariable("CONST_" + value + "_BW" + length, value);
+		name = (name == null) ?  "CONST_" + value + "_BW" + length : name;
+
+		ConstantVariable newConstant = new ConstantVariable(name, value);
 
 		if (forcedLength != null && !newConstant.getLength().equals(forcedLength))
 			newConstant.setLength(forcedLength);
@@ -129,6 +131,6 @@ public class ConstantVariable extends Variable {
 				new StringBuilder(newBuilder.subSequence(rangeToExtract.getLowest(), rangeToExtract.getHighest() + 1))
 						.reverse().toString(), 2);
 
-		return createNamedConstant(subRangeValue, rangeToExtract.deriveLength());
+		return createNamedConstant(subRangeValue, null, rangeToExtract.deriveLength());
 	}
 }

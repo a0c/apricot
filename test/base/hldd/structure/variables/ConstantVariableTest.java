@@ -17,13 +17,13 @@ public class ConstantVariableTest {
 	@Test (expected = HLDDException.class)
 	public void testSubRange() throws HLDDException {
 
-		ConstantVariable const0100 = ConstantVariable.createNamedConstant(new BigInteger("4"), new Indices(3, 0));
-		ConstantVariable const0 = ConstantVariable.createNamedConstant(new BigInteger("0"), new Indices(0, 0));
-		ConstantVariable const1 = ConstantVariable.createNamedConstant(new BigInteger("1"), new Indices(0, 0));
-		ConstantVariable const10 = ConstantVariable.createNamedConstant(new BigInteger("2"), new Indices(1, 0));
-		ConstantVariable const100 = ConstantVariable.createNamedConstant(new BigInteger("4"), new Indices(2, 0));
-		ConstantVariable const01 = ConstantVariable.createNamedConstant(new BigInteger("1"), new Indices(1, 0));
-		ConstantVariable const010 = ConstantVariable.createNamedConstant(new BigInteger("2"), new Indices(2, 0));
+		ConstantVariable const0100 = ConstantVariable.createNamedConstant(new BigInteger("4"), null, new Indices(3, 0));
+		ConstantVariable const0 = ConstantVariable.createNamedConstant(new BigInteger("0"), null, new Indices(0, 0));
+		ConstantVariable const1 = ConstantVariable.createNamedConstant(new BigInteger("1"), null, new Indices(0, 0));
+		ConstantVariable const10 = ConstantVariable.createNamedConstant(new BigInteger("2"), null, new Indices(1, 0));
+		ConstantVariable const100 = ConstantVariable.createNamedConstant(new BigInteger("4"), null, new Indices(2, 0));
+		ConstantVariable const01 = ConstantVariable.createNamedConstant(new BigInteger("1"), null, new Indices(1, 0));
+		ConstantVariable const010 = ConstantVariable.createNamedConstant(new BigInteger("2"), null, new Indices(2, 0));
 
 		assertEquals(const0.toString(), const0100.subRange(new Indices(0, 0)).toString());
 		assertEquals(const0.toString(), const0100.subRange(new Indices(1, 1)).toString());

@@ -194,11 +194,14 @@ public class Successors {
 	}
 
 	/**
-	 * <b>NB!</b> This method should only be used via {@link Node#decompact(Condition)}
 	 * @param condition whose holder (complex condition) is to be decompacted
-	 * @throws base.HLDDException if this object doesn't contain the specified condition
+	 * @throws base.HLDDException if array-condition is specified as a parameter, or
+	 * 		if this object doesn't contain the specified condition
 	 */
 	public void decompact(Condition condition) throws HLDDException {
+		if (condition.isArray()) {
+			throw new HLDDException("Successors: decompact(): scalar-condition expected, found: " + condition);
+		}
 		// skip scalar conditions
 		if (hasExactCondition(condition)) {
 			return; // do nothing
@@ -213,9 +216,7 @@ public class Successors {
 
 		successorByCondition.remove(cond);
 
-		int scalarCondsCount = cond.getElementsCount();
-		for (int idx = 0; idx < scalarCondsCount; idx++) {
-			Condition scalarCondition = cond.getElementAt(idx);
+		for (Condition scalarCondition : cond.asList()) {
 			setSuccessor(scalarCondition, Node.clone(successor));
 		}
 

@@ -3,6 +3,8 @@ package ui.optionPanels;
 import ui.BusinessLogic.HLDDRepresentationType;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -10,19 +12,37 @@ import javax.swing.*;
  * <br>Time: 16:48:15
  */
 public class VHDLBehOptionsPanel {
-    private JRadioButton expandCSCheckBox;
+    private JRadioButton flattenRadioButton;
     private JPanel mainPanel;
     private JRadioButton reducedRadioButton;
     private JRadioButton minimizedRadioButton;
+	private JRadioButton asGraphsRadioButton;
+	private JCheckBox subGraphsCheckBox;
+	private JRadioButton asFunctionRadioButton;
 
 
-    public JPanel getMainPanel() {
+	public VHDLBehOptionsPanel() {
+		DisableSubGraphsListener disableSubGrListener = new DisableSubGraphsListener();
+		flattenRadioButton.addChangeListener(disableSubGrListener);
+		asGraphsRadioButton.addChangeListener(disableSubGrListener);
+		asFunctionRadioButton.addChangeListener(disableSubGrListener);
+	}
+
+	public JPanel getMainPanel() {
         return mainPanel;
     }
 
-    public boolean shouldExpandCS() {
-        return expandCSCheckBox.isSelected();
+    public boolean shouldFlattenCS() {
+        return flattenRadioButton.isSelected();
     }
+
+	public boolean shouldAsGraphCS() {
+		return asGraphsRadioButton.isSelected();
+	}
+
+	public boolean shouldUseSubGraphs() {
+		return subGraphsCheckBox.isSelected();
+	}
 
     public HLDDRepresentationType getHlddType() {
         if (reducedRadioButton.isSelected()) {
@@ -32,4 +52,15 @@ public class VHDLBehOptionsPanel {
         } else return HLDDRepresentationType.FULL_TREE;
     }
 
+	private class DisableSubGraphsListener implements ChangeListener {
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if (flattenRadioButton.isSelected() || asGraphsRadioButton.isSelected()) {
+				subGraphsCheckBox.setSelected(false);
+				subGraphsCheckBox.setEnabled(false);
+			} else if (asFunctionRadioButton.isSelected()) {
+				subGraphsCheckBox.setEnabled(true);
+			}
+		}
+	}
 }

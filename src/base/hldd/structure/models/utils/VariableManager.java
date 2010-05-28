@@ -2,9 +2,13 @@ package base.hldd.structure.models.utils;
 
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.ConstantVariable;
+import base.hldd.structure.variables.FunctionVariable;
+import base.hldd.structure.variables.UserDefinedFunctionVariable;
+import base.vhdl.structure.Operator;
 
 import java.util.TreeMap;
 import java.util.Collection;
+import java.util.TreeSet;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -54,6 +58,64 @@ public class VariableManager {
     public Collection<AbstractVariable> getVariables() {
         return vars.values();
     }
+
+	public Collection<FunctionVariable> getFunctions(Operator operator) {
+		return getFunctions(vars.values(), operator);
+	}
+
+	public Collection<FunctionVariable> getUDFunctions(String userDefinedOperator) {
+		return getUDFunctions(vars.values(), userDefinedOperator);
+	}
+
+	public static Collection<FunctionVariable> getFunctions(Collection<AbstractVariable> vars, Operator operator) {
+		TreeSet<FunctionVariable> funcSet = new TreeSet<FunctionVariable>(FunctionVariable.getComparator());
+
+		if (operator == null) {
+			for (AbstractVariable variable : vars) {
+				if (variable instanceof FunctionVariable) {
+					FunctionVariable functionVariable = (FunctionVariable) variable;
+
+					funcSet.add(functionVariable);
+				}
+			}
+		} else {
+			for (AbstractVariable variable : vars) {
+				if (variable instanceof FunctionVariable) {
+					FunctionVariable functionVariable = (FunctionVariable) variable;
+
+					if (functionVariable.getOperator() == operator) {
+						funcSet.add(functionVariable);
+					}
+				}
+			}
+		}
+		return funcSet;
+	}
+
+	public static Collection<FunctionVariable> getUDFunctions(Collection<AbstractVariable> vars, String userDefinedOperator) {
+		TreeSet<FunctionVariable> funcSet = new TreeSet<FunctionVariable>(FunctionVariable.getComparator());
+
+		if (userDefinedOperator == null) {
+			for (AbstractVariable variable : vars) {
+				if (variable instanceof UserDefinedFunctionVariable) {
+					UserDefinedFunctionVariable functionVariable = (UserDefinedFunctionVariable) variable;
+
+					funcSet.add(functionVariable);
+				}
+			}
+		} else {
+			for (AbstractVariable variable : vars) {
+				if (variable instanceof UserDefinedFunctionVariable) {
+					UserDefinedFunctionVariable functionVariable = (UserDefinedFunctionVariable) variable;
+
+					if (functionVariable.getUserDefinedOperator().equals(userDefinedOperator)) {
+						funcSet.add(functionVariable);
+					}
+				}
+			}
+		}
+		return funcSet;
+	}
 
     public Collection<ConstantVariable> getConstants() {
         return consts.values();

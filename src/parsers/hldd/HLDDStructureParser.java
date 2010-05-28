@@ -82,7 +82,8 @@ public class HLDDStructureParser {
                         inputIndices[i] = inputIndex;
                         inputPartedIndices[i] = parsePartedIndices(inputDeclaration.substring(inputDeclaration.indexOf("=")));
                     }
-                    builder.buildFunction(index, name, functionType, inputIndices, inputPartedIndices, length);
+					int nameIdx = Integer.parseInt(name.substring(name.lastIndexOf("_") + 1));
+                    builder.buildFunction(index, nameIdx, functionType, inputIndices, inputPartedIndices, length);
 
                 } else if (flags.isInput()) {
                     /* VARIABLE (INPUT PORTS) */

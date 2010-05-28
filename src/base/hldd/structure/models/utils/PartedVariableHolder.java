@@ -1,5 +1,6 @@
 package base.hldd.structure.models.utils;
 
+import base.HashCodeUtil;
 import base.hldd.structure.variables.AbstractVariable;
 import base.Indices;
 
@@ -24,7 +25,7 @@ public class PartedVariableHolder {
     }
 
     public PartedVariableHolder(AbstractVariable variable, Indices partedIndices) {
-        this(variable, partedIndices, NO_TRUE_VALUE);
+        this(variable, partedIndices, NO_TRUE_VALUE); //todo: instead of NO_TRUE_VALUE extend PartedVariableHolder class ...
     }
 
     public AbstractVariable getVariable() {
@@ -57,4 +58,30 @@ public class PartedVariableHolder {
     public String toString() {
         return variable + Indices.toString(partedIndices);
     }
+
+	@Override
+	public int hashCode() {
+		int result = HashCodeUtil.SEED;
+		result = HashCodeUtil.hash(result, variable);
+		result = HashCodeUtil.hash(result, partedIndices);
+		result = HashCodeUtil.hash(result, trueValue);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || obj.getClass() != this.getClass()) return false;
+		PartedVariableHolder thatHolder = (PartedVariableHolder) obj;
+
+		if (variable != thatHolder.variable) return false;
+
+		if (partedIndices == null ^ thatHolder.partedIndices == null) return false;
+
+		if (partedIndices != null && !partedIndices.equals(thatHolder.partedIndices)) {
+			return false;
+		}
+
+		return  trueValue == thatHolder.trueValue;
+	}
 }
