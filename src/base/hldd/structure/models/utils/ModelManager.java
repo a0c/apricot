@@ -100,13 +100,15 @@ public class ModelManager {
 		
 		/* Create FUNCTION */
 		FunctionVariable functionVariable;
-		if (flattenCondition && conditionalStmt.isCompositeCondition()) {
+		if (flattenCondition) {
 			functionVariable = createCompositeFunction(conditionalStmt);
-			return new PartedVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
-		} else {
-			functionVariable = createFunction(conditionalStmt, false);
-			return detectTrueValueAndSimplify(functionVariable, inverted); //todo: don't represent NOT as isInverted(). Use Function instead. And remove isInverted() parameter from here and further on. But think carefully: it may be a deeply internal INV in condition (there INV-s are preserved as functions)
+			if (functionVariable != null) {
+				return new PartedVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
+			}
 		}
+		
+		functionVariable = createFunction(conditionalStmt, false);
+		return detectTrueValueAndSimplify(functionVariable, inverted); //todo: don't represent NOT as isInverted(). Use Function instead. And remove isInverted() parameter from here and further on. But think carefully: it may be a deeply internal INV in condition (there INV-s are preserved as functions)
 	}
 	
 	/**
@@ -175,6 +177,10 @@ public class ModelManager {
     }
 
     private CompositeFunctionVariable createCompositeFunction(Expression condition) throws Exception {
+		if (!condition.isCompositeCondition()) {
+			return null;
+		}
+
         Operator compositeOperator = condition.getOperator();
         List<PartedVariableHolder> compositeElements = new LinkedList<PartedVariableHolder>();
 
