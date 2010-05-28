@@ -12,7 +12,6 @@ import base.Type;
 import java.util.*;
 import java.math.BigInteger;
 
-import parsers.vhdl.OperandLengthSetter;
 import parsers.vhdl.PackageParser;
 
 /**
@@ -225,8 +224,6 @@ public class ModelManager {
                 functionVariable = doCreateFinalFunction(Operator.CAT,
                         partiallySetVarList.toArray(new PartedVariableHolder[partiallySetVarList.size()]));
             } else {
-                /* Store lengths for CONSTANTS */
-                doSetLengthFor(expression);
                 /* Create and collect operands */
                 PartedVariableHolder[] operandsHolders = new PartedVariableHolder[expression.getOperands().size()];
                 if (isTransition) {
@@ -562,7 +559,6 @@ public class ModelManager {
      * @throws Exception if the <code>operand</code> contains an undeclared variable
      */
     public AbstractVariable convertOperandToVariable(AbstractOperand operand, Indices targetLength, boolean isTransition) throws Exception {
-        doSetLengthFor(operand);
 
         if (operand instanceof Expression || operand instanceof OperandImpl && operand.isInverted()) {
 
@@ -605,18 +601,6 @@ public class ModelManager {
         }
         throw new Exception("Obtaining VHDL structure variables from " + operand.getClass().getSimpleName() +
                 "instances is not supported");
-    }
-
-    /**
-	 * todo: remove this method. use a separate visitor in VHDL preprocessing. consider: v_out <= "0000"; // v_out may be 3:0 and may be 0:3
-     * Sets all the lengths for the specified operand and its sub-operands.
-     * @param operand to set length for
-     * @throws Exception {@link parsers.vhdl.OperandLengthSetter#OperandLengthSetter(ModelManager , AbstractOperand)}.
-     */
-    private void doSetLengthFor(AbstractOperand operand) throws Exception {
-        if (operand.getLength() == null) {
-            new OperandLengthSetter(this, operand);
-        }
     }
 
     public Condition convertOperandsToCondition(OperandImpl[] conditionOperands) {

@@ -22,15 +22,7 @@ public class TransitionNode extends AbstractNode {
         this.transition = transition;
     }
 
-    /**
-     * Use {@link #getTargetOperand()} instead
-     */
-    @Deprecated
-    public String getVariableName() {
-        return getTargetOperand().getName();
-    }
-
-    public boolean isNull() {
+	public boolean isNull() {
         return transition.isNull();
     }
 

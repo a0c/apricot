@@ -30,42 +30,10 @@
   </component>
   <component name="ChangeListManager" verified="true">
     <list default="true" readonly="true" id="fe24fc54-7d70-4f9c-9e9a-b4d21f55ffe4" name="Default" comment="&#10;# Brief commit desciption here&#10;&#10;# Full commit description here (comment lines starting with '#' will not be included)&#10;&#10;">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/Variable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/Variable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/base/hldd/structure/variables/ConstantVariableTest.java" afterPath="$PROJECT_DIR$/test/base/hldd/structure/variables/ConstantVariableTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/base/hldd/visitors/UsedFunctionsCollectorImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/VHDL2HLDDMapping.java" afterPath="$PROJECT_DIR$/src/base/VHDL2HLDDMapping.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ConditionGraphManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/BusinessLogic.java" afterPath="$PROJECT_DIR$/src/ui/BusinessLogic.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.form" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.form" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/BooleanOperandsCollector.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ExtraConditionGraphManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/PartedVariableHolder.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/PartedVariableHolder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/UserDefinedFunctionVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/UserDefinedFunctionVariable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Successors.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Successors.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/ApplicationForm.java" afterPath="$PROJECT_DIR$/src/ui/ApplicationForm.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/AbstractVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/AbstractVariable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/VariableManager.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/VariableManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java" afterPath="$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/BehModel.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/BehModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java" afterPath="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/nodes/Node.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/nodes/Node.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/Flags.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/Flags.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/hldd/Collector.java" afterPath="$PROJECT_DIR$/src/parsers/hldd/Collector.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/ConstantVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/ConstantVariable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/structure/Operator.java" afterPath="$PROJECT_DIR$/src/base/vhdl/structure/Operator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/FunctionVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/FunctionVariable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/GraphVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/GraphVariable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" afterPath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/base/hldd/structure/variables/FunctionVariableTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java" afterPath="$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" afterPath="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" afterPath="$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/AbstractModelCreator.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/AbstractModelCreator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureBuilder.java" afterPath="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/structure/Expression.java" afterPath="$PROJECT_DIR$/src/base/vhdl/structure/Expression.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/Type.java" afterPath="$PROJECT_DIR$/src/base/Type.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.java" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/vhdl/visitors/BehDDGraphGenerator.java" afterPath="$PROJECT_DIR$/src/base/vhdl/visitors/BehDDGraphGenerator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" afterPath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" />
     </list>
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -166,7 +134,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="486" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
+      <breakpoint url="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" line="488" class="base.vhdl.visitors.GraphGenerator" package="base.vhdl.visitors">
         <option name="ENABLED" value="false" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -317,7 +285,7 @@
       <file leaf-file-name="GraphGenerator.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="887" column="44" selection-start="44534" selection-end="44534" vertical-scroll-proportion="0.48056537">
+            <state line="156" column="0" selection-start="7225" selection-end="7225" vertical-scroll-proportion="0.3133098">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -325,11 +293,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OperandLengthSetter.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/OperandLengthSetter.java">
+      <file leaf-file-name="ModelManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="11" selection-start="2194" selection-end="2194" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="600" column="0" selection-start="31546" selection-end="31546" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -353,7 +323,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/Interpreter.java" />
         <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/AbstractModelCreator.java" />
         <option value="$PROJECT_DIR$/src/base/hldd/structure/variables/FunctionVariable.java" />
         <option value="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java" />
@@ -367,8 +336,9 @@
         <option value="$PROJECT_DIR$/src/base/hldd/structure/variables/UserDefinedFunctionVariable.java" />
         <option value="$PROJECT_DIR$/src/base/vhdl/structure/Operator.java" />
         <option value="$PROJECT_DIR$/src/ui/ApplicationForm.java" />
-        <option value="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" />
+        <option value="$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java" />
         <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" />
+        <option value="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" />
       </list>
     </option>
   </component>
@@ -450,7 +420,7 @@
     <option name="lastEditedConfigurable" value="Project 'VertigoInterfaceParsers'" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1" splitterProportion="0.5">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -462,12 +432,12 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane />
       </pane>
       <pane id="PackagesPane" />
       <pane id="Favorites" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -943,11 +913,13 @@
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921347" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.083333336" sideWeight="0.7314607" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24978317" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921347" sideWeight="0.0" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="21" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921347" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30786517" sideWeight="0.5" order="22" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3280899" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24935733" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -969,9 +941,7 @@
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Slice" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30786517" sideWeight="0.5" order="22" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
@@ -1094,41 +1064,6 @@
     <option name="myLastEditedConfigurable" value="Project Default" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/visitors/UsedFunctionsCollectorImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="12" selection-start="687" selection-end="687" vertical-scroll-proportion="0.33449075" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Expression.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="13" selection-start="181" selection-end="181" vertical-scroll-proportion="0.17708333" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/BooleanOperandsCollector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="49" column="25" selection-start="1470" selection-end="1470" vertical-scroll-proportion="0.45936397" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Operator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="118" column="0" selection-start="3978" selection-end="3978" vertical-scroll-proportion="1.4216726" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/utils/Successors.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="80" column="82" selection-start="2633" selection-end="2633" vertical-scroll-proportion="0.3321739" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehDDGraphGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="13" selection-start="275" selection-end="275" vertical-scroll-proportion="0.19675925" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="36" selection-start="280" selection-end="280" vertical-scroll-proportion="0.22025913" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="841" column="0" selection-start="35793" selection-end="35793" vertical-scroll-proportion="0.33333334" />
@@ -1149,9 +1084,53 @@
         <state line="51" column="31" selection-start="1685" selection-end="1699" vertical-scroll-proportion="0.33333334" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java">
+    <entry file="file://$PROJECT_DIR$/src/ui/io/AssertionCheckReader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="476" column="72" selection-start="25110" selection-end="25110" vertical-scroll-proportion="5.6042404" />
+        <state line="251" column="8" selection-start="8981" selection-end="8981" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/PartedVariableHolder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="15" selection-start="1133" selection-end="1133" vertical-scroll-proportion="0.33333334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Transition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="13" selection-start="124" selection-end="124" vertical-scroll-proportion="0.13773148">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SRC_BACKUP/BehDDResetInspector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="35" selection-start="1772" selection-end="1772" vertical-scroll-proportion="0.57211536">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="0" selection-start="1757" selection-end="1757" vertical-scroll-proportion="0.59134614">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="46" selection-start="464" selection-end="464" vertical-scroll-proportion="0.13773148">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/AbstractVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="49" selection-start="630" selection-end="630" vertical-scroll-proportion="0.25578704">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java">
@@ -1163,19 +1142,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/OperandLengthSetter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="11" selection-start="2194" selection-end="2194" vertical-scroll-proportion="0.0" />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ui/io/AssertionCheckReader.java">
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="251" column="8" selection-start="8981" selection-end="8981" vertical-scroll-proportion="0.0">
+        <state line="600" column="0" selection-start="31546" selection-end="31546" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Operator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="19" selection-start="19" selection-end="19" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="887" column="44" selection-start="44534" selection-end="44534" vertical-scroll-proportion="0.48056537">
+        <state line="156" column="0" selection-start="7225" selection-end="7225" vertical-scroll-proportion="0.3133098">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

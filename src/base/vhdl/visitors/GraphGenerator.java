@@ -18,11 +18,10 @@ import base.hldd.structure.Flags;
 import base.hldd.visitors.ObsoleteResetRemoverImpl;
 import base.Indices;
 import base.VHDL2HLDDMapping;
+import parsers.vhdl.OperandLengthSetter;
 
 import java.util.*;
 import java.util.logging.Logger;
-
-import parsers.vhdl.VHDLStructureParser;
 
 /**
  *
@@ -156,9 +155,10 @@ public abstract class GraphGenerator extends AbstractVisitor {
             }
         }
 
+		/* Adjust CONSTANT LENGTHS to the lengths of the variables that use these constants directly */
+		adjustConstantAndOperandLengths(architecture);
+
         for (Process process : architecture.getProcesses()) {
-            /* Adjust CONSTANT LENGTHS to the lengths of the variables that use these constants directly */
-            adjustConstantLengths(process);
             /* Collect partialSet variables */
             collectPartialSettings(process);
         }
@@ -439,9 +439,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
     Though, it still cannot set multiple variable in one process tree. */
     protected abstract void doCheckWhenTransitions(WhenNode whenNode) throws Exception;
 
-    private void adjustConstantLengths(Process process) throws Exception {
+    private void adjustConstantAndOperandLengths(Architecture architecture) throws Exception {
         /* Adjust CONSTANT LENGTHS to the lengths of the variables that use these constants directly */
-        process.traverse(new ConstantLengthAdjuster());
+        architecture.traverse(new ConstantLengthAdjuster());
+		/* Adjust OPERAND LENGTHS */
+		architecture.traverse(new OperandLengthAdjuster());
     }
 
     private void collectPartialSettings(Process process) throws Exception {
@@ -823,7 +825,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
      * Adjusts CONSTANT LENGTHS to the lengths of the variables that use these constants directly.<br>
      * NB! Only adjusts named constrants!
      */
-    protected class ConstantLengthAdjuster extends AbstractVisitor {
+    private class ConstantLengthAdjuster extends AbstractVisitor {
         /* Here only request processing of AbstractNodes(ParseTree) */
         public void visitEntity(Entity entity) throws Exception {}
 
@@ -848,10 +850,10 @@ public abstract class GraphGenerator extends AbstractVisitor {
         public void visitTransitionNode(TransitionNode transitionNode) throws Exception {
             if (transitionNode.isNull()) return;
 
-            AbstractOperand operand = transitionNode.getValueOperand();
-            String absGraphVariableName = transitionNode.getVariableName();
+            AbstractOperand valueOperand = transitionNode.getValueOperand();
+            String targetName = transitionNode.getTargetOperand().getName();
 
-            adjustOperands(new OperandImpl(absGraphVariableName), operand);
+            adjustOperands(new OperandImpl(targetName), valueOperand);
         }
 
         public void visitCaseNode(CaseNode caseNode) throws Exception {
@@ -884,26 +886,71 @@ public abstract class GraphGenerator extends AbstractVisitor {
             /* Adjust Operands only if both are instances of OperandImpl */
             if (!(leftOperand instanceof OperandImpl && rightOperand instanceof OperandImpl)) return;
             
-            String rightVariableName = ((OperandImpl) rightOperand).getName();
-            if (!VHDLStructureParser.isConstant(rightVariableName)) {
-                ConstantVariable constantVariable = modelCollector.getConstant(rightVariableName);
-                if (constantVariable != null) {
-                    AbstractVariable absGraphVariable = modelCollector.getVariable(((OperandImpl) leftOperand).getName());
-                    if (absGraphVariable == null) {           
-                        throw new Exception("Cannot adjust the length of the following constant: " + constantVariable.getName() + "." +
-                                "\nVariable collector doesn't contain the following adjusting variable: " + ((OperandImpl) leftOperand).getName());
-                    }
-
-                    /* Adjust Constant Length */
-                    Indices length = leftOperand.isParted()
-                            ? leftOperand.getPartedIndices()
-                            : absGraphVariable.getLength();
-                    constantVariable.setLength(length);
-                }
-            }
-
-        }
+            String rightVarName = ((OperandImpl) rightOperand).getName();
+			String leftVarName = ((OperandImpl) leftOperand).getName();
+			ConstantVariable constantVariable = modelCollector.getConstant(rightVarName);
+			if (constantVariable != null) {
+				AbstractVariable leftVariable = modelCollector.getVariable(leftVarName);
+				if (leftVariable == null) {
+					throw new Exception("Cannot adjust the length of the following constant: " + constantVariable.getName() + "." +
+							"\nVariable collector doesn't contain the following adjusting variable: " + leftVarName);
+				}
+				
+				/* Adjust Constant Length */
+				Indices length = leftOperand.isParted() ? leftOperand.getPartedIndices() : leftVariable.getLength();
+				constantVariable.setLength(length);
+			}
+		}
     }
+	
+	private class OperandLengthAdjuster extends AbstractVisitor {
+		
+		@Override
+		public void visitEntity(Entity entity) throws Exception {}
+		@Override
+		public void visitArchitecture(Architecture architecture) throws Exception {
+			architecture.getTransitions().traverse(this);
+		}
+		@Override
+		public void visitProcess(Process process) throws Exception {
+			process.getRootNode().traverse(this);
+		}
+		@Override
+		public void visitIfNode(IfNode ifNode) throws Exception {
+			Expression conditionExpression = ifNode.getConditionExpression();
+			doSetLengthFor(conditionExpression);
+			
+			ifNode.getTruePart().traverse(this);
+			
+			if (ifNode.getFalsePart() != null) {
+				ifNode.getFalsePart().traverse(this);
+			}
+		}
+		@Override
+		public void visitTransitionNode(TransitionNode transitionNode) throws Exception {
+			if (transitionNode.isNull()) {
+				return;
+			}
+			doSetLengthFor(transitionNode.getValueOperand());
+		}
+		@Override
+		public void visitCaseNode(CaseNode caseNode) throws Exception {
+			for (WhenNode whenNode : caseNode.getConditions()) {
+				whenNode.traverse(this);
+			}
+		}
+		@Override
+		public void visitWhenNode(WhenNode whenNode) throws Exception {
+			whenNode.getTransitions().traverse(this);
+		}
+		
+		private void doSetLengthFor(AbstractOperand operand) throws Exception {
+			if (operand.getLength() == null) {
+				new OperandLengthSetter(modelCollector, operand); //todo: consider: v_out <= "0000"; // v_out may be 3:0 and may be 0:3
+			}
+		}
+		
+	}
 
     private class PartialSetVariableCollector extends AbstractVisitor {
         private final Set<Variable> processVariables;
