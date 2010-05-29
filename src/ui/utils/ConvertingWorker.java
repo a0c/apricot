@@ -22,11 +22,8 @@ import parsers.psl.ParserShell;
 
 import javax.swing.*;
 
-import ui.BusinessLogic;
+import ui.*;
 import ui.BusinessLogic.*;
-import ui.ExtendedException;
-import ui.ConfigurationHandler;
-import ui.ApplicationForm;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -53,22 +50,19 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 	private final HLDDRepresentationType hlddType;
     private final boolean shouldSimplify;
 
-	public ConvertingWorker(BusinessLogic businessLogic, ParserID parserId, ConsoleWriter consoleWriter,
-							File sourceFile, File pslFile, File baseModelFile,
-							boolean shouldReuseConstants, boolean doFlattenConditions,
-							boolean doCreateGraphsForCS, boolean doCreateSubGraphs, HLDDRepresentationType hlddType, boolean shouldSimplify) {
+	public ConvertingWorker(BusinessLogic businessLogic, ConsoleWriter consoleWriter, ConverterSettings settings) {
         this.businessLogic = businessLogic;
-        this.parserId = parserId;
+        this.parserId = settings.getParserId();
         this.consoleWriter = consoleWriter;
-        this.sourceFile = sourceFile;
-        this.pslFile = pslFile;
-        this.baseModelFile = baseModelFile;
-        this.shouldReuseConstants = shouldReuseConstants;
-        this.doFlattenConditions = doFlattenConditions;
-		this.doCreateGraphsForCS = doCreateGraphsForCS;
-		this.doCreateSubGraphs = doCreateSubGraphs;
-		this.hlddType = hlddType;
-        this.shouldSimplify = shouldSimplify;
+        this.sourceFile = settings.getSourceFile();
+        this.pslFile = settings.getPslFile();
+        this.baseModelFile = settings.getBaseModelFile();
+        this.shouldReuseConstants = settings.isDoReuseConstants();
+        this.doFlattenConditions = settings.isDoFlattenConditions();
+		this.doCreateGraphsForCS = settings.isDoCreateGraphsForCS();
+		this.doCreateSubGraphs = settings.isDoCreateExtraGraphsForCS();
+		this.hlddType = settings.getHlddType();
+        this.shouldSimplify = settings.isDoSimplify();
     }
 
 

@@ -29,8 +29,7 @@ public class BusinessLogic {
     private BehModel model;
 
     /* Auxiliary fields */
-    private String message;
-    private String comment;
+	private String comment;
 
     public BusinessLogic(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
         this.applicationForm = applicationForm;
@@ -39,30 +38,22 @@ public class BusinessLogic {
 
     public void processParse() throws ExtendedException {
         /* Receive data from form */
-        ParserID parserID = applicationForm.getSelectedParserId();
-        boolean shouldReuseConstants = applicationForm.shouldReuseConstants();
-        boolean shouldSimplify = applicationForm.shouldSimplify();
-        boolean doFlattenConditions = applicationForm.shouldFlattenCS();
-        boolean doCreateGraphsForCS = applicationForm.shouldAsGraphCS();
-        boolean doCreateSubGraphs = applicationForm.shouldUseSubGraphs();
-        HLDDRepresentationType hlddType = applicationForm.getHlddRepresentationType();
+		ConverterSettings settings = new ConverterSettings();
+		settings.setParserId(applicationForm.getSelectedParserId());
+		settings.setSourceFile(sourceFile);
+		settings.setPslFile(destFile);
+		settings.setBaseModelFile(baseModelFile);
+		settings.setDoReuseConstants(applicationForm.shouldReuseConstants());
+		settings.setDoSimplify(applicationForm.shouldSimplify());
+		settings.setDoFlattenConditions(applicationForm.shouldFlattenCS());
+		settings.setDoCreateGraphsForCS(applicationForm.shouldAsGraphCS());
+		settings.setDoCreateExtraGraphsForCS(applicationForm.shouldUseSubGraphs());
+		settings.setHlddType(applicationForm.getHlddRepresentationType());
 
-        /* Check files */
-        if (sourceFile == null || destFile == null) {
-            message = parserID == ParserID.PSL2THLDD
-                    ? "Either Library or PSL file is missing" 
-                    : "Either source or destination file is missing";
-            throw new ExtendedException(message, ExtendedException.MISSING_FILES_TEXT);
-        }
-        if (parserID == ParserID.PSL2THLDD && baseModelFile == null) {
-            message = "Base HLDD model file is missing";
-            throw new ExtendedException(message, ExtendedException.MISSING_FILE_TEXT);
-        }
-
+		settings.validate();
 
         /* Perform PARSING and CONVERSIONS in a separate thread */
-        new ConvertingWorker(this, parserID, consoleWriter, sourceFile, destFile, baseModelFile,
-                shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, hlddType, shouldSimplify).execute();
+        new ConvertingWorker(this, consoleWriter, settings).execute();
 
     }
 
@@ -89,7 +80,7 @@ public class BusinessLogic {
             model.toFile(destFile, comment);
             consoleWriter.writeLn("Model saved to: " + destFile.getAbsolutePath());
         } catch (IOException e) {
-            message = "Error while saving file:\n" + e.getMessage();
+			String message = "Error while saving file:\n" + e.getMessage();
             throw new ExtendedException(message, ExtendedException.ERROR_TEXT);
         } finally {
             /* For PSL parser, change output file back from *.TGM into *.PSL */
