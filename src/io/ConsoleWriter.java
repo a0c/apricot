@@ -91,4 +91,8 @@ public class ConsoleWriter {
 		}
 		return logMessageBuilder;
 	}
+
+	public static ConsoleWriter getStub() {
+		return new ConsoleWriter(new JTextArea(), false);
+	}
 }

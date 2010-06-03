@@ -3,11 +3,10 @@ package parsers.hldd;
 import io.scan.HLDDScanner;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.variables.utils.DefaultGraphVariableCreator;
-import parsers.hldd.HLDDStructureBuilder;
-import parsers.hldd.HLDDStructureParser;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -50,7 +49,7 @@ public class TestHLDDStructureParser {
 
         BehModel behModel = structureBuilder.getModel();
 
-        behModel.toFile(destFile, "");
+        behModel.toFile(new FileOutputStream(destFile), "");
 
         System.out.println("  Done!");
     }

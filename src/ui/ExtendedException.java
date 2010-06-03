@@ -11,7 +11,6 @@ import java.util.EmptyStackException;
 public class ExtendedException extends Exception {
     public static final String FILE_NOT_FOUND_TEXT = "File not found";
     public static final String MISSING_FILE_TEXT = "Missing file";
-    public static final String MISSING_FILES_TEXT = "Missing files";
     public static final String ERROR_TEXT = "Error";
     public static final String IO_ERROR_TEXT = "I/O Error";
 	// Errors in Configuration

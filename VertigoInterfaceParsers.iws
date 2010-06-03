@@ -30,8 +30,41 @@
   </component>
   <component name="ChangeListManager" verified="true">
     <list default="true" readonly="true" id="fe24fc54-7d70-4f9c-9e9a-b4d21f55ffe4" name="Default" comment="&#10;# Brief commit desciption here&#10;&#10;# Full commit description here (comment lines starting with '#' will not be included)&#10;&#10;">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/ui/RTLOutputFileGeneratorTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VertigoInterfaceParsers.ipr" afterPath="$PROJECT_DIR$/VertigoInterfaceParsers.ipr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/utils/AssertionLoadingWorker.java" afterPath="$PROJECT_DIR$/src/ui/utils/AssertionLoadingWorker.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/BusinessLogic.java" afterPath="$PROJECT_DIR$/src/ui/BusinessLogic.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.form" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.form" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/parsers/hldd/TestHLDDStructureParser.java" afterPath="$PROJECT_DIR$/src/parsers/hldd/TestHLDDStructureParser.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/Statistics.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ui/RTLOutputFileGenerator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehDdOptionsPanel.java" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehDdOptionsPanel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/ApplicationForm.java" afterPath="$PROJECT_DIR$/src/ui/ApplicationForm.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ui/utils/UIWorkerFinalizerImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/BehModel.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/BehModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/PSLMain.java" afterPath="$PROJECT_DIR$/src/PSLMain.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifierTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/DesignTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/ConverterSettings.java" afterPath="$PROJECT_DIR$/src/ui/ConverterSettings.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/ExtendedException.java" afterPath="$PROJECT_DIR$/src/ui/ExtendedException.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ui/utils/AbstractWorkerFinalizer.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/DesignCreatorTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/ui/ConverterSettingsTest.java" afterPath="$PROJECT_DIR$/test/ui/ConverterSettingsTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ConditionGraphManager.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ConditionGraphManager.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/loggingForTest.properties" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ui/OutputFileGenerator.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/DesignCreator.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/ui/OutputFileGeneratorTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" afterPath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifier.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/utils/CoverageAnalyzingWorker.java" afterPath="$PROJECT_DIR$/src/ui/utils/CoverageAnalyzingWorker.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" afterPath="$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/io/ConsoleWriter.java" afterPath="$PROJECT_DIR$/src/io/ConsoleWriter.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/Design.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/StatisticsTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehDdOptionsPanel.form" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehDdOptionsPanel.form" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.java" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.java" />
     </list>
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -54,7 +87,7 @@
   </component>
   <component name="DebuggerManager">
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="125" class="ui.utils.ConvertingWorker" package="ui.utils">
+      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="136" class="ui.utils.ConvertingWorker" package="ui.utils">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -119,7 +152,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="117" class="ui.utils.ConvertingWorker" package="ui.utils">
+      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="128" class="ui.utils.ConvertingWorker" package="ui.utils">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -145,7 +178,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="111" class="ui.utils.ConvertingWorker" package="ui.utils">
+      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="122" class="ui.utils.ConvertingWorker" package="ui.utils">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -158,7 +191,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="95" class="ui.utils.ConvertingWorker" package="ui.utils">
+      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="106" class="ui.utils.ConvertingWorker" package="ui.utils">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -171,7 +204,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="161" class="ui.utils.ConvertingWorker" package="ui.utils">
+      <breakpoint url="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" line="169" class="ui.utils.ConvertingWorker" package="ui.utils">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -245,8 +278,8 @@
       <property name="field_breakpoints_groupByClasses" value="true" />
       <property name="method_breakpoints_groupByClasses" value="true" />
       <property name="exception_breakpoints_viewId" value="TABLE" />
-      <property name="exception_breakpoints_groupByClasses" value="true" />
       <property name="field_breakpoints_viewId" value="TABLE" />
+      <property name="exception_breakpoints_groupByClasses" value="true" />
       <property name="method_breakpoints_groupByMethods" value="false" />
     </ui_properties>
   </component>
@@ -274,8 +307,41 @@
       <file leaf-file-name="ConvertingWorker.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="117" column="0" selection-start="4702" selection-end="4702" vertical-scroll-proportion="0.0">
+            <state line="264" column="70" selection-start="12778" selection-end="12778" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TestDesignsList.txt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="105" column="0" selection-start="11331" selection-end="11331" vertical-scroll-proportion="0.0">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ApplicationForm.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="631" column="48" selection-start="26942" selection-end="26976" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AutomaticConverterVerifier.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifier.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="144" column="63" selection-start="4841" selection-end="4841" vertical-scroll-proportion="0.7835648">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -284,20 +350,16 @@
         <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="869" column="36" selection-start="43598" selection-end="43598" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelManager.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ModelManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="103" column="31" selection-start="4055" selection-end="4055" vertical-scroll-proportion="0.33333334">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="103" column="31" selection-start="4055" selection-end="4055" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -321,22 +383,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/AbstractModelCreator.java" />
-        <option value="$PROJECT_DIR$/src/base/hldd/structure/variables/FunctionVariable.java" />
-        <option value="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureParser.java" />
-        <option value="$PROJECT_DIR$/src/parsers/hldd/Collector.java" />
-        <option value="$PROJECT_DIR$/src/parsers/hldd/HLDDStructureBuilder.java" />
-        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/VariableManager.java" />
-        <option value="$PROJECT_DIR$/test/base/hldd/structure/variables/FunctionVariableTest.java" />
+        <option value="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/DesignCreator.java" />
+        <option value="$PROJECT_DIR$/src/ui/utils/AssertionLoadingWorker.java" />
+        <option value="$PROJECT_DIR$/src/ui/utils/CoverageAnalyzingWorker.java" />
+        <option value="$PROJECT_DIR$/src/ui/OutputFileGenerator.java" />
+        <option value="$PROJECT_DIR$/test/ui/OutputFileGeneratorTest.java" />
+        <option value="$PROJECT_DIR$/test/ui/RTLOutputFileGeneratorTest.java" />
+        <option value="$PROJECT_DIR$/src/ui/RTLOutputFileGenerator.java" />
+        <option value="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/StatisticsTest.java" />
+        <option value="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/Statistics.java" />
         <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ConditionGraphManager.java" />
-        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ExtraConditionGraphManager.java" />
-        <option value="$PROJECT_DIR$/src/base/VHDL2HLDDMapping.java" />
-        <option value="$PROJECT_DIR$/src/base/hldd/structure/variables/UserDefinedFunctionVariable.java" />
-        <option value="$PROJECT_DIR$/src/base/vhdl/structure/Operator.java" />
+        <option value="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifierTest.java" />
+        <option value="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt" />
+        <option value="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifier.java" />
+        <option value="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/DesignCreatorTest.java" />
+        <option value="$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" />
         <option value="$PROJECT_DIR$/src/ui/ApplicationForm.java" />
-        <option value="$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java" />
-        <option value="$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java" />
-        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java" />
       </list>
     </option>
   </component>
@@ -360,15 +422,21 @@
       <profile-state>
         <expanded-state>
           <State>
+            <id>Control flow issues</id>
+          </State>
+          <State>
             <id>Inspections</id>
           </State>
           <State>
             <id>Naming conventions</id>
           </State>
+          <State>
+            <id>Probable bugs</id>
+          </State>
         </expanded-state>
         <selected-state>
           <State>
-            <id>BooleanMethodNameMustStartWithQuestion</id>
+            <id>IgnoreResultOfCall</id>
           </State>
         </selected-state>
       </profile-state>
@@ -430,90 +498,96 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane />
       </pane>
-      <pane id="PackagesPane" />
       <pane id="Favorites" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="SDKs" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="112" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="141" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="112" />
     <property name="OverrideImplement.combined" value="true" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="141" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="RunManagerConfig.showSettingsBeforeRunnig" value="true" />
-    <property name="recentsLimit" value="5" />
-    <property name="MemberChooser.sorted" value="false" />
-    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="134" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="recentsLimit" value="5" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="last_opened_file_path" value="D:\Programming\C\Apricot\designs\branch\hc11\modified\MIN\tr" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="136" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="808" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="816" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="805" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="813" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="129" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="134" />
     <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="GoToAction.allIncluded" value="false" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
-    <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
-    <property name="RunManagerConfig.compileBeforeRunning" value="true" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="RunManagerConfig.compileBeforeRunning" value="true" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
-    <property name="options.lastSelected" value="preferences.sourceCode.General" />
-    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="options.lastSelected" value="project.propCompiler" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="false" />
     <property name="GenerateAntBuildDialog.backupFiles" value="true" />
-    <property name="options.searchVisible" value="true" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">
+      <recent name="ui" />
+      <recent name="ui.optionPanels" />
       <recent name="base.hldd.structure.variables" />
       <recent name="base.hldd.structure.models.utils" />
       <recent name="base.hldd.structure.nodes.utils" />
     </key>
     <key name="IntroduceConstantDialog.RECENTS_KEY">
-      <recent name="" />
+      <recent name="ui.ConverterSettings" />
+      <recent name="ee.ttu.pld.apricot.verifier.Statistics" />
+      <recent name="ee.ttu.pld.apricot.verifier.Design" />
+      <recent name="ee.ttu.pld.apricot.verifier.AutomaticConverterVerifier" />
+      <recent name="ee.ttu.pld.apricot.verifier.DesignCreator" />
     </key>
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="ee.ttu.pld.apricot.verifier" />
+      <recent name="ui.utils" />
       <recent name="base.hldd.structure.models.utils" />
       <recent name="base.hldd.visitors" />
       <recent name="base.hldd.structure.nodes.utils" />
-      <recent name="base.vhdl.visitors" />
-      <recent name="parsers.vhdl" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="ee.ttu.pld.apricot.verifier" />
       <recent name="base" />
       <recent name="io.visual.base" />
       <recent name="ui.fileViewer" />
       <recent name="io" />
-      <recent name="quickstart" />
     </key>
   </component>
   <component name="RegexUtilComponent" text="1900-01-01 2007/08/13 1900.01.01 1900 01 01 1900-01.01 1900 13 01 1900 02 31" flags="0" regex="(19|20)\d\d([- /.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])" mode="0" />
-  <component name="RunManager" selected="Application.Application Frame">
-    <configuration default="false" name="ConstantVariableTest.testSubRange" type="JUnit" factoryName="JUnit" temporary="true">
+  <component name="RunManager" selected="JUnit.DesignCreatorTest.loadCorrectNumberOfTestDesigns">
+    <configuration default="false" name="StatisticsTest.correctMapToString" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" runner="emma">
         <pattern>
-          <option name="PATTERN" value="base.hldd.structure.variables.*" />
+          <option name="PATTERN" value="ee.ttu.pld.apricot.verifier.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -521,9 +595,93 @@
       <module name="VertigoInterfaceParsers" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="base.hldd.structure.variables" />
-      <option name="MAIN_CLASS_NAME" value="base.hldd.structure.variables.ConstantVariableTest" />
-      <option name="METHOD_NAME" value="testSubRange" />
+      <option name="PACKAGE_NAME" value="ee.ttu.pld.apricot.verifier" />
+      <option name="MAIN_CLASS_NAME" value="ee.ttu.pld.apricot.verifier.StatisticsTest" />
+      <option name="METHOD_NAME" value="correctMapToString" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="DesignCreatorTest.loadCorrectNumberOfTestDesigns" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="ee.ttu.pld.apricot.verifier.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="VertigoInterfaceParsers" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="ee.ttu.pld.apricot.verifier" />
+      <option name="MAIN_CLASS_NAME" value="ee.ttu.pld.apricot.verifier.DesignCreatorTest" />
+      <option name="METHOD_NAME" value="loadCorrectNumberOfTestDesigns" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="DesignCreatorTest.createDefaultFiles" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="ee.ttu.pld.apricot.verifier.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="VertigoInterfaceParsers" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="ee.ttu.pld.apricot.verifier" />
+      <option name="MAIN_CLASS_NAME" value="ee.ttu.pld.apricot.verifier.DesignCreatorTest" />
+      <option name="METHOD_NAME" value="createDefaultFiles" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="AutomaticConverterVerifierTest.testVerify" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="ee.ttu.pld.apricot.verifier.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <module name="VertigoInterfaceParsers" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="ee.ttu.pld.apricot.verifier" />
+      <option name="MAIN_CLASS_NAME" value="ee.ttu.pld.apricot.verifier.AutomaticConverterVerifierTest" />
+      <option name="METHOD_NAME" value="testVerify" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
@@ -535,7 +693,7 @@
       </option>
       <envs />
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3521" />
+        <option name="DEBUG_PORT" value="1679" />
         <option name="TRANSPORT" value="0" />
         <option name="LOCAL" value="true" />
       </RunnerSettings>
@@ -544,10 +702,10 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="ConstantVariableTest" type="JUnit" factoryName="JUnit" temporary="true">
+    <configuration default="false" name="AutomaticConverterVerifierTest" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" runner="emma">
         <pattern>
-          <option name="PATTERN" value="base.hldd.structure.variables.*" />
+          <option name="PATTERN" value="ee.ttu.pld.apricot.verifier.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -555,8 +713,8 @@
       <module name="VertigoInterfaceParsers" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="base.hldd.structure.variables" />
-      <option name="MAIN_CLASS_NAME" value="base.hldd.structure.variables.ConstantVariableTest" />
+      <option name="PACKAGE_NAME" value="ee.ttu.pld.apricot.verifier" />
+      <option name="MAIN_CLASS_NAME" value="ee.ttu.pld.apricot.verifier.AutomaticConverterVerifierTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -569,102 +727,6 @@
       </option>
       <envs />
       <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="IndicesTest.absoluteFor" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" runner="emma">
-        <pattern>
-          <option name="PATTERN" value="base.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <extension name="snapshooter" />
-      <module name="VertigoInterfaceParsers" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="base" />
-      <option name="MAIN_CLASS_NAME" value="base.IndicesTest" />
-      <option name="METHOD_NAME" value="absoluteFor" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <envs />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="4335" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Debug" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="TransitionNodeTest.correctIsTransitionOf" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" runner="emma">
-        <pattern>
-          <option name="PATTERN" value="base.vhdl.structure.nodes.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <extension name="snapshooter" />
-      <module name="VertigoInterfaceParsers" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="base.vhdl.structure.nodes" />
-      <option name="MAIN_CLASS_NAME" value="base.vhdl.structure.nodes.TransitionNodeTest" />
-      <option name="METHOD_NAME" value="correctIsTransitionOf" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="FunctionVariableTest.testGetComparator" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" runner="emma">
-        <pattern>
-          <option name="PATTERN" value="base.hldd.structure.variables.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <extension name="snapshooter" />
-      <module name="VertigoInterfaceParsers" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="base.hldd.structure.variables" />
-      <option name="MAIN_CLASS_NAME" value="base.hldd.structure.variables.FunctionVariableTest" />
-      <option name="METHOD_NAME" value="testGetComparator" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <envs />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="4861" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -803,13 +865,43 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <list size="6">
-      <item index="0" class="java.lang.String" itemvalue="JUnit.ConstantVariableTest.testSubRange" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.ConstantVariableTest" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.IndicesTest.absoluteFor" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.TransitionNodeTest.correctIsTransitionOf" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.FunctionVariableTest.testGetComparator" />
-      <item index="5" class="java.lang.String" itemvalue="Application.Application Frame" />
+    <configuration default="false" name="AutomaticConverterVerifier" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="ee.ttu.pld.apricot.verifier.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="snapshooter" />
+      <option name="MAIN_CLASS_NAME" value="ee.ttu.pld.apricot.verifier.AutomaticConverterVerifier" />
+      <option name="VM_PARAMETERS" value="-Djava.util.logging.config.file=&quot;D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\src\loggingForTest.properties&quot;" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="VertigoInterfaceParsers" />
+      <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1696" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <list size="7">
+      <item index="0" class="java.lang.String" itemvalue="Application.Application Frame" />
+      <item index="1" class="java.lang.String" itemvalue="Application.AutomaticConverterVerifier" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.StatisticsTest.correctMapToString" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.DesignCreatorTest.loadCorrectNumberOfTestDesigns" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.DesignCreatorTest.createDefaultFiles" />
+      <item index="5" class="java.lang.String" itemvalue="JUnit.AutomaticConverterVerifierTest.testVerify" />
+      <item index="6" class="java.lang.String" itemvalue="JUnit.AutomaticConverterVerifierTest" />
     </list>
   </component>
   <component name="ScopeChooserConfigurable.UI">
@@ -909,6 +1001,7 @@
     <frame x="-4" y="-4" width="1288" height="1032" extended-state="6" />
     <editor active="true" />
     <layout>
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22815534" sideWeight="0.7314607" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921347" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.083333336" sideWeight="0.7314607" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -924,15 +1017,14 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39821574" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33333334" sideWeight="0.69213486" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26067415" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22815534" sideWeight="0.7314607" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3966292" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Repositories" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3295711" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Regex Tester" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Maven projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32957503" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Analyze Dataflow to here" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921347" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Analyze Dataflow from here" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24655312" sideWeight="0.7268623" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Scrappy" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32931158" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
@@ -942,8 +1034,8 @@
       <window_info id="Slice" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
       <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Duplicates" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3992095" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1062,99 +1154,118 @@
     <option name="myLastEditedConfigurable" value="Project Default" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.java">
+    <entry file="file://$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="841" column="0" selection-start="35793" selection-end="35793" vertical-scroll-proportion="0.33333334" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/base/hldd/structure/variables/ConstantVariableTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="13" selection-start="282" selection-end="282" vertical-scroll-proportion="0.17708333" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/base/hldd/structure/variables/FunctionVariableTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="13" selection-start="265" selection-end="265" vertical-scroll-proportion="0.17708333" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/ConditionGraphManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="31" selection-start="1685" selection-end="1699" vertical-scroll-proportion="0.33333334" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ui/io/AssertionCheckReader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="251" column="8" selection-start="8981" selection-end="8981" vertical-scroll-proportion="0.0">
+        <state line="14" column="13" selection-start="307" selection-end="307" vertical-scroll-proportion="0.18063754">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/PartedVariableHolder.java">
+    <entry file="file://$PROJECT_DIR$/src/ui/BusinessLogic.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="15" selection-start="1133" selection-end="1133" vertical-scroll-proportion="0.33333334">
+        <state line="53" column="0" selection-start="1903" selection-end="1903" vertical-scroll-proportion="0.55489963">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ui/ConverterSettings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="13" selection-start="277" selection-end="277" vertical-scroll-proportion="0.28099173">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/ui/ConverterSettingsTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="13" selection-start="293" selection-end="293" vertical-scroll-proportion="-2.4734356">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ui/OutputFileGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="13" selection-start="376" selection-end="376" vertical-scroll-proportion="-0.74616295">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/ui/OutputFileGeneratorTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="13" selection-start="326" selection-end="326" vertical-scroll-proportion="-2.6328218">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ui/RTLOutputFileGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="13" selection-start="239" selection-end="239" vertical-scroll-proportion="0.24085006">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/ui/RTLOutputFileGeneratorTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="13" selection-start="312" selection-end="312" vertical-scroll-proportion="0.18063754">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Transition.java">
+    <entry file="file://$PROJECT_DIR$/src/ui/utils/UIWorkerFinalizerImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="13" selection-start="124" selection-end="124" vertical-scroll-proportion="0.13773148">
+        <state line="8" column="64" selection-start="200" selection-end="201" vertical-scroll-proportion="0.1605667">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ui/utils/AbstractWorkerFinalizer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="22" selection-start="201" selection-end="201" vertical-scroll-proportion="0.18063754">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SRC_BACKUP/BehDDResetInspector.java">
+    <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/Statistics.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="35" selection-start="1772" selection-end="1772" vertical-scroll-proportion="0.57211536">
-          <folding />
+        <state line="165" column="0" selection-start="4071" selection-end="4071" vertical-scroll-proportion="0.87957495">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java">
+    <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="0" selection-start="1757" selection-end="1757" vertical-scroll-proportion="0.59134614">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/nodes/TransitionNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="46" selection-start="464" selection-end="464" vertical-scroll-proportion="0.13773148">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/AbstractVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="49" selection-start="630" selection-end="630" vertical-scroll-proportion="0.25578704">
+        <state line="105" column="0" selection-start="11331" selection-end="11331" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="117" column="0" selection-start="4702" selection-end="4702" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="264" column="70" selection-start="12778" selection-end="12778" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/OperandLengthSetter.java">
+    <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/structure/Operator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="19" selection-start="19" selection-end="19" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="869" column="36" selection-start="43598" selection-end="43598" vertical-scroll-proportion="0.0">
+        <state line="631" column="48" selection-start="26942" selection-end="26976" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1163,7 +1274,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="103" column="31" selection-start="4055" selection-end="4055" vertical-scroll-proportion="0.33333334">
+        <state line="103" column="31" selection-start="4055" selection-end="4055" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifier.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="144" column="63" selection-start="4841" selection-end="4841" vertical-scroll-proportion="0.7835648">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

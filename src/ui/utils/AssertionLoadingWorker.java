@@ -33,7 +33,7 @@ public class AssertionLoadingWorker extends TaskSwingWorker {
                     isProcessFinished = true;
 
                 } catch (Exception e) {
-                    businessLogicAssertionChecker.getApplicationForm().updateChkFileTextField("", null);
+                    businessLogicAssertionChecker.getApplicationForm().updateChkFileTextField(null);
                     occurredException = new ExtendedException("IO Error occurred while reading simulation file:\n" +
                     e.getMessage(), ExtendedException.IO_ERROR_TEXT);
                     isProcessFinished = false;
@@ -83,10 +83,10 @@ public class AssertionLoadingWorker extends TaskSwingWorker {
         ApplicationForm applicationForm = businessLogicAssertionChecker.getApplicationForm();
         /* Update text field and spinner */
         if (simulFile != null) {
-            applicationForm.updateChkFileTextField(simulFile.getName(), simulFile.getAbsolutePath());
+            applicationForm.updateChkFileTextField(simulFile);
             applicationForm.updateDrawSpinner(maxValue);
         } else {
-            applicationForm.updateChkFileTextField("", null);
+            applicationForm.updateChkFileTextField(null);
         }
 
         /* In any case, enable UI */

@@ -1,0 +1,105 @@
+#### Here only list AGMs and TGMs
+
+####D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_F.agm
+####D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_M.agm
+####D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_R.agm
+####D:\WORKSPACE\tr\b13_M_EX.agm
+####D:\WORKSPACE\tr\b13_M_FU.agm
+####D:\WORKSPACE\tr\b13_M_GR.agm
+
+#### b00
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b00\b00_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b00\b00_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b00\b00_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b00\b00_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b00\b00_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b00\b00_R_FU_RTL.agm
+#### b01
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b01\b01_F_FL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b01\b01_F_FL_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b01\b01_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b01\b01_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b01\b01_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b01\b01_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b01\b01_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b01\b01_R_FU_RTL.agm
+#### b02
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b02\b02_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b02\b02_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b02\b02_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b02\b02_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b02\b02_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b02\b02_R_FU_RTL.agm
+#### b03
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b03\b03_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b03\b03_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b03\b03_M_EX.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b03\b03_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b03\b03_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b03\b03_M_GR.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b03\b03_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b03\b03_R_FU_RTL.agm
+#### b04
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_EDITED_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_EDITED_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_EDITED_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_EDITED_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_EDITED_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_EDITED_R_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b04\b04_R_FU_RTL.agm
+#### b06
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b06\b06_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b06\b06_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b06\b06_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b06\b06_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b06\b06_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b06\b06_R_FU_RTL.agm
+#### b09
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b09\b09_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b09\b09_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b09\b09_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b09\b09_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b09\b09_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b09\b09_R_FU_RTL.agm
+#### b10
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_F_FL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_F_FL_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_M_GR.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b10\b10_R_FU_RTL.agm
+#### b11
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b11\b11_F_FL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b11\b11_F_FL_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b11\b11_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b11\b11_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b11\b11_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b11\b11_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b11\b11_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b11\b11_R_FU_RTL.agm
+#### b13
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_F_FL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_M_EX.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_M_GR.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\orig\b13\b13_R_FU.agm
+
+########################################################################################################################################
+#### TREES
+
+#### b00
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_F_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_M_FU_RTL.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_R_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_R_FU_RTL.agm

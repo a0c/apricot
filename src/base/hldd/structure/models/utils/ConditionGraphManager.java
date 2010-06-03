@@ -312,6 +312,15 @@ public class ConditionGraphManager {
 								}
 							}
 							break;
+						case XOR:
+							for (PartedVariableHolder operand : operands) {
+								if (result == null) {
+									result = evaluate(operand);
+								} else {
+									result = result ^ evaluate(operand);
+								}
+							}
+							break;
 						case EQ:
 							boolean opA = evaluate(operands.get(0));
 							boolean opB = evaluate(operands.get(1));

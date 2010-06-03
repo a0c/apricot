@@ -57,14 +57,14 @@ public class CoverageAnalyzingWorker extends TaskSwingWorker {
         ApplicationForm applicationForm = businessLogic.getApplicationForm();
         File covFile = businessLogic.deriveFileFrom(businessLogic.getHlddFile(), ".agm", ".cov");
         if (covFile != null) {
-            applicationForm.updateCovTextField(covFile.getName(), covFile.getAbsolutePath());
+            applicationForm.updateCovTextField(covFile);
             businessLogic.setCovFile(covFile);
         }
 
         File vhdlFile = businessLogic.deriveFileFrom(businessLogic.getHlddFile(), ".agm", ".vhdl");
         if (vhdlFile == null) vhdlFile = businessLogic.deriveFileFrom(businessLogic.getHlddFile(), ".agm", ".vhd");
         if (vhdlFile != null) {
-            applicationForm.updateVhdlCovTextField(vhdlFile.getName(), vhdlFile.getAbsolutePath());
+            applicationForm.updateVhdlCovTextField(vhdlFile);
             businessLogic.setVhdlFile(vhdlFile);
         }
         /* Automatically clikc Show button, if both files are set */

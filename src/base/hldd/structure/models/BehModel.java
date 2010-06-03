@@ -6,6 +6,7 @@ import base.hldd.structure.variables.utils.GraphVariableCreator;
 import base.hldd.structure.Graph;
 import base.hldd.visitors.VHDLLinesCollector;
 import io.ExtendedBufferedReader;
+import io.QuietCloser;
 import io.scan.HLDDScanner;
 
 import java.io.*;
@@ -125,33 +126,19 @@ public class BehModel {
         }
     }
 
-    public void toFile(File outFile, String comment) throws IOException {
+    public void toFile(OutputStream outputStream, String comment) throws IOException {
 
         String fileAsString = composeFileString(comment);
 
-        writeStringToFile(outFile, fileAsString);
+        writeStringToFile(outputStream, fileAsString);
 
+		QuietCloser.closeQuietly(outputStream);
     }
 
-    private void writeStringToFile(File outFile, String fileAsString) throws IOException {
-        if (outFile == null) { // PRINT to System.out;
-
-            System.out.println(fileAsString);
-
-        } else { // PRINT to file
-
-            FileOutputStream outFileStream = new FileOutputStream(outFile);
-            OutputStreamWriter outStreamWriter = new OutputStreamWriter(outFileStream);
-            BufferedWriter outBufWriter = new BufferedWriter(outStreamWriter);
-
-
-            outBufWriter.write(fileAsString);
-
-            outBufWriter.flush();
-
-            outFileStream.close();
-
-        }
+    private void writeStringToFile(OutputStream outputStream, String fileAsString) throws IOException {
+		BufferedWriter outBufWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+		outBufWriter.write(fileAsString);
+		outBufWriter.flush();
     }
 
     protected String composeFileString(String comment) {
@@ -233,7 +220,7 @@ public class BehModel {
         nodeCount = rootNodeAbsIndex;
     }
 
-    public void printMapFile(File mapFile) throws Exception {
+    public void printMapFile(OutputStream outputStream) throws Exception {
         VHDLLinesCollector vhdlLinesCollector = new VHDLLinesCollector();
         for (int index = graphOffset(); index < varCount; index++) {
             AbstractVariable absVar = getVariableByIndex(index);
@@ -241,7 +228,10 @@ public class BehModel {
                 ((GraphVariable) absVar).traverse(vhdlLinesCollector);
             }
         }
-        writeStringToFile(mapFile, vhdlLinesCollector.getVhdlLinesAsString());
+
+		writeStringToFile(outputStream, vhdlLinesCollector.getVhdlLinesAsString());
+
+		QuietCloser.closeQuietly(outputStream);
     }
     
     public AbstractVariable getVarByName(String name) {

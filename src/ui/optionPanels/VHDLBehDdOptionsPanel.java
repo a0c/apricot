@@ -1,6 +1,7 @@
 package ui.optionPanels;
 
 import ui.BusinessLogic;
+import ui.OutputFileGenerator;
 
 import javax.swing.*;
 
@@ -16,8 +17,16 @@ public class VHDLBehDdOptionsPanel {
     private JRadioButton reducedRadioButton;
     private JRadioButton minimizedRadioButton;
     private JRadioButton expandCSCheckBox;
+	private JRadioButton fullRadioButton;
 
-    public JPanel getMainPanel() {
+	public VHDLBehDdOptionsPanel(OutputFileGenerator outputFileGenerator) {
+		fullRadioButton.addChangeListener(outputFileGenerator);
+		reducedRadioButton.addChangeListener(outputFileGenerator);
+		minimizedRadioButton.addChangeListener(outputFileGenerator);
+		//todo: update ConditionStatement Modes
+	}
+
+	public JPanel getMainPanel() {
         return mainPanel;
     }
 

@@ -1,6 +1,7 @@
 package ui.optionPanels;
 
 import ui.BusinessLogic.HLDDRepresentationType;
+import ui.OutputFileGenerator;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -19,13 +20,21 @@ public class VHDLBehOptionsPanel {
 	private JRadioButton asGraphsRadioButton;
 	private JCheckBox subGraphsCheckBox;
 	private JRadioButton asFunctionRadioButton;
+	private JRadioButton fullRadioButton;
 
 
-	public VHDLBehOptionsPanel() {
+	public VHDLBehOptionsPanel(OutputFileGenerator outputFileGenerator) {
 		DisableSubGraphsListener disableSubGrListener = new DisableSubGraphsListener();
 		flattenRadioButton.addChangeListener(disableSubGrListener);
 		asGraphsRadioButton.addChangeListener(disableSubGrListener);
 		asFunctionRadioButton.addChangeListener(disableSubGrListener);
+		fullRadioButton.addChangeListener(outputFileGenerator);
+		reducedRadioButton.addChangeListener(outputFileGenerator);
+		minimizedRadioButton.addChangeListener(outputFileGenerator);
+		asFunctionRadioButton.addChangeListener(outputFileGenerator);
+		asGraphsRadioButton.addChangeListener(outputFileGenerator);
+		flattenRadioButton.addChangeListener(outputFileGenerator);
+		subGraphsCheckBox.addChangeListener(outputFileGenerator);
 	}
 
 	public JPanel getMainPanel() {
@@ -36,11 +45,11 @@ public class VHDLBehOptionsPanel {
         return flattenRadioButton.isSelected();
     }
 
-	public boolean shouldAsGraphCS() {
+	public boolean shouldCreateCSGraphs() {
 		return asGraphsRadioButton.isSelected();
 	}
 
-	public boolean shouldUseSubGraphs() {
+	public boolean shouldCreateExtraCSGraphs() {
 		return subGraphsCheckBox.isSelected();
 	}
 

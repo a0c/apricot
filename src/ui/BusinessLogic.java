@@ -1,6 +1,7 @@
 package ui;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -8,6 +9,7 @@ import base.hldd.structure.models.BehModel;
 import io.ConsoleWriter;
 
 import ui.utils.ConvertingWorker;
+import ui.utils.UIWorkerFinalizerImpl;
 
 
 /**
@@ -38,22 +40,17 @@ public class BusinessLogic {
 
     public void processParse() throws ExtendedException {
         /* Receive data from form */
-		ConverterSettings settings = new ConverterSettings();
-		settings.setParserId(applicationForm.getSelectedParserId());
-		settings.setSourceFile(sourceFile);
-		settings.setPslFile(destFile);
-		settings.setBaseModelFile(baseModelFile);
-		settings.setDoReuseConstants(applicationForm.shouldReuseConstants());
-		settings.setDoSimplify(applicationForm.shouldSimplify());
-		settings.setDoFlattenConditions(applicationForm.shouldFlattenCS());
-		settings.setDoCreateGraphsForCS(applicationForm.shouldAsGraphCS());
-		settings.setDoCreateExtraGraphsForCS(applicationForm.shouldUseSubGraphs());
-		settings.setHlddType(applicationForm.getHlddRepresentationType());
-
-		settings.validate();
-
+		ConverterSettings.Builder settingsBuilder = new ConverterSettings.Builder(applicationForm.getSelectedParserId(), sourceFile, destFile);
+		settingsBuilder.setBaseModelFile(baseModelFile);
+		settingsBuilder.setDoReuseConstants(applicationForm.shouldReuseConstants());
+		settingsBuilder.setDoSimplify(applicationForm.shouldSimplify());
+		settingsBuilder.setDoFlattenConditions(applicationForm.shouldFlattenCS());
+		settingsBuilder.setDoCreateCSGraphs(applicationForm.shouldCreateCSGraphs());
+		settingsBuilder.setDoCreateExtraCSGraphs(applicationForm.shouldCreateExtraCSGraphs());
+		settingsBuilder.setHlddType(applicationForm.getHlddRepresentationType());
+		
         /* Perform PARSING and CONVERSIONS in a separate thread */
-        new ConvertingWorker(this, consoleWriter, settings).execute();
+        new ConvertingWorker(new UIWorkerFinalizerImpl(this, consoleWriter), consoleWriter, settingsBuilder.build()).execute();
 
     }
 
@@ -77,7 +74,7 @@ public class BusinessLogic {
             /* For PSL parser, change output file from *.PSL into *.TGM */
             changeDestFile(".psl", ".tgm");
 
-            model.toFile(destFile, comment);
+            model.toFile(new FileOutputStream(destFile), comment);
             consoleWriter.writeLn("Model saved to: " + destFile.getAbsolutePath());
         } catch (IOException e) {
 			String message = "Error while saving file:\n" + e.getMessage();
@@ -132,7 +129,11 @@ public class BusinessLogic {
         this.baseModelFile = baseModelFile;
     }
 
-    public void clearFiles() {
+	public File getSourceFile() {
+		return sourceFile;
+	}
+
+	public void clearFiles() {
         sourceFile = null;
         destFile = null;
         baseModelFile = null;

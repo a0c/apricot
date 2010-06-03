@@ -114,8 +114,9 @@ public class ApplicationForm implements ActionListener {
         fileViewerSplitPane.setDividerLocation(700);
         /* Create PARSERS options panels */
         selectedParserId = ParserID.getSelected(parserComboBox.getSelectedIndex());
-        vhdlBehOptionsPanel = new VHDLBehOptionsPanel();
-        vhdlBehDdOptionsPanel = new VHDLBehDdOptionsPanel();
+		OutputFileGenerator outputFileGenerator = new OutputFileGenerator(this, hlddButton);
+		vhdlBehOptionsPanel = new VHDLBehOptionsPanel(outputFileGenerator);
+        vhdlBehDdOptionsPanel = new VHDLBehDdOptionsPanel(outputFileGenerator);
         hlddBehOptionsPanel = new HLDDBehOptionsPanel();
         pslOptionsPanel = new PSLOptionsPanel();
 
@@ -124,6 +125,8 @@ public class ApplicationForm implements ActionListener {
         /* PARSERS */
         businessLogic = new BusinessLogic(this, consoleWriter);
         addActionListener(vhdlButton, hlddButton, parseButton, parserComboBox, ppgLibButton);
+		vhdlTextField.getDocument().addDocumentListener(outputFileGenerator);
+		vhdlTextField.getDocument().addDocumentListener(new RTLOutputFileGenerator(this, hlddButton));
         /* SIMULATION */
         businessLogicSimul = new BusinessLogicSimulation(this, consoleWriter);
         addActionListener(hlddSimulButton, simulateButton, chkFileButton, drawButton);
@@ -315,14 +318,14 @@ public class ApplicationForm implements ActionListener {
                         }
                         /* Clear HLDD File in all Parsers */
                         businessLogic.setDestFile(null);
-                        updateTextFieldFor(hlddButton, "", null);
+                        updateTextFieldFor(hlddButton, null);
                     } else {
                         businessLogic.setDestFile(selectedFile);
                         /* Automatically look for identical PSL Base Model file */
                         triggerAutomaticSelection(selectedFile, sourceButton);
                     }
                 }
-                updateTextFieldFor(sourceButton, selectedFile.getName(), selectedFile.getAbsolutePath());
+                updateTextFieldFor(sourceButton, selectedFile);
 
             } catch (ExtendedException e) {
                 showErrorMessage(e);
@@ -337,7 +340,7 @@ public class ApplicationForm implements ActionListener {
             File baseModelFile = businessLogic.deriveBaseModelFileFrom(selectedFile);
             if (baseModelFile != null) {
                 businessLogic.setBaseModelFile(baseModelFile);
-                updateTextFieldFor(vhdlButton, baseModelFile.getName(), baseModelFile.getAbsolutePath());
+                updateTextFieldFor(vhdlButton, baseModelFile);
             }
         } else if (pressedButton == hlddAssertButton) {
             /* Automatically look for identical TGM file */
@@ -345,7 +348,7 @@ public class ApplicationForm implements ActionListener {
             if (tgmFile != null) {
                 checkAssertionCheckBox.setSelected(true);
                 businessLogicAssertionChecker.setTgmFile(tgmFile);
-                updateTextFieldFor(tgmButton, tgmFile.getName(), tgmFile.getAbsolutePath());
+                updateTextFieldFor(tgmButton, tgmFile);
             }
 
             /* Automatically look for identical Patterns file */
@@ -391,10 +394,9 @@ public class ApplicationForm implements ActionListener {
 
     private void updateTextAreas() {
         //todo: get texts from businessLogic
-        String emptyText = "";
-        updateTextFieldFor(vhdlButton, emptyText, null);
-        updateTextFieldFor(hlddButton, emptyText, null);
-        updateTextFieldFor(ppgLibButton, emptyText, null);
+        updateTextFieldFor(vhdlButton, null);
+        updateTextFieldFor(hlddButton, null);
+        updateTextFieldFor(ppgLibButton, null);
     }
 
     private void updateButtons() {
@@ -493,10 +495,10 @@ public class ApplicationForm implements ActionListener {
 		}
 	}
 
-	public boolean shouldAsGraphCS() {
+	public boolean shouldCreateCSGraphs() {
 		switch (selectedParserId) {
 			case VhdlBeh2HlddBeh:
-				return vhdlBehOptionsPanel.shouldAsGraphCS();
+				return vhdlBehOptionsPanel.shouldCreateCSGraphs();
 			case VhdlBehDd2HlddBeh:
 				return false;//todo...
 			default:
@@ -504,10 +506,10 @@ public class ApplicationForm implements ActionListener {
 		}
 	}
 
-	public boolean shouldUseSubGraphs() {
+	public boolean shouldCreateExtraCSGraphs() {
 		switch (selectedParserId) {
 			case VhdlBeh2HlddBeh:
-				return vhdlBehOptionsPanel.shouldUseSubGraphs();
+				return vhdlBehOptionsPanel.shouldCreateExtraCSGraphs();
 			case VhdlBehDd2HlddBeh:
 				return false;//todo...
 			default:
@@ -555,12 +557,26 @@ public class ApplicationForm implements ActionListener {
         return mainPanel;
     }
 
-    private void updateTextFieldFor(JButton parentButton, String text, String tooltip) {
+    void updateTextFieldFor(JButton parentButton, File file) {
         JTextField textFieldToUpdate = textFieldByButton.get(parentButton);
         if (textFieldToUpdate != null) {
-            textFieldToUpdate.setText(text);
-            textFieldToUpdate.setToolTipText(tooltip);
-        }
+			String text;
+			String tooltip;
+			Color color = Color.BLACK;
+			if (file == null) {
+				text = "";
+				tooltip = null;
+			} else {
+				text = file.getName();
+				tooltip = file.getAbsolutePath();
+				if (textFieldToUpdate == hlddTextField && file.exists()) {
+					color = Color.RED;
+				}
+			}
+			textFieldToUpdate.setText(text);
+			textFieldToUpdate.setToolTipText(tooltip);
+			textFieldToUpdate.setForeground(color);
+		}
     }
 
 
@@ -615,13 +631,14 @@ public class ApplicationForm implements ActionListener {
 
     public void doSaveConvertedModel() {
         /* Save converted file */
+		enableUI(false);
         try {
             businessLogic.saveModel();
         } catch (ExtendedException e1) {
             JOptionPane.showMessageDialog(frame, e1.getMessage(), e1.getTitle(), JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        JOptionPane.showMessageDialog(frame, "File successfully saved", "File saved", JOptionPane.INFORMATION_MESSAGE);
+        } finally {
+			enableUI(true);
+		}
     }
 
     public void doAskForComment() {
@@ -663,16 +680,16 @@ public class ApplicationForm implements ActionListener {
         return analyzeCoverateCheckBox.isSelected();
     }
 
-    public void updateChkFileTextField(String selectedFileName, String selectedFilePath) {
-        updateTextFieldFor(chkFileButton, selectedFileName, selectedFilePath);
+    public void updateChkFileTextField(File file) {
+        updateTextFieldFor(chkFileButton, file);
     }
 
-    public void updateCovTextField(String selectedFileName, String selectedFilePath) {
-        updateTextFieldFor(covButton, selectedFileName, selectedFilePath);
+    public void updateCovTextField(File file) {
+        updateTextFieldFor(covButton, file);
     }
 
-    public void updateVhdlCovTextField(String selectedFileName, String selectedFilePath) {
-        updateTextFieldFor(vhdlCovButton, selectedFileName, selectedFilePath);
+    public void updateVhdlCovTextField(File file) {
+        updateTextFieldFor(vhdlCovButton, file);
     }
 
     public void updateDrawSpinner(int maxValue) {
@@ -709,7 +726,15 @@ public class ApplicationForm implements ActionListener {
         return frame;
     }
 
-    public void setEnableHlddSimulButton(boolean enable) {
+	public File getSourceFile() {
+		return businessLogic.getSourceFile();
+	}
+
+	public void setDestFile(File destFile) {
+		businessLogic.setDestFile(destFile);
+	}
+
+	public void setEnableHlddSimulButton(boolean enable) {
         hlddSimulButton.setEnabled(enable);
     }
 

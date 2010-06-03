@@ -1,6 +1,7 @@
 import parsers.psl.ParserShell;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -20,7 +21,7 @@ public class PSLMain {
                 null);
         pslParserShell.run();
 
-        pslParserShell.getModel().toFile(new File("D:\\Documents and Settings\\Randy\\My Documents\\Anton\\TTU\\RAIK\\VERTIGO docs\\PSL\\latw_dummy_ETS08.agm"), pslParserShell.getComment());
+        pslParserShell.getModel().toFile(new FileOutputStream(new File("D:\\Documents and Settings\\Randy\\My Documents\\Anton\\TTU\\RAIK\\VERTIGO docs\\PSL\\latw_dummy_ETS08.agm")), pslParserShell.getComment());
 
     }
 

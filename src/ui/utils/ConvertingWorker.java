@@ -36,9 +36,9 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
     private static final DateFormat DATE_TIME_FORMAT = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
     private static final String SEPARATOR = "#### ";
 
-    private final BusinessLogic businessLogic;
     private final ParserID parserId;
     private final ConsoleWriter consoleWriter;
+	private String comment = "";
 
     private final File sourceFile;
     private File pslFile;
@@ -49,9 +49,12 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 	private final boolean doCreateSubGraphs;
 	private final HLDDRepresentationType hlddType;
     private final boolean shouldSimplify;
+	private final AbstractWorkerFinalizer workerFinalizer;
+	private ConverterSettings settings;
 
-	public ConvertingWorker(BusinessLogic businessLogic, ConsoleWriter consoleWriter, ConverterSettings settings) {
-        this.businessLogic = businessLogic;
+	public ConvertingWorker(AbstractWorkerFinalizer workerFinalizer, ConsoleWriter consoleWriter, ConverterSettings settings) {
+		this.workerFinalizer = workerFinalizer;
+		this.settings = settings;
         this.parserId = settings.getParserId();
         this.consoleWriter = consoleWriter;
         this.sourceFile = settings.getSourceFile();
@@ -59,16 +62,27 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
         this.baseModelFile = settings.getBaseModelFile();
         this.shouldReuseConstants = settings.isDoReuseConstants();
         this.doFlattenConditions = settings.isDoFlattenConditions();
-		this.doCreateGraphsForCS = settings.isDoCreateGraphsForCS();
-		this.doCreateSubGraphs = settings.isDoCreateExtraGraphsForCS();
+		this.doCreateGraphsForCS = settings.isDoCreateCSGraphs(); // todo: should be represented as Enum (CSMode or ConditionalStatementMode)
+		this.doCreateSubGraphs = settings.isDoCreateExtraCSGraphs();
 		this.hlddType = settings.getHlddType();
         this.shouldSimplify = settings.isDoSimplify();
+		/* Load Configuration */
+		try {
+			if (parserId == ParserID.VhdlBeh2HlddBeh || parserId == ParserID.VhdlBehDd2HlddBeh) {
+				ConfigurationHandler.load(sourceFile);
+			}
+		} catch (ExtendedException e) {
+			if (e.getTitle().equals(ExtendedException.UNDEFINED_STATE_VAR_NAME_TEXT)) { //todo: replace UNDEFINED_STATE_VAR_NAME_TEXT with another type of Exception
+				this.workerFinalizer.doReactOnConfigError(e, this);
+			}
+		}
+
     }
 
 
     protected BehModel doInBackground() throws ExtendedException {
-        /* Disable UI */
-        businessLogic.getApplicationForm().enableUI(false);
+		if (isCancelled()) return null;
+		workerFinalizer.doBeforeWorker();
 
         BehModel model = null;
         Entity entity;
@@ -85,9 +99,6 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
             switch (parserId) {
                 case VhdlBeh2HlddBeh:
                     vhdl2hlddMapping.clear();
-
-					/* Load Configuration */
-					ConfigurationHandler.load(sourceFile);
 
                     total = 4;
                     total += hlddType == HLDDRepresentationType.REDUCED ? 1 :
@@ -132,16 +143,13 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
                             model.getGraphCount() + " Graphs and " + model.getNodeCount() + " Nodes.");
                     /* Print VHDL_2_HLDD_Mapping to file */
                     consoleWriter.write("Writing VHDL2HLDD map file...");
-                    model.printMapFile(new File(sourceFile.getAbsolutePath().replaceFirst(".(vhd|vhdl)$", ".map")));
+                    model.printMapFile(settings.getMapFileStream());
                     consoleWriter.done();
 
                     break;
 
                 case VhdlBehDd2HlddBeh:
                     vhdl2hlddMapping.clear();
-
-					/* Load Configuration */
-					ConfigurationHandler.load(sourceFile);
 
                     total = 4;
                     total += hlddType == HLDDRepresentationType.REDUCED ? 1 :
@@ -190,7 +198,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
                             model.getGraphCount() + " Graphs and " + model.getNodeCount() + " Nodes.");
 					/* Print VHDL_2_HLDD_Mapping to file */
 					consoleWriter.write("Writing VHDL2HLDD map file...");
-					model.printMapFile(new File(sourceFile.getAbsolutePath().replaceFirst(".(vhd|vhdl)$", ".map")));
+					model.printMapFile(settings.getMapFileStream());
 					consoleWriter.done();
 
                     break;
@@ -228,7 +236,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
                     ParserShell pslParserShell = new ParserShell(sourceFile, pslFile, baseModelFile, consoleWriter);
                     pslParserShell.run();
 
-                    businessLogic.addComment(pslParserShell.getComment());
+					comment = pslParserShell.getComment();
                     model = pslParserShell.getModel();
                     break;
 
@@ -237,21 +245,18 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
             }
 
         } catch (Exception e) {
-			if (e instanceof ExtendedException && ((ExtendedException) e).getTitle().equals(ExtendedException.UNDEFINED_STATE_VAR_NAME_TEXT)) {
-				consoleWriter.writeLn("Aborted");
-				throw ((ExtendedException) e);
-			} else {
-				StringWriter stringWriter = new StringWriter();
-				e.printStackTrace(new PrintWriter(stringWriter));
-				LOG.fine(stringWriter.toString());
-				e.printStackTrace();
-				consoleWriter.failed();
-				throw ExtendedException.create(e);
-			}
+			StringWriter stringWriter = new StringWriter();
+			e.printStackTrace(new PrintWriter(stringWriter));
+			LOG.fine(stringWriter.toString());
+			e.printStackTrace();
+			consoleWriter.failed();
+			throw ExtendedException.create(e);
 		} catch (Throwable throwable) {
             consoleWriter.failed();
             throw ExtendedException.create(throwable);
-        }
+        } finally {
+			workerFinalizer.doAfterWorker(this);			
+		}
 
         return model;
     }
@@ -277,39 +282,25 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
     }
 
     protected void done() {
-		ApplicationForm applicationForm = businessLogic.getApplicationForm();
 
-		/* Enable UI */
-		applicationForm.enableUI(true);
-
-        try {
-            businessLogic.setModel(get());
-        } catch (InterruptedException e) {return;} catch (ExecutionException e) {
-			Throwable cause = e.getCause();
-			if (cause instanceof ExtendedException && ((ExtendedException) cause).getTitle().equals(ExtendedException.UNDEFINED_STATE_VAR_NAME_TEXT)) {
-				applicationForm.doAskForSTATEVarName((ExtendedException) cause);
-				return;
-			} else {
-				/* If error occurred while parsing, terminate process. */
-				ConfigurationHandler.reset();
-				throw new RuntimeException(cause);
-			}
+		if (isCancelled()) return;
+		
+		BehModel model;
+		try {
+			model = get();
+		} catch (InterruptedException e) {return;} catch (ExecutionException e) {
+			/* If error occurred while parsing, terminate process. */
+			ConfigurationHandler.reset();
+			throw new RuntimeException(e.getCause());
 		}
 
-        applicationForm.doAskForComment();
-
-        applicationForm.doSaveConvertedModel();
-
-        consoleWriter.writeLn("");
-
-        if (parserId == ParserID.VhdlBeh2HlddBeh) {
-            businessLogic.doLoadHlddGraph();
-        }
-
-		ConfigurationHandler.reset();
+		workerFinalizer.doWhenDone(model);
 
         super.done();
     }
 
+	public String getComment() {
+		return comment;
+	}
 
 }
