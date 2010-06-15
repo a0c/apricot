@@ -52,7 +52,7 @@
                     <rowspec value="top:4dlu:noGrow"/>
                     <rowspec value="fill:156px:noGrow"/>
                     <rowspec value="top:1dlu:noGrow"/>
-                    <rowspec value="center:36px:noGrow"/>
+                    <rowspec value="bottom:36px:noGrow"/>
                     <colspec value="fill:395px:noGrow"/>
                     <constraints>
                       <tabbedpane title="Converters"/>
@@ -101,9 +101,9 @@
                         </children>
                       </grid>
                       <grid id="81d57" layout-manager="FormLayout">
-                        <rowspec value="center:25px:noGrow"/>
+                        <rowspec value="center:max(d;4px):noGrow"/>
                         <rowspec value="top:4dlu:noGrow"/>
-                        <rowspec value="center:25px:noGrow"/>
+                        <rowspec value="center:max(d;4px):noGrow"/>
                         <colspec value="fill:88px:noGrow"/>
                         <colspec value="left:5dlu:noGrow"/>
                         <colspec value="fill:d:grow"/>
@@ -181,7 +181,7 @@
                       <component id="d6f0" class="javax.swing.JButton" binding="parseButton" default-binding="true">
                         <constraints>
                           <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <forms defaultalign-horz="false"/>
+                          <forms defaultalign-horz="false" defaultalign-vert="false"/>
                         </constraints>
                         <properties>
                           <text value="&amp;Convert"/>
@@ -193,30 +193,8 @@
                           <forms/>
                         </constraints>
                         <properties/>
-                        <border type="none" title="Options" title-justification="2">
-                          <title-color color="-16777216"/>
-                        </border>
-                        <children>
-                          <grid id="8fcc4" binding="notAvailablePanel" layout-manager="FormLayout">
-                            <rowspec value="center:d:noGrow"/>
-                            <colspec value="fill:d:grow"/>
-                            <constraints border-constraint="Center"/>
-                            <properties/>
-                            <border type="none"/>
-                            <children>
-                              <component id="e97bc" class="javax.swing.JLabel">
-                                <constraints>
-                                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                                  <forms defaultalign-horz="false"/>
-                                </constraints>
-                                <properties>
-                                  <foreground color="-6710887"/>
-                                  <text value="Not Available"/>
-                                </properties>
-                              </component>
-                            </children>
-                          </grid>
-                        </children>
+                        <border type="none"/>
+                        <children/>
                       </grid>
                       <vspacer id="60a43">
                         <constraints>
@@ -374,16 +352,6 @@
                               <text value="&amp;Random Stimuli"/>
                             </properties>
                           </component>
-                          <component id="75d37" class="javax.swing.JSpinner" binding="patternNrSpinnerAssert" custom-create="true">
-                            <constraints>
-                              <grid row="4" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false"/>
-                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                            </constraints>
-                            <properties>
-                              <inheritsPopupMenu value="true"/>
-                              <toolTipText value="Number of random patterns to check. If TST file is found, it gets used instead of random patterns."/>
-                            </properties>
-                          </component>
                           <component id="a248e" class="javax.swing.JButton" binding="checkButton" default-binding="true">
                             <constraints>
                               <grid row="8" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -391,30 +359,6 @@
                             </constraints>
                             <properties>
                               <text value="&amp;Simulate"/>
-                            </properties>
-                          </component>
-                          <component id="50a65" class="javax.swing.JButton" binding="tgmButton">
-                            <constraints>
-                              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                              <forms/>
-                            </constraints>
-                            <properties>
-                              <font style="0"/>
-                              <text value="&amp;Assertions"/>
-                            </properties>
-                          </component>
-                          <component id="bce00" class="javax.swing.JTextField" binding="tgmTextField">
-                            <constraints>
-                              <grid row="6" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false">
-                                <preferred-size width="150" height="-1"/>
-                              </grid>
-                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                            </constraints>
-                            <properties>
-                              <background color="-1"/>
-                              <editable value="false"/>
-                              <focusable value="false"/>
-                              <opaque value="false"/>
                             </properties>
                           </component>
                           <component id="9a102" class="javax.swing.JCheckBox" binding="checkAssertionCheckBox">
@@ -427,6 +371,40 @@
                               <opaque value="false"/>
                               <selected value="false"/>
                               <text value="Ch&amp;eck Assertions"/>
+                            </properties>
+                          </component>
+                          <component id="75d37" class="javax.swing.JSpinner" binding="patternNrSpinnerAssert" custom-create="true">
+                            <constraints>
+                              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                            </constraints>
+                            <properties>
+                              <inheritsPopupMenu value="true"/>
+                              <toolTipText value="Number of random patterns to check. If TST file is found, it gets used instead of random patterns."/>
+                            </properties>
+                          </component>
+                          <component id="50a65" class="javax.swing.JButton" binding="tgmButton">
+                            <constraints>
+                              <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <font style="0"/>
+                              <text value="&amp;Assertions"/>
+                            </properties>
+                          </component>
+                          <component id="bce00" class="javax.swing.JTextField" binding="tgmTextField">
+                            <constraints>
+                              <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false">
+                                <preferred-size width="150" height="-1"/>
+                              </grid>
+                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                              <editable value="false"/>
+                              <focusable value="false"/>
+                              <opaque value="false"/>
                             </properties>
                           </component>
                         </children>
@@ -448,7 +426,9 @@
                         <rowspec value="fill:d:noGrow"/>
                         <rowspec value="top:4dlu:noGrow"/>
                         <rowspec value="fill:d:noGrow"/>
-                        <rowspec value="top:4dlu:noGrow"/>
+                        <rowspec value="top:1dlu:noGrow"/>
+                        <rowspec value="center:d:grow"/>
+                        <rowspec value="top:1dlu:noGrow"/>
                         <rowspec value="fill:d:noGrow"/>
                         <rowspec value="top:4dlu:noGrow"/>
                         <rowspec value="center:max(d;25px):noGrow"/>
@@ -459,6 +439,10 @@
                         <colspec value="fill:d:noGrow"/>
                         <colspec value="left:6dlu:noGrow"/>
                         <colspec value="fill:d:grow"/>
+                        <colspec value="left:4dlu:noGrow"/>
+                        <colspec value="fill:max(d;4px):noGrow"/>
+                        <colspec value="left:4dlu:noGrow"/>
+                        <colspec value="fill:max(d;4px):noGrow"/>
                         <constraints>
                           <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                           <forms defaultalign-vert="false"/>
@@ -478,7 +462,7 @@
                           </component>
                           <component id="640a5" class="javax.swing.JTextField" binding="hlddCoverageTextField">
                             <constraints>
-                              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false">
+                              <grid row="0" column="2" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false">
                                 <preferred-size width="150" height="-1"/>
                               </grid>
                               <forms defaultalign-horz="false" defaultalign-vert="false"/>
@@ -492,7 +476,7 @@
                           </component>
                           <component id="d340a" class="javax.swing.JButton" binding="analyzeButton" default-binding="true">
                             <constraints>
-                              <grid row="8" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                              <grid row="10" column="0" row-span="1" col-span="7" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-horz="false"/>
                             </constraints>
                             <properties>
@@ -501,20 +485,13 @@
                           </component>
                           <component id="6f7d2" class="javax.swing.JRadioButton" binding="randomCovRadioButton">
                             <constraints>
-                              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
+                              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-vert="false"/>
                             </constraints>
                             <properties>
                               <selected value="true"/>
                               <text value="&amp;Random Stimuli"/>
                             </properties>
-                          </component>
-                          <component id="40a13" class="javax.swing.JSpinner" binding="patternNrSpinnerCoverage" custom-create="true">
-                            <constraints>
-                              <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                              <forms defaultalign-horz="false"/>
-                            </constraints>
-                            <properties/>
                           </component>
                           <component id="5fc6e" class="javax.swing.JRadioButton" binding="tstCovRadioButton">
                             <constraints>
@@ -525,15 +502,69 @@
                               <text value="Stimuli from .TST &amp;File"/>
                             </properties>
                           </component>
-                          <component id="770a3" class="javax.swing.JCheckBox" binding="analyzeCoverateCheckBox" default-binding="true">
+                          <component id="40a13" class="javax.swing.JSpinner" binding="patternNrSpinnerCoverage" custom-create="true">
                             <constraints>
-                              <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                            </constraints>
+                            <properties/>
+                          </component>
+                          <component id="a3b91" class="javax.swing.JCheckBox" binding="edgeCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="&amp;edge"/>
+                            </properties>
+                          </component>
+                          <component id="b23b" class="javax.swing.JCheckBox" binding="conditionCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="c&amp;ondition"/>
+                            </properties>
+                          </component>
+                          <component id="6a34a" class="javax.swing.JCheckBox" binding="nodeCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="&amp;node"/>
+                            </properties>
+                          </component>
+                          <component id="d59d5" class="javax.swing.JCheckBox" binding="toggleCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="&amp;toggle"/>
+                            </properties>
+                          </component>
+                          <component id="770a3" class="javax.swing.JCheckBox" binding="analyzeCoverageCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-horz="false"/>
                             </constraints>
                             <properties>
                               <selected value="true"/>
                               <text value="&amp;Analyze Coverage"/>
                             </properties>
+                          </component>
+                          <component id="f317e" class="javax.swing.JSeparator">
+                            <constraints>
+                              <grid row="4" column="4" row-span="1" col-span="3" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                            </constraints>
+                            <properties/>
                           </component>
                         </children>
                       </grid>

@@ -65,13 +65,15 @@ public class BusinessLogicCoverageAnalyzer {
         int patternCount = applicationForm.getPatternCountForCoverage();
         boolean isRandom = applicationForm.isRandomCov();
         boolean isDoAssert = applicationForm.isDoAnalyzeCoverage();
+		String directive = applicationForm.getCoverageAnalyzerDirective();
         
 
         /* Collect execution string */
         List<String> commandList = new ArrayList<String>(5);
-        commandList.add(ApplicationForm.LIB_DIR + (com.sun.jna.Platform.isWindows() ? "beh_simul.exe" : "beh_simul"));
+        commandList.add(ApplicationForm.LIB_DIR + (com.sun.jna.Platform.isWindows() ? "hlddsim.exe" : "hlddsim"));
         if (isDoAssert) {
             commandList.add("-coverage");
+			commandList.add(directive);
         }
         if (isRandom) {
             commandList.add("-random");

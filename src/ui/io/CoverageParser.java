@@ -16,9 +16,9 @@ public class CoverageParser {
     private AbstractCoverage edgeCoverage = null;
     private AbstractCoverage toggleCoverage = null;
 
-    private static final String NODES_START = "Node coverage:";
-    private static final String EDGES_START = "Edge coverage:";
-    private static final String TOTAL_START = "Toggle coverage:";
+    private static final String NODES_START = "Node Coverage =";
+    private static final String EDGES_START = "Edge Coverage =";
+    private static final String TOTAL_START = "Toggle Coverage =";
 
     private boolean checkNodes = true;
     private boolean checkEdges = true;

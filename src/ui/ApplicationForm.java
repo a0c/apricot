@@ -40,8 +40,7 @@ public class ApplicationForm implements ActionListener {
     private JButton hlddButton;
     private JButton parseButton;
     private JPanel optionsPanel;
-    private JPanel notAvailablePanel;
-    private JTabbedPane tabbedPane;
+	private JTabbedPane tabbedPane;
     private JCheckBox checkAssertionCheckBox;
     private JButton simulateButton;
     private JSpinner drawPatternCountSpinner;
@@ -75,13 +74,17 @@ public class ApplicationForm implements ActionListener {
     private JTextField covTextField;
     private JButton showButton;
     private JTextField tgmTextField;
-    private JCheckBox analyzeCoverateCheckBox;
+    private JCheckBox analyzeCoverageCheckBox;
     private JTabbedPane pictureTabPane;
     private JTabbedPane upperRightTabbedPane;
     private JTabbedPane fileViewerTabbedPane2;
     private JPanel clickMePanel2;
     private JSplitPane fileViewerSplitPane;
-    private MouseSelectionAdapter upperRightTabbedPaneAdapter;
+	private JCheckBox nodeCheckBox;
+	private JCheckBox edgeCheckBox;
+	private JCheckBox toggleCheckBox;
+	private JCheckBox conditionCheckBox;
+	private MouseSelectionAdapter upperRightTabbedPaneAdapter;
     private MouseSelectionAdapter picturePaneAdapter;
 
 
@@ -105,7 +108,7 @@ public class ApplicationForm implements ActionListener {
     private TabbedPaneListener tabbedPaneListener;
     private TabbedPaneListener tabbedPaneListener2;
 
-    public ApplicationForm() {
+	public ApplicationForm() {
         /* ConsoleWriter to write into a consoleTextArea */
         ConsoleWriter consoleWriter = new ConsoleWriter(consoleTextArea, false);
         infoScrollPane.getVerticalScrollBar().addAdjustmentListener((AdjustmentListener) consolePanel);
@@ -158,7 +161,14 @@ public class ApplicationForm implements ActionListener {
                 new RadioButtonToSpinnerLinker(randomAssertRadioButton, patternNrSpinnerAssert));
         randomCovRadioButton.addChangeListener(
                 new RadioButtonToSpinnerLinker(randomCovRadioButton, patternNrSpinnerCoverage));
-    }
+
+		CoverageCheckBoxSetter checkBoxSetter = new CoverageCheckBoxSetter();
+		analyzeCoverageCheckBox.addActionListener(checkBoxSetter);
+		edgeCheckBox.addActionListener(checkBoxSetter);
+		conditionCheckBox.addActionListener(checkBoxSetter);
+		nodeCheckBox.addActionListener(checkBoxSetter);
+		toggleCheckBox.addActionListener(checkBoxSetter);
+	}
 
     private void mapTextFieldsToButtons() {
         textFieldByButton.put(vhdlButton, vhdlTextField);
@@ -677,8 +687,28 @@ public class ApplicationForm implements ActionListener {
     }
 
     public boolean isDoAnalyzeCoverage() {
-        return analyzeCoverateCheckBox.isSelected();
+        return analyzeCoverageCheckBox.isSelected();
     }
+
+	public String getCoverageAnalyzerDirective() {
+		if (!isDoAnalyzeCoverage()) {
+			return null;
+		}
+		StringBuilder directiveBuilder = new StringBuilder(4);
+		if (nodeCheckBox.isSelected()) {
+			directiveBuilder.append("n");
+		}
+		if (edgeCheckBox.isSelected()) {
+			directiveBuilder.append("e");
+		}
+		if (conditionCheckBox.isSelected()) {
+			directiveBuilder.append("c");
+		}
+		if (toggleCheckBox.isSelected()) {
+			directiveBuilder.append("t");
+		}
+		return directiveBuilder.toString();
+	}
 
     public void updateChkFileTextField(File file) {
         updateTextFieldFor(chkFileButton, file);
@@ -919,4 +949,26 @@ public class ApplicationForm implements ActionListener {
             }
         }
     }
+
+	private class CoverageCheckBoxSetter implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Object source = e.getSource();
+			if (source == analyzeCoverageCheckBox) {
+				boolean isSelected = analyzeCoverageCheckBox.isSelected();
+				/* Switch ALL boxes ON/OFF */
+				edgeCheckBox.setSelected(isSelected);
+				conditionCheckBox.setSelected(isSelected);
+				nodeCheckBox.setSelected(isSelected);
+				toggleCheckBox.setSelected(isSelected);
+			} else {
+				if (edgeCheckBox.isSelected() || conditionCheckBox.isSelected()
+						|| nodeCheckBox.isSelected() || toggleCheckBox.isSelected()) {
+					analyzeCoverageCheckBox.setSelected(true);
+				} else {
+					analyzeCoverageCheckBox.setSelected(false);
+				}
+			}
+		}
+	}
 }

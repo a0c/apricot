@@ -61,7 +61,7 @@
                 </constraints>
                 <properties>
                   <selected value="true"/>
-                  <text value="&amp;Minimized"/>
+                  <text value="&amp;Minimized (default)"/>
                 </properties>
               </component>
             </children>

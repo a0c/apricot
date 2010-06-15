@@ -57,7 +57,6 @@ public class SingleFileSelector {
             while (!file.exists()) {
                 file = file.getParentFile();
             }
-            JOptionPane.showMessageDialog(null, "Previously opened file is not found (was deleted probably). Going up to folder:\n" + file.toString(), "Notification", JOptionPane.INFORMATION_MESSAGE);
             INSTANCE.fileChooser.setCurrentDirectory(file);
         }
         INSTANCE.isFileSelected = false;
