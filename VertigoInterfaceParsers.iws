@@ -30,17 +30,10 @@
   </component>
   <component name="ChangeListManager" verified="true">
     <list default="true" readonly="true" id="fe24fc54-7d70-4f9c-9e9a-b4d21f55ffe4" name="Default" comment="&#10;# Brief commit desciption here&#10;&#10;# Full commit description here (comment lines starting with '#' will not be included)&#10;&#10;">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.form" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.form" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/io/CoverageParser.java" afterPath="$PROJECT_DIR$/src/ui/io/CoverageParser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SETUP/HLDDTools.jar" afterPath="$PROJECT_DIR$/SETUP/HLDDTools.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/ApplicationForm.form" afterPath="$PROJECT_DIR$/src/ui/ApplicationForm.form" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/PSLOptionsPanel.form" afterPath="$PROJECT_DIR$/src/ui/optionPanels/PSLOptionsPanel.form" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehDdOptionsPanel.form" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehDdOptionsPanel.form" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt" afterPath="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/VariableManager.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/models/utils/VariableManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base/hldd/structure/variables/FunctionVariable.java" afterPath="$PROJECT_DIR$/src/base/hldd/structure/variables/FunctionVariable.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" afterPath="$PROJECT_DIR$/VertigoInterfaceParsers.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/BusinessLogicCoverageAnalyzer.java" afterPath="$PROJECT_DIR$/src/ui/BusinessLogicCoverageAnalyzer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.java" afterPath="$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/ApplicationForm.java" afterPath="$PROJECT_DIR$/src/ui/ApplicationForm.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ui/SingleFileSelector.java" afterPath="$PROJECT_DIR$/src/ui/SingleFileSelector.java" />
     </list>
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -206,19 +199,6 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/parsers/vhdl/VHDLStructureParser.java" line="36" class="parsers.vhdl.VHDLStructureParser" package="parsers.vhdl">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
     </line_breakpoints>
     <breakpoint_any>
       <breakpoint>
@@ -296,7 +276,7 @@
       <file leaf-file-name="ConvertingWorker.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="106" column="0" selection-start="3904" selection-end="3904" vertical-scroll-proportion="0.0">
+            <state line="121" column="57" selection-start="4899" selection-end="4899" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -305,7 +285,7 @@
       <file leaf-file-name="TestDesignsList.txt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="105" column="0" selection-start="11331" selection-end="11331" vertical-scroll-proportion="0.0">
+            <state line="113" column="0" selection-start="11967" selection-end="11967" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -314,7 +294,7 @@
       <file leaf-file-name="ApplicationForm.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="964" column="61" selection-start="39552" selection-end="39552" vertical-scroll-proportion="0.67886657">
+            <state line="964" column="61" selection-start="39552" selection-end="39552" vertical-scroll-proportion="0.6851852">
               <folding />
             </state>
           </provider>
@@ -323,16 +303,7 @@
       <file leaf-file-name="VHDLStructureParser.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/VHDLStructureParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="60" selection-start="268" selection-end="268" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VHDLStructureBuilder.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/VHDLStructureBuilder.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="111" column="0" selection-start="4107" selection-end="4107" vertical-scroll-proportion="0.0">
+            <state line="36" column="0" selection-start="791" selection-end="791" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -354,15 +325,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GraphGenerator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="869" column="36" selection-start="43598" selection-end="43598" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FindManager">
@@ -373,10 +335,7 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/Statistics.java" />
-        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/ConditionGraphManager.java" />
         <option value="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifierTest.java" />
-        <option value="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt" />
         <option value="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifier.java" />
         <option value="$PROJECT_DIR$/test/ee/ttu/pld/apricot/verifier/DesignCreatorTest.java" />
         <option value="$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java" />
@@ -389,6 +348,9 @@
         <option value="$PROJECT_DIR$/src/ui/optionPanels/PSLOptionsPanel.form" />
         <option value="$PROJECT_DIR$/src/ui/io/CoverageParser.java" />
         <option value="$PROJECT_DIR$/src/ui/ApplicationForm.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/variables/FunctionVariable.java" />
+        <option value="$PROJECT_DIR$/src/base/hldd/structure/models/utils/VariableManager.java" />
+        <option value="$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt" />
       </list>
     </option>
   </component>
@@ -573,7 +535,7 @@
     </key>
   </component>
   <component name="RegexUtilComponent" text="1900-01-01 2007/08/13 1900.01.01 1900 01 01 1900-01.01 1900 13 01 1900 02 31" flags="0" regex="(19|20)\d\d([- /.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])" mode="0" />
-  <component name="RunManager" selected="Application.Application Frame">
+  <component name="RunManager" selected="Application.AutomaticConverterVerifier">
     <configuration default="false" name="StatisticsTest.correctMapToString" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" runner="emma">
         <pattern>
@@ -1144,70 +1106,9 @@
     <option name="myLastEditedConfigurable" value="Project Default" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/ui/io/AssertionCheckReader.java">
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehDDGraphGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="251" column="8" selection-start="8981" selection-end="8981" vertical-scroll-proportion="0.734375" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ui/BusinessLogicCoverageAnalyzer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="75" column="0" selection-start="2428" selection-end="2428" vertical-scroll-proportion="0.33293977" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/io/scan/VHDLToken.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="8" selection-start="2189" selection-end="2189" vertical-scroll-proportion="0.33293268" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/ModelManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="372" column="17" selection-start="19517" selection-end="19517" vertical-scroll-proportion="0.45552886" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="106" column="0" selection-start="3904" selection-end="3904" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="105" column="0" selection-start="11331" selection-end="11331" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifier.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="144" column="63" selection-start="4841" selection-end="4841" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="869" column="36" selection-start="43598" selection-end="43598" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/VHDLStructureParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="60" selection-start="268" selection-end="268" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ui/OutputFileGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="13" selection-start="376" selection-end="376" vertical-scroll-proportion="0.18063754">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="25" selection-start="573" selection-end="573" vertical-scroll-proportion="0.34120426">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ui/optionPanels/VHDLBehOptionsPanel.form">
-      <provider selected="true" editor-type-id="ui-designer">
-        <state />
+        <state line="50" column="22" selection-start="2047" selection-end="2047" vertical-scroll-proportion="0.33293977" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ui/optionPanels/PSLOptionsPanel.form">
@@ -1215,19 +1116,96 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.form">
-      <provider selected="true" editor-type-id="ui-designer">
-        <state />
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/CompositeNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="96" column="36" selection-start="4756" selection-end="4756" vertical-scroll-proportion="0.45766872">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/GraphGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="732" column="53" selection-start="38470" selection-end="38470" vertical-scroll-proportion="0.10817308">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/nodes/Node.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="299" column="16" selection-start="8949" selection-end="8949" vertical-scroll-proportion="0.32572114">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/AutomaticConverterVerifier.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="144" column="63" selection-start="4841" selection-end="4841" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/BehGraphGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="44" column="0" selection-start="1513" selection-end="1513" vertical-scroll-proportion="0.46875">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/vhdl/visitors/DelayFlagCollector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="0" selection-start="824" selection-end="824" vertical-scroll-proportion="0.020070838">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ui/utils/ConvertingWorker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="121" column="57" selection-start="4899" selection-end="4899" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/AbstractModelCreator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="193" column="30" selection-start="6398" selection-end="6398" vertical-scroll-proportion="0.36127508">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/VHDLStructureBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="111" column="0" selection-start="4107" selection-end="4107" vertical-scroll-proportion="0.0" />
+        <state line="111" column="0" selection-start="4107" selection-end="4107" vertical-scroll-proportion="0.020432692">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/parsers/vhdl/VHDLStructureParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="36" column="0" selection-start="791" selection-end="791" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/variables/FunctionVariable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="200" column="0" selection-start="6608" selection-end="6608" vertical-scroll-proportion="0.67886657">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/base/hldd/structure/models/utils/VariableManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="65" column="40" selection-start="2264" selection-end="2264" vertical-scroll-proportion="0.019675925">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ee/ttu/pld/apricot/verifier/TestDesignsList.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="113" column="0" selection-start="11967" selection-end="11967" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ui/ApplicationForm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="964" column="61" selection-start="39552" selection-end="39552" vertical-scroll-proportion="0.67886657">
+        <state line="964" column="61" selection-start="39552" selection-end="39552" vertical-scroll-proportion="0.6851852">
           <folding />
         </state>
       </provider>

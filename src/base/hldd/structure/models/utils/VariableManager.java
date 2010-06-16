@@ -72,7 +72,7 @@ public class VariableManager {
 
 		if (operator == null) {
 			for (AbstractVariable variable : vars) {
-				if (variable instanceof FunctionVariable) {
+				if (variable.getClass() == FunctionVariable.class) {
 					FunctionVariable functionVariable = (FunctionVariable) variable;
 
 					funcSet.add(functionVariable);
@@ -80,7 +80,7 @@ public class VariableManager {
 			}
 		} else {
 			for (AbstractVariable variable : vars) {
-				if (variable instanceof FunctionVariable) {
+				if (variable.getClass() == FunctionVariable.class) {
 					FunctionVariable functionVariable = (FunctionVariable) variable;
 
 					if (functionVariable.getOperator() == operator) {
@@ -97,7 +97,7 @@ public class VariableManager {
 
 		if (userDefinedOperator == null) {
 			for (AbstractVariable variable : vars) {
-				if (variable instanceof UserDefinedFunctionVariable) {
+				if (variable.getClass() == UserDefinedFunctionVariable.class) {
 					UserDefinedFunctionVariable functionVariable = (UserDefinedFunctionVariable) variable;
 
 					funcSet.add(functionVariable);
@@ -105,7 +105,7 @@ public class VariableManager {
 			}
 		} else {
 			for (AbstractVariable variable : vars) {
-				if (variable instanceof UserDefinedFunctionVariable) {
+				if (variable.getClass() == UserDefinedFunctionVariable.class) {
 					UserDefinedFunctionVariable functionVariable = (UserDefinedFunctionVariable) variable;
 
 					if (functionVariable.getUserDefinedOperator().equals(userDefinedOperator)) {

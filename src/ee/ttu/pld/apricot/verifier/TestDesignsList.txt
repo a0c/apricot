@@ -103,3 +103,11 @@ D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfacePa
 D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_M_FU_RTL.agm
 D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_R_FU.agm
 D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\ITC99\trees\b00\b00_R_FU_RTL.agm
+
+########################################################################################################################################
+#### CRC
+
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\CRC\crc_demo_F_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\CRC\crc_demo_M_FU.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\CRC\crc_demo_M_GR.agm
+D:\Documents and Settings\Randy\My Documents\Programming\Java\VertigoInterfaceParsers9\test\designs\CRC\crc_demo_R_FU.agm

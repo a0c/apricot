@@ -198,7 +198,7 @@ public class FunctionVariable extends Variable {
 		@Override
 		public int compare(FunctionVariable o1, FunctionVariable o2) {
 
-			int compNames = o1.operator.name().compareTo(o2.operator.name());
+			int compNames = o1.operatorToString().compareTo(o2.operatorToString());
 
 			if (compNames != 0) {
 				return compNames < 0 ? -1 : 1;
