@@ -162,19 +162,23 @@ public class VHDLStructureParser {
                     if (valueString.contains(" WHEN ") && valueString.contains(" ELSE ")) {
                         /* ##### WHEN-ELSE outside PROCESSES (in ARCHITECTURE) */
                         // Split to parts
-                        String[] varValueParts = valueString.split("(( WHEN )|( ELSE ))", 3);
-                        if (varValueParts.length != 3)
-                            throw new Exception("WHEN-ELSE statement \"" + valueString + "\" is parsed incorrectly." +
-                                    "\nExpected number of parsed tokens: 3\nActual number of parsed tokens: " + varValueParts.length);
-                        // Build each part
-                        builder.buildIfStatement(varValueParts[1]);
-                        //todo: substitue current lines with calculated lines...
-                        //todo: use "\bWHEN\b" word boundary!
-                        builder.buildTransition(name, varValueParts[0]);
-                        builder.buildElseStatement();
-                        //todo: substitue current lines with calculated lines...
-                        builder.buildTransition(name, varValueParts[2]);
-                        builder.buildCloseDeclaration();
+						String[] varValueParts = valueString.split("(( WHEN )|( ELSE ))"); //todo: use "\\bWHEN\\b" word boundary!
+						int maxIdx = varValueParts.length - 1;
+						for (int i = 0; i < varValueParts.length; i+=2) {
+							int conditionIdx = i + 1;
+							if (conditionIdx <= maxIdx) {
+								if (i == 0) {
+									builder.buildIfStatement(varValueParts[conditionIdx]);
+								} else {
+									builder.buildElsifStatement(varValueParts[conditionIdx]);
+								}
+							} else {
+								builder.buildElseStatement();
+							}
+							//todo: substitute current lines with calculated lines...
+							builder.buildTransition(name, varValueParts[i]);
+						}
+						builder.buildCloseDeclaration();
                     } else {
                         /* Create new TRANSITION */
                         builder.buildTransition(name, valueString);

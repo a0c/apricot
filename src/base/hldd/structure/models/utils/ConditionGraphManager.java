@@ -194,7 +194,7 @@ public class ConditionGraphManager {
 
 			LinkedList<PartedVariableHolder> boolOperandsList = new BooleanOperandsCollector(sourceCondition).collect();
 
-			new UnusedFunctionsRemover(sourceCondition, boolOperandsList).remove();
+//			new UnusedFunctionsRemover(sourceCondition, boolOperandsList).remove();
 
 			return createFrom(boolOperandsList, null);
 		}
@@ -351,6 +351,7 @@ public class ConditionGraphManager {
 		}
 	}
 
+/*
 	private class UnusedFunctionsRemover {
 		private final PartedVariableHolder sourceCondition;
 		private final LinkedList<PartedVariableHolder> boolOperandsList;
@@ -381,5 +382,6 @@ public class ConditionGraphManager {
 			}
 		}
 	}
+*/
 
 }
