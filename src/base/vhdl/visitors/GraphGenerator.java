@@ -17,7 +17,6 @@ import base.hldd.structure.nodes.CompositeNode;
 import base.hldd.structure.Flags;
 import base.hldd.visitors.ObsoleteResetRemoverImpl;
 import base.Indices;
-import base.VHDL2HLDDMapping;
 import parsers.vhdl.OperandLengthSetter;
 
 import java.util.*;
@@ -61,10 +60,6 @@ public abstract class GraphGenerator extends AbstractVisitor {
     /* For each process, a set of partially set variables for those variables that are parted. */
     protected Map<Process, Map<String, Set<OperandImpl>>> partialSettingsMapByProcess
             = new HashMap<Process, Map<String, Set<OperandImpl>>>();
-    /**
-     * Maps VHDL to HLDD.
-     */
-    private final VHDL2HLDDMapping vhdl2hlddMapping = VHDL2HLDDMapping.getInstance();
 
 	public ModelManager getModelCollector() {
         return modelCollector;
@@ -206,7 +201,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
                 ? new CompositeNode((CompositeFunctionVariable) dependentVariable)
                 : new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(2).build();
         /* Add VHDL lines the node's been created from */
-        controlNode.setVhdlLines(vhdl2hlddMapping.getLinesForNode(ifNode));
+        controlNode.setSource(ifNode.getSource());
 
         /*#################################################
         *       P R O C E S S     T R U E  P A R T
@@ -317,7 +312,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
             /* Create TerminalNode */
             Node terminalNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).build();
             /* Add VHDL lines the node's been created from */
-            terminalNode.setVhdlLines(vhdl2hlddMapping.getLinesForNode(transitionNode));
+            terminalNode.setSource(transitionNode.getSource());
             /* Add TerminalNode to Current Context and remove Current Context from stack, if the stack is NOT empty.
              * If the stack is empty, initiate the root node */
             contextManager.fillCurrentContextWith(terminalNode);
@@ -376,7 +371,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
         /* Create Control Node */
         Node controlNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(conditionValuesCount).build();
         /* Add VHDL lines the node's been created from */
-        controlNode.setVhdlLines(vhdl2hlddMapping.getLinesForNode(caseNode)); //todo: inline with the creation process above...
+        controlNode.setSource(caseNode.getSource()); //todo: inline with the creation process above...
 
         /*#################################################
         *       P R O C E S S     C O N D I T I O N S
@@ -744,9 +739,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
          */
         private Node getDefaultValueNode() {
             if (defaultValueStack.isEmpty()) {
-                Set<Integer> vhdlLines = getCurrentContext() == null
-                        ? new TreeSet<Integer>() : getCurrentContext().getControlNode().getVhdlLines();
-                return new Node.Builder(graphVariable).vhdlLines(vhdlLines).build();
+                return new Node.Builder(graphVariable).build();
             } else {
                 Node defaultValueNode = defaultValueStack.peek().defaultValueNode;
                 return Node.clone(defaultValueNode);

@@ -1,6 +1,7 @@
 package base.hldd.structure.nodes;
 
 import base.HLDDException;
+import base.SourceLocation;
 import base.hldd.structure.nodes.utils.Successors;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.AbstractVariable;
@@ -10,7 +11,7 @@ import base.hldd.visitors.Visitable;
 import base.hldd.visitors.HLDDVisitor;
 import base.Indices;
 
-import java.util.*;
+import java.util.Collection;
 /**
  * Class represents a NODE as it is defined in AGM.
  *
@@ -35,7 +36,7 @@ public class Node implements Visitable, Cloneable {
     /**
      * Line numbers in VHDL file this Node was created from
      */
-    private Set<Integer> vhdlLines;
+    private SourceLocation source;
 
     /* ==================================
     *  |  Fields set during indexation  |
@@ -62,7 +63,7 @@ public class Node implements Visitable, Cloneable {
         dependentVariable = builder.dependentVariable;
 		successors = builder.successors;
         partedIndices = builder.partedIndices;
-        vhdlLines = builder.vhdlLines;
+        source = builder.source;
     }
     
 
@@ -142,10 +143,10 @@ public class Node implements Visitable, Cloneable {
     }
 
     public Node clone() {
-        if (isTerminalNode()) {
-            return new Builder(dependentVariable).partedIndices(partedIndices).vhdlLines(vhdlLines).build();
+		if (isTerminalNode()) {
+			return new Builder(dependentVariable).partedIndices(partedIndices).source(source).build();
         } else {
-            Node clonedNode = new Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(successors.getConditionValuesCount()).vhdlLines(vhdlLines).build();
+			Node clonedNode = new Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(successors.getConditionValuesCount()).source(source).build();
 			clonedNode.successors.cloneFrom(successors);
             return clonedNode;
         }
@@ -209,8 +210,8 @@ public class Node implements Visitable, Cloneable {
         return partedIndices;
     }
 
-    public Set<Integer> getVhdlLines() {
-        return vhdlLines;
+    public SourceLocation getSource() {
+        return source;
     }
 
     /* Getters END */
@@ -229,17 +230,17 @@ public class Node implements Visitable, Cloneable {
         this.dependentVariable = dependentVariable;
     }
 
-    public void setVhdlLines(Set<Integer> vhdlLines) {
-        this.vhdlLines = vhdlLines;
+    public void setSource(SourceLocation source) {
+        this.source = source;
     }
 
-    public void addVhdlLines(Set<Integer> newVhdlLines) {
+    public void addSource(SourceLocation source) {
 		/* Explicit lines are added.
 		* Implicit lines  */
-		if (vhdlLines == null) {
+		if (this.source == null) {
 			return; // todo: current case for Beh2RTLTransformer
 		}
-		vhdlLines.addAll(newVhdlLines);
+		setSource(this.source.addSource(source));
 	}
 
     /* Setters END */
@@ -307,7 +308,7 @@ public class Node implements Visitable, Cloneable {
 			throw new RuntimeException(e); // Should not occur
 		}
 
-		successors.fillEmptyWith(fillingNode, getVhdlLines());
+		successors.fillEmptyWith(fillingNode, getSource());
     }
 
     /**
@@ -372,7 +373,7 @@ public class Node implements Visitable, Cloneable {
         // Optional parameters -- initialized to default values
         private Successors successors = null;
         private Indices partedIndices = null;
-        private Set<Integer> vhdlLines = new TreeSet<Integer>();
+        private SourceLocation source = null;
 
 		public Builder(AbstractVariable dependentVariable) {
             this.dependentVariable = dependentVariable;
@@ -392,10 +393,10 @@ public class Node implements Visitable, Cloneable {
             return this;
         }
 
-        public Builder vhdlLines(Set<Integer> vhdlLines) {
-            this.vhdlLines = vhdlLines;
+        public Builder source(SourceLocation source) {
+            this.source = source;
             return this;
         }
-    }
+	}
 
 }

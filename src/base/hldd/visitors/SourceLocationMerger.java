@@ -10,16 +10,16 @@ import base.hldd.structure.variables.GraphVariable;
  * <br>Date: 13.04.2009
  * <br>Time: 17:08:48
  */
-public class VHDLLinesMerger implements HLDDVisitor {
+public class SourceLocationMerger implements HLDDVisitor {
     private Node secondNode;
 
-    public VHDLLinesMerger(Node secondNode) {
+    public SourceLocationMerger(Node secondNode) {
         this.secondNode = secondNode;
     }
 
-    public void visitNode(Node node) {
+	public void visitNode(Node node) {
         /* Add VHDL lines to node */        
-        node.addVhdlLines(secondNode.getVhdlLines());
+        node.addSource(secondNode.getSource());
         /* For ControlNodes, merge the subtree as well */
         if (node.isControlNode()) {
 			int conditionsCount = node.getConditionsCount();

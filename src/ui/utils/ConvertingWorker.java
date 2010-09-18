@@ -9,7 +9,6 @@ import base.hldd.structure.models.utils.ModelManager;
 import base.hldd.structure.models.utils.ModelCreator;
 import base.vhdl.structure.Entity;
 import base.vhdl.visitors.*;
-import base.VHDL2HLDDMapping;
 
 import java.io.*;
 import java.util.concurrent.ExecutionException;
@@ -91,14 +90,12 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
         ModelCreator modelCreator;
         int current = 1, total;
         long startTime;
-        VHDL2HLDDMapping vhdl2hlddMapping = VHDL2HLDDMapping.getInstance();
 
         consoleWriter.writeLn(getTimeAsString() + "\tRunning " + parserId.getTitle() + " converter:");
 
         try {
             switch (parserId) {
                 case VhdlBeh2HlddBeh:
-                    vhdl2hlddMapping.clear();
 
                     total = 4;
                     total += hlddType == HLDDRepresentationType.REDUCED ? 1 :
@@ -149,7 +146,6 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
                     break;
 
                 case VhdlBehDd2HlddBeh:
-                    vhdl2hlddMapping.clear();
 
                     total = 4;
                     total += hlddType == HLDDRepresentationType.REDUCED ? 1 :

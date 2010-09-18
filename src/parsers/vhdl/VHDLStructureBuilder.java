@@ -1,12 +1,12 @@
 package parsers.vhdl;
 
+import base.SourceLocation;
 import base.vhdl.structure.Process;
 import base.vhdl.structure.nodes.*;
 import base.vhdl.structure.Transition;
 import base.vhdl.structure.Expression;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Package;
-import base.VHDL2HLDDMapping;
 import base.Indices;
 import base.Type;
 
@@ -31,11 +31,7 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
 //
 //    private ExpressionBuilder expressionBuilder = new ExpressionBuilder(valueCalculator, variableNames);
 
-    /* MAPPING fields */
-    /* Singleton that stores VHDL line numbers the current structure object is being created from */
-    private VHDL2HLDDMapping vhdl2HLDDMapping = VHDL2HLDDMapping.getInstance();
-
-    public void buildEntity(String entityName) {
+	public void buildEntity(String entityName) {
         if (entity == null) {
             entity = new Entity(entityName);
             contextStack.push(entity);
@@ -145,9 +141,10 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
     /**
      *
      * @param conditionString a string representation of a condition
-     * @throws Exception if and error occurs during the creation of a condition
+     * @param source corresponding lines in source VHDL file
+	 * @throws Exception if and error occurs during the creation of a condition
      */
-    public void buildIfStatement(String conditionString) throws Exception {
+    public void buildIfStatement(String conditionString, SourceLocation source) throws Exception {
         /* Create IfNode */
         AbstractOperand conditionExpression = expressionBuilder.buildExpression(conditionString);
         if (conditionExpression instanceof OperandImpl) {
@@ -158,7 +155,7 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
         }
         IfNode ifNode = new IfNode((Expression) conditionExpression);
         /* Map created IfNode with VHDL lines being processed currently */
-        vhdl2HLDDMapping.setLinesForNode(ifNode, vhdl2HLDDMapping.getCurrentLines());
+		ifNode.setSource(source);
         /* Add IfNode to Current Context */
         addNodeToCurrentContext(ifNode);
         /* Add IfNode to Context Stack */
@@ -242,9 +239,10 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
      *
      * @param variableName left part of the transition
      * @param variableValue right part of the transition
-     * @throws Exception if and error occurs duting the creation of a transition
+     * @param source corresponding lines in source VHDL file
+	 * @throws Exception if and error occurs duting the creation of a transition
      */
-    public void buildTransition(String variableName, String variableValue) throws Exception {
+    public void buildTransition(String variableName, String variableValue, SourceLocation source) throws Exception {
         /* Create TransitionNode */
         Transition transition;
         if (variableValue.equals("NULL")) {
@@ -263,7 +261,7 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
         }
         TransitionNode transitionNode = new TransitionNode(transition);
         /* Map created TransitionNode with VHDL lines being processed currently */
-        vhdl2HLDDMapping.setLinesForNode(transitionNode, vhdl2HLDDMapping.getCurrentLines());
+		transitionNode.setSource(source);
         /* Add TransitionNode to Current Context */
         addNodeToCurrentContext(transitionNode);
     }
@@ -314,10 +312,11 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
     /**
      *
      * @param conditionString a string representation of a condition
-     * @throws  Exception if and error occurs during the creation of a condition
+     * @param source corresponding lines in source VHDL file
+	 * @throws  Exception if and error occurs during the creation of a condition
      *          or a preceding IF statement was not found for the ELSIF statement
      */
-    public void buildElsifStatement(String conditionString) throws Exception {
+    public void buildElsifStatement(String conditionString, SourceLocation source) throws Exception {
         /* Mark falsePart for current IfNode on top of Context Stack */
         Object currentContext = contextStack.peek();
         if (currentContext instanceof IfNode) {
@@ -326,7 +325,7 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
             /* 1) Build new IfNode,
             *  2) add it to the falsePart of the Current Context,
             *  3) put newly built IfNode on top of Context Stack */
-            buildIfStatement(conditionString);
+            buildIfStatement(conditionString, source);
             /* Remove Preceding IF statement from Context Stack */
             contextStack.remove(ifNode); //todo: check to work properly. Use remove(int) otherwise.
         } else throw new Exception("Preceding IF statement is not found for the following ELSIF statement: " + conditionString);
@@ -345,11 +344,11 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
 
     }
 
-    public void buildCaseStatement(String variableName) throws Exception {
+    public void buildCaseStatement(String variableName, SourceLocation source) throws Exception {
         /* Create CaseNode */
         CaseNode caseNode = new CaseNode(expressionBuilder.buildExpression(variableName));
         /* Map created CaseNode with VHDL lines being processed currently */
-        vhdl2HLDDMapping.setLinesForNode(caseNode, vhdl2HLDDMapping.getCurrentLines());        
+		caseNode.setSource(source);
         /* Add CaseNode to Current Context */
         addNodeToCurrentContext(caseNode);
         /* Add CaseNode to Context Stack */

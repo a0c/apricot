@@ -1,5 +1,6 @@
 package base.vhdl.structure.nodes;
 
+import base.SourceLocation;
 import base.vhdl.visitors.Visitable;
 import base.vhdl.processors.Processable;
 import base.vhdl.processors.NodeReplacerImpl;
@@ -12,8 +13,10 @@ import base.vhdl.processors.NodeReplacerImpl;
 public abstract class AbstractNode implements Visitable, Processable {
 
     protected AbstractNode parentNode;
+	/* Line numbers in VHDL file this Node was created from */
+	private SourceLocation source;
 
-    public abstract boolean isIdenticalTo(AbstractNode comparedNode);
+	public abstract boolean isIdenticalTo(AbstractNode comparedNode);
 
     /**
      * Replaces the node with the specified replacingNode.
@@ -41,4 +44,12 @@ public abstract class AbstractNode implements Visitable, Processable {
     public AbstractNode getParentNode() {
         return parentNode;
     }
+
+	public void setSource(SourceLocation source) {
+		this.source = source;
+	}
+
+	public SourceLocation getSource() {
+		return source;
+	}
 }

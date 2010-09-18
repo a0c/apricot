@@ -1,5 +1,6 @@
 package base.hldd.visitors;
 
+import base.SourceLocation;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.variables.GraphVariable;
 
@@ -11,24 +12,21 @@ import java.util.HashSet;
  * <br>Date: 10.04.2009
  * <br>Time: 19:10:06
  */
-public class VHDLLinesCollector implements HLDDVisitor {
+public class SourceLocationCollector implements HLDDVisitor {
     private Set<Node> visitedNodes;
     private int currentGraphIndex;
 
-    private StringBuilder vhdlLinesBuilder = new StringBuilder();
+    private StringBuilder sourceBuilder = new StringBuilder();
 
-    public void visitNode(Node node) throws Exception {
+	public void visitNode(Node node) throws Exception {
         if (!visitedNodes.contains(node)) {
             /* Mark as visited */
             visitedNodes.add(node);
             if (node.isTerminalNode()) {
-                /* Collect into localStringBuilder and then into main one */
-                StringBuilder localCollector = new StringBuilder();
-                for (int vhdlLine : node.getVhdlLines()) localCollector.append(vhdlLine).append(", ");
-                if (localCollector.length() > 0) {
-                    vhdlLinesBuilder.append(currentGraphIndex).append(" ").append(node.getRelativeIndex());
-                    vhdlLinesBuilder.append(": ").append(localCollector.substring(0, localCollector.length() - 2));
-                    vhdlLinesBuilder.append("\n");
+				SourceLocation source = node.getSource();
+                if (source != null) {
+					sourceBuilder.append(currentGraphIndex).append(" ").append(node.getRelativeIndex());
+                    sourceBuilder.append(": ").append(source.toString()).append("\n");
                 }
             } else {
                 for (Node successor : node.getSuccessors()) {
@@ -47,7 +45,7 @@ public class VHDLLinesCollector implements HLDDVisitor {
         graphVariable.getGraph().getRootNode().traverse(this);
     }
 
-    public String getVhdlLinesAsString() {
-        return vhdlLinesBuilder.toString();
+    public String getSourceAsString() {
+        return sourceBuilder.toString();
     }
 }

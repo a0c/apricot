@@ -1,5 +1,6 @@
 package parsers.vhdl;
 
+import base.SourceLocation;
 import io.scan.VHDLScanner;
 import io.scan.VHDLToken;
 
@@ -33,6 +34,8 @@ public class VHDLStructureParser {
 
         while ((token = scanner.next()) != null) {
             value = token.getValue();
+
+			SourceLocation source = scanner.getCurrentSource();
 
             switch (token.getType()) {
                 case USE_DECL:
@@ -144,7 +147,7 @@ public class VHDLStructureParser {
                     /* If CONDITION */
                     conditionString = value.substring(2, value.indexOf(" THEN")).trim();
                     /* Create new IF_STATEMENT */
-                    builder.buildIfStatement(conditionString);
+                    builder.buildIfStatement(conditionString, source);
                     break;
                 case TRANSITION:
                     /* Variable NAME and VALUE */
@@ -168,27 +171,28 @@ public class VHDLStructureParser {
 							int conditionIdx = i + 1;
 							if (conditionIdx <= maxIdx) {
 								if (i == 0) {
-									builder.buildIfStatement(varValueParts[conditionIdx]);
+									//todo: substitute current lines with calculated lines, for a finer-grained location...
+									builder.buildIfStatement(varValueParts[conditionIdx], source);
 								} else {
-									builder.buildElsifStatement(varValueParts[conditionIdx]);
+									builder.buildElsifStatement(varValueParts[conditionIdx], source);
 								}
 							} else {
 								builder.buildElseStatement();
 							}
 							//todo: substitute current lines with calculated lines...
-							builder.buildTransition(name, varValueParts[i]);
+							builder.buildTransition(name, varValueParts[i], source);
 						}
 						builder.buildCloseDeclaration();
                     } else {
                         /* Create new TRANSITION */
-                        builder.buildTransition(name, valueString);
+                        builder.buildTransition(name, valueString, source);
                     }
                     break;
                 case ELSIF_STATEMENT:
                     /* If CONDITION */
                     conditionString = value.substring(5, value.indexOf(" THEN")).trim();
                     /* Create new ELSIF_STATEMENT */
-                    builder.buildElsifStatement(conditionString);
+                    builder.buildElsifStatement(conditionString, source);
                     break;
                 case ELSE:
                     builder.buildElseStatement();
@@ -197,7 +201,7 @@ public class VHDLStructureParser {
                     /* Variable NAME */
                     name = value.substring(4, value.indexOf(" IS")).trim();
                     /* Create new CASE_STATEMENT */
-                    builder.buildCaseStatement(name);
+                    builder.buildCaseStatement(name, source);
                     break;
                 case WHEN_STATEMENT:
                     /* CONDITION */

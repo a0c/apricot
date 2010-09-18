@@ -1,9 +1,9 @@
 package io.scan;
 
-import base.VHDL2HLDDMapping;
-
 import java.io.*;
+import java.util.LinkedList;
 
+import base.SourceLocation;
 import io.QuietCloser;
 
 /**
@@ -16,9 +16,9 @@ public class LexemeComposer {
     private char lastReadChar;
     private BufferedReader bReader;
     private boolean toUpperCase = true;
-    private VHDL2HLDDMapping vhdl2hlddMapping = VHDL2HLDDMapping.getInstance();
+	private final VHDLLinesTracker vhdlLinesTracker;
 
-    private static final char NEW_LINE = '\r';
+	private static final char NEW_LINE = '\r';
     private static final char END_OF_FILE = 65535;
     public static final String DEFAULT_COMMENT = "--";
 
@@ -59,7 +59,8 @@ public class LexemeComposer {
 
     private LexemeComposer(Reader reader) {
         bReader = new BufferedReader(reader);
-    }
+		vhdlLinesTracker = new VHDLLinesTracker();
+	}
 
 
     /**
@@ -82,8 +83,8 @@ public class LexemeComposer {
             /* Read next char */
             if (ignoreLastReadChar) {
                 lastReadChar = (char) bReader.read();
-                /* Append EVERY NEW READ char to VHDL2HLDD mapper */
-                vhdl2hlddMapping.append(lastReadChar);
+                /* Append EVERY NEW READ char to VHDLLinesTracker */
+                vhdlLinesTracker.append(lastReadChar);
             }
             ignoreLastReadChar = true;
             /* Check EOF */
@@ -102,7 +103,7 @@ public class LexemeComposer {
             /* Check COMMENTS */
             if (newLexemeType == LexemeType.OP_SUBTR && newLexemeValue.toString().equals(DEFAULT_COMMENT)) {
                 bReader.readLine();
-                vhdl2hlddMapping.append(NEW_LINE);
+                vhdlLinesTracker.append(NEW_LINE);
 //                while((lastReadChar = (char) bReader.read()) != '\n' && lastReadChar != 65535); // Skip Line
 //                if (lastReadChar == 65535) return null;
                 newLexemeType = null;
@@ -127,4 +128,95 @@ public class LexemeComposer {
         QuietCloser.closeQuietly(bReader);
     }
 
+	public SourceLocation getCurrentSource() {
+		return vhdlLinesTracker.getCurrentSource();
+	}
+
+	public void purgeCurrentLines() {
+		vhdlLinesTracker.purgeCurrentLines();
+	}
+
+	public int getCurrentLineCount() {
+		return vhdlLinesTracker.getCurrentLineCount();
+	}
+
+	private class VHDLLinesTracker {
+		private static final char NEW_LINE_UNIX = '\n';
+		private static final char NEW_LINE_MAC = '\r';
+		private static final char END_OF_FILE = 65535;
+
+		/**
+		 * Currently processed VHDL lines.
+		 * Not a single line, but a list of lines, since a single
+		 * {@link io.scan.VHDLToken} can span across multiple lines.
+		 */
+		private LinkedList<Integer> currentLines = new LinkedList<Integer>();
+
+		/* Fields for the line currently under processing */
+		private char lastChar;
+		private StringBuilder line;
+		private int currentLineCount;
+
+		private VHDLLinesTracker() {
+			lastChar = 0;
+			currentLineCount = 1;
+			line = new StringBuilder();
+		}
+
+		public SourceLocation getCurrentSource() {
+			/* Add any non-empty lines being currently under processing */
+			addLineToCurrentLines();
+			return new SourceLocation(currentLines);
+		}
+
+		private void addLineToCurrentLines() {
+			String trimmedLine = line.toString().trim();
+			if (trimmedLine.length() > 0) {
+				/* Add all lines but comments to currentLines */
+				if (!trimmedLine.startsWith(DEFAULT_COMMENT)) {
+					/* Add to currentLines */
+					currentLines.add(currentLineCount);
+				}
+				/* Init new empty line */
+				line = new StringBuilder();
+			}
+		}
+
+		public void purgeCurrentLines() {
+			currentLines = new LinkedList<Integer>();
+			line = new StringBuilder();
+		}
+
+		public void append(char newChar) {
+			/* Count lines */
+			if (isNewLine(newChar)) {
+				addLineToCurrentLines();
+				currentLineCount++;
+			}
+			/* Append the character */
+			if (newChar != END_OF_FILE) {
+				line.append(newChar);
+			}
+			/* Save last character */
+			lastChar = newChar;
+		}
+
+		int getCurrentLineCount() {
+			return currentLineCount;
+		}
+
+		/**
+		 * New lines: {@link #NEW_LINE_MAC}, {@link #NEW_LINE_UNIX} or {@link #NEW_LINE_MAC} + {@link #NEW_LINE_UNIX}.<br>
+		 * Thus, new line is detected if either<br>
+		 * 1) <code>newChar</code> is {@link #NEW_LINE_MAC} or<br>
+		 * 2) <code>newChar</code> is {@link #NEW_LINE_UNIX} and the lastChar is not {@link #NEW_LINE_MAC}.<br><br>
+		 * The last condition allows avoiding counting the new line twice for {@link #NEW_LINE_MAC} + {@link #NEW_LINE_UNIX}.
+		 * @param newChar newly appended character
+		 * @return <code>true</code> if the <code>newChar</code> denotes a new line
+		 */
+		private boolean isNewLine(char newChar) {
+			return newChar == NEW_LINE_MAC || (newChar == NEW_LINE_UNIX && lastChar != NEW_LINE_MAC);
+		}
+
+	}
 }

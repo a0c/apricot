@@ -1,6 +1,7 @@
 package base.hldd.structure.nodes.utils;
 
 import base.HLDDException;
+import base.SourceLocation;
 import base.hldd.structure.nodes.Node;
 
 import java.util.*;
@@ -119,7 +120,7 @@ public class Successors {
 		return true;
 	}
 
-	public void fillEmptyWith(Node fillingNode, Set<Integer> vhdlLines) {
+	public void fillEmptyWith(Node fillingNode, SourceLocation source) {
 		for (Map.Entry<Condition, Node> entry : successorByCondition.entrySet()) {
 			Condition condition = entry.getKey();
 			Node successor = entry.getValue();
@@ -132,8 +133,8 @@ public class Successors {
 				* (i.e. node is obtained from
 				* {@link base.vhdl.visitors.GraphGenerator.ContextManager#getDefaultValueNode()}), then copy lines from
 				* Control Node being filled. It means that ControlNode is not fully covered when calculating coverage. */
-				if (fillingNode.getVhdlLines().isEmpty()) {
-					copy.setVhdlLines(new TreeSet<Integer>(vhdlLines)); // not a shallow copy!
+				if (fillingNode.getSource() == null) {
+					copy.setSource(source);
 				}
 			} else if (successor.isControlNode()) {
 				/* Fill recursively every non-empty successor */

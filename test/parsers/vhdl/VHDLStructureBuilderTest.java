@@ -60,7 +60,7 @@ public class VHDLStructureBuilderTest {
         builder.buildPort(portName, false, new Type(new Indices(portHighestSB, 0)));
         builder.buildArchitecture("ArchitectureName", "ArchitectureAffiliation");
         builder.buildProcess("ProcessName", new LinkedList<String>());
-        builder.buildTransition(portName, transitionValue);
+        builder.buildTransition(portName, transitionValue, null);
         return builder.getVHDLStructure();
     }
 }

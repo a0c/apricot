@@ -1,6 +1,7 @@
 package base.hldd.structure.nodes;
 
 import base.HLDDException;
+import base.SourceLocation;
 import base.hldd.structure.models.utils.ModelManager.CompositeFunctionVariable;
 import base.hldd.structure.models.utils.PartedVariableHolder;
 import base.hldd.structure.nodes.utils.Condition;
@@ -164,5 +165,14 @@ public class CompositeNode extends Node {
 	@Override
 	public Condition getOthers() throws HLDDException {
 		return lastNode.getOthers();
+	}
+
+	@Override
+	public void setSource(SourceLocation source) {
+		for (Node node : trueValuesByNodes.keySet()) {
+			if (node.isControlNode()) {
+				node.setSource(source);
+			}
+		}
 	}
 }

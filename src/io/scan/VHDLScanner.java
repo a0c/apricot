@@ -1,10 +1,9 @@
 package io.scan;
 
-import base.VHDL2HLDDMapping;
+import base.SourceLocation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 /**
@@ -32,9 +31,7 @@ public class VHDLScanner {
     private boolean allowIncompleteTokens = false;
     private File sourceFile = null;
 
-    private final VHDL2HLDDMapping vhdl2hlddMapping = VHDL2HLDDMapping.getInstance();
-
-    public VHDLScanner(LexemeComposer lexemeComposer) {
+	public VHDLScanner(LexemeComposer lexemeComposer) {
         this.lexemeComposer = lexemeComposer;
         allowIncompleteTokens = true;
     }
@@ -61,7 +58,7 @@ public class VHDLScanner {
     public VHDLToken next() throws Exception {
         StringBuffer complexTokenValue = new StringBuffer();
         VHDLToken.Type complexTokenType = VHDLToken.Type.UNKNOWN;
-        vhdl2hlddMapping.purgeCurrentLines();
+        lexemeComposer.purgeCurrentLines();
 
         while (true) {
             /* Read next LEXEME */
@@ -131,7 +128,13 @@ public class VHDLScanner {
 //        bReader.reset();
 //    }
 //
-    public void close() {
+
+
+	public SourceLocation getCurrentSource() {
+		return lexemeComposer.getCurrentSource();
+	}
+
+	public void close() {
         lexemeComposer.close();
     }
 

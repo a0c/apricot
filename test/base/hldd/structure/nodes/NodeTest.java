@@ -1,5 +1,6 @@
 package base.hldd.structure.nodes;
 
+import base.SourceLocation;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import base.hldd.structure.variables.Variable;
@@ -47,24 +48,22 @@ public class NodeTest {
         assertNotNull(node.getPartedIndices());
         assertEquals(partedIndices, node.getPartedIndices());
 
-        // Terminal node with vhdl lines
-        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).vhdlLines(Collections.singleton(2)).build();
+        // Terminal node with source
+        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).source(new SourceLocation(Collections.singleton(2))).build();
         assertTrue(node.isTerminalNode());
-        assertNotNull(node.getVhdlLines());
-        assertEquals(1, node.getVhdlLines().size());
-        assertTrue(node.getVhdlLines().contains(new Integer(2)));
+        assertNotNull(node.getSource());
+        assertEquals("2", node.getSource().toString());
 
-        // Control node with parted indices and vhdl lines
+        // Control node with parted indices and source
         partedIndices = new Indices(2, 1);
-        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2).partedIndices(partedIndices).vhdlLines(Collections.singleton(199)).build();
+        node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2).partedIndices(partedIndices).source(new SourceLocation(Collections.singleton(199))).build();
         assertTrue(node.isControlNode());
         assertNotNull(node.getSuccessors());
         assertEquals(2, node.getConditionValuesCount());
         assertNotNull(node.getPartedIndices());
         assertEquals(partedIndices, node.getPartedIndices());
-        assertNotNull(node.getVhdlLines());
-        assertEquals(1, node.getVhdlLines().size());
-        assertTrue(node.getVhdlLines().contains(new Integer(199)));
+        assertNotNull(node.getSource());
+        assertEquals("199", node.getSource().toString());
         
     }
 

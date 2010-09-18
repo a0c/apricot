@@ -1,10 +1,9 @@
 package base.hldd.structure.nodes;
 
+import base.SourceLocation;
 import base.hldd.structure.variables.AbstractVariable;
 import base.psl.structure.Range;
 import base.Indices;
-
-import java.util.Set;
 
 /**
  * Node with a notion of <i>temporal window</i>.
@@ -71,8 +70,8 @@ public class TemporalNode extends Node {
         /**
          * Override superclass method and return this builder (not the one of the superclass)
          */
-        public Builder vhdlLines(Set<Integer> vhdlLines) {
-            super.vhdlLines(vhdlLines);
+        public Builder source(SourceLocation vhdlLines) {
+            super.source(vhdlLines);
             return this;
         }
 
@@ -85,6 +84,6 @@ public class TemporalNode extends Node {
             this.windowPlaceholders = windowPlaceholders;
             return this;
         }
-    }
+	}
 
 }

@@ -1,9 +1,10 @@
 package base.hldd.structure.nodes.utils;
 
 import base.HLDDException;
+import base.SourceLocation;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.variables.AbstractVariable;
-import base.hldd.visitors.VHDLLinesMerger;
+import base.hldd.visitors.SourceLocationMerger;
 
 import java.util.*;
 
@@ -348,7 +349,7 @@ public class Utility {
      * Reduces redundant ControlNodes.
      * @see #isRedundant(base.hldd.structure.nodes.Node) definition of redundancy.
      *
-     * todo: Consider {@link base.VHDL2HLDDMapping}: whether VHDLlines must be moved from reduced ControlNode into
+     * todo: Consider if SourceLocation must be moved from reduced ControlNode into
      * todo: replacing node... 
      */
     private static class Reducer {
@@ -392,8 +393,8 @@ public class Utility {
                     Node parentNode = parentNodesStack.peek();
                     Condition parentCondition = parentConditionsStack.peek();
                     Node firstSuccessor = node.getSuccessor(node.getCondition(0));
-                    /* Collect VHDL lines from all successors into the firstSuccessor */
-                    firstSuccessor.setVhdlLines(collectSuccessorLines(node.getSuccessors()));
+                    /* Collect SourceLocation-s from all successors into the firstSuccessor */
+                    firstSuccessor.setSource(collectSuccessorSources(node.getSuccessors()));
                     if (parentNode == null) {
                         rootNode = firstSuccessor;
                     } else {
@@ -403,10 +404,15 @@ public class Utility {
             }
         }
 
-        private Set<Integer> collectSuccessorLines(Collection<Node> successors) {
-            Set<Integer> newVHDLLines = new TreeSet<Integer>();
-            for (Node successor : successors) newVHDLLines.addAll(successor.getVhdlLines());
-            return newVHDLLines;
+        private SourceLocation collectSuccessorSources(Collection<Node> successors) {
+			Collection<SourceLocation> sources = new LinkedList<SourceLocation>();
+			for (Node successor : successors) {
+				SourceLocation source = successor.getSource();
+				if (source != null) {
+					sources.add(source);
+				}
+			}
+			return SourceLocation.createFrom(sources);
         }
 
         private void doPop() {
@@ -473,7 +479,7 @@ public class Utility {
 			for (Node usedNode : usedNodes) { //todo: use Collection, and make Node implement equals() for a faster search
 				if (usedNode.isIdenticalTo(node)) {
 					/* Add VHDL lines to the usedNode */
-					new VHDLLinesMerger(node).visitNode(usedNode);
+					new SourceLocationMerger(node).visitNode(usedNode);
 					return usedNode;
 				}
 			}

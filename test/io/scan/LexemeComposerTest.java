@@ -1,6 +1,9 @@
 package io.scan;
 
+import base.SourceLocation;
 import org.junit.Test;
+
+
 import static org.junit.Assert.*;
 
 /**
@@ -36,5 +39,47 @@ public class LexemeComposerTest {
             assertEquals(result, lexemeComposer.nextLexeme().getValue());
         }
     }
+
+	/* VHDLLinesTracker */
+	@Test
+	public void correctLineSeparation() throws Exception {
+		/* Double lines with different line separators */
+		String sources[] = {
+				"asdf\nfdsa", "asdf \nfdsa", "asdf\n fdsa", "asdf \n fdsa", // Unix / Win / modern Mac
+				"asdf\rfdsa", "asdf \rfdsa", "asdf\r fdsa", "asdf \r fdsa", // Old Mac
+				"asdf\r\nfdsa", "asdf \r\nfdsa", "asdf\r\n fdsa", "asdf \r\n fdsa" // Win
+		};
+		for (String source : sources) {
+			/* Feed LexemeComposer with line and read the whole source through */
+			lexemeComposer = new LexemeComposer(source, false);
+			while (lexemeComposer.nextLexeme() != null);
+			/* Check the number of lines */
+			assertEquals(2, lexemeComposer.getCurrentLineCount());
+		}
+		/* Single line */
+		lexemeComposer = new LexemeComposer("asdf");
+		lexemeComposer.nextLexeme();
+		assertEquals(1, lexemeComposer.getCurrentLineCount());
+	}
+	@Test public void correctLineSeparationFromFile() throws Exception {
+		lexemeComposer = new LexemeComposer(LexemeComposerTest.class.getResourceAsStream("crc_demo_Min.vhd"));
+		while (lexemeComposer.nextLexeme() != null);
+		/* Check the number of lines */
+		assertEquals(354, lexemeComposer.getCurrentLineCount());
+	}
+	@Test public void correctMultipleTokensOnLine() throws Exception {
+		lexemeComposer = new LexemeComposer("wert <= qwer; --somecomment\nasdfds <= fafsd;", false);
+		VHDLScanner vhdlScanner = new VHDLScanner(lexemeComposer);
+		/* Ask for one next token */
+		vhdlScanner.next();
+		SourceLocation currentSource = lexemeComposer.getCurrentSource();
+		assertNotNull(currentSource);
+		assertEquals("1", currentSource.toString());
+		/* Ask for another token */
+		vhdlScanner.next();
+		currentSource = lexemeComposer.getCurrentSource();
+		assertNotNull(currentSource);
+		assertEquals("2", currentSource.toString());
+	}
 
 }

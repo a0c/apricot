@@ -1,5 +1,6 @@
 package base.hldd.structure.nodes;
 
+import base.SourceLocation;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import base.hldd.structure.variables.Variable;
@@ -9,7 +10,6 @@ import base.Indices;
 import base.Type;
 
 import java.util.Collections;
-import java.util.Set;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -39,25 +39,25 @@ public class TemporalNodeTest {
 
         // Check correctness of superclass methods
         Indices partedIndices = new Indices(9, 2);
-        Set<Integer> vhdlLines = Collections.singleton(1991);
+        SourceLocation source = new SourceLocation(Collections.singleton(1991));
         node = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags()))
                 .createSuccessors(2)
                 .partedIndices(partedIndices)
-                .vhdlLines(vhdlLines).build();
+                .source(source).build();
         assertTrue(node instanceof TemporalNode);
         assertTrue(node.isControlNode());
         assertNotNull(node.getPartedIndices());
         assertEquals(partedIndices, node.getPartedIndices());
-        assertNotNull(node.getVhdlLines());
-        assertEquals(vhdlLines, node.getVhdlLines());
-        assertTrue(node.getVhdlLines().contains(new Integer(1991)));
+        assertNotNull(node.getSource());
+        assertEquals(source, node.getSource());
+        assertEquals("1991", node.getSource().toString());
 
         // Check class of the chained builder
         Node.Builder builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2);
         assertTrue(builder instanceof TemporalNode.Builder);
         builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).partedIndices(partedIndices);
         assertTrue(builder instanceof TemporalNode.Builder);
-        builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).vhdlLines(vhdlLines);
+        builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).source(source);
         assertTrue(builder instanceof TemporalNode.Builder);
 
     }

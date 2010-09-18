@@ -1,8 +1,8 @@
 package base.hldd.structure.models.utils;
 
 import base.HLDDException;
+import base.SourceLocation;
 import base.Type;
-import base.VHDL2HLDDMapping;
 import base.hldd.structure.Flags;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.utils.Condition;
@@ -24,7 +24,6 @@ import java.util.*;
  */
 public class ConditionGraphManager {
 	private ModelManager modelCollector;
-	private static final VHDL2HLDDMapping VHDL2HLDD_MAPPING = VHDL2HLDDMapping.getInstance();
 	private Map<GraphVariable, Map<Condition, Condition>> portmapByGraph = new HashMap<GraphVariable, Map<Condition, Condition>>();
 
 	public ConditionGraphManager(ModelManager modelCollector) {
@@ -75,7 +74,7 @@ public class ConditionGraphManager {
 		AbstractVariable caseVariable = modelCollector.convertOperandToVariable(caseOperand, null, false);
 		int conditionValuesCount = modelCollector.getConditionValuesCount(caseVariable);
 		Node rootNode = new Node.Builder(caseVariable).createSuccessors(conditionValuesCount).
-				partedIndices(caseOperand.getPartedIndices()).vhdlLines(VHDL2HLDD_MAPPING.getLinesForNode(caseNode)).build();
+				partedIndices(caseOperand.getPartedIndices()).source(caseNode.getSource()).build();
 		/* Fill Root Node, and map branches (to condition values)*/
 		Map<Condition, Condition> conditionMapping = new HashMap<Condition, Condition>();
 		Set<ConstantVariable> terminalVariablesSet = new HashSet<ConstantVariable>();
@@ -99,7 +98,7 @@ public class ConditionGraphManager {
 			ConstantVariable terminalVariable = ConstantVariable.createNamedConstant(terminalValue, name, null);
 			modelCollector.addVariable(terminalVariable);
 			terminalVariablesSet.add(terminalVariable);
-			Node terminalNode = new Node.Builder(terminalVariable)/*.vhdlLines(VHDL2HLDD_MAPPING.getLinesForNode(whenNode))*/.build(); //todo: fix commented part
+			Node terminalNode = new Node.Builder(terminalVariable)/*.source(whenNode.getSource())*/.build(); //todo: fix commented part
 			// Fill
 			for (Condition condition : whenCondition.asList()) {
 				rootNode.setSuccessor(condition, terminalNode.clone());
@@ -138,11 +137,16 @@ public class ConditionGraphManager {
 	}
 
 	static String createName(AbstractNode node) throws HLDDException {
-		TreeSet<Integer> linesForNode = VHDL2HLDD_MAPPING.getLinesForNode(node);
+		SourceLocation source = node.getSource();
+		if (source == null) {
+			throw new HLDDException("ConditionGraphManager: failed to create name for " + node.getClass().getSimpleName()
+					+ ", because node doesn't have source. Only IfNode and CaseNode are supported.");
+		}
+		Integer firstSourceLine = source.getFirstLine();
 		if (node instanceof CaseNode) {
-			return "CASE__" + linesForNode.first();
+			return "CASE__" + firstSourceLine;
 		} else if (node instanceof IfNode) {
-			return "IF__" + linesForNode.first();
+			return "IF__" + firstSourceLine;
 		} else {
 			throw new HLDDException("ConditionGraphManager: creating name for " + node.getClass().getSimpleName()
 					+ ". Only IfNode and CaseNode are supported.");
@@ -181,13 +185,13 @@ public class ConditionGraphManager {
 
 	private class FullTreeCreator {
 		private PartedVariableHolder sourceCondition;
-		private TreeSet<Integer> vhdlLines;
+		private SourceLocation source;
 		private Interpreter interpreter;
 
 		public FullTreeCreator(PartedVariableHolder sourceCondition, IfNode ifNode) throws Exception {
 			this.sourceCondition = sourceCondition;
-			this.vhdlLines = VHDL2HLDD_MAPPING.getLinesForNode(ifNode);
-			this.interpreter = new Interpreter(this.sourceCondition, modelCollector.getConstant0(), modelCollector.getConstant1(), vhdlLines.toString());
+			this.source = ifNode.getSource();
+			this.interpreter = new Interpreter(this.sourceCondition, modelCollector.getConstant0(), modelCollector.getConstant1(), source.toString());
 		}
 
 		public Node create() throws Exception {
@@ -206,7 +210,7 @@ public class ConditionGraphManager {
 				PartedVariableHolder thisVarHolder = boolOperandsList.removeFirst(); // TAKE
 
 				Node thisNode = new Node.Builder(thisVarHolder.getVariable()).partedIndices(thisVarHolder.getPartedIndices()).
-						vhdlLines(vhdlLines).createSuccessors(2).build();
+						source(source).createSuccessors(2).build();
 
 				/* TRUE branch */
 				interpreter.assign(thisVarHolder, true);
@@ -238,15 +242,15 @@ public class ConditionGraphManager {
 		private final PartedVariableHolder evaluatedCondition;
 		private final ConstantVariable constant0;
 		private final ConstantVariable constant1;
-		private final String vhdlLines;
+		private final String sourceAsString;
 
 		private final HashMap<PartedVariableHolder, Boolean> valueByVariable = new HashMap<PartedVariableHolder, Boolean>();
 
-		public Interpreter(PartedVariableHolder evaluatedCondition, ConstantVariable constant0, ConstantVariable constant1, String vhdlLines) {
+		public Interpreter(PartedVariableHolder evaluatedCondition, ConstantVariable constant0, ConstantVariable constant1, String sourceAsString) {
 			this.evaluatedCondition = evaluatedCondition;
 			this.constant0 = constant0;
 			this.constant1 = constant1;
-			this.vhdlLines = vhdlLines;
+			this.sourceAsString = sourceAsString;
 		}
 
 		public void assign(PartedVariableHolder variable, boolean value) {
@@ -331,7 +335,7 @@ public class ConditionGraphManager {
 							result = !opA;
 							break;
 						default:
-							throw new HLDDException("ConditionGraphManager: don't know how to evaluate " + operator + " (lines " + vhdlLines + ")");
+							throw new HLDDException("ConditionGraphManager: don't know how to evaluate " + operator + " (lines " + sourceAsString + ")");
 
 					}
 

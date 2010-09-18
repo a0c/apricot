@@ -4,7 +4,7 @@ import base.hldd.structure.variables.*;
 import base.hldd.structure.variables.utils.DefaultGraphVariableCreator;
 import base.hldd.structure.variables.utils.GraphVariableCreator;
 import base.hldd.structure.Graph;
-import base.hldd.visitors.VHDLLinesCollector;
+import base.hldd.visitors.SourceLocationCollector;
 import io.ExtendedBufferedReader;
 import io.QuietCloser;
 import io.scan.HLDDScanner;
@@ -221,15 +221,15 @@ public class BehModel {
     }
 
     public void printMapFile(OutputStream outputStream) throws Exception {
-        VHDLLinesCollector vhdlLinesCollector = new VHDLLinesCollector();
+        SourceLocationCollector sourceCollector = new SourceLocationCollector();
         for (int index = graphOffset(); index < varCount; index++) {
             AbstractVariable absVar = getVariableByIndex(index);
             if (absVar instanceof GraphVariable) {
-                ((GraphVariable) absVar).traverse(vhdlLinesCollector);
+                ((GraphVariable) absVar).traverse(sourceCollector);
             }
         }
 
-		writeStringToFile(outputStream, vhdlLinesCollector.getVhdlLinesAsString());
+		writeStringToFile(outputStream, sourceCollector.getSourceAsString());
 
 		QuietCloser.closeQuietly(outputStream);
     }
