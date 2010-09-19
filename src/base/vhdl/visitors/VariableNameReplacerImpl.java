@@ -37,13 +37,15 @@ public class VariableNameReplacerImpl extends AbstractVisitor {
 
 	private boolean isStateVarSet = false;
 	private boolean isInStateProcess;
+	private ConfigurationHandler config;
 
-	public VariableNameReplacerImpl() {
+	public VariableNameReplacerImpl(ConfigurationHandler config) {
+		this.config = config;
 		readStateName();
 	}
 
 	private void readStateName() {
-		stateVarName = ConfigurationHandler.getStateVarName();
+		stateVarName = config.getStateVarName();
 		if (stateVarName != null && stateVarName.length() > 0) {
 			if (stateVarName.contains(".")) {
 				// extract process name or order
@@ -117,7 +119,7 @@ public class VariableNameReplacerImpl extends AbstractVisitor {
 		if (isInStateProcess && varNameOrig.equalsIgnoreCase(stateVarName)) {
 			// do it only once
 			if (!isStateVarSet) {
-				ConfigurationHandler.setStateVarName(variable.getName());
+				config.setStateVarName(variable.getName());
 				isStateVarSet = true;
 			} else {
 				String message = "Trying to update the name of STATE variable twice." +

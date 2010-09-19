@@ -1,7 +1,6 @@
 package ui.utils;
 
 import base.hldd.structure.models.BehModel;
-import ui.ExtendedException;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -14,6 +13,14 @@ public abstract class AbstractWorkerFinalizer {
 	public abstract void doAfterWorker(ConvertingWorker convertingWorker);
 	public abstract void doWhenDone(BehModel model);
 
-	public abstract void doReactOnConfigError(ExtendedException e, ConvertingWorker convertingWorker);
-
+	public static AbstractWorkerFinalizer getStub() {
+		return new AbstractWorkerFinalizer() {
+			@Override
+			public void doBeforeWorker() {}
+			@Override
+			public void doAfterWorker(ConvertingWorker convertingWorker) {}
+			@Override
+			public void doWhenDone(BehModel model) {}
+		};
+	}
 }

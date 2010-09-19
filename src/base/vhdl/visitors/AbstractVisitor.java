@@ -7,7 +7,6 @@ import base.vhdl.structure.nodes.*;
 
 import java.util.regex.Pattern;
 
-import ui.ConfigurationHandler;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -34,20 +33,7 @@ public abstract class AbstractVisitor {
     public abstract void visitWhenNode(WhenNode whenNode) throws Exception;
 
 	/**
-     * This method should not be used. State signals/variables must be rather detected with analysis of their usages.
-	 * todo: A different visitor should be implemented.
-	 * Moreover, state-flag is only required in pure RTL graphs, where there is a Control part and Datapath part.
-	 * Yes, but the flag itself should be added by VHDL2HLDD converter :)
-	 */
-	@Deprecated
-	static boolean isStateName(String name) {
-		String stateName = ConfigurationHandler.getStateVarName();
-		return stateName != null && stateName.equalsIgnoreCase(name);
-//		return name.equalsIgnoreCase("STATE") || name.equalsIgnoreCase("STATO") || name.equalsIgnoreCase("ITFC_STATE");
-	}
-
-	/**
-     * see {@link #isStateName(String)}
+     * todo: see {@link ui.ConfigurationHandler#isStateName(String)}
      */
     @Deprecated
     static boolean isClockName(String varName) {

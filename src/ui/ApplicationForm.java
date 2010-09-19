@@ -627,18 +627,6 @@ public class ApplicationForm implements ActionListener {
 		}
     }
 
-	public void doAskForSTATEVarName(ExtendedException extE) {
-		String[] buttons = {"Continue  (I won't need RTL HLDD later)", "Abort"};
-		int answer = JOptionPane.showOptionDialog(frame, extE.getMessage(), extE.getTitle(),
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, buttons, buttons[0]);
-		if (answer == JOptionPane.YES_OPTION) {
-			ConfigurationHandler.setCheckStateVarName(false);
-			parseButton.doClick();
-		} else {
-			ConfigurationHandler.reset();
-		}
-	}
-
     public void doSaveConvertedModel() {
         /* Save converted file */
 		enableUI(false);

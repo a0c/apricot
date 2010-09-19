@@ -5,6 +5,7 @@ import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.*;
 import static junit.framework.Assert.*;
 import base.vhdl.structure.Process;
+import ui.ConfigurationHandler;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -15,7 +16,11 @@ public class VariableNameReplacerImplTest {
 
     @Test
     public void prefix() {
-        VariableNameReplacerImpl nameReplacer = new VariableNameReplacerImpl();
+		ConfigurationHandler config = createMock(ConfigurationHandler.class);
+		expect(config.getStateVarName()).andReturn("");
+		replay(config);
+
+		VariableNameReplacerImpl nameReplacer = new VariableNameReplacerImpl(config);
 
         Process mockProcess = createMock(Process.class);
         expect(mockProcess.getName()).andReturn("REG_SET");

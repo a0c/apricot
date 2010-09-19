@@ -18,6 +18,7 @@ import base.hldd.structure.Flags;
 import base.hldd.visitors.ObsoleteResetRemoverImpl;
 import base.Indices;
 import parsers.vhdl.OperandLengthSetter;
+import ui.ConfigurationHandler;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -43,6 +44,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	protected static final Logger LOG = Logger.getLogger(GraphGenerator.class.getName());
 
+	private final ConfigurationHandler config;
     protected ModelManager modelCollector;
 	private ConditionGraphManager conditionGraphManager;
 	private ExtraConditionGraphManager extraConditionGraphManager;
@@ -71,6 +73,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
     /**
      *
+     * @param config optional settings from .config file
      * @param   useSameConstants <code>true</code> if the constant with the <u>same value</u> and <u>adjusted length</u> should be used
      *          for requested value. <code>false</code> if a new constant should be created for the same value, but a different length
      *          than already exists.
@@ -83,7 +86,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	 * @param doCreateSubGraphs whether to create Extra Graphs or not
 	 * @param generatorType generator's type. Used for initialization of isNullTransition only.
      */
-    protected GraphGenerator(boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs, Type generatorType) {
+    protected GraphGenerator(ConfigurationHandler config, boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs, Type generatorType) {
+		this.config = config;
 		modelCollector = new ModelManager(useSameConstants);
         this.doFlattenConditions = doFlattenConditions;
         this.doCreateGraphsForCS = doCreateGraphsForCS;
@@ -134,7 +138,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
         Set<Signal> signals = architecture.getSignals();
         for (Signal signal : signals) {
             Flags flags = new Flags();
-            if (isStateName(signal.getName())) flags.setState(true).setDelay(true);
+            if (config.isStateName(signal.getName())) flags.setState(true).setDelay(true);
             base.hldd.structure.variables.Variable signalVariable = new base.hldd.structure.variables.Variable(signal.getName(), signal.getType(), flags);
             modelCollector.addVariable(signalVariable);
         }
@@ -144,7 +148,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
             Set<Variable> variables = process.getVariables();
             for (Variable variable : variables) {
                 Flags flags = new Flags();
-                if (isStateName(variable.getName())) flags.setState(true).setDelay(true);
+                if (config.isStateName(variable.getName())) flags.setState(true).setDelay(true);
                 base.hldd.structure.variables.Variable newVariable = new base.hldd.structure.variables.Variable(variable.getName(), variable.getType(), flags);
                 modelCollector.addVariable(newVariable);
             }

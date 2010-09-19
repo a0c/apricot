@@ -4,7 +4,6 @@ import base.hldd.structure.models.BehModel;
 import io.ConsoleWriter;
 import io.QuietCloser;
 import ui.ConverterSettings;
-import ui.ExtendedException;
 import ui.utils.AbstractWorkerFinalizer;
 import ui.utils.ConvertingWorker;
 
@@ -45,7 +44,7 @@ public class AutomaticConverterVerifier {
 		String hlddFilePath = hlddFile.getAbsolutePath();
 		try {
 			// Convert
-			ConvertingWorker convertingWorker = createWorker(settings, statistics, hlddFilePath);
+			ConvertingWorker convertingWorker = new ConvertingWorker(AbstractWorkerFinalizer.getStub(), ConsoleWriter.getStub(), settings);
 			convertingWorker.execute();
 			while (!convertingWorker.isDone()) {
 				Thread.sleep(50);
@@ -88,26 +87,6 @@ public class AutomaticConverterVerifier {
 		writer.write(mapFileStream.toString());
 		writer.flush();
 		QuietCloser.closeQuietly(writer);
-	}
-
-	private ConvertingWorker createWorker(ConverterSettings settings, final Statistics statistics, final String designFilePath) {
-		return new ConvertingWorker(
-				new AbstractWorkerFinalizer() {
-					@Override
-					public void doBeforeWorker() {}
-
-					@Override
-					public void doAfterWorker(ConvertingWorker convertingWorker) {}
-
-					@Override
-					public void doWhenDone(BehModel model) {}
-
-					@Override
-					public void doReactOnConfigError(ExtendedException e, ConvertingWorker convertingWorker) {
-						statistics.info("Config validation failed for " + designFilePath + ": " + e.getTitle());
-					}
-				},
-				ConsoleWriter.getStub(), settings);
 	}
 
 	static boolean areEqual(InputStream firstStream, InputStream secondStream) throws NoSuchAlgorithmException, IOException {

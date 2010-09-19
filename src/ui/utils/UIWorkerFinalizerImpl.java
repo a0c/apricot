@@ -5,7 +5,6 @@ import io.ConsoleWriter;
 import ui.ApplicationForm;
 import ui.BusinessLogic;
 import ui.ConfigurationHandler;
-import ui.ExtendedException;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -51,16 +50,5 @@ public class UIWorkerFinalizerImpl extends AbstractWorkerFinalizer {
         if (applicationForm.getSelectedParserId() == BusinessLogic.ParserID.VhdlBeh2HlddBeh) {
             businessLogic.doLoadHlddGraph();
         }
-
-		ConfigurationHandler.reset();
-
-	}
-
-	@Override
-	public void doReactOnConfigError(ExtendedException e, ConvertingWorker convertingWorker) {
-
-		businessLogic.getApplicationForm().doAskForSTATEVarName(e);
-		convertingWorker.cancel(true); // cancel worker, another one will be started in doAskForSTATEVarName() if requested 
-
 	}
 }

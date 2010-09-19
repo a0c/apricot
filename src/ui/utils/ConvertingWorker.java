@@ -50,6 +50,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
     private final boolean shouldSimplify;
 	private final AbstractWorkerFinalizer workerFinalizer;
 	private ConverterSettings settings;
+	private ConfigurationHandler config;
 
 	public ConvertingWorker(AbstractWorkerFinalizer workerFinalizer, ConsoleWriter consoleWriter, ConverterSettings settings) {
 		this.workerFinalizer = workerFinalizer;
@@ -66,14 +67,8 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 		this.hlddType = settings.getHlddType();
         this.shouldSimplify = settings.isDoSimplify();
 		/* Load Configuration */
-		try {
-			if (parserId == ParserID.VhdlBeh2HlddBeh || parserId == ParserID.VhdlBehDd2HlddBeh) {
-				ConfigurationHandler.load(sourceFile);
-			}
-		} catch (ExtendedException e) {
-			if (e.getTitle().equals(ExtendedException.UNDEFINED_STATE_VAR_NAME_TEXT)) { //todo: replace UNDEFINED_STATE_VAR_NAME_TEXT with another type of Exception
-				this.workerFinalizer.doReactOnConfigError(e, this);
-			}
+		if (parserId == ParserID.VhdlBeh2HlddBeh || parserId == ParserID.VhdlBehDd2HlddBeh) {
+			config = ConfigurationHandler.loadConfiguration(sourceFile);
 		}
 
     }
@@ -108,7 +103,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
                     startTime = System.currentTimeMillis();
                     /* Process received VHDL structure */
                     consoleWriter.write(stat(current++, total) + "Preprocessing VHDL structure...");
-                    entity.traverse(new VariableNameReplacerImpl()); // todo: varNR.getStateName()
+                    entity.traverse(new VariableNameReplacerImpl(config)); // todo: varNR.getStateName()
                     DelayFlagCollector delayCollector = new DelayFlagCollector();
                     entity.traverse(delayCollector);
                     entity.traverse(new ClockEventRemover());
@@ -116,7 +111,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
                     /* Generate Graphs (GraphVariables) and collect all variables */
                     consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-                    graphCreatingVisitor = new BehGraphGenerator(shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, delayCollector.getDFlagNames());
+                    graphCreatingVisitor = new BehGraphGenerator(config, shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, delayCollector.getDFlagNames());
                     entity.traverse(graphCreatingVisitor);
                     modelCollector = graphCreatingVisitor.getModelCollector();
                     consoleWriter.done();
@@ -170,7 +165,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
                     /* Generate Graphs (GraphVariables) and collect all variables */
                     consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-                    graphCreatingVisitor = new BehDDGraphGenerator(shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs);
+                    graphCreatingVisitor = new BehDDGraphGenerator(config, shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs);
                     entity.traverse(graphCreatingVisitor);
                     modelCollector = graphCreatingVisitor.getModelCollector();
                     consoleWriter.done();
@@ -286,7 +281,6 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 			model = get();
 		} catch (InterruptedException e) {return;} catch (ExecutionException e) {
 			/* If error occurred while parsing, terminate process. */
-			ConfigurationHandler.reset();
 			throw new RuntimeException(e.getCause());
 		}
 

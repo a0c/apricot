@@ -22,11 +22,14 @@ public class ConfigurationHandler {
 	public static final String STATE_NAME = "state_name";
 
 
-	private static boolean s_checkStateVariableName = true;
-	private static Properties properties;
+	private final Properties properties;
 
-	public static void load(File sourceFile) throws ExtendedException {
-		properties = getProperties();
+	private ConfigurationHandler(Properties properties) {
+		this.properties = properties;
+	}
+
+	public static ConfigurationHandler loadConfiguration(File sourceFile) {
+		Properties properties = new Properties();
 
 		properties.setProperty(SOURCE_FILE_PATH, sourceFile.getAbsolutePath());
 
@@ -56,63 +59,27 @@ public class ConfigurationHandler {
 		}
 
 		// empty properties, in case propFile == null
-
-		validate();
+		return new ConfigurationHandler(properties);
 	}
 
-	public static void validate() throws ExtendedException {
-		StringBuilder message;
-
-		if (properties == null) {
-			return;
-		}
-
-		/* Check STATE variable name availability */
-		String stateVarName = properties.getProperty(STATE_NAME);
-		if (s_checkStateVariableName && (stateVarName == null || stateVarName.length() == 0)) {
-			LOG.info("STATE variable/signal name is not defined.");
-			message = new StringBuilder("STATE variable/signal name is not defined.");
-			String propFilePath = properties.getProperty(CONFIGURATION_FILE_PATH);
-			String inFile = " ";
-			if (propFilePath == null) {
-				message.append("\n\nReason: configuration file not found");
-				LOG.info("Configuration file not found");
-				File propFile = new File(properties.getProperty(SOURCE_FILE_PATH));
-				String propName = propFile.getName();
-				propFile = new File(propFile.getParentFile(), propName.substring(0, propName.lastIndexOf(".")) + ".config");
-				inFile = " in file:\n" + propFile.getAbsolutePath() + "\n";
-			} else {
-				message.append("\n\nReason: configuration file doesn't contain mapping with key \"").append(STATE_NAME).append("\"");
-				LOG.info("Configuration file doesn't contain mapping with key " + STATE_NAME);
-			}
-			message.append("\n\nIf you don't want to convert this HLDD (Beh) to RTL HLDD later,").
-					append("\nyou can proceed without defining STATE variable name.").
-					append("\nOtherwise define it by key \"").append(STATE_NAME).append("\"").append(inFile).append("and re-run the converter.");
-			throw new ExtendedException(message.toString(), ExtendedException.UNDEFINED_STATE_VAR_NAME_TEXT);
-		}
+	public String getStateVarName() {
+		return properties.getProperty(STATE_NAME);
 	}
 
-	public static String getStateVarName() {
-		return getProperties().getProperty(STATE_NAME);
+	public void setStateVarName(String stateVarName) {
+		properties.setProperty(STATE_NAME, stateVarName);
 	}
 
-	private static Properties getProperties() {
-		if (properties == null) {
-			properties = new Properties();
-		}
-		return properties;
-	}
-
-	public static void setStateVarName(String stateVarName) {
-		getProperties().setProperty(STATE_NAME, stateVarName);
-	}
-
-	public static void reset() {
-		setCheckStateVarName(true);
-		properties = new Properties();
-	}
-
-	public static void setCheckStateVarName(boolean checkStateVarName) {
-		s_checkStateVariableName = checkStateVarName;
+	/**
+	 * This method should not be used. State signals/variables must be rather detected with analysis of their usages.
+	 * todo: A different visitor should be implemented.
+	 * Moreover, state-flag is only required in pure RTL graphs, where there is a Control part and Datapath part.
+	 * Yes, but the flag itself should be added by VHDL2HLDD converter :)
+	 * @param name signal/variable name to check for being state
+	 * @return whether this is a state name
+	 */
+	public boolean isStateName(String name) {
+		String stateName = getStateVarName();
+		return stateName != null && stateName.equalsIgnoreCase(name);
 	}
 }

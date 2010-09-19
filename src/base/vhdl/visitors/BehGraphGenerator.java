@@ -1,6 +1,7 @@
 package base.vhdl.visitors;
 
 import base.vhdl.structure.nodes.*;
+import ui.ConfigurationHandler;
 
 import java.util.Collection;
 
@@ -12,8 +13,8 @@ import java.util.Collection;
 public class BehGraphGenerator extends GraphGenerator {
     private Collection<String> registers;
 
-    public BehGraphGenerator(boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs, Collection<String> registers) {
-        super(useSameConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, Type.Beh);
+    public BehGraphGenerator(ConfigurationHandler config, boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs, Collection<String> registers) {
+        super(config, useSameConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, Type.Beh);
         this.registers = registers;
     }
 

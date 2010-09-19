@@ -13,8 +13,6 @@ public class ExtendedException extends Exception {
     public static final String MISSING_FILE_TEXT = "Missing file";
     public static final String ERROR_TEXT = "Error";
     public static final String IO_ERROR_TEXT = "I/O Error";
-	// Errors in Configuration
-    public static final String UNDEFINED_STATE_VAR_NAME_TEXT = "STATE variable/signal name undefined";
     private final String message;
     private final String title;
 
