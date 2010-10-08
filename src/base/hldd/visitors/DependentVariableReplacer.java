@@ -1,5 +1,6 @@
 package base.hldd.visitors;
 
+import base.hldd.structure.models.utils.PartedVariableHolder;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.GraphVariable;
@@ -11,11 +12,11 @@ import base.hldd.structure.variables.GraphVariable;
  */
 public class DependentVariableReplacer implements HLDDVisitor {
     private final AbstractVariable variableToReplace;
-    private final AbstractVariable replacingVariable;
+    private final PartedVariableHolder replacingVarHolder;
 
-    public DependentVariableReplacer(AbstractVariable variableToReplace, AbstractVariable replacingVariable) {
+	public DependentVariableReplacer(AbstractVariable variableToReplace, PartedVariableHolder replacingVarHolder) {
         this.variableToReplace = variableToReplace;
-        this.replacingVariable = replacingVariable;
+        this.replacingVarHolder = replacingVarHolder;
     }
 
     public void visitNode(Node node) throws Exception {
@@ -29,8 +30,12 @@ public class DependentVariableReplacer implements HLDDVisitor {
 
     private void replaceNode(Node node) {
         if (node.getDependentVariable() == variableToReplace) {
-            node.setDependentVariable(replacingVariable);
-        }
+			node.setDependentVariable(replacingVarHolder.getVariable());
+			if (replacingVarHolder.isParted()) {
+				//todo: Indices.absoluteFor()...
+				node.setPartedIndices(replacingVarHolder.getPartedIndices());
+			}
+		}
     }
 
     public void visitGraphVariable(GraphVariable graphVariable) throws Exception {

@@ -97,7 +97,6 @@ public class PPGLibraryReader {
             word = pslBufReader.readBlock('{', '}', true);
             if (word == null || word.length() == 0) throw new Exception("PPG for operator \'" + ppgName + "\' has empty or no body" + pslBufReader.log());
 
-//            BehModel model = new BehModel(word);
             BehModel model = BehModel.parseHlddStructure(word, new PPGLibraryGraphVariableCreator());
             ppgLibrary.setModelToPPG(ppgName, model);
 

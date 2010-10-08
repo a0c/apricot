@@ -1,5 +1,6 @@
 package base.hldd.structure.variables;
 
+import base.HierarchyLocation;
 import base.Type;
 import base.Indices;
 
@@ -8,8 +9,7 @@ import base.Indices;
  * <br>Date: 11.02.2008
  * <br>Time: 9:44:21
  */
-//todo: turn into Interface. There is no implementation at all!
-public abstract class AbstractVariable {
+public abstract class AbstractVariable implements Comparable<AbstractVariable> {
 
     public abstract boolean isIdenticalTo(AbstractVariable comparedAbsVariable);
 
@@ -22,8 +22,6 @@ public abstract class AbstractVariable {
     public abstract boolean isInput();
 
     public abstract boolean isOutput();
-
-    public abstract String getName();
 
     public abstract String getPureName();
 
@@ -49,5 +47,27 @@ public abstract class AbstractVariable {
 
 	public boolean isExpansion() { // todo: do the same (default behavior) for other methods, where possible (e.g. FSM)
 		return false;
+	}
+
+	private final HierarchyLocation location = new HierarchyLocation();
+
+	public String getName() {
+
+		return location.toString();
+	}
+
+	public void addNamePrefix(String namePrefix) {
+
+		location.addLocation(namePrefix);
+	}
+
+	public boolean isTopLevel() {
+		return location.isTopLevel();
+	}
+
+	@Override
+	public int compareTo(AbstractVariable o) {
+
+		return getName().compareTo(o.getName());
 	}
 }

@@ -9,9 +9,12 @@ import base.vhdl.structure.*;
 import base.vhdl.structure.Package;
 import base.Indices;
 import base.Type;
+import io.QuietCloser;
 
+import java.io.*;
 import java.util.*;
 import java.math.BigInteger;
+import java.util.regex.Pattern;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -24,12 +27,6 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
     private Set<Package> packages = new HashSet<Package>();
     /* Context Stack */
     private Stack<Object> contextStack = new Stack<Object>();
-
-//    private OperandValueCalculator valueCalculator = new OperandValueCalculator();
-//
-//    private Collection<String> variableNames = new HashSet<String>();
-//
-//    private ExpressionBuilder expressionBuilder = new ExpressionBuilder(valueCalculator, variableNames);
 
 	public void buildEntity(String entityName) {
         if (entity == null) {
@@ -49,6 +46,15 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
         }
     }
 
+	public void buildComponentDeclaration(String componentName, File sourceFile) throws Exception {
+		if (entity != null) {
+			File compArchFile = new ArchitectureFileFinder(sourceFile).findArchitectureFileForEntity(componentName);
+			ComponentDeclaration comp = new ComponentDeclaration(componentName, compArchFile);
+			entity.addComponentDeclaration(comp);
+			contextStack.push(comp);
+		}
+	}
+
     public void buildGeneric(String genericConstantName, BigInteger value) {
         if (entity != null) {
             Constant newConstant = new Constant(genericConstantName, value);
@@ -60,10 +66,34 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
     public void buildPort(String portName, boolean isInput, Type type) {
         if (entity != null) {
             Port newPort = new Port(portName, isInput, type);
-            variableNames.add(portName);
-            entity.addPort(newPort);
+			Object currentContext = contextStack.peek();
+			if (currentContext instanceof Entity) {
+				variableNames.add(portName);
+				entity.addPort(newPort);
+			} else if (currentContext instanceof ComponentDeclaration) {
+				((ComponentDeclaration) currentContext).addPort(newPort);
+			}
         }
     }
+
+	public void buildComponentInstantiation(String componentName, String componentUnitName, List<Map.Entry<String,String>> portMappingEntries) throws Exception {
+		PortMap portMap = new PortMap(portMappingEntries.size());
+		for (Map.Entry<String, String> portMappingEntry : portMappingEntries) {
+			AbstractOperand formal = expressionBuilder.buildExpression(portMappingEntry.getKey());
+			AbstractOperand actual = expressionBuilder.buildExpression(portMappingEntry.getValue());
+			if (!(formal instanceof OperandImpl)) {
+				throw new Exception("Simple operand expected as a Formal in port map " + portMappingEntry);
+			}
+			portMap.addMapping((OperandImpl) formal, actual);
+		}
+		ComponentDeclaration componentDeclaration = entity.resolveComponentDeclaration(componentUnitName);
+		ComponentInstantiation compInst = new ComponentInstantiation(componentName, componentDeclaration, portMap);
+
+		Object currentContext = contextStack.peek();
+		if (currentContext instanceof Architecture) {
+			((Architecture) currentContext).addComponent(compInst);
+		}
+	}
 
     public void buildArchitecture(String name, String affiliation) {
         if (entity != null) {
@@ -389,4 +419,95 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
         packages.add(aPackage);
     }
 
+	static class ArchitectureFileFinder {
+		private final File sourceFile;
+
+		public ArchitectureFileFinder(File sourceFile) {
+			this.sourceFile = sourceFile;
+		}
+
+		public File findArchitectureFileForEntity(String entityName) {
+
+			List<File> files = getListOfFiles();
+
+			for (File file : files) {
+
+				FileInputStream fis = null;
+				try {
+
+					fis = new FileInputStream(file);
+					
+					if (new Detector(fis, entityName).isDetected()) {
+						return file;
+					}
+
+				} catch (FileNotFoundException e) {
+					throw new RuntimeException(e); // should never happen
+				} finally {
+					QuietCloser.closeQuietly(fis);
+				}
+			}
+			return null;
+		}
+
+		List<File> getListOfFiles() {
+			return Arrays.asList(sourceFile.getParentFile().listFiles(new FileFilter() {
+				@Override
+				public boolean accept(File pathname) {
+					if (pathname.equals(sourceFile)) {
+						return false;
+					}
+					String fileName = pathname.getName().toLowerCase();
+					return fileName.endsWith(".vhd") || fileName.endsWith(".vhdl");
+				}
+			}));
+		}
+
+		public File getSourceFile() {
+			return sourceFile;
+		}
+
+		public static class Detector {
+			// basic_identifier ::= letter { [ underline ] letter_or_digit }
+			private static final Pattern IDENTIFIER = Pattern.compile("([a-z]\\w*)", Pattern.CASE_INSENSITIVE);
+			private final Scanner scanner;
+			private final String entityName;
+
+			public Detector(InputStream inputStream, String entityName) {
+				this.entityName = entityName;
+				scanner = new Scanner(new BufferedInputStream(inputStream));
+			}
+
+			public boolean isDetected() {
+				String token;
+				while ((token = nextSignificant()) != null) {
+					if (token.equalsIgnoreCase("architecture")
+							&& IDENTIFIER.matcher(nextSignificant()).matches() 
+							&& "of".equalsIgnoreCase(nextSignificant())
+							&& entityName.equalsIgnoreCase(nextSignificant())
+							&& "is".equalsIgnoreCase(nextSignificant())) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			private String nextSignificant() {
+				while (scanner.hasNext()) {
+					String token = scanner.next();
+					if (token.startsWith("--")) {
+						/* Skip commented line */
+						if (scanner.hasNextLine()) {
+							scanner.nextLine();
+							continue;
+						} else {
+							return null;
+						}
+					}
+					return token;
+				}
+				return null;
+			}
+		}
+	}
 }

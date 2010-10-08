@@ -15,7 +15,7 @@ public class PartedVariableHolder {
     public static final int NO_TRUE_VALUE = Integer.MIN_VALUE;
     
     private AbstractVariable variable;
-    private final Indices partedIndices;
+    private Indices partedIndices;
     private final int trueValue;
 
     public PartedVariableHolder(AbstractVariable variable, Indices partedIndices, int trueValue) {
@@ -44,6 +44,10 @@ public class PartedVariableHolder {
         return trueValue == 0;
     }
 
+	public boolean isParted() {
+		return partedIndices != null;
+	}
+
     public boolean isIdenticalTo(PartedVariableHolder comparedHolder){
         /* Compare Variables */
         if (!variable.isIdenticalTo(comparedHolder.variable)) return false;
@@ -54,6 +58,10 @@ public class PartedVariableHolder {
     public void setVariable(AbstractVariable variable) {
         this.variable = variable;
     }
+
+	public void setPartedIndices(Indices partedIndices) {
+		this.partedIndices = partedIndices;
+	}
 
     public String toString() {
         return variable + Indices.toString(partedIndices);
@@ -78,6 +86,7 @@ public class PartedVariableHolder {
 
 		if (partedIndices == null ^ thatHolder.partedIndices == null) return false;
 
+		//noinspection SimplifiableIfStatement
 		if (partedIndices != null && !partedIndices.equals(thatHolder.partedIndices)) {
 			return false;
 		}

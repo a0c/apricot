@@ -4,6 +4,7 @@ import base.SourceLocation;
 import io.scan.VHDLScanner;
 import io.scan.VHDLToken;
 
+import java.text.ParseException;
 import java.util.*;
 import java.math.BigInteger;
 
@@ -59,6 +60,10 @@ public class VHDLStructureParser {
                     name = value.split("\\s")[1];
                     builder.buildEntity(name);
                     break;
+				case COMPONENT_DECL:
+					name = value.split("\\s")[1];
+					builder.buildComponentDeclaration(name, scanner.getSourceFile());
+					break;
                 case GENERIC_OPEN:
                 case PORT_OPEN:
                 case BEGIN:
@@ -93,6 +98,27 @@ public class VHDLStructureParser {
                         builder.buildPort(name, isInput, type);
                     }
                     break;
+				case PORT_MAP:
+					String[] valueParts = value.split(":|(PORT MAP)", 3);
+					if (valueParts.length != 3) throw new Exception("Sorry, don't know how to parse this port mapping: " + value);
+					name = valueParts[0].trim();
+					String pm = valueParts[2].trim();
+					String[] portMappings = pm.substring(pm.indexOf("(") + 1, pm.lastIndexOf(")")).split(",");
+					List<Map.Entry<String, String>> portMappingEntries = new ArrayList<Map.Entry<String, String>>();
+					for (String portMapping : portMappings) {
+						if (!portMapping.contains("=>")) {
+							//todo POSITIONAL ASSOTIATION in port map
+							throw new ParseException("Implementation is missing for POSITIONAL ASSOCIATION in port map "
+									+ Arrays.toString(portMappings), 0);
+						}
+						String[] parts = portMapping.split("=>", 2);
+						if (parts.length != 2) {
+							throw new ParseException("Invalid port mapping: " + portMapping, 0);
+						}
+						portMappingEntries.add(new AbstractMap.SimpleImmutableEntry<String, String>(parts[0].trim(), parts[1].trim()));
+					}
+					builder.buildComponentInstantiation(name, valueParts[1].trim(), portMappingEntries);
+					break;
                 case DECL_CLOSE:
                     builder.buildCloseDeclaration();
                     break;

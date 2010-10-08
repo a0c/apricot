@@ -16,7 +16,7 @@ public class Variable extends AbstractVariable {
     /**
      * Variable NAME
      */
-    protected String name;
+    private String name = "";
     /**
      * Variable INDEX.
      * set index to '-1'. Needed for indexation (just to avoid indexing a variable twice)
@@ -30,20 +30,21 @@ public class Variable extends AbstractVariable {
     /**
      * Variable FLAGS
      */
-    private Flags flags;
+    private Flags flags = new Flags();
 
     /**
      * Constructor for OVERRIDING in inherited classes (ConstantVariable)
      */
-    protected Variable() {
-        // set index to '-1'. Needed for indexation (just to avoid indexing a variable twice)
-        flags = new Flags();
-    }
+    protected Variable() {}
 
     public Variable(String varName, Type type, Flags flags) {
         this.name = varName;
         this.type = type;
         this.flags = flags;
+    }
+
+	public Variable(String varName, Type type) {
+		this(varName, type, new Flags());
     }
 
     public String toString() {
@@ -84,7 +85,7 @@ public class Variable extends AbstractVariable {
     /* Getters START */
 
     public String getName() {
-        return name;
+        return super.getName() + name;
     }
 
     public String getPureName() {
@@ -162,10 +163,6 @@ public class Variable extends AbstractVariable {
 
         this.index = index;
 
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public void setConstant(boolean isConstant) {

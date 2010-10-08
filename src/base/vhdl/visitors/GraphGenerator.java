@@ -1,15 +1,13 @@
 package base.vhdl.visitors;
 
 import base.HLDDException;
-import base.hldd.structure.models.utils.ConditionGraphManager;
-import base.hldd.structure.models.utils.ExtraConditionGraphManager;
+import base.hldd.structure.models.BehModel;
+import base.hldd.structure.models.utils.*;
 import base.hldd.structure.nodes.utils.Condition;
 import base.vhdl.structure.nodes.*;
 import base.vhdl.structure.Process;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Variable;
-import base.hldd.structure.models.utils.ModelManager;
-import base.hldd.structure.models.utils.PartedVariableHolder;
 import base.hldd.structure.models.utils.ModelManager.CompositeFunctionVariable;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.nodes.Node;
@@ -19,6 +17,8 @@ import base.hldd.visitors.ObsoleteResetRemoverImpl;
 import base.Indices;
 import parsers.vhdl.OperandLengthSetter;
 import ui.ConfigurationHandler;
+import ui.ConverterSettings;
+import ui.ExtendedException;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -45,6 +45,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	protected static final Logger LOG = Logger.getLogger(GraphGenerator.class.getName());
 
 	private final ConfigurationHandler config;
+	private final ConverterSettings settings;
     protected ModelManager modelCollector;
 	private ConditionGraphManager conditionGraphManager;
 	private ExtraConditionGraphManager extraConditionGraphManager;
@@ -59,9 +60,6 @@ public abstract class GraphGenerator extends AbstractVisitor {
     private final boolean isNullATransition;
     /* Set of processed graphVars. Used for skipping processed variables. */
     protected Set<String> processedGraphVars = new HashSet<String>();
-    /* For each process, a set of partially set variables for those variables that are parted. */
-    protected Map<Process, Map<String, Set<OperandImpl>>> partialSettingsMapByProcess
-            = new HashMap<Process, Map<String, Set<OperandImpl>>>();
 
 	public ModelManager getModelCollector() {
         return modelCollector;
@@ -74,27 +72,19 @@ public abstract class GraphGenerator extends AbstractVisitor {
     /**
      *
      * @param config optional settings from .config file
-     * @param   useSameConstants <code>true</code> if the constant with the <u>same value</u> and <u>adjusted length</u> should be used
-     *          for requested value. <code>false</code> if a new constant should be created for the same value, but a different length
-     *          than already exists.
-     *          <br>todo: <b>NB!</b> <code>true</code> possibility is not implemented yet. When implementing it, either
-     *          modify getModelCollector() method to perform adjustment of partedIndices of terminal nodes in GraphVariables,
-     *          or make the TerminalNode set its partedIndices itself.
-	 * @param doFlattenConditions whether to inline Composite conditions into a set of Control Nodes (true value), or
- *        create a single node function (false value).
-	 * @param doCreateGraphsForCS whether to create Conditional Graphs or not
-	 * @param doCreateSubGraphs whether to create Extra Graphs or not
+     * @param settings base settings for conversion
 	 * @param generatorType generator's type. Used for initialization of isNullTransition only.
      */
-    protected GraphGenerator(ConfigurationHandler config, boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs, Type generatorType) {
+	protected GraphGenerator(ConfigurationHandler config, ConverterSettings settings, Type generatorType) {
 		this.config = config;
-		modelCollector = new ModelManager(useSameConstants);
-        this.doFlattenConditions = doFlattenConditions;
-        this.doCreateGraphsForCS = doCreateGraphsForCS;
+		this.settings = settings;
+		modelCollector = new ModelManager();
+		this.doFlattenConditions = settings.isDoFlattenConditions();
+		this.doCreateGraphsForCS = settings.isDoCreateCSGraphs(); // todo: should be represented as Enum (CSMode or ConditionalStatementMode)
 		if (this.doCreateGraphsForCS) {
 			conditionGraphManager = new ConditionGraphManager(modelCollector);
 		}
-		this.doCreateSubGraphs = doCreateSubGraphs;
+		this.doCreateSubGraphs = settings.isDoCreateExtraCSGraphs();
 		if (this.doCreateSubGraphs) {
 			extraConditionGraphManager = new ExtraConditionGraphManager(modelCollector);
 		}
@@ -157,6 +147,10 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		/* Adjust CONSTANT LENGTHS to the lengths of the variables that use these constants directly */
 		adjustConstantAndOperandLengths(architecture);
 
+		Set<ComponentInstantiation> components = architecture.getComponents();
+		/* Update partially assigned signals with components' output port mappings */
+		modelCollector.splitPartiallyAssignedSignals(components);
+
         for (Process process : architecture.getProcesses()) {
             /* Collect partialSet variables */
             collectPartialSettings(process);
@@ -166,7 +160,19 @@ public abstract class GraphGenerator extends AbstractVisitor {
         for (AbstractNode archTransNode : architecture.getTransitions().getChildren()) {
             couldProcessNextGraphVariable(null, archTransNode);
         }
+
+		/* Process COMPONENTS */
+		for (ComponentInstantiation component : components) {
+			loadComponent(component);
+		}
     }
+
+	private void loadComponent(ComponentInstantiation component) throws ExtendedException {
+
+		BehModel model = ComponentLoader.loadModel(component, settings);
+
+		new ComponentMerger(component, model).mergeTo(modelCollector);
+	}
 
     private void collectConstants(Set<Constant> constants) throws Exception {
         for (Constant constant : constants) {
@@ -446,28 +452,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
     }
 
     private void collectPartialSettings(Process process) throws Exception {
-        PartialSetVariableCollector collector = new PartialSetVariableCollector(process.getVariables());
-        process.traverse(collector);
-        Map<String, Set<OperandImpl>> partialSettingsMap = collector.getPartialSettingsMap();
-        if (!partialSettingsMap.isEmpty()) {
-            partialSettingsMapByProcess.put(process, partialSettingsMap);
-        }
-    }
 
-	/**
-     * @param oldGraphVariable old variable on the base of which to build the
-     *        new one and what to replace with the new variable 
-     * @param graphVarRootNode root node of the new variable
-     * @param isDelay Delay-flag to set to the new GraphVariable
-     * @return the newly created GraphVariable
-     * @throws Exception If {@link base.hldd.structure.models.utils.ModelManager#replace(AbstractVariable, AbstractVariable)}
-     *         throws an exception
-     */
-    protected GraphVariable createAndReplaceNewGraph(AbstractVariable oldGraphVariable, Node graphVarRootNode, boolean isDelay) throws Exception {
-        GraphVariable newGraphVariable = new GraphVariable(oldGraphVariable, graphVarRootNode);
-        newGraphVariable.setDelay(isDelay);
-        modelCollector.replace(oldGraphVariable, newGraphVariable);
-        return newGraphVariable;
+		modelCollector.collectPartialSettings(process);
     }
 
     /**
@@ -476,9 +462,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
      * @return <code>true</code> if next graph variable was processed.
      *         <code>false</code> if no graph variables could be found to
      *         process during traversal of the specified rootNode
-     * @throws Exception if {@link AbstractNode#traverse(AbstractVisitor)} or
-     *         {@link #createAndReplaceNewGraph(base.hldd.structure.variables.AbstractVariable,
-               base.hldd.structure.nodes.Node, boolean)} throw an Exception
+     * @throws Exception if {@link AbstractNode#traverse(AbstractVisitor)} throws an Exception
      */
     protected boolean couldProcessNextGraphVariable(AbstractVariable initGraphVariable, AbstractNode rootNode) throws Exception {
 		setGraphVariable(initGraphVariable);
@@ -487,7 +471,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
         rootNode.traverse(this);
         if (graphVariableRootNode != null) {
             /* Create new GraphVariable and replace old one */
-            GraphVariable newGraphVariable = createAndReplaceNewGraph(graphVariable, graphVariableRootNode, isDelay(graphVariable.getName()));
+            GraphVariable newGraphVariable = modelCollector.createAndReplaceNewGraph(graphVariable, graphVariableRootNode, isDelay(graphVariable.getName()));
 
             /* Remove redundant resets */
             graphVariableRootNode.traverse(new ObsoleteResetRemoverImpl(newGraphVariable));
@@ -503,16 +487,16 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	protected abstract boolean isDelay(String variableName);
 
     protected void processPartialSettings(Process process) throws Exception {
-        /* For each partially set variable in process, traverse the tree once for each partial setting variable */
-        Map<String,Set<OperandImpl>> partialSettingsMap = partialSettingsMapByProcess.get(process);
-        for (String varName : partialSettingsMap.keySet()) {
-            Set<OperandImpl> partSetOperandsSet = partialSettingsMap.get(varName);
+		/* For each partially assigned variable in process, traverse the tree once for each partial assigned variable */
+		for (Map.Entry<String,Set<OperandImpl>> partialAssignments : modelCollector.getPartialAssignmentsFor(process).entrySet()) {
+			String varName = partialAssignments.getKey();
+			Set<OperandImpl> partialSets = partialAssignments.getValue();
             AbstractVariable wholeVariable = modelCollector.getVariable(varName); // base variable of partial setting variables
             /* Check for missing CAT inputs and for intersections (throw Exception).*/
-            doCheckPartialSetForCompleteness(varName, wholeVariable.getLength(), partSetOperandsSet);
+			modelCollector.finalizeAndCheckForCompleteness(partialSets, wholeVariable.getLength(), varName);
             /* For each partial setting variable, traverse the tree */
-            List<GraphVariable> partialSetVarsList = new LinkedList<GraphVariable>();
-            for (OperandImpl partSetOperand : partSetOperandsSet) {
+			List<OperandImpl> partialSetList = new LinkedList<OperandImpl>();
+			for (OperandImpl partSetOperand : partialSets) {
                 /* Create new variable */ //todo: may be substitute with couldProcessNextGraphVariable(). Check ModelCollector.replace() to act equally to modelCollector.addVariable() met below:
 				setGraphVariable(new PartedVariable(partSetOperand.getName(), wholeVariable.getType(), partSetOperand.getPartedIndices()));
 				graphVariableRootNode = null;
@@ -522,71 +506,14 @@ public abstract class GraphGenerator extends AbstractVisitor {
                     GraphVariable newGraphVariable = new GraphVariable(graphVariable, graphVariableRootNode);
                     modelCollector.addVariable(partSetOperand.toString(), newGraphVariable);
                     //todo: Remove redundant resets?
-                    partialSetVarsList.add(newGraphVariable);
+					partialSetList.add(partSetOperand);
                     processedGraphVars.add(partSetOperand.toString());
                 } else throw new Exception("Partial setting variable " + graphVariable + " is never set."); //todo: assert could also be used 
             }
-            /* Create CAT function */
-            AbstractVariable catFunction = createCatFunction(partialSetVarsList);
-            /* Make base variable tree contain 1 Terminal Node only: the CAT node */
-            createAndReplaceNewGraph(wholeVariable, new Node.Builder(catFunction).build(), isDelay(varName)); // isDelay(varName) was at first "true".
-            processedGraphVars.add(varName);
-        }
-    }
 
-    private AbstractVariable createCatFunction(List<GraphVariable> partialSetVarsList) throws Exception {
-        /* Sort by index */
-        Collections.sort(partialSetVarsList, new GraphVariableComparator());
-        /* Create CAT Expression */
-        Expression catExpession = new Expression(Operator.CAT, false);
-        /* Add all inputs to the expression */
-        for (GraphVariable partialGraphVariable : partialSetVarsList) {
-            PartedVariable baseVariable = ((PartedVariable) partialGraphVariable.getBaseVariable());
-            catExpession.addOperand(new OperandImpl(baseVariable.getPureName(), baseVariable.getPartedIndices(), false));
-        }
-        /* Add the Expression to ModelCollector */
-        return modelCollector.convertOperandToVariable(catExpession, null, true);
-    }
+			modelCollector.concatenatePartialAssignments(wholeVariable, partialSetList, isDelay(varName));
 
-    static Indices[] extractUnsetIndices(boolean[] setBits) {
-        List<Indices> indicesList = new LinkedList<Indices>();
-        int lowest = -1, highest = -1;
-        for (int i = 0; i < setBits.length; i++) {
-            if (!setBits[i]) {
-                if (lowest == -1) {
-                    lowest = i;
-                }
-                highest = i;
-            } else {
-                if (lowest != -1) {
-                    indicesList.add(new Indices(highest, lowest));
-                    lowest = -1; highest = -1;
-                }
-            }
-        }
-        if (lowest != -1) {
-            indicesList.add(new Indices(highest, lowest));
-        }
-        return indicesList.toArray(new Indices[indicesList.size()]);
-    }
-
-    private void doCheckPartialSetForCompleteness(String varName, Indices length, Set<OperandImpl> partSetOperandsSet) throws Exception {
-        boolean[] bits = new boolean[length.length()];
-        /* Check intersections: if any, inform about them */
-        for (OperandImpl partSetOperand : partSetOperandsSet) {
-            if (!partSetOperand.isParted()) throw new Exception("Partial setting operand doesn't contain parted indices: " + partSetOperand);
-            Indices partedIndices = partSetOperand.getPartedIndices();
-            for (int index = partedIndices.getLowest(); index <= partedIndices.getHighest(); index++) {
-                /* If this bit has already been set, inform about intersection */
-                if (bits[index]) throw new Exception("Intersection of partial setting operands:" +
-                        "\nBit " + index + " has already been set for operand " + partSetOperand.getName());
-                bits[index] = true;
-            }
-        }
-        /* Check missing partial setting variables: if any, fill the set with missing variables */
-        Indices[] unsetIndicesArray = extractUnsetIndices(bits);
-        for (Indices unsetIndices : unsetIndicesArray) { //todo: It may occur, that the whole variable is unset. Consider this.
-            partSetOperandsSet.add(new OperandImpl(varName, unsetIndices,  false));
+			processedGraphVars.add(varName);
         }
     }
 
@@ -948,133 +875,6 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		}
 		
 	}
-
-    private class PartialSetVariableCollector extends AbstractVisitor {
-        private final Set<Variable> processVariables;
-        private Map<String, Set<OperandImpl>> partialSettingsMap = new HashMap<String, Set<OperandImpl>>();
-
-        public PartialSetVariableCollector(Set<Variable> processVariables) {
-            this.processVariables = processVariables;
-        }
-
-        /* Here only request processing of AbstractNodes(ParseTree) */
-        public void visitEntity(Entity entity) throws Exception {}
-
-        public void visitArchitecture(Architecture architecture) throws Exception {}
-
-        public void visitProcess(Process process) throws Exception {
-            process.getRootNode().traverse(this);
-        }
-
-        public void visitIfNode(IfNode ifNode) throws Exception {
-            ifNode.getTruePart().traverse(this);
-            if (ifNode.getFalsePart() != null) {
-                ifNode.getFalsePart().traverse(this);
-            }
-        }
-
-        public void visitTransitionNode(TransitionNode transitionNode) throws Exception {
-            if (transitionNode.isNull()) return;
-            OperandImpl varOperand = transitionNode.getTargetOperand();
-            if (varOperand.isParted()) {
-                /* Get the set of parted variables */
-                Set<OperandImpl> partedVarSet;
-                /* Check that variable is already mapped and map it otherwise */
-                String varOperandName = varOperand.getName();
-                if (partialSettingsMap.containsKey(varOperandName)) {
-                    partedVarSet = partialSettingsMap.get(varOperandName);
-                } else {
-                    partedVarSet = new HashSet<OperandImpl>();
-                    partialSettingsMap.put(varOperandName, partedVarSet);
-                }
-                /* Add operand to set */
-                partedVarSet.add(varOperand);
-            }
-        }
-
-        public void visitCaseNode(CaseNode caseNode) throws Exception {
-            for (WhenNode whenNode : caseNode.getConditions()) {
-                whenNode.traverse(this);
-            }
-        }
-
-        public void visitWhenNode(WhenNode whenNode) throws Exception {
-            whenNode.getTransitions().traverse(this);
-        }
-
-        public Map<String, Set<OperandImpl>> getPartialSettingsMap() {
-            doDisinterlapPartialSettings();
-            return partialSettingsMap;
-        }
-
-        /**
-         * Splits partial settings into non-interlaping regions
-         */
-        private void doDisinterlapPartialSettings() {
-
-            /* For each parted variable... */
-            for (String varName : partialSettingsMap.keySet()) {
-                /* create a new set of parted variable operands... */
-                HashSet<OperandImpl> newPartedVarSet = new HashSet<OperandImpl>();
-                /* and fill it with non-intersecting parted variable operands. */
-
-                /* Use 2 SortedSets: a separate one for START and END markers.
-                 * 1) Place START and END markers into 2 SortedSets according to the following:
-                 *      a) Starting index -> "i" for START and "i - 1" for END
-                 *      b) Ending index   -> "i" for END and "i + 1" for START
-                 * 2) Create intervals: take next marker from either SortedSet. Number of markers in both sets is equal.
-                 * */
-                SortedSet<Integer> startsSet = new TreeSet<Integer>();
-                SortedSet<Integer> endsSet = new TreeSet<Integer>();
-                int lowerBound = -1;
-                int upperBound = modelCollector.getVariable(varName).getLength().length() /*getHighestSB() + 1*/;
-                /* Fill SortedSets */
-                for (OperandImpl partialSetOperand : partialSettingsMap.get(varName)) {
-                    Indices partedIndices = partialSetOperand.getPartedIndices();
-                    /* Starting index */
-                    startsSet.add(partedIndices.getLowest());
-                    if (partedIndices.getLowest() - 1 > lowerBound) {
-                        endsSet.add(partedIndices.getLowest() - 1);
-                    }
-                    /* Ending index */
-                    endsSet.add(partedIndices.getHighest());
-                    if (partedIndices.getHighest() + 1 < upperBound) {
-                        startsSet.add(partedIndices.getHighest() + 1);
-                    }
-                }
-                /* Check number of markers */
-                if (startsSet.size() != endsSet.size()) throw new RuntimeException("Unexpected bug occured while " +
-                        "extracting non-intersecting regions for partial setting variables:" +
-                        "\n Amounts of START and END markers are different.");
-                /* Create intervals */
-                Integer[] startsArray = new Integer[startsSet.size()];
-                startsSet.toArray(startsArray);
-                Integer[] endsArray = new Integer[endsSet.size()];
-                endsSet.toArray(endsArray);
-                for (int i = 0; i < startsArray.length; i++) {
-                    newPartedVarSet.add(new OperandImpl(varName, new Indices(endsArray[i], startsArray[i]), false));
-                }
-
-                /* Replace the variable set in partigalSettingsMap with the new one */
-                partialSettingsMap.put(varName, newPartedVarSet);
-            }
-
-        }
-    }
-
-    private class GraphVariableComparator implements Comparator<GraphVariable> {
-        public int compare(GraphVariable o1, GraphVariable o2) {
-            if (o1.getBaseVariable().getClass() != PartedVariable.class
-                    || o2.getBaseVariable().getClass() != PartedVariable.class)
-                throw new RuntimeException("GraphVariables are compered whose base variables are not instances of "
-                        + PartedVariable.class.getSimpleName());
-            /* Compare GraphVariables by the parted indices of their base variables */
-            /* NB! Larger indices should be catted earlier, so swap the compared indices */
-            return ((PartedVariable) o2.getBaseVariable()).getPartedIndices().compareTo(((PartedVariable) o1.getBaseVariable()).getPartedIndices());
-        }
-    }
-
-
 
 //    public AbstractVariable getReplacingVariable(AbstractVariable initialVariable) {
 //        //todo: if replacingChildren is Empty...

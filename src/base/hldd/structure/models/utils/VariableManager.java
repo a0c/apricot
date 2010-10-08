@@ -1,11 +1,13 @@
 package base.hldd.structure.models.utils;
 
+import base.Indices;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.ConstantVariable;
 import base.hldd.structure.variables.FunctionVariable;
 import base.hldd.structure.variables.UserDefinedFunctionVariable;
 import base.vhdl.structure.Operator;
 
+import java.math.BigInteger;
 import java.util.TreeMap;
 import java.util.Collection;
 import java.util.TreeSet;
@@ -23,9 +25,8 @@ public class VariableManager {
     /**
      *
      * @param newVariable variable to be added
-     * @throws Exception if the collector has already got the variable with identical name
      */
-    public void addVariable(AbstractVariable newVariable) throws Exception {
+    public void addVariable(AbstractVariable newVariable) {
         addVariable(newVariable.getName(), newVariable);
     }
 
@@ -38,12 +39,9 @@ public class VariableManager {
         if (newVariable instanceof ConstantVariable) {
             if (!consts.containsKey(varName)) {
                 consts.put(varName, (ConstantVariable) newVariable);
-//                throw new Exception("Set of CONSTANTS does already have the following constant: " + newVariable);
             }
         } else {
-            if (vars.put(varName, newVariable) != null) {
-//                throw new Exception("Set of VARIABLES does already have the following variable: " + newVariable);
-            }
+            vars.put(varName, newVariable);
         }
     }
 
@@ -75,6 +73,11 @@ public class VariableManager {
 				if (variable.getClass() == FunctionVariable.class) {
 					FunctionVariable functionVariable = (FunctionVariable) variable;
 
+					// skip functions from deeper levels of hierarchy
+					if (!functionVariable.isTopLevel()) {
+						continue;
+					}
+
 					funcSet.add(functionVariable);
 				}
 			}
@@ -82,6 +85,11 @@ public class VariableManager {
 			for (AbstractVariable variable : vars) {
 				if (variable.getClass() == FunctionVariable.class) {
 					FunctionVariable functionVariable = (FunctionVariable) variable;
+
+					// skip functions from deeper levels of hierarchy
+					if (!functionVariable.isTopLevel()) {
+						continue;
+					}
 
 					if (functionVariable.getOperator() == operator) {
 						funcSet.add(functionVariable);
@@ -121,16 +129,6 @@ public class VariableManager {
         return consts.values();
     }
 
-    public AbstractVariable[] getVariablesAsArray() {
-        Collection<AbstractVariable> variablesCollection = getVariables();
-        return variablesCollection.toArray(new AbstractVariable[variablesCollection.size()]);
-    }
-
-    public ConstantVariable[] getConstantsAsArray() {
-        Collection<ConstantVariable> constantsCollection = getConstants();
-        return constantsCollection.toArray(new ConstantVariable[constantsCollection.size()]);
-    }
-
     public AbstractVariable getVariableByName(String variableName) {
         return vars.get(variableName);
     }
@@ -139,7 +137,41 @@ public class VariableManager {
         return consts.get(constantName);
     }
 
-    public TreeMap<String, ConstantVariable> getConsts() {
-        return consts;
-    }
+	/**
+	 * Looks for a constant with the desired value in stored constants.
+	 * If no such constant is found, a new one is created and stored.
+	 * The new constant is also returned.
+	 * @param value desired value of the constant
+	 * @param targetLength requested length or <code>null</code> if doesn't matter
+	 * @return an instance of ConstantVariable with the value of <code>constValueToFind</code>
+	 */
+	public ConstantVariable getConstantByValue(BigInteger value, Indices targetLength) {
+
+		// Search for EXISTENT constants
+		for (String constName : consts.keySet()) {
+			ConstantVariable constantVariable = consts.get(constName);
+			if (constantVariable.getValue().equals(value)) {
+				/* Constan with the SAME VALUE found. */
+				/* For EVERY variable LENGTH there must be a SEPARATE constant */
+				if (targetLength == null) {
+					/* If length doesn't matter, return the first met constant with the required value */
+					return constantVariable;
+				} else {
+					if (targetLength.equals(constantVariable.getLength())) {
+						return constantVariable;
+					}
+				}
+			}
+		}
+		// EXISTENT constant is not found, so create a new one
+		ConstantVariable newConstantVariable = ConstantVariable.createNamedConstant(value, null, targetLength);
+		consts.put(newConstantVariable.getName(), newConstantVariable);
+		return newConstantVariable;
+
+	}
+
+	public ConstantVariable getConstantByValue(BigInteger value) {
+		return getConstantByValue(value, null);
+	}
+
 }

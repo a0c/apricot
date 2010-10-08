@@ -1,6 +1,7 @@
 package base.hldd.structure.models.utils;
 
 import base.HLDDException;
+import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.variables.Variable;
@@ -12,6 +13,7 @@ import base.Type;
 import java.util.*;
 import java.math.BigInteger;
 
+import base.vhdl.structure.Process;
 import parsers.vhdl.PackageParser;
 
 /**
@@ -21,16 +23,15 @@ import parsers.vhdl.PackageParser;
 */
 public class ModelManager {
     private VariableManager variableManager;
-    private final boolean useSameConstants;
+	private PartialAssignmentManager partialAssignmentManager;
 	private ConstantVariable constant0;
 	private ConstantVariable constant1;
 
-    public ModelManager(boolean useSameConstants) {
-        this.useSameConstants = useSameConstants;
+    public ModelManager() {
         variableManager = new VariableManager();
     }
 
-    public void addVariable(AbstractVariable newVariable) throws Exception {
+    public void addVariable(AbstractVariable newVariable) {
         variableManager.addVariable(newVariable);
     }
 
@@ -56,44 +57,62 @@ public class ModelManager {
 		return constant1;
 	}
 	
-    public void replace(AbstractVariable variableToReplace, AbstractVariable replacingVariable) throws Exception {
-        if (variableToReplace instanceof ConstantVariable) {
-            throw new Exception("ConstantVariable cannot be replaced currently. Implementation is simply missing.");
-        }
-        if (variableToReplace instanceof GraphVariable && replacingVariable instanceof Variable) {
-			/* todo: this situation never occurs, because replace() is only called with replacingVariable being instanceof GraphVariable */
-            /* Remove old variable from hash */
-            removeVariable(variableToReplace);
-            /* Remove replacing variable from hash */
-            removeVariable(replacingVariable);
+    public void rebase(AbstractVariable variableToRebase, AbstractVariable newBaseVariable) {
 
-            /* Replace base variable */
-            ((GraphVariable) variableToReplace).replaceBaseVariable(replacingVariable);
-            /* ReAdd updated old variable to hash */
-            addVariable(variableToReplace);
-        } else {
-            /* Remove old variable from hash */
-            removeVariable(variableToReplace);
-            /* Add new variable to hash */
-            addVariable(replacingVariable);
+		/* Remove old variable from hash */
+		removeVariable(variableToRebase);
+		/* Remove base variable from hash */
+		removeVariable(newBaseVariable);
 
-            /* Replace old variable with new one in Functions and GraphVariables */
-            for (AbstractVariable absVariable : variableManager.getVariables()) {
-                if (absVariable instanceof FunctionVariable) {
-                    FunctionVariable functionVariable = (FunctionVariable) absVariable;
-                    for (PartedVariableHolder operand : functionVariable.getOperands()) {
-                        if (operand.getVariable() == variableToReplace) {
-                            operand.setVariable(replacingVariable);
-                        }
-                    }
-                } else if (absVariable instanceof GraphVariable) {
-                    GraphVariable graphVariable = (GraphVariable) absVariable;
-                    graphVariable.traverse(new DependentVariableReplacer(variableToReplace, replacingVariable));
-                }
-            }
-        }
+		/* Replace base variable */
+		((GraphVariable) variableToRebase).setBaseVariable(newBaseVariable);
+		/* ReAdd updated old variable to hash */
+		addVariable(variableToRebase);
 
+		replaceInModel(newBaseVariable, new PartedVariableHolder(variableToRebase, null));
     }
+
+	public void replaceWithIndices(AbstractVariable variableToReplace, PartedVariableHolder replacingVarHolder) {
+		AbstractVariable replacingVariable = replacingVarHolder.getVariable();
+
+		/* Remove old variable from hash */
+		removeVariable(variableToReplace);
+		/* Add new variable to hash */
+		addVariable(replacingVariable);
+
+		/* Replace old variable with new one in Functions and GraphVariables */
+		replaceInModel(variableToReplace, replacingVarHolder);
+	}
+
+	private void replaceInModel(AbstractVariable variableToReplace, PartedVariableHolder replacingVarHolder) {
+
+		AbstractVariable replacingVariable = replacingVarHolder.getVariable();
+		/* Replace old variable with new one in Functions and GraphVariables */
+		for (AbstractVariable absVariable : variableManager.getVariables()) {
+
+			if (absVariable instanceof FunctionVariable) {
+				FunctionVariable functionVariable = (FunctionVariable) absVariable;
+				for (PartedVariableHolder operand : functionVariable.getOperands()) {
+					if (operand.getVariable() == variableToReplace) {
+						operand.setVariable(replacingVariable);
+						if (replacingVarHolder.isParted()) {
+							//todo: Indices.absoluteFor()...
+							operand.setPartedIndices(replacingVarHolder.getPartedIndices());
+						}
+					}
+				}
+
+			} else if (absVariable instanceof GraphVariable) {
+				GraphVariable graphVariable = (GraphVariable) absVariable;
+				try {
+					graphVariable.traverse(new DependentVariableReplacer(variableToReplace, replacingVarHolder));
+				} catch (Exception e) {
+					throw new RuntimeException("Error while traversing GraphVariable with DependentVariableReplacer: "
+							+ e.getMessage(), e); /* should never happen */
+				}
+			}
+		}
+	}
 
 	public PartedVariableHolder convertConditionalStmt(Expression conditionalStmt, boolean flattenCondition) throws Exception {
 		boolean inverted = conditionalStmt.isInverted();
@@ -355,8 +374,7 @@ public class ModelManager {
             functionVariable.setOperator(operator == Operator.MULT ? Operator.SHIFT_LEFT : Operator.SHIFT_RIGHT);
             functionVariable.setNameIdx(generateFunctionNameIdx(functionVariable.getOperator()));
             /* Create SHIFT step operand */
-            AbstractVariable shiftStepOpeVariable =
-                    ConstantVariable.getConstByValue(powerOf2Constant.value, null, variableManager.getConsts(), useSameConstants);
+            AbstractVariable shiftStepOpeVariable = variableManager.getConstantByValue(powerOf2Constant.value);
             /* Get the operand being shifted. Here assume that MULT and DIV have 2 operands only. */
             PartedVariableHolder shiftedOperandHolder = operandHolders.get(invertBit(powerOf2Constant.index));
             /* Set the shiftedOperand as left operand */
@@ -411,7 +429,74 @@ public class ModelManager {
 		
 		ConstantVariable subConstant = baseConstant.subRange(rangeToExtract);
 		
-		return ConstantVariable.getConstByValue(subConstant.getValue(), subConstant.getLength(), variableManager.getConsts(), useSameConstants);
+		return variableManager.getConstantByValue(subConstant.getValue(), subConstant.getLength());
+	}
+
+	public void concatenatePartialAssignments(AbstractVariable wholeVariable, List<OperandImpl> partialAssignments, boolean delay) throws Exception {
+		/* Create CAT function */
+		FunctionVariable catFunction = createCatFunction(partialAssignments);
+		/* Make base variable tree contain 1 Terminal Node only: the CAT node */
+		createAndReplaceNewGraph(wholeVariable, new Node.Builder(catFunction).build(), delay); // isDelay(varName) was at first "true".
+	}
+	/**
+	 * @param oldGraphVariable old variable on the base of which to build the
+	 *        new one and what to replace with the new variable
+	 * @param graphVarRootNode root node of the new variable
+	 * @param isDelay Delay-flag to set to the new GraphVariable
+	 * @return the newly created GraphVariable
+	 */
+	 public GraphVariable createAndReplaceNewGraph(AbstractVariable oldGraphVariable, Node graphVarRootNode, boolean isDelay) {
+		GraphVariable newGraphVariable = new GraphVariable(oldGraphVariable, graphVarRootNode);
+		newGraphVariable.setDelay(isDelay);
+		replaceWithIndices(oldGraphVariable, new PartedVariableHolder(newGraphVariable, null));
+		return newGraphVariable;
+	}
+
+	private FunctionVariable createCatFunction(List<OperandImpl> partialSetList) throws Exception {
+		/* Sort by index */
+		Collections.sort(partialSetList, new OperandImplComparator());
+		/* Create CAT Expression */
+		Expression catExpession = new Expression(Operator.CAT, false);
+		/* Add all inputs to the expression */
+		for (OperandImpl partialSet : partialSetList) {
+			catExpession.addOperand(partialSet);
+		}
+		/* Add the Expression to ModelCollector */
+		return (FunctionVariable) convertOperandToVariable(catExpession, null, true);
+	}
+
+	private PartialAssignmentManager getPartialAssignmentManager() {
+		if (partialAssignmentManager == null) {
+			partialAssignmentManager = new PartialAssignmentManager(this);
+		}
+		return partialAssignmentManager;
+	}
+
+	public void collectPartialSettings(Process process) throws Exception {
+		getPartialAssignmentManager().collectPartialSettings(process);
+	}
+
+	public boolean hasPartialAssignmentsIn(Process process) {
+		return getPartialAssignmentManager().hasPartialAssignmentsIn(process);
+	}
+
+	public Map<String, Set<OperandImpl>> getPartialAssignmentsFor(Process process) {
+		return getPartialAssignmentManager().getPartialAssignmentsFor(process);
+	}
+
+	public void finalizeAndCheckForCompleteness(Set<OperandImpl> partialSets, Indices wholeLength, String varName) throws Exception {
+		PartialAssignmentManager.finalizeAndCheckForCompleteness(partialSets, wholeLength, varName);
+	}
+
+	public void splitPartiallyAssignedSignals(Set<ComponentInstantiation> components) throws Exception {
+		getPartialAssignmentManager().splitPartiallyAssignedSignals(components);
+	}
+
+	private class OperandImplComparator implements Comparator<OperandImpl> {
+		public int compare(OperandImpl o1, OperandImpl o2) {
+			/* NB! Larger indices should be catted earlier, so swap the compared indices */
+			return o2.getPartedIndices().compareTo(o1.getPartedIndices());
+		}
 	}
 
 	private class ValueAndIndexHolder {
@@ -466,10 +551,14 @@ public class ModelManager {
             String varName = operandImpl.getName() + partedIndices;
             /* Obtain the PartedVariable (all parted GraphVariables have been set by this point) */
             AbstractVariable operandVariable = getVariable(varName);
-            if (operandVariable == null || !(operandVariable instanceof GraphVariable)
-                    || !(((GraphVariable) operandVariable).getBaseVariable() instanceof PartedVariable)) return emptyList;
-            /* Provide NULL indices here, since they are already included in the base variable as PartedVariable. */
-            returnList.add(new PartedVariableHolder(operandVariable, null/*operand.getPartedIndices()*/));
+			if (operandVariable != null && (operandVariable instanceof PartedVariable ||
+							(operandVariable instanceof GraphVariable
+									&& ((GraphVariable) operandVariable).getBaseVariable() instanceof PartedVariable))) {
+				/* Provide NULL indices here, since they are already included in the base variable as PartedVariable. */
+				returnList.add(new PartedVariableHolder(operandVariable, null));
+			} else {
+				return emptyList;
+			}
         }
         return returnList;
     }
@@ -576,8 +665,8 @@ public class ModelManager {
             if (constantValue != null) {
                 /* Get CONSTANT by VALUE*/
                 //todo: Jaan: different constants for different contexts
-                return ConstantVariable.getConstByValue(constantValue,
-                        operand.getLength() != null ? operand.getLength() : targetLength, variableManager.getConsts(), useSameConstants);
+                return variableManager.getConstantByValue(constantValue,
+                        operand.getLength() != null ? operand.getLength() : targetLength);
 
             } else {
                 /* Get VARIABLE by NAME */
@@ -646,12 +735,12 @@ public class ModelManager {
 		return largestIndexUsed == -1 ? 1 : largestIndexUsed + 1;
 	}
 
-	public ConstantVariable[] getConstants() {
-        return variableManager.getConstantsAsArray();
+	public Collection<ConstantVariable> getConstants() {
+        return variableManager.getConstants();
     }
 
-    public AbstractVariable[] getVariables() {
-        return variableManager.getVariablesAsArray();
+    public Collection<AbstractVariable> getVariables() {
+        return variableManager.getVariables();
     }
 
     public AbstractVariable getVariable(String variableName) {

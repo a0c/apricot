@@ -3,6 +3,8 @@ package base.vhdl.structure;
 import base.vhdl.visitors.Visitable;
 import base.vhdl.visitors.AbstractVisitor;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.io.File;
@@ -26,6 +28,8 @@ public class Entity implements Visitable {
 
     private Set<Port> ports;
 
+    private Map<String, ComponentDeclaration> componentDeclarations;
+
     private Architecture architecture;
 
 
@@ -43,11 +47,16 @@ public class Entity implements Visitable {
         ports = new HashSet<Port>();
         genericConstants = new HashSet<Constant>();
         constants = new HashSet<Constant>();
+		componentDeclarations = new HashMap<String, ComponentDeclaration>();
     }
 
     public void addPort(Port newPort) {
         ports.add(newPort);
     }
+
+	public void addComponentDeclaration(ComponentDeclaration componentDeclaration) {
+		componentDeclarations.put(componentDeclaration.getName(), componentDeclaration);
+	}
 
     public void addGenericConstant(Constant newGenericConstant) {
         genericConstants.add(newGenericConstant);
@@ -109,4 +118,8 @@ public class Entity implements Visitable {
         }
         return null;
     }
+
+	public ComponentDeclaration resolveComponentDeclaration(String compDeclName) {
+		return componentDeclarations.get(compDeclName);
+	}
 }

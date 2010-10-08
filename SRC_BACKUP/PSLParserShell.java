@@ -1,7 +1,6 @@
 package parsers.psl;
 
 import base.hldd.structure.models.BehModel;
-import base.hldd.structure.models.utils.*;
 import base.hldd.structure.models.utils.ModelManager;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.TemporalNode;
@@ -10,7 +9,6 @@ import base.psl.structure.PPGLibrary;
 import base.psl.expression.BooleanExpression;
 import base.psl.structure.PPG;
 import base.psl.structure.Range;
-import base.hldd.structure.variables.*;
 import io.PPGLibraryReader;
 import io.PSLBufferedReader;
 import io.scan.PSLScanner;
@@ -20,7 +18,6 @@ import parsers.vhdl.VHDLStructureParser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
 import java.math.BigInteger;
 
 /**
@@ -109,7 +106,7 @@ public class PSLParserShell {
 
         /* Fill HLDD Model Manager with HLDD model variables */
         hlddModelManager = new ModelManager(false);
-        for (AbstractVariable variable : hlddModel.getVars().values()) {
+        for (AbstractVariable variable : hlddModel.getVariables()) {
             if (variable instanceof Variable || variable instanceof GraphVariable) {
                 hlddModelManager.addVariable(variable);
             }

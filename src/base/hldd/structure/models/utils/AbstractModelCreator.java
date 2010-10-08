@@ -16,14 +16,14 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractModelCreator implements ModelCreator {
     protected static final Logger LOG = Logger.getLogger(AbstractModelCreator.class.getName());
-    protected ConstantVariable[] constants;//todo: why array?! Collection would be better!
-    protected AbstractVariable[] variables;
-    protected HashMap<Integer, AbstractVariable> indexVariableHash;
+    protected Collection<ConstantVariable> constants;
+    protected Collection<AbstractVariable> variables;
+    protected Collection<AbstractVariable> variablesCollection;
 
-    public AbstractModelCreator(ConstantVariable[] constants, AbstractVariable[] variables) {
+	public AbstractModelCreator(Collection<ConstantVariable> constants, Collection<AbstractVariable> variables) {
         this.constants = constants;
         this.variables = variables;
-        indexVariableHash = new HashMap<Integer, AbstractVariable>();
+        variablesCollection = new LinkedList<AbstractVariable>();
     }
 
     public void create() {
@@ -91,7 +91,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
                 System.out.println(msg);
                 continue;
             }
-            indexVariableHash.put(constant.getIndex(), constant);
+            variablesCollection.add(constant);
         }
         for (AbstractVariable variable : variables) {
             if (variable.getIndex() == -1) {
@@ -100,7 +100,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
                 System.out.println(msg);
                 continue;
             }
-            indexVariableHash.put(variable.getIndex(), variable);
+            variablesCollection.add(variable);
         }
 
         LOG.exiting(LOG.getName(), "hashIndices(3/4)");
@@ -110,7 +110,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 
     private void removeObsoleteConstants() {
         LOG.entering(LOG.getName(), "removeObsoleteConstants(1/4)");
-        ArrayList<ConstantVariable> usedConstants = new ArrayList<ConstantVariable>();
+        LinkedList<ConstantVariable> usedConstants = new LinkedList<ConstantVariable>();
 
         for (ConstantVariable constant : constants) {
             boolean isUsed = false;
@@ -146,12 +146,12 @@ public abstract class AbstractModelCreator implements ModelCreator {
             }
         }
 
-        constants = usedConstants.toArray(new ConstantVariable[usedConstants.size()]);
+        constants = usedConstants;
         LOG.exiting(LOG.getName(), "removeObsoleteConstants(1/4)");
     }
 
 	private void removeObsoleteFunctions() {
-		ArrayList<AbstractVariable> usedVars = new ArrayList<AbstractVariable>();
+		LinkedList<AbstractVariable> usedVars = new LinkedList<AbstractVariable>();
 
 		/* Collect function usages */
 		UsedFunctionsCollectorImpl functionsCollector = new UsedFunctionsCollectorImpl();
@@ -182,14 +182,14 @@ public abstract class AbstractModelCreator implements ModelCreator {
 			}
 		}
 
-		variables = usedVars.toArray(new AbstractVariable[usedVars.size()]);
+		variables = usedVars;
 	}
 
 	private void renameFunctions() {
 		int idx = 1;
 		Operator prevOperator = null;
 
-		Collection<FunctionVariable> functions = VariableManager.getFunctions(Arrays.asList(variables), null);
+		Collection<FunctionVariable> functions = VariableManager.getFunctions(variables, null);
 
 		for (FunctionVariable functionVariable : functions) {
 			Operator operator = functionVariable.getOperator();
@@ -223,10 +223,10 @@ public abstract class AbstractModelCreator implements ModelCreator {
 		 * Non-Delay graphs must be ordered in such a way that for every graph those node dependent variables
 		 * that are Non-Delays must precede the graph (typical dependency ordering).
 		 *
-		 * @param variables array of variables to sort
+		 * @param variables collection of variables to sort
 		 * @return ordered list of GraphVariables
 		 */
-		public List<GraphVariable> sort(AbstractVariable[] variables) {
+		public List<GraphVariable> sort(Collection<AbstractVariable> variables) {
 			/* Collect 2 lists of GraphVariables */
 			List<GraphVariable> delayGraphList = new LinkedList<GraphVariable>();
 			List<GraphVariable> nonDelayGraphList = new LinkedList<GraphVariable>();
@@ -268,11 +268,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 			* 1) alphabetical order of mutually independent variables;
 			* 2) deterministic behaviour of the sorting procedure for multiple invocations on the same input data.
 			* */
-			Collections.sort(nonDelayGraphList, new Comparator<GraphVariable>() {
-				public int compare(GraphVariable o1, GraphVariable o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
-			});
+			Collections.sort(nonDelayGraphList);
 
 			/* Sort Topologically */
 			LinkedList<GraphVariable> sortedList = new LinkedList<GraphVariable>();

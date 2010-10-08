@@ -33,7 +33,11 @@ public class ConfigurationHandler {
 
 		properties.setProperty(SOURCE_FILE_PATH, sourceFile.getAbsolutePath());
 
-		File propFile = BusinessLogic.deriveFileFrom(sourceFile, ".vhd", ".config");
+		File propFile = null;
+		try {
+			propFile = BusinessLogic.deriveFileFrom(sourceFile, ".vhd", ".config");
+		} catch (RuntimeException e) { // do nothing, leave propFile == null
+		}
 
 		if (propFile == null) {
 			try {

@@ -42,7 +42,6 @@ public class BusinessLogic {
         /* Receive data from form */
 		ConverterSettings.Builder settingsBuilder = new ConverterSettings.Builder(applicationForm.getSelectedParserId(), sourceFile, destFile);
 		settingsBuilder.setBaseModelFile(baseModelFile);
-		settingsBuilder.setDoReuseConstants(applicationForm.shouldReuseConstants());
 		settingsBuilder.setDoSimplify(applicationForm.shouldSimplify());
 		settingsBuilder.setDoFlattenConditions(applicationForm.shouldFlattenCS());
 		settingsBuilder.setDoCreateCSGraphs(applicationForm.shouldCreateCSGraphs());

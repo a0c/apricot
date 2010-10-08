@@ -68,7 +68,7 @@ public class FunctionVariable extends Variable {
 
 	@Override
 	public String getName() {
-		return operatorToString() + "____" + nameIdx;
+		return super.getName() + operatorToString() + "____" + nameIdx;
 	}
 
 	protected String operatorToString() {
@@ -81,7 +81,7 @@ public class FunctionVariable extends Variable {
         String delim = operands.size() > 2 ? " " : "\t";
         for (PartedVariableHolder operand : operands) {
             sb.append("A").append(i++).append("<= ");
-            String indicesAsString = operand.getPartedIndices() != null
+            String indicesAsString = operand.isParted()
                     ? operand.getPartedIndices().toStringAngular(false)
                     : operand.getVariable().lengthToString();
             sb.append(operand.getVariable().getIndex()).append(indicesAsString);
@@ -193,6 +193,7 @@ public class FunctionVariable extends Variable {
 		return new FunctionsComparator();
 	}
 
+	//todo: useless comparator, consider removing it. See the difference with and without it.
 	public static class FunctionsComparator implements Comparator<FunctionVariable> {
 
 		@Override

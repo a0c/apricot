@@ -4,6 +4,7 @@ import base.vhdl.structure.nodes.*;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Process;
 import ui.ConfigurationHandler;
+import ui.ConverterSettings;
 
 /**
  * <br><br>User: Anton Chepurov
@@ -12,13 +13,13 @@ import ui.ConfigurationHandler;
  */
 public class BehDDGraphGenerator extends GraphGenerator {
 
-    public BehDDGraphGenerator(ConfigurationHandler config, boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs) {
-        super(config, useSameConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, Type.BehDD);
+    public BehDDGraphGenerator(ConfigurationHandler config, ConverterSettings settings) {
+        super(config, settings, Type.BehDD);
     }
 
     public void visitProcess(base.vhdl.structure.Process process) throws Exception {
 
-        if (partialSettingsMapByProcess.containsKey(process)) {
+        if (modelCollector.hasPartialAssignmentsIn(process)) {
             /* Process partial settings, like "Parity(7) <= smth;" */
             processPartialSettings(process);
         } else {

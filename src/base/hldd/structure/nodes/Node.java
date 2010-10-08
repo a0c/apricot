@@ -230,6 +230,10 @@ public class Node implements Visitable, Cloneable {
         this.dependentVariable = dependentVariable;
     }
 
+	public void setPartedIndices(Indices partedIndices) {
+		this.partedIndices = partedIndices;
+	}
+
     public void setSource(SourceLocation source) {
         this.source = source;
     }

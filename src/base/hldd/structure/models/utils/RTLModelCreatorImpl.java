@@ -7,6 +7,7 @@ import base.hldd.structure.models.Model;
 import base.hldd.structure.models.BehModel;
 import parsers.Beh2RtlTransformer.ControlPartManager;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public class RTLModelCreatorImpl extends AbstractModelCreator {
     private Model rtlModel;
     private final ControlPartManager controlPartManager;
 
-    public RTLModelCreatorImpl(ConstantVariable[] constants, AbstractVariable[] variables, ControlPartManager controlPartManager) {
+    public RTLModelCreatorImpl(Collection<ConstantVariable> constants, Collection<AbstractVariable> variables, ControlPartManager controlPartManager) {
         super(constants, variables);
         this.controlPartManager = controlPartManager;
     }
@@ -84,7 +85,7 @@ public class RTLModelCreatorImpl extends AbstractModelCreator {
     }
 
     protected void doCreateModel() {
-        rtlModel = new Model(indexVariableHash);
+        rtlModel = new Model(variablesCollection);
     }
 
     public BehModel getModel() {

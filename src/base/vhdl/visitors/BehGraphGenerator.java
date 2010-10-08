@@ -2,6 +2,7 @@ package base.vhdl.visitors;
 
 import base.vhdl.structure.nodes.*;
 import ui.ConfigurationHandler;
+import ui.ConverterSettings;
 
 import java.util.Collection;
 
@@ -13,14 +14,14 @@ import java.util.Collection;
 public class BehGraphGenerator extends GraphGenerator {
     private Collection<String> registers;
 
-    public BehGraphGenerator(ConfigurationHandler config, boolean useSameConstants, boolean doFlattenConditions, boolean doCreateGraphsForCS, boolean doCreateSubGraphs, Collection<String> registers) {
-        super(config, useSameConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, Type.Beh);
+    public BehGraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<String> registers) {
+        super(config, settings, Type.Beh);
         this.registers = registers;
     }
 
     public void visitProcess(base.vhdl.structure.Process process) throws Exception {
 
-        if (partialSettingsMapByProcess.containsKey(process)) {
+        if (modelCollector.hasPartialAssignmentsIn(process)) {
             /* At first, process partial settings, like "Parity(7) <= smth;" */
             processPartialSettings(process);
         }
@@ -47,19 +48,4 @@ public class BehGraphGenerator extends GraphGenerator {
         return registers.contains(variableName);
     }
 
-//    public void replaceArchitectureTransitions() throws Exception {
-//        for (AbstractNode replacindNode : replacingChildren) {
-//            if (replacindNode instanceof TransitionNode) {
-//                TransitionNode transitionNode = (TransitionNode) replacindNode;
-//                AbstractVariable replacingVariable = modelCollector.getVariable(transitionNode.getVariableName());
-//                AbstractVariable variableToReplace = modelCollector.getVariable(((OperandImpl) transitionNode.getValueOperand()).getName());
-//                modelCollector.replace(variableToReplace, replacingVariable);
-//            }
-//        }
-//        /* Replace to replacingVariable */
-//        AbstractVariable replacingVariable = getReplacingVariable(graphVariable);
-//        if (replacingVariable != null) {
-//            modelCollector.replace(graphVariable, replacingVariable);
-//        }
-//    }
 }

@@ -1,10 +1,8 @@
 package ee.ttu.pld.apricot.verifier;
 
 import base.hldd.structure.models.BehModel;
-import io.ConsoleWriter;
 import io.QuietCloser;
 import ui.ConverterSettings;
-import ui.utils.AbstractWorkerFinalizer;
 import ui.utils.ConvertingWorker;
 
 import java.io.*;
@@ -44,13 +42,8 @@ public class AutomaticConverterVerifier {
 		String hlddFilePath = hlddFile.getAbsolutePath();
 		try {
 			// Convert
-			ConvertingWorker convertingWorker = new ConvertingWorker(AbstractWorkerFinalizer.getStub(), ConsoleWriter.getStub(), settings);
-			convertingWorker.execute();
-			while (!convertingWorker.isDone()) {
-				Thread.sleep(50);
-			}
+			BehModel model = ConvertingWorker.convertAndWait(settings);
 			// Compare
-			BehModel model = convertingWorker.get();
 			model.toFile(modelStream, null);
 			if (areEqual(new FileInputStream(hlddFile), new ByteArrayInputStream(modelStream.toByteArray()))) {
 				statistics.pass();

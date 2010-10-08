@@ -166,7 +166,7 @@ public class LexemeComposer {
 		public SourceLocation getCurrentSource() {
 			/* Add any non-empty lines being currently under processing */
 			addLineToCurrentLines();
-			return new SourceLocation(currentLines);
+			return currentLines.isEmpty() ? null : new SourceLocation(currentLines);
 		}
 
 		private void addLineToCurrentLines() {

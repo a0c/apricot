@@ -2,7 +2,6 @@ package base.vhdl.structure;
 
 import base.vhdl.visitors.Visitable;
 import base.vhdl.visitors.AbstractVisitor;
-import base.vhdl.visitors.BehGraphGenerator;
 import base.vhdl.structure.nodes.CompositeNode;
 
 import java.util.*;
@@ -23,6 +22,8 @@ public class Architecture implements Visitable {
     private Set<Process> processes = new LinkedHashSet<Process>();
 
     private CompositeNode transitions;
+
+	private Set<ComponentInstantiation> components = new HashSet<ComponentInstantiation>();
 
     public Architecture(String name, String affiliation) {
         this.name = name;
@@ -61,8 +62,11 @@ public class Architecture implements Visitable {
         return processes;
     }
 
+	public Set<ComponentInstantiation> getComponents() {
+		return components;
+	}
     /**
-     * NB! Transitions are added using {@link #getTransitions()} method.
+     * NB! Transitions are added using this method.
      * @return process-external transitions of the given {@link base.vhdl.structure.Architecture}  
      */
     public CompositeNode getTransitions() {
@@ -82,11 +86,6 @@ public class Architecture implements Visitable {
         for (Process process : processes) {
             process.traverse(visitor);
         }
-
-//        if (visitor instanceof BehGraphGenerator) {
-//            ((BehGraphGenerator) visitor).replaceArchitectureTransitions();
-//        }
-
     }
 
     public Signal resolveSignal(String signalName) {
@@ -106,4 +105,8 @@ public class Architecture implements Visitable {
         }
         return null;        
     }
+
+	public void addComponent(ComponentInstantiation componentInst) {
+		components.add(componentInst);
+	}
 }

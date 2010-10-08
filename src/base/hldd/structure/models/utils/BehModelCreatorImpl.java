@@ -16,7 +16,7 @@ import java.util.*;
 public class BehModelCreatorImpl extends AbstractModelCreator {
     private BehModel model;
 
-    public BehModelCreatorImpl(ConstantVariable[] constants, AbstractVariable[] variables) {
+    public BehModelCreatorImpl(Collection<ConstantVariable> constants, Collection<AbstractVariable> variables) {
         super(constants, variables);
     }
 
@@ -28,7 +28,7 @@ public class BehModelCreatorImpl extends AbstractModelCreator {
         for (GraphVariable graphVariable : sortedGraphList) {
             if (graphVariable.isOutput()) continue;
             if (!graphVariable.isDelay()) {
-                graphVariable.setIndex(varIndex++);
+                graphVariable.forceSetIndex(varIndex++);
                 graphVariable.getGraph().setIndex(graphIndex++);
                 graphVariable.getGraph().getRootNode().indexate(nodeIndex);
                 nodeIndex += graphVariable.getGraph().getSize();
@@ -39,7 +39,7 @@ public class BehModelCreatorImpl extends AbstractModelCreator {
         for (GraphVariable graphVariable : sortedGraphList) {
             if (graphVariable.isOutput()) continue;
             if (graphVariable.isDelay()) {
-                graphVariable.setIndex(varIndex++);
+                graphVariable.forceSetIndex(varIndex++);
                 graphVariable.getGraph().setIndex(graphIndex++);
                 graphVariable.getGraph().getRootNode().indexate(nodeIndex);
                 nodeIndex += graphVariable.getGraph().getSize();
@@ -49,7 +49,7 @@ public class BehModelCreatorImpl extends AbstractModelCreator {
         /* Index OUTPUTS */
         for (GraphVariable graphVariable : sortedGraphList) {
             if (graphVariable.isOutput()) {
-                graphVariable.setIndex(varIndex++);
+                graphVariable.forceSetIndex(varIndex++);
                 graphVariable.getGraph().setIndex(graphIndex++);
                 graphVariable.getGraph().getRootNode().indexate(nodeIndex);
                 nodeIndex += graphVariable.getGraph().getSize();
@@ -99,7 +99,7 @@ public class BehModelCreatorImpl extends AbstractModelCreator {
 
     protected void doCreateModel() {
         LOG.entering(LOG.getName(), "doCreateModel(4/4)");
-        model = new BehModel(indexVariableHash);
+        model = new BehModel(variablesCollection);
         LOG.exiting(LOG.getName(), "doCreateModel(4/4)");
     }
 

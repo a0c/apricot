@@ -133,7 +133,7 @@ public class HLDDStructureBuilder {
         /* Create GraphVariables */
         graphVariableCreator.createGraphVariables(collector);
 
-        model = new BehModel(collector.getIndexVariableHash());
+        model = new BehModel(collector.getVariablesCollection());
 
     }
 

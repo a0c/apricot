@@ -6,6 +6,8 @@ import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.FunctionVariable;
 import base.Indices;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -31,12 +33,12 @@ public class Collector {
         graphOffset = -1;
     }
 
-    HashMap<Integer, AbstractVariable> getIndexVariableHash() {
-        HashMap<Integer, AbstractVariable> returnHash = new HashMap<Integer, AbstractVariable>();
-        for (int index : indexVarHash.keySet()) {
-            returnHash.put(index, (AbstractVariable) indexVarHash.get(index));
+    Collection<AbstractVariable> getVariablesCollection() {
+		Collection<AbstractVariable> varCollection = new ArrayList<AbstractVariable>(indexVarHash.size());
+        for (Object variableObject : indexVarHash.values()) {
+            varCollection.add((AbstractVariable) variableObject);
         }
-        return returnHash;
+        return varCollection;
     }
 
     public Object getVarObject(int index) {

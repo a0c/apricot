@@ -25,17 +25,16 @@ public class ConverterSettings {
 	public static final String HLDD_TYPE_IS_NULL = "Mandatory field hlddType is null.";
 
 	/* Immutable fields */
-	private BusinessLogic.ParserID parserId;
-	private File sourceFile;
-	private File pslFile;
-	private File baseModelFile;
-	private File mapFile;
-	private boolean doReuseConstants;
-	private boolean doSimplify;
-	private boolean doFlattenConditions;
-	private boolean doCreateCSGraphs;
-	private boolean doCreateExtraCSGraphs;
-	private BusinessLogic.HLDDRepresentationType hlddType;
+	private final BusinessLogic.ParserID parserId;
+	private final File sourceFile;
+	private final File pslFile;
+	private final File baseModelFile;
+	private final File mapFile;
+	private final boolean doSimplify;
+	private final boolean doFlattenConditions;
+	private final boolean doCreateCSGraphs;
+	private final boolean doCreateExtraCSGraphs;
+	private final BusinessLogic.HLDDRepresentationType hlddType;
 	/* Mutable fields */
 	private OutputStream mapFileStream;
 
@@ -45,7 +44,6 @@ public class ConverterSettings {
 		pslFile = builder.pslFile;
 		baseModelFile = builder.baseModelFile;
 		mapFile = builder.mapFile;
-		doReuseConstants = builder.doReuseConstants;
 		doSimplify = builder.doSimplify;
 		doFlattenConditions = builder.doFlattenConditions;
 		doCreateCSGraphs = builder.doCreateCSGraphs;
@@ -77,14 +75,14 @@ public class ConverterSettings {
 		return mapFile;
 	}
 
-	public boolean isDoReuseConstants() {
-		return doReuseConstants;
-	}
-
 	public boolean isDoSimplify() {
 		return doSimplify;
 	}
 
+	/**
+	 * @return whether to inline Composite conditions into a set of Control Nodes (true value),
+	 * 		or create a single node function (false value)
+	 */
 	public boolean isDoFlattenConditions() {
 		return doFlattenConditions;
 	}
@@ -102,6 +100,9 @@ public class ConverterSettings {
 	}
 
 	public OutputStream getMapFileStream() throws ExtendedException {
+		if (!Builder.isMapFileAllowed(parserId)) {
+			return null;
+		}
 		if (mapFileStream == null) {
 			mapFileStream = generateMapFileStream();
 		}
@@ -135,7 +136,6 @@ public class ConverterSettings {
 					+ ": illegal extension. Expected: '.agm' or '.tgm'");
 		}
 
-		boolean doReuseConstants = false;
 		boolean doSimplify = false;
 		boolean doFlattenConditions =  false;
 		boolean doCreateCSGraphs = false;
@@ -189,7 +189,6 @@ public class ConverterSettings {
 
 		Builder settingsBuilder = new Builder(parserId, sourceFile, originalFile);
 		settingsBuilder.setBaseModelFile(baseModelFile);
-		settingsBuilder.setDoReuseConstants(doReuseConstants);
 		settingsBuilder.setDoSimplify(doSimplify);
 		settingsBuilder.setDoFlattenConditions(doFlattenConditions);
 		settingsBuilder.setDoCreateCSGraphs(doCreateCSGraphs);
@@ -230,7 +229,6 @@ public class ConverterSettings {
 		sb.append(", pslFile=").append(pslFile);
 		sb.append(", baseModelFile=").append(baseModelFile);
 		sb.append(", mapFile=").append(mapFile);
-		sb.append(", doReuseConstants=").append(doReuseConstants);
 		sb.append(", doSimplify=").append(doSimplify);
 		sb.append(", doFlattenConditions=").append(doFlattenConditions);
 		sb.append(", doCreateCSGraphs=").append(doCreateCSGraphs);
@@ -251,7 +249,6 @@ public class ConverterSettings {
 		if (doCreateCSGraphs != settings.doCreateCSGraphs) return false;
 		if (doCreateExtraCSGraphs != settings.doCreateExtraCSGraphs) return false;
 		if (doFlattenConditions != settings.doFlattenConditions) return false;
-		if (doReuseConstants != settings.doReuseConstants) return false;
 		if (doSimplify != settings.doSimplify) return false;
 		if (baseModelFile != null ? !baseModelFile.equals(settings.baseModelFile) : settings.baseModelFile != null)
 			return false;
@@ -274,7 +271,6 @@ public class ConverterSettings {
 		result = 31 * result + (pslFile != null ? pslFile.hashCode() : 0);
 		result = 31 * result + (baseModelFile != null ? baseModelFile.hashCode() : 0);
 		result = 31 * result + (mapFile != null ? mapFile.hashCode() : 0);
-		result = 31 * result + (doReuseConstants ? 1 : 0);
 		result = 31 * result + (doSimplify ? 1 : 0);
 		result = 31 * result + (doFlattenConditions ? 1 : 0);
 		result = 31 * result + (doCreateCSGraphs ? 1 : 0);
@@ -292,13 +288,12 @@ public class ConverterSettings {
 
 	public static class Builder {
 		// mandatory fields
-		private BusinessLogic.ParserID parserId;
+		private final BusinessLogic.ParserID parserId;
 		private File sourceFile;
-		private File pslFile;
+		private final File pslFile;
 		// optional fields
 		private File baseModelFile;
 		private File mapFile;
-		private boolean doReuseConstants;
 		private boolean doSimplify;
 		private boolean doFlattenConditions;
 		private boolean doCreateCSGraphs;
@@ -311,23 +306,37 @@ public class ConverterSettings {
 			this.pslFile = pslFile;
 		}
 
+		public Builder(ConverterSettings defaultSettings) {
+			this(defaultSettings.parserId, defaultSettings.sourceFile, defaultSettings.pslFile);
+			setBaseModelFile(defaultSettings.baseModelFile);
+			setDoSimplify(defaultSettings.doSimplify);
+			setDoFlattenConditions(defaultSettings.doFlattenConditions);
+			setDoCreateCSGraphs(defaultSettings.doCreateCSGraphs);
+			setDoCreateExtraCSGraphs(defaultSettings.doCreateExtraCSGraphs);
+			setHlddType(defaultSettings.hlddType);
+		}
+
 		public ConverterSettings build() throws ExtendedException {
 			validate();
 			// generate Map file
-			if (parserId == VhdlBeh2HlddBeh || parserId == VhdlBehDd2HlddBeh) {
+			if (isMapFileAllowed(parserId)) {
 				mapFile = new File(pslFile.getAbsolutePath().replaceFirst(".agm$", ".map"));
 			}
 
 			return new ConverterSettings(this);
 		}
 
-		public Builder setBaseModelFile(File baseModelFile) {
-			this.baseModelFile = baseModelFile;
+		private static boolean isMapFileAllowed(final BusinessLogic.ParserID parserId) {
+			return parserId == VhdlBeh2HlddBeh || parserId == VhdlBehDd2HlddBeh;
+		}
+
+		public Builder setSourceFile(File sourceFile) {
+			this.sourceFile = sourceFile;
 			return this;
 		}
 
-		public Builder setDoReuseConstants(boolean doReuseConstants) {
-			this.doReuseConstants = doReuseConstants;
+		public Builder setBaseModelFile(File baseModelFile) {
+			this.baseModelFile = baseModelFile;
 			return this;
 		}
 

@@ -83,8 +83,8 @@ public class ParserShell {
         BehModel hlddModel = BehModel.parseHlddStructure(baseModelFile);
 
         /* Fill HLDD Model Manager with HLDD model variables */
-        hlddModelManager = new ModelManager(false);
-        for (AbstractVariable variable : hlddModel.getVars().values()) {
+        hlddModelManager = new ModelManager();
+        for (AbstractVariable variable : hlddModel.getVariables()) {
             if (variable instanceof Variable || variable instanceof GraphVariable) {
                 hlddModelManager.addVariable(variable);
             }

@@ -1,7 +1,6 @@
 package base.hldd.structure.models.utils;
 
 import base.HLDDException;
-import base.Indices;
 import base.hldd.structure.variables.*;
 import base.vhdl.structure.Operator;
 
@@ -30,8 +29,8 @@ class BooleanOperandsCollector {
 	private void collect(PartedVariableHolder partedVariableHolder) throws HLDDException {
 
 		AbstractVariable abstractVariable = partedVariableHolder.getVariable();
-		Indices partedIndices = partedVariableHolder.getPartedIndices();
-		int length = partedIndices == null ? abstractVariable.getLength().length() : partedIndices.length();
+		int length = partedVariableHolder.isParted() ? partedVariableHolder.getPartedIndices().length()
+				: abstractVariable.getLength().length();
 
 		if (abstractVariable.getClass() == Variable.class || abstractVariable instanceof GraphVariable) {
 

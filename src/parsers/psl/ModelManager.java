@@ -36,9 +36,13 @@ public class ModelManager {
         this.hlddModelManager = hlddModelManager;
     }
 
-    public VariableManager getVariableManager() {
-        return variableManager;
-    }
+	public Collection<AbstractVariable> getVariables() {
+		return variableManager.getVariables();
+	}
+
+	public Collection<ConstantVariable> getConstants() {
+		return variableManager.getConstants();
+	}
 
     public String getComment() {
         return commentLine == null ? "" : commentLine.toString();

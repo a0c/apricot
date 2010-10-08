@@ -1,5 +1,6 @@
 package base.vhdl.visitors;
 
+import base.hldd.structure.models.utils.ModelManager;
 import base.vhdl.structure.*;
 import base.vhdl.structure.nodes.IfNode;
 import base.vhdl.structure.nodes.TransitionNode;
@@ -15,12 +16,13 @@ import java.util.*;
  * <br>Time: 11:11:48
  */
 public class PartialSetVariableCollector extends AbstractVisitor {
-    private final Set<Variable> processVariables;
     private Map<String, Set<OperandImpl>> partialSettingsMap = new HashMap<String, Set<OperandImpl>>();
 
-    public PartialSetVariableCollector(Set<Variable> processVariables) {
-        this.processVariables = processVariables;
-    }
+	private final ModelManager modelManager;
+
+	public PartialSetVariableCollector(ModelManager modelManager) {
+		this.modelManager = modelManager;
+	}
 
     /* Here only request processing of AbstractNodes(ParseTree) */
     public void visitEntity(Entity entity) throws Exception {}
@@ -92,7 +94,7 @@ public class PartialSetVariableCollector extends AbstractVisitor {
             SortedSet<Integer> startsSet = new TreeSet<Integer>();
             SortedSet<Integer> endsSet = new TreeSet<Integer>();
             int lowerBound = -1;
-            int upperBound = getVariable(varName).getType().getLength().length();   //getHighestSBPure() + 1; //modelCollector.getVariable(varName).getHighestSB() + 1;
+            int upperBound = modelManager.getVariable(varName).getLength().length();
             /* Fill SortedSets */
             for (OperandImpl partialSetOperand : partialSettingsMap.get(varName)) {
                 Indices partedIndices = partialSetOperand.getPartedIndices();
@@ -125,14 +127,4 @@ public class PartialSetVariableCollector extends AbstractVisitor {
         }
 
     }
-
-    private Variable getVariable(String varName) {
-        for (Variable processVariable : processVariables) {
-            if (processVariable.getName().equals(varName)) {
-                return processVariable;
-            }
-        }
-        throw new RuntimeException(getClass().getSimpleName() + ": Process does not have a variable with name: " + varName);
-    }
-
 }

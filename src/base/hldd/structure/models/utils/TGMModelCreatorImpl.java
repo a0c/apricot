@@ -112,9 +112,8 @@ public class TGMModelCreatorImpl implements ModelCreator {
         /* Create model */
         /* Here use functionality of standard BehModelCreatorImpl (one ModelCreator implementation invokes another) */
         LOG.info("Creating " + BehModel.class.getSimpleName() + " ( TGM file )");        
-        VariableManager variableManager = modelManager.getVariableManager();
         BehModelCreatorImpl modelCreator =
-                new BehModelCreatorImpl(variableManager.getConstantsAsArray(), variableManager.getVariablesAsArray());
+                new BehModelCreatorImpl(modelManager.getConstants(), modelManager.getVariables());
         model = modelCreator.getModel();
         model.setMode("BEHAVIORAL");
 

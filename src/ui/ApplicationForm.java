@@ -478,22 +478,6 @@ public class ApplicationForm implements ActionListener {
         return randomCovRadioButton.isSelected();
     }
 
-    public boolean shouldReuseConstants() {
-        switch (selectedParserId) {
-            case VhdlBeh2HlddBeh:
-                return false;
-            case VhdlBehDd2HlddBeh:
-                return vhdlBehDdOptionsPanel.shouldReuseConstants();
-            default:
-                return false;
-        }
-//        if (vhdlBehOptionsPanel.getMainPanel().isShowing()) {
-//            return vhdlBehOptionsPanel.shouldReuseConstants();
-//        } else if (vhdlBehDdOptionsPanel.getMainPanel().isShowing()) {
-//            return vhdlBehDdOptionsPanel.shouldReuseConstants();
-//        } else return false;
-    }
-
     public boolean shouldFlattenCS() {
 		switch (selectedParserId) {
 			case VhdlBeh2HlddBeh:

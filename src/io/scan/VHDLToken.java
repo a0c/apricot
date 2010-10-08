@@ -98,6 +98,8 @@ public class VHDLToken {
         SIGNAL_DECL("^SIGNAL " + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* :" + Sub.TYPE.regex + Sub.INIT.regex + " ;$"),
         VARIABLE_DECL("^VARIABLE " + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* :" + Sub.TYPE.regex + Sub.INIT.regex + " ;$"),
         PROCESS_DECL("(" + Sub.LBL.regex + " :)?PROCESS \\( " + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* \\)$"),
+		COMPONENT_DECL("^COMPONENT " + Sub.LBL.regex + "$"),
+		PORT_MAP("^" + Sub.LBL.regex + " :" + Sub.LBL.regex + " PORT MAP \\( .* \\) ;$"),
         IF_STATEMENT("^IF .* THEN$"),
         ELSIF_STATEMENT("^ELSIF .* THEN$"),
         ELSE("ELSE"),

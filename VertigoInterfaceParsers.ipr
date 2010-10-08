@@ -55,6 +55,7 @@
       <entry name="?*.dtd" />
       <entry name="?*.tld" />
       <entry name="?*.vhd" />
+      <entry name="?*.vhdl" />
       <entry name="*.txt" />
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true" />

@@ -12,7 +12,6 @@ import javax.swing.*;
  */
 public class VHDLBehDdOptionsPanel {
     private JPanel mainPanel;
-    private JCheckBox reuseConstantsCheckBox;
     private JCheckBox simplifyCheckBox;
     private JRadioButton reducedRadioButton;
     private JRadioButton minimizedRadioButton;
@@ -28,10 +27,6 @@ public class VHDLBehDdOptionsPanel {
 
 	public JPanel getMainPanel() {
         return mainPanel;
-    }
-
-    public boolean shouldReuseConstants() {
-        return reuseConstantsCheckBox.isSelected();
     }
 
     public boolean shouldSimplify() {

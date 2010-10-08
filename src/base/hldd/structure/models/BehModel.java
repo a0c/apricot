@@ -5,13 +5,11 @@ import base.hldd.structure.variables.utils.DefaultGraphVariableCreator;
 import base.hldd.structure.variables.utils.GraphVariableCreator;
 import base.hldd.structure.Graph;
 import base.hldd.visitors.SourceLocationCollector;
-import io.ExtendedBufferedReader;
 import io.QuietCloser;
 import io.scan.HLDDScanner;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import parsers.hldd.HLDDStructureBuilder;
 import parsers.hldd.HLDDStructureParser;
@@ -32,12 +30,10 @@ public class BehModel {
     protected int outpCount;
     protected int constCount;
     protected int funcCount;
-    
-    protected ExtendedBufferedReader reader;
 
-    protected TreeMap<String, AbstractVariable> vars;
-    protected TreeMap<String, ConstantVariable> consts;
-    protected TreeMap<Integer, String> varNameByIndex;
+	private TreeMap<Integer, AbstractVariable> variableByIndex = new TreeMap<Integer, AbstractVariable>();
+	private LinkedList<AbstractVariable> variables = new LinkedList<AbstractVariable>();
+	private LinkedList<ConstantVariable> constants = new LinkedList<ConstantVariable>();
 
     private String mode;
 
@@ -70,46 +66,39 @@ public class BehModel {
         return parseHlddStructure(hlddSource, new DefaultGraphVariableCreator());
     }
 
-    /**
-     * Constructor for an object to be filled with variables later on
-     */
-    public BehModel() {
-        vars = new TreeMap<String, AbstractVariable>();
-        varNameByIndex = new TreeMap<Integer, String>();
-        consts = new TreeMap<String, ConstantVariable>();
+	/**
+	 * Constructor based on a collection of variables
+	 * @param variables collection of variables containing both constants and variables
+	 */
+	public BehModel(Collection<AbstractVariable> variables) {
+		// fill convenience collections with variables
+		storeVariables(variables);
     }
 
-    /**
-     * Constructor based on a map of variables
-     * @param variableByIndex map of variables, where <b>key</b> is an <u>index</u> of the variable and
-     * <b>value</b> is the <u>variable itself</u>
-     */
-    public BehModel(HashMap<Integer, AbstractVariable> variableByIndex) {
-        // Init all class fields
-        this();
-        // Fill vars with Variables
-        for (Integer index : variableByIndex.keySet()) {
-            setVariableByIndex(index, variableByIndex.get(index));
-        }
-    }
-    
-    public AbstractVariable getVariableByIndex(int index) {
-        return vars.containsKey(varNameByIndex.get(index)) ? vars.get(varNameByIndex.get(index)) : consts.get(varNameByIndex.get(index));
+	public AbstractVariable getVariableByIndex(int index) {
+		return variableByIndex.get(index);
     }
 
-    public void setVariableByIndex(int index, AbstractVariable absVariable) {
+    private void storeVariables(Collection<AbstractVariable> variablesCollection) {
 
-        String varName = absVariable.getName();
-        if (!(absVariable instanceof ConstantVariable)) {
-            vars.put(varName, absVariable);
-        } else {
-            consts.put(varName, (ConstantVariable) absVariable);
-        }
-        varNameByIndex.put(index, varName);
+		LinkedList<AbstractVariable> variablesList = new LinkedList<AbstractVariable>(variablesCollection);
 
-        addStat(absVariable);
+		Collections.sort(variablesList);
+		
+		for (AbstractVariable absVariable : variablesList) {
+			/* map by index */
+			variableByIndex.put(absVariable.getIndex(), absVariable);
 
-    }
+			/* keep variables and constants separately for speed-up of requests */
+			if (absVariable instanceof ConstantVariable) {
+				constants.add((ConstantVariable) absVariable);
+			} else {
+				variables.add(absVariable);
+			}
+
+			addStat(absVariable);
+		}
+	}
 
     protected void addStat(AbstractVariable variable) {
         /* Calculate STAT (statistical data) */
@@ -143,44 +132,44 @@ public class BehModel {
 
     protected String composeFileString(String comment) {
 
-        StringBuffer str = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         // add COMMENT if exists
         if (comment != null && !comment.equals("")) {
             String[] lines = comment.split("\n");
             for (String line : lines) {
-                str.append(";").append(line).append("\n");
+                sb.append(";").append(line).append("\n");
             }
         }
 
-        str.append("\nSTAT#\t").append(nodeCount).append(" Nods,  ");
-        str.append(varCount).append(" Vars,  ");
-        str.append(graphCount).append(" Grps,  ");
-        str.append(inpCount).append(" Inps,  ");
-        str.append(outpCount).append(" Outs,  ");
-        str.append(constCount).append(" Cons,  ");
-        str.append(funcCount).append(" Funs  ");
+        sb.append("\nSTAT#\t").append(nodeCount).append(" Nods,  ");
+        sb.append(varCount).append(" Vars,  ");
+        sb.append(graphCount).append(" Grps,  ");
+        sb.append(inpCount).append(" Inps,  ");
+        sb.append(outpCount).append(" Outs,  ");
+        sb.append(constCount).append(" Cons,  ");
+        sb.append(funcCount).append(" Funs  ");
 
-        str.append("\n\nMODE#\t");
-        str.append(mode == null ? "RTL" : mode);
-        str.append("\n\n");
+        sb.append("\n\nMODE#\t");
+        sb.append(mode == null ? "RTL" : mode);
+        sb.append("\n\n");
 
         for (int i = 0; i < varCount; i++) {
 
             if (i == inpOffset())
-                str.append(";inputs\n");
+                sb.append(";inputs\n");
             if (i == constOffset())
-                str.append("\n\n;constants\n");
+                sb.append("\n\n;constants\n");
             if (i == funcOffset())
-                str.append("\n\n;functions\n");
+                sb.append("\n\n;functions\n");
             if (i == graphOffset())
-                str.append("\n\n;graphs\n");
+                sb.append("\n\n;graphs\n");
 
-            str.append(vars.containsKey(varNameByIndex.get(i)) ? vars.get(varNameByIndex.get(i)).toString() : consts.get(varNameByIndex.get(i))).append("\n");
+            sb.append(getVariableByIndex(i)).append("\n");
 
         }
 
-        return str.toString();
+        return sb.toString();
     }
 
     /**
@@ -233,14 +222,8 @@ public class BehModel {
 
 		QuietCloser.closeQuietly(outputStream);
     }
-    
-    public AbstractVariable getVarByName(String name) {
 
-        return vars.containsKey(name) ? vars.get(name) : consts.containsKey(name) ? consts.get(name) : null;
-
-    }
-
-    public int inpOffset() { return 0; }
+	public int inpOffset() { return 0; }
 
     public int constOffset() { return inpOffset() + inpCount; }
 
@@ -250,11 +233,7 @@ public class BehModel {
 
     /* Getters START */
 
-    public ExtendedBufferedReader getReader() {
-        return reader;
-    }
-
-    public int getNodeCount() {
+	public int getNodeCount() {
         return nodeCount;
     }
 
@@ -266,29 +245,32 @@ public class BehModel {
         return graphCount;
     }
 
-    public int getInpCount() {
-        return inpCount;
+	public Collection<AbstractVariable> getVariables() {
+        return variables;
     }
 
-    public int getOutpCount() {
-        return outpCount;
+    public Collection<ConstantVariable> getConstants() {
+        return constants;
     }
 
-    public int getConstCount() {
-        return constCount;
-    }
+	public Collection<Variable> getInputPorts() {
+		ArrayList<Variable> inPorts = new ArrayList<Variable>(inpCount);
+		for (int i = 0; i < inpCount; i++) {
+			inPorts.add((Variable) getVariableByIndex(i));
+		}
+		return inPorts;
+	}
 
-    public int getFuncCount() {
-        return funcCount;
-    }
-
-    public TreeMap<String, AbstractVariable> getVars() {
-        return vars;
-    }
-
-    public TreeMap<String, ConstantVariable> getConsts() {
-        return consts;
-    }
+	public Collection<GraphVariable> getOutputPorts() {
+		ArrayList<GraphVariable> outPorts = new ArrayList<GraphVariable>(outpCount);
+		for (int i = graphOffset(); i < varCount; i++) {
+			GraphVariable graphVariable = (GraphVariable) getVariableByIndex(i);
+			if (graphVariable.isOutput()) {
+				outPorts.add(graphVariable);
+			}
+		}
+		return outPorts;
+	}
 
     /* Getters END */
 

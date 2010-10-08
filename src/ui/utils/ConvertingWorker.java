@@ -42,10 +42,6 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
     private final File sourceFile;
     private File pslFile;
     private final File baseModelFile;
-    private final boolean shouldReuseConstants;
-    private final boolean doFlattenConditions;
-	private final boolean doCreateGraphsForCS;
-	private final boolean doCreateSubGraphs;
 	private final HLDDRepresentationType hlddType;
     private final boolean shouldSimplify;
 	private final AbstractWorkerFinalizer workerFinalizer;
@@ -60,10 +56,6 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
         this.sourceFile = settings.getSourceFile();
         this.pslFile = settings.getPslFile();
         this.baseModelFile = settings.getBaseModelFile();
-        this.shouldReuseConstants = settings.isDoReuseConstants();
-        this.doFlattenConditions = settings.isDoFlattenConditions();
-		this.doCreateGraphsForCS = settings.isDoCreateCSGraphs(); // todo: should be represented as Enum (CSMode or ConditionalStatementMode)
-		this.doCreateSubGraphs = settings.isDoCreateExtraCSGraphs();
 		this.hlddType = settings.getHlddType();
         this.shouldSimplify = settings.isDoSimplify();
 		/* Load Configuration */
@@ -83,6 +75,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
         GraphGenerator graphCreatingVisitor;
         ModelManager modelCollector;
         ModelCreator modelCreator;
+		OutputStream mapFileStream = settings.getMapFileStream();
         int current = 1, total;
         long startTime;
 
@@ -111,7 +104,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
                     /* Generate Graphs (GraphVariables) and collect all variables */
                     consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-                    graphCreatingVisitor = new BehGraphGenerator(config, shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs, delayCollector.getDFlagNames());
+                    graphCreatingVisitor = new BehGraphGenerator(config, settings, delayCollector.getDFlagNames());
                     entity.traverse(graphCreatingVisitor);
                     modelCollector = graphCreatingVisitor.getModelCollector();
                     consoleWriter.done();
@@ -135,7 +128,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
                             model.getGraphCount() + " Graphs and " + model.getNodeCount() + " Nodes.");
                     /* Print VHDL_2_HLDD_Mapping to file */
                     consoleWriter.write("Writing VHDL2HLDD map file...");
-                    model.printMapFile(settings.getMapFileStream());
+                    model.printMapFile(mapFileStream);
                     consoleWriter.done();
 
                     break;
@@ -165,7 +158,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
                     /* Generate Graphs (GraphVariables) and collect all variables */
                     consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-                    graphCreatingVisitor = new BehDDGraphGenerator(config, shouldReuseConstants, doFlattenConditions, doCreateGraphsForCS, doCreateSubGraphs);
+                    graphCreatingVisitor = new BehDDGraphGenerator(config, settings);
                     entity.traverse(graphCreatingVisitor);
                     modelCollector = graphCreatingVisitor.getModelCollector();
                     consoleWriter.done();
@@ -189,7 +182,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
                             model.getGraphCount() + " Graphs and " + model.getNodeCount() + " Nodes.");
 					/* Print VHDL_2_HLDD_Mapping to file */
 					consoleWriter.write("Writing VHDL2HLDD map file...");
-					model.printMapFile(settings.getMapFileStream());
+					model.printMapFile(mapFileStream);
 					consoleWriter.done();
 
                     break;
@@ -293,4 +286,37 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 		return comment;
 	}
 
+	public static BehModel convertAndWait(ConverterSettings settings) throws InterruptedException, ExecutionException {
+
+		ConvertingWorker converter = new ConvertingWorker(
+				AbstractWorkerFinalizer.getStub(),
+				ConsoleWriter.getStub(),
+				settings);
+
+		converter.execute();
+
+		while (!converter.isDone()) {
+
+			Thread.sleep(50);
+
+		}
+
+		return converter.get();
+	}
+
+	public static BehModel convertInSeparateThreadAndWait(ConverterSettings settings) throws InterruptedException, ExecutionException {
+
+		ConvertingWorker converter = new ConvertingWorker(
+				AbstractWorkerFinalizer.getStub(),
+				ConsoleWriter.getStub(),
+				settings);
+
+		Thread thread = new Thread(converter);
+
+		thread.start();
+
+		thread.join();
+
+		return converter.get();
+	}
 }

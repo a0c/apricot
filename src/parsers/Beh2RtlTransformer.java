@@ -45,18 +45,18 @@ public class Beh2RtlTransformer {
     public void transform() throws Exception {
 
         if (modelCollector == null) {
-            modelCollector = new ModelManager(false);
+            modelCollector = new ModelManager();
         }
 
         /* Minimize */
         behModel.minimize();
 
         /* Copy CONSTANTS */
-        for (ConstantVariable constantVariable : behModel.getConsts().values()) {
+        for (ConstantVariable constantVariable : behModel.getConstants()) {
             modelCollector.addVariable(constantVariable);
         }
         /* Copy INPUTS, FUNCTIONS and STATE variable */
-        for (AbstractVariable absVariable : behModel.getVars().values()) {
+        for (AbstractVariable absVariable : behModel.getVariables()) {
             if (absVariable.isInput()) modelCollector.addVariable(absVariable);
             else if (absVariable instanceof FunctionVariable) modelCollector.addVariable(absVariable);
         }
@@ -90,7 +90,7 @@ public class Beh2RtlTransformer {
 
     private void createGraphs(ResetInspector resetInspector, ControlPartManager controlPartManager) throws Exception {
 
-        for (AbstractVariable absVariable : behModel.getVars().values()) {
+        for (AbstractVariable absVariable : behModel.getVariables()) {
             if (absVariable instanceof GraphVariable) {
                 GraphVariable graphVariable = (GraphVariable) absVariable;
                 if (graphVariable.isState()) continue;
@@ -189,7 +189,7 @@ public class Beh2RtlTransformer {
         /* Firstly traverse STATE graph */
 		LOG.fine("Processing STATE graph...");
 		boolean hasStateVar = false;
-		for (AbstractVariable absVariable : behModel.getVars().values()) {
+		for (AbstractVariable absVariable : behModel.getVariables()) {
 			if (absVariable instanceof GraphVariable) {
 				GraphVariable graphVariable = (GraphVariable) absVariable;
 				if (graphVariable.isState()) {
@@ -210,7 +210,7 @@ public class Beh2RtlTransformer {
 		}
         /* Traverse all graphs */
 		int i = 1, total = behModel.getGraphCount() - 1; // -1 ---> STATE graph
-        for (AbstractVariable absVariable : behModel.getVars().values()) {
+        for (AbstractVariable absVariable : behModel.getVariables()) {
 			if (absVariable instanceof GraphVariable) {
 				GraphVariable graphVariable = (GraphVariable) absVariable;
 				if (graphVariable.isState()) continue;
@@ -232,7 +232,7 @@ public class Beh2RtlTransformer {
 
         /* Firstly, search for STATE variable,
         * in order to make it have the leading position amongst Control Part Variables */
-        for (AbstractVariable absVar : behModel.getVars().values()) {
+        for (AbstractVariable absVar : behModel.getVariables()) {
             if (absVar.isState()) {
                 modelCollector.addVariable(((GraphVariable) absVar).getBaseVariable());
                 controlPartManager.addControlPartVariable(absVar);
@@ -242,7 +242,7 @@ public class Beh2RtlTransformer {
 
         /* Create Control Part Outputs for every GraphVariable  */
         TerminalNodeCollector termNodeCollector = controlPartManager.termNodeCollector;
-        for (AbstractVariable absVar : behModel.getVars().values()) {
+        for (AbstractVariable absVar : behModel.getVariables()) {
             if (absVar.isState()) continue;
             if (absVar instanceof GraphVariable) {
                 GraphVariable graphVariable = (GraphVariable) absVar;
@@ -281,7 +281,7 @@ public class Beh2RtlTransformer {
     private TerminalNodeCollector createMuxAddrValuesMapping() throws Exception {
 
         TerminalNodeCollector termNodeCollector = new TerminalNodeCollector();
-        for (AbstractVariable absVar : behModel.getVars().values()) {
+        for (AbstractVariable absVar : behModel.getVariables()) {
             if (absVar.isState()) continue;
             if (absVar instanceof GraphVariable) {
                 GraphVariable graphVariable = (GraphVariable) absVar;
@@ -294,7 +294,7 @@ public class Beh2RtlTransformer {
     private ResetInspector createResetMapping() throws Exception {
 
         ResetInspector inspector = new ResetInspector();
-        for (AbstractVariable absVar : behModel.getVars().values()) {
+        for (AbstractVariable absVar : behModel.getVariables()) {
             if (absVar instanceof GraphVariable) {
                 GraphVariable graphVariable = (GraphVariable) absVar;
                 graphVariable.traverse(inspector);
