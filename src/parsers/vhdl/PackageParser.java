@@ -72,9 +72,14 @@ public class PackageParser {
     }
 
     public static void parseAndBuildTypeDecl(PackageBuilder builder, String vhdlLine) throws Exception {
-        builder.registerType(
-                parseTypeName(vhdlLine),
-                parseType(vhdlLine.substring(vhdlLine.indexOf(" IS ") + 4), (AbstractPackageBuilder) builder));
+		String name = parseTypeName(vhdlLine);
+		Type type = null;
+		try {
+			type = parseType(vhdlLine.substring(vhdlLine.indexOf(" IS ") + 4), (AbstractPackageBuilder) builder);
+		} catch (UnsupportedConstructException e) {
+			System.out.println("Skipping unsupported type: " + e.getUnsupportedConstruct());
+		}
+		builder.registerType(name, type);
     }
 
     public Package getPackageStructure(){
@@ -135,9 +140,8 @@ public class PackageParser {
      *         (for named constants <code>null</code> is returned as well).
      */
     public static BigInteger parseConstantValue(String valueAsString) {
-        RadixEnum radix = RadixEnum.parseRadix(valueAsString);
-        valueAsString = radix.trimConstantString(valueAsString);
-        return radix.intValue(valueAsString);
+		ConstantValueAndLengthHolder varHolder = parseConstantValueWithLength(valueAsString);
+		return varHolder == null ? null : varHolder.getValue();
     }
 
     /**
@@ -149,6 +153,9 @@ public class PackageParser {
      */
     public static ConstantValueAndLengthHolder parseConstantValueWithLength(String valueAsString) {
         RadixEnum radix = RadixEnum.parseRadix(valueAsString);
+		if (radix == null) {
+			return null;
+		}
         valueAsString = radix.trimConstantString(valueAsString);
         BigInteger intValue = radix.intValue(valueAsString);
         return intValue == null ? null : new ConstantValueAndLengthHolder(intValue, radix.lengthFor(valueAsString));
@@ -175,8 +182,8 @@ public class PackageParser {
             int ofIndex = typeString.lastIndexOf(" OF ");
             String subType = typeString.substring(ofIndex + 4).trim();
             if (!(subType.equals("BIT") || subType.equals("STD_LOGIC")))
-                throw new Exception("Unsupported type: \'" + typeString + "\'\n" +
-                        "Only BIT and STD_LOGIC are supported as array subtypes.");
+                throw new UnsupportedConstructException("Unsupported type: \'" + typeString + "\'\n" +
+                        "Only BIT and STD_LOGIC are supported as array subtypes.", typeString);
             /* Parse indices */
             Indices indices = builder.buildIndices(
                     ExpressionBuilder.trimEnclosingBrackets(typeString.substring(6, ofIndex)));
@@ -206,7 +213,7 @@ public class PackageParser {
         } else if (typeString.equals("BOOLEAN")) {
             return Type.createFromValues(1, 0);
         } else {
-            throw new Exception("Unsupported type: \'" + typeString + "\'");
+            throw new UnsupportedConstructException("Unsupported type: \'" + typeString + "\'", typeString);
         }
     }
 
@@ -214,9 +221,12 @@ public class PackageParser {
     enum RadixEnum {
         BINARY(2), BOOLEAN(2), HEXADECIMAL(16), ARBITRARY(-1), DECIMAL(10);
 
-        private static final Pattern HEX_PATTERN = Pattern.compile("^X \".+\"$");
+        private static final Pattern BIN_PATTERN = Pattern.compile("(\'[01]+\')|(\"[01]+\")");
+        private static final Pattern HEX_PATTERN = Pattern.compile("^X \" ?[0-9a-f]+ \"$", Pattern.CASE_INSENSITIVE);
+		private static final Pattern BASED_PATTERN = Pattern.compile("^\\d+ # [\\._0-9a-f]+ #( E\\+?[0-9]+)?$", Pattern.CASE_INSENSITIVE);
+		private static final Pattern DEC_PATTERN = Pattern.compile("-?\\d+");
 
-        private final int radixAsInt;
+		private final int radixAsInt;
 
         RadixEnum(int radixAsInt) {
             this.radixAsInt = radixAsInt;
@@ -260,12 +270,12 @@ public class PackageParser {
             return isBinary(valueAsString) ? BINARY :
 					isBoolean(valueAsString) ? BOOLEAN :
 							isHex(valueAsString) ? HEXADECIMAL :
-									isBased(valueAsString) ? ARBITRARY : DECIMAL;
+									isBased(valueAsString) ? ARBITRARY :
+											isDecimal(valueAsString) ? DECIMAL : null;
         }
 
         private static boolean isBinary(String valueAsString) {
-            return valueAsString.startsWith("\'") && valueAsString.endsWith("\'")
-                        || valueAsString.startsWith("\"") && valueAsString.endsWith("\"");
+            return BIN_PATTERN.matcher(valueAsString).matches();
         }
 
         private static boolean isBoolean(String valueAsString) {
@@ -285,7 +295,11 @@ public class PackageParser {
         }
 
 		private static boolean isBased(String valueAsString) {
-			return valueAsString.contains("#");
+			return BASED_PATTERN.matcher(valueAsString).matches();
+		}
+
+		private static boolean isDecimal(String valueAsString) {
+			return DEC_PATTERN.matcher(valueAsString).matches();
 		}
 
         private Indices lengthFor(String valueAsString) {
