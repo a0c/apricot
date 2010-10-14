@@ -4,7 +4,6 @@ import base.Type;
 import base.Indices;
 import base.vhdl.structure.Constant;
 
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
@@ -28,8 +27,6 @@ public abstract class AbstractPackageBuilder implements PackageBuilder {
 
     protected ExpressionBuilder expressionBuilder = new ExpressionBuilder(valueCalculator, variableNames);
 
-
-    public abstract void buildConstant(String constantName, BigInteger value);
 
     public void registerConstant(Constant newConstant) {
         variableNames.add(newConstant.getName());

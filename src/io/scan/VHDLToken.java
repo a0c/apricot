@@ -106,6 +106,7 @@ public class VHDLToken {
         PROCESS_DECL("(" + Sub.LBL.regex + " :)?PROCESS \\( " + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* \\)$"),
 		COMPONENT_DECL("^COMPONENT " + Sub.LBL.regex + "$"),
 		PORT_MAP("^" + Sub.LBL.regex + " :" + Sub.LBL.regex + " PORT MAP \\( .* \\) ;$"),
+		ALIAS("^ALIAS " + Sub.LBL.regex + " :" + Sub.TYPE.regex + " IS .+ ;$"),
         IF_STATEMENT("^IF .* THEN$"),
         ELSIF_STATEMENT("^ELSIF .* THEN$"),
         ELSE("ELSE"),
@@ -115,6 +116,7 @@ public class VHDLToken {
         WHEN_STATEMENT("^WHEN .* =>$"),
         PACKAGE_DECL("^PACKAGE(?!( BODY )) .+ IS$"),
         PACKAGE_BODY_DECL("^PACKAGE BODY .+ IS$"),
+		WITH("^WITH " + Sub.LBL.regex + " SELECT .+ ;$"),
         UNKNOWN("");
 
         private final Pattern pattern;

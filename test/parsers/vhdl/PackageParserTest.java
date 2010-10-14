@@ -1,7 +1,6 @@
 package parsers.vhdl;
 
 import org.junit.Test;
-import org.junit.Ignore;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -105,14 +104,14 @@ public class PackageParserTest {
         /* INTEGER RANGE 0 TO 3
         * ##########################################*/
         String typeString;
-        Type type = PackageParser.parseType(typeString = "INTEGER RANGE 32767 DOWNTO -32768", builder);
+        Type type = PackageParser.parseType(typeString = "INTEGER RANGE 32767 DOWNTO -32768", builder).type;
         assertTrue("Type is not enum: " + typeString, type.isEnum());
         assertTrue("Type is not signed: " + typeString, type.isSigned());
         assertEquals("Wrong cardinality for type: " + typeString, 65536, type.getCardinality());
         assertEquals("Wrong highestSB for type: " + typeString, 15, type.getHighestSB());
         assertEquals("Wrong offset for type: " + typeString, 0, type.getOffset());
         assertEquals("Wrong length printing for type: " + typeString, "<15:0>", type.lengthToString());
-        type = PackageParser.parseType(typeString = "INTEGER RANGE 0 TO 3", builder);
+        type = PackageParser.parseType(typeString = "INTEGER RANGE 0 TO 3", builder).type;
         assertTrue("Type is not enum: " + typeString, type.isEnum());
         assertFalse("Type is signed: " + typeString, type.isSigned());
         assertEquals("Wrong cardinality for type: " + typeString, 4, type.getCardinality());
@@ -124,7 +123,7 @@ public class PackageParserTest {
         *  BIT_VECTOR ( 8 DOWNTO 0) */
         /* {IN} STD_LOGIC_VECTOR(MOD_EN_BITS-3 DOWNTO 0)
         * ########################################################*/
-        type = PackageParser.parseType(typeString = "BIT_VECTOR ( 8 DOWNTO 0 )", builder);
+        type = PackageParser.parseType(typeString = "BIT_VECTOR ( 8 DOWNTO 0 )", builder).type;
         assertFalse("Type is enum: " + typeString, type.isEnum());
         assertFalse("Type is signed: " + typeString, type.isSigned());
         RuntimeException e = null;
@@ -137,7 +136,7 @@ public class PackageParserTest {
         assertEquals("Wrong highestSB for type: " + typeString, 8, type.getHighestSB());
         assertEquals("Wrong offset for type: " + typeString, 0, type.getOffset());
         assertEquals("Wrong length printing for type: " + typeString, "<8:0>", type.lengthToString());
-        type = PackageParser.parseType(typeString = "STD_LOGIC_VECTOR ( 10 - 3 DOWNTO 0 )", builder);
+        type = PackageParser.parseType(typeString = "STD_LOGIC_VECTOR ( 10 - 3 DOWNTO 0 )", builder).type;
         assertFalse("Type is enum: " + typeString, type.isEnum());
         assertFalse("Type is signed: " + typeString, type.isSigned());
         e = null;
@@ -154,7 +153,7 @@ public class PackageParserTest {
         /* ########################################################
         * ARRAY ((PROCESSOR_WIDTH -1) DOWNTO -1) OF STD_LOGIC;
         * ########################################################*/
-        type = PackageParser.parseType(typeString = "ARRAY ( ( 9 - 1 ) DOWNTO -1 ) OF STD_LOGIC ;", builder);
+        type = PackageParser.parseType(typeString = "ARRAY ( ( 9 - 1 ) DOWNTO -1 ) OF STD_LOGIC ;", builder).type;
         assertFalse("Type is enum: " + typeString, type.isEnum());
         assertFalse("Type is signed: " + typeString, type.isSigned());
         e = null;
@@ -171,7 +170,7 @@ public class PackageParserTest {
         /* ##############
         * BIT or STD_LOGIC
         * ############## */
-        type = PackageParser.parseType(typeString = "BIT", builder);
+        type = PackageParser.parseType(typeString = "BIT", builder).type;
         assertFalse("Type is enum: " + typeString, type.isEnum());
         assertFalse("Type is signed: " + typeString, type.isSigned());
         e = null;
@@ -184,7 +183,7 @@ public class PackageParserTest {
         assertEquals("Wrong highestSB for type: " + typeString, 0, type.getHighestSB());
         assertEquals("Wrong offset for type: " + typeString, 0, type.getOffset());
         assertEquals("Wrong length printing for type: " + typeString, "<0:0>", type.lengthToString());
-        type = PackageParser.parseType(typeString = "STD_LOGIC", builder);
+        type = PackageParser.parseType(typeString = "STD_LOGIC", builder).type;
         assertFalse("Type is enum: " + typeString, type.isEnum());
         assertFalse("Type is signed: " + typeString, type.isSigned());
         e = null;
@@ -201,7 +200,7 @@ public class PackageParserTest {
         /* ##############
         *  BOOLEAN
         * ##############*/
-        type = PackageParser.parseType(typeString = "BOOLEAN", builder);
+        type = PackageParser.parseType(typeString = "BOOLEAN", builder).type;
         assertTrue("Type is enum: " + typeString, type.isEnum());
         assertFalse("Type is signed: " + typeString, type.isSigned());
         assertEquals("Wrong cardinality for type: " + typeString, 2, type.getCardinality());

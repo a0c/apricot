@@ -103,6 +103,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
         /* Collect CONSTANTS */
         collectConstants(entity.getConstants());
+        collectConstants(entity.getGenericConstants());
 
         /* Process PORTS */
         Set<Port> ports = entity.getPorts();
@@ -176,7 +177,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
     private void collectConstants(Set<Constant> constants) throws Exception {
         for (Constant constant : constants) {
-            ConstantVariable constantVariable = new ConstantVariable(constant.getName(), constant.getValue());
+            ConstantVariable constantVariable = new ConstantVariable(constant.getName(), constant.getValue(), constant.getType());
             modelCollector.addVariable(constantVariable);
         }
     }
@@ -377,7 +378,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
         /* Count possible conditions of dependentVariable */
         //todo: suspicious action: dependentVariable.isState() ? caseNode.getConditions().size(). May be "when => others", may be "when A | B | C =>" ... consider these...
 //        int conditionValuesCount = dependentVariable.isState() ? caseNode.getConditions().size() : modelCollector.getConditionValuesCount(dependentVariable);
-        int conditionValuesCount = modelCollector.getConditionValuesCount(dependentVariable);
+        int conditionValuesCount = variableOperand.isParted() ? partedIndices.deriveValueRange().length()
+				: modelCollector.getConditionValuesCount(dependentVariable);
         /* Create Control Node */
         Node controlNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(conditionValuesCount).build();
         /* Add VHDL lines the node's been created from */

@@ -6,7 +6,6 @@ import io.scan.VHDLToken;
 
 import java.text.ParseException;
 import java.util.*;
-import java.math.BigInteger;
 
 import base.Type;
 
@@ -30,7 +29,7 @@ public class VHDLStructureParser {
         VHDLToken token;
         String value, name, conditionString, valueString;
         Type type;
-        BigInteger valueInt;
+		TypeAndValueHolder typeAndValue;
         boolean isInput;
 
         while ((token = scanner.next()) != null) {
@@ -75,11 +74,10 @@ public class VHDLStructureParser {
                         value = aToken.getValue();
                         /* Generic NAME */
                         name = value.substring(0, value.indexOf(":")).trim();
-                        /* Generic VALUE */
-                        String valueAsString = PackageParser.extractInitializationString(value);
-                        if (valueAsString == null) throw new Exception("Generic constant " + name + " is not initialized");
-                        valueInt = PackageParser.parseConstantValue(valueAsString);
-                        builder.buildGeneric(name, valueInt);
+						/* Generic TYPE and VALUE*/
+						typeAndValue = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder);
+						if (typeAndValue.value == null) throw new Exception("Generic constant " + name + " is not initialized");
+						builder.buildGeneric(name, typeAndValue.type, typeAndValue.value);
                     }
                     break;
                 case PORT_DECL:
@@ -92,8 +90,7 @@ public class VHDLStructureParser {
                         String[] typeString = value.substring(value.indexOf(":") + 1).trim().split("\\s", 2);
                         isInput = typeString[0].trim().equals("IN");
                         /* Port HIGHEST SIGNIFICANT BIT */
-//                        highestSB = extractHSB(typeString[1].trim());
-                        type = PackageParser.parseType(typeString[1].trim(), builder);
+						type = PackageParser.parseType(typeString[1].trim(), builder).type;
                         /* Create new PORT */
                         builder.buildPort(name, isInput, type);
                     }
@@ -146,12 +143,19 @@ public class VHDLStructureParser {
                         /* Signal NAME */
                         name = value.substring(6, value.indexOf(":")).trim();
                         /* Signal HIGHEST SIGNIFICANT BIT */
-//                        highestSB = extractHSB(value.substring(value.indexOf(":") + 1).trim());
-                        type = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder);
-                        /* Create new SIGNAL */
-                        builder.buildSignal(name, type);
+						typeAndValue = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder);
+						/* Create new SIGNAL */
+						builder.buildSignal(name, typeAndValue.type, typeAndValue.value);
                     }
                     break;
+				case ALIAS:
+					int colonIndex = value.indexOf(":");
+					int isIndex = value.indexOf(" IS ");
+					name = value.substring(6, colonIndex).trim();
+					type = PackageParser.parseType(value.substring(colonIndex + 1, isIndex).trim(), builder).type;
+					value = value.substring(isIndex + 4, value.length() - 1);
+					builder.buildAlias(name, type, value);
+					break;
                 case PROCESS_DECL:
                     String processName = value.contains(":") ? value.substring(0, value.indexOf(":")).trim() : null;
                     builder.buildProcess(processName, extractSensitivityList(value));
@@ -163,8 +167,7 @@ public class VHDLStructureParser {
                         /* Variable NAME */
                         name = value.substring(8, value.indexOf(":")).trim();
                         /* Variable HIGHEST SIGNIFICANT BIT */
-//                        highestSB = extractHSB(value.substring(value.indexOf(":") + 1).trim());
-                        type = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder);
+						type = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder).type;
                         /* Create new VARIABLE */
                         builder.buildVariable(name, type);
                     }
@@ -236,6 +239,30 @@ public class VHDLStructureParser {
                     for (int i = 0; i < conditionStrings.length; i++) conditionStrings[i] = conditionStrings[i].trim();
                     builder.buildWhenStatement(conditionStrings);
                     break;
+				case WITH:
+					/* Variable NAME */
+					int selectIdx = value.indexOf(" SELECT ");
+					name = value.substring(5, selectIdx).trim();
+					builder.buildCaseStatement(name, source); //todo: SourceLocation for WHEN
+					/* CONDITIONS */
+					String[] choicesAndAssigns = value.substring(selectIdx + 8, value.lastIndexOf(";")).split("( WHEN )|(,)");
+					String target = null;
+					for (int i = 0; i < choicesAndAssigns.length - 1; i += 2) {
+						String transition = choicesAndAssigns[i].trim();
+						String[] conditions = choicesAndAssigns[i+1].split(" ?\\| ?");
+						for (int j = 0; j < conditions.length; j++) conditions[j] = conditions[j].trim();
+						builder.buildWhenStatement(conditions);
+
+						if (target == null) {
+							String[] targetAndValue = transition.split(" <= ?");
+							target = targetAndValue[0].trim();
+							builder.buildTransition(target, targetAndValue[1].trim(), source);
+						} else {
+							builder.buildTransition(target, transition, source);
+						}
+					}
+					builder.buildCloseDeclaration();
+					break;
                 default:
                     System.out.println("Unknown TOKEN is met: \"" + value + "\"");
             }
@@ -258,77 +285,6 @@ public class VHDLStructureParser {
         }
         return sensitivityList;
     }
-
-    /**
-     * Calculates highest sighificant bit for the given type.
-     * A minus sign is appended to the returned value of HSB,
-     * if the variable is SIGNED.
-     *
-     * @param typeString where to extract the HSB from
-     * @return  highest significant bit required to represent
-     *          the value given in <code>typeString</code>
-     *          with a minus sign appended if the value is
-     *          SIGNED.
-     * @throws Exception    if unsupported type is met or
-     *                      exception occurred while parsing
-     *                      index to INT.
-     */
-//    int extractHSB(String typeString) throws Exception {
-//        int highestSB = 0;
-//        boolean signed = false;
-//
-//        //todo: Here, use ExpressionBuilder to see, whether it produces OperandImpl or ExpressionImpl:
-//        //todo: Actually, no need for distinguishing between them: make AbstractOperand Interpretable!
-//
-//        // Trim ';'
-//        if (typeString.endsWith(";")) {
-//            typeString = typeString.substring(0, typeString.length() - 1).trim();
-//        }
-//
-//        if (typeString.contains(" RANGE ")) {
-//            /* INTEGER RANGE 32767 DOWNTO -32768 */
-//            /* INTEGER RANGE 0 TO 3 */
-//            Indices indices = builder.buildIndices(typeString.substring(typeString.indexOf(" RANGE ") + 7));
-//
-//            // Calculate the LENGTH of the register to store the max. possible value of the variable
-//            highestSB = PackageParser.calcRegLengthForValue(indices.getHighest(), indices.getLowest());
-//            // Decide whether the value holder must be SIGNED or UNSIGNED
-//            if (indices.getLowest() < 0) signed = true;
-//
-//        } else if ((typeString.startsWith("BIT_VECTOR ") || typeString.startsWith("STD_LOGIC_VECTOR ") || typeString.startsWith("UNSIGNED"))
-//                && ExpressionBuilder.bitRangePattern.matcher(typeString).matches()) {
-//            /* BIT_VECTOR ( 8 DOWNTO 0) */
-//            /* {IN} STD_LOGIC_VECTOR(MOD_EN_BITS-3 DOWNTO 0) */
-//            Indices indices = builder.buildIndices(typeString);
-//            /* LENGTH of bus */
-//            highestSB = indices.getHighest() - indices.getLowest();
-//
-//        } else if (typeString.startsWith("ARRAY ")) {
-//            /* ARRAY ((PROCESSOR_WIDTH -1) DOWNTO -1) OF STD_LOGIC; */
-//            /* Check subtype */
-//            int ofIndex = typeString.lastIndexOf(" OF ");
-//            String subType = typeString.substring(ofIndex + 4).trim();
-//            if (!(subType.equals("BIT") || subType.equals("STD_LOGIC")))
-//                throw new Exception("Unsupported type: \'" + typeString + "\'\n" +
-//                        "Only BIT and STD_LOGIC are supported as array subtypes.");
-//            /* Parse indices */
-//            Indices indices = builder.buildIndices(
-//                    ExpressionBuilder.trimEnclosingBrackets(typeString.substring(6, ofIndex)));
-//            //todo: signed? what does the last -1 mean here: "(PROCESSOR_WIDTH -1) DOWNTO -1"
-//            /* LENGTH of bus */
-//            highestSB = indices.getHighest() - indices.getLowest();
-//
-//        } else if (builder.containsType(typeString)) {
-//            highestSB = builder.getType(typeString);
-//        } else {
-//            if (!(typeString.equals("BIT") || typeString.equals("STD_LOGIC") || typeString.equals("BOOLEAN")))
-//                throw new Exception("Unsupported type: \'" + typeString + "\'");
-//            // If BIT, STD_LOGIC or BOOLEAN, then do nothing (leave highestSB = 0;)
-//        }
-//
-//        return signed ? -highestSB : highestSB;
-//
-//    }
 
     /**
      * Splits multiple declaration of PORTS, VARIABLES, CONSTANTS, SIGNALS and
@@ -393,16 +349,4 @@ public class VHDLStructureParser {
             return declarationsArray;
         }
     }
-
-    /**
-     * <b>NB! {@link PackageParser#parseConstantValue(String)} should be used instead.
-     * <br>HEX, DEC, BIN are not considered here.</b>
-     * @param variableAsString line to check
-     * @return whether the line declares a constant
-     */
-    @Deprecated
-    public static boolean isConstant(String variableAsString) {
-        return Character.isDigit(variableAsString.charAt(0));
-    }
-
 }

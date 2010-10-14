@@ -16,9 +16,10 @@ public interface PackageBuilder {
      * {@link io.scan.VHDLToken.Type#TYPE_ENUM_DECL TYPE_DECL}.
      *
      * @param constantName name of the constant being built
+	 * @param type type of the constant being built
      * @param value value of the new constant being built
      */
-    void buildConstant(String constantName, BigInteger value);
+    void buildConstant(String constantName, Type type, BigInteger value);
 
     /**
      * Maps type of a {@link io.scan.VHDLToken.Type#TYPE_ENUM_DECL TYPE_ENUM_DECL} with the type's name.

@@ -37,7 +37,7 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
         for (Package aPackage : packages) {
             /* Copy constants */
             for (Constant constant : aPackage.getConstants()) {
-                buildGeneric(constant.getName(), constant.getValue());
+                buildGeneric(constant.getName(), constant.getType(), constant.getValue());
             }
             /* Copy typeByName */
             for (Map.Entry<String, Type> hsbByTNameEntry : aPackage.getTypeByName().entrySet()) {
@@ -55,9 +55,9 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
 		}
 	}
 
-    public void buildGeneric(String genericConstantName, BigInteger value) {
+    public void buildGeneric(String genericConstantName, Type type, BigInteger value) {
         if (entity != null) {
-            Constant newConstant = new Constant(genericConstantName, value);
+            Constant newConstant = new Constant(genericConstantName, type, value);
             registerConstant(newConstant);
             entity.addGenericConstant(newConstant);
         }
@@ -102,9 +102,9 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
         }
     }
 
-    public void buildConstant(String constantName, BigInteger value) {
+    public void buildConstant(String constantName, Type type, BigInteger value) {
         if (entity != null) {
-            Constant newConstant = new Constant(constantName, value);
+            Constant newConstant = new Constant(constantName, type, value);
             registerConstant(newConstant);
             Object currentContext = contextStack.peek();
             if (currentContext == null) {
@@ -158,15 +158,25 @@ public class VHDLStructureBuilder extends AbstractPackageBuilder {
         }
     }
 
-    public void buildSignal(String signalName, Type type) {
+    public void buildSignal(String signalName, Type type, BigInteger defaultValue) {
         Object objectUnderConstr = contextStack.peek();
         if (objectUnderConstr instanceof Architecture) {
             Architecture architecture = (Architecture) objectUnderConstr;
-            architecture.addSignal(new Signal(signalName, type));
+            architecture.addSignal(new Signal(signalName, type, defaultValue));
             variableNames.add(signalName);
         }
     }
 
+	public void buildAlias(String name, Type type, String actual) throws Exception {
+
+		AbstractOperand actualOperand = expressionBuilder.buildExpression(actual);
+		if (!(actualOperand instanceof OperandImpl)) {
+			throw new UnsupportedConstructException("Simple operand expected as alias' actual, received: "
+					+ actual, actual);
+		}
+
+		expressionBuilder.addAlias(new Alias(name, type, (OperandImpl) actualOperand));
+	}
 
     /**
      *

@@ -159,9 +159,9 @@ public class ExpressionBuilderTest {
     @Test
     public void correctIndicesBuilt() throws Exception {
         OperandValueCalculator calculator = new OperandValueCalculator();
-        calculator.addConstant(new Constant("CONSTANT", BigInteger.valueOf(130)));
-        calculator.addConstant(new Constant("ANOTHER_GENERIC", BigInteger.valueOf(3)));
-        calculator.addConstant(new Constant("PROCESSOR_WIDTH", BigInteger.valueOf(19)));
+        calculator.addConstant(new Constant("CONSTANT", null, BigInteger.valueOf(130)));
+        calculator.addConstant(new Constant("ANOTHER_GENERIC", null, BigInteger.valueOf(3)));
+        calculator.addConstant(new Constant("PROCESSOR_WIDTH", null, BigInteger.valueOf(19)));
 
         ExpressionBuilder builder = new ExpressionBuilder(calculator, Collections.<String>emptySet());
         for (int i = 0; i < sourceIndices.length; i++) {

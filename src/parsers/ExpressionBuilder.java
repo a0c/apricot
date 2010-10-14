@@ -3,12 +3,8 @@ package parsers;
 import base.vhdl.structure.*;
 import base.helpers.RegexFactory;
 import base.Indices;
-import parsers.IndicesDeclaration;
 
-import java.util.Stack;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Collection;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -40,6 +36,7 @@ public class ExpressionBuilder {
 
     private final OperandValueCalculator valueCalculator;
     private final Collection<String> variableNames;
+	private final HashMap<String, Alias> aliasByName = new HashMap<String, Alias>();
 
     public ExpressionBuilder() {
         valueCalculator = new OperandValueCalculator();
@@ -101,7 +98,7 @@ public class ExpressionBuilder {
             Indices partedIndices = buildIndices(line);
             String pureOperand = extractPureOperand(line, partedIndices != null);
 
-            return new OperandImpl(pureOperand, partedIndices, expressionContext.isInverted);
+            return replaceAliases(new OperandImpl(pureOperand, partedIndices, expressionContext.isInverted));
         } else {
             Expression expression = new Expression(operator, expressionContext.isInverted);
             // Get substrings of operands
@@ -113,6 +110,22 @@ public class ExpressionBuilder {
         }
 
     }
+
+	private AbstractOperand replaceAliases(OperandImpl operand) {
+
+		if (!aliasByName.containsKey(operand.getName())) {
+			return operand;
+		}
+
+		if (operand.isParted()) {
+			//todo: sliced ALIAS, see VHDL2008_comments.pdf => p.105
+			throw new RuntimeException("Implement me: SLICED ALIAS. todo: merge indices");
+		}
+
+		OperandImpl actualOperand = aliasByName.get(operand.getName()).getActual();
+
+		return new OperandImpl(actualOperand.getName(), actualOperand.getPartedIndices(), operand.isInverted());
+	}
 
     private boolean isUserDefinedFunction(String line) throws Exception {
         return USER_DEFINED_CONV.matcher(line).matches()
@@ -455,6 +468,10 @@ public class ExpressionBuilder {
 
         return retExpr;
     }
+
+	public void addAlias(Alias alias) {
+		aliasByName.put(alias.getName(), alias);
+	}
 
     /* AUXILIARY classes */
     class Region {

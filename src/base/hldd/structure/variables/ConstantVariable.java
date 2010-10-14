@@ -19,11 +19,19 @@ public class ConstantVariable extends Variable {
     // ConstantVariable VALUE
     private BigInteger value;
 
-    public ConstantVariable(String constantName, BigInteger value){
-		super(constantName, new Type(Indices.deriveLengthForValues(value.intValue(), 0))/*todo: remove this thing!!!*/);
+	public ConstantVariable(String constantName, BigInteger value){
+		this(constantName, value, deriveType(value));
+	}
+
+	public ConstantVariable(String constantName, BigInteger value, Type type){
+		super(constantName, type == null ? deriveType(value) : type);
         this.value = value;
         setConstant(true);
     }
+
+	private static Type deriveType(BigInteger value) {
+		return new Type(Indices.deriveLengthForValues(value.intValue(), 0));
+	}
 
     public String toString() {
         return super.toString() + "\tVAL = " + value;

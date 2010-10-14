@@ -1,5 +1,6 @@
 package parsers.vhdl;
 
+import base.Type;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Package;
 
@@ -13,9 +14,9 @@ import java.math.BigInteger;
 public class DefaultPackageBuilder extends AbstractPackageBuilder {
     private Package aPackage;
 
-    public void buildConstant(String constantName, BigInteger value) {
+    public void buildConstant(String constantName, Type type, BigInteger value) {
         if (aPackage != null) {
-            Constant newConstant = new Constant(constantName, value);
+            Constant newConstant = new Constant(constantName, type, value);
 
             aPackage.addConstant(newConstant);
             registerConstant(newConstant);

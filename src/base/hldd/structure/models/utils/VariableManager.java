@@ -147,6 +147,15 @@ public class VariableManager {
 	 */
 	public ConstantVariable getConstantByValue(BigInteger value, Indices targetLength) {
 
+		// Prefer constants with meaningful names (look for direct constant)
+		ConstantVariable constWithSmartName = ConstantVariable.createNamedConstant(value, null, targetLength);
+		ConstantVariable existingConstant = getConstantByName(constWithSmartName.getName());
+		if (existingConstant != null) {
+			if (targetLength == null || existingConstant.getLength().equals(targetLength)) {
+				return existingConstant;
+			}
+		}
+
 		// Search for EXISTENT constants
 		for (String constName : consts.keySet()) {
 			ConstantVariable constantVariable = consts.get(constName);
@@ -164,9 +173,8 @@ public class VariableManager {
 			}
 		}
 		// EXISTENT constant is not found, so create a new one
-		ConstantVariable newConstantVariable = ConstantVariable.createNamedConstant(value, null, targetLength);
-		consts.put(newConstantVariable.getName(), newConstantVariable);
-		return newConstantVariable;
+		consts.put(constWithSmartName.getName(), constWithSmartName);
+		return constWithSmartName;
 
 	}
 
