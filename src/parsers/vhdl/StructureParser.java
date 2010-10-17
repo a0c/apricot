@@ -12,13 +12,13 @@ import base.Type;
 /**
  * @author Anton Chepurov
  */
-public class VHDLStructureParser {
+public class StructureParser {
 
 	private VHDLScanner scanner;
 
-	private VHDLStructureBuilder builder;
+	private StructureBuilder builder;
 
-	public VHDLStructureParser(VHDLScanner scanner, VHDLStructureBuilder builder) {
+	public StructureParser(VHDLScanner scanner, StructureBuilder builder) {
 		this.scanner = scanner;
 		this.builder = builder;
 	}

@@ -3,7 +3,7 @@ package base.helpers;
 /**
  * @author Anton Chepurov
  */
-public class RegexFactory {
+public class RegexpFactory {
 
 	private static final String REGEXP_META_CHARACTERS = "([{\\^-$|]})?*+.";
 
@@ -25,13 +25,13 @@ public class RegexFactory {
 		return stringBuffer.toString();
 	}
 
-	public static MatchAndSplitRegexHolder createMatchAndSplitRegexps(String word, boolean isFirstWordInPhrase, boolean withWindow) {
+	public static MatchAndSplitRegexpHolder createMatchAndSplitRegexps(String word, boolean isFirstWordInPhrase, boolean withWindow) {
 		String matchingRegexp, splittingRegexp;
 		boolean startsWithLetter = Character.isLetter(word.charAt(0));
 		boolean endsWithLetter = Character.isLetter(word.charAt(word.length() - 1));
 		String splittingRegexpStart;
 		String splittingRegexpEnd;
-		String baseRegexp = RegexFactory.createStringRegexp(word);
+		String baseRegexp = RegexpFactory.createStringRegexp(word);
 
 		if (isFirstWordInPhrase) {
 			/* Delimiter is the first word in the phrase */
@@ -59,7 +59,7 @@ public class RegexFactory {
 
 		}
 
-		return new MatchAndSplitRegexHolder(matchingRegexp, splittingRegexp);
+		return new MatchAndSplitRegexpHolder(matchingRegexp, splittingRegexp);
 	}
 
 }

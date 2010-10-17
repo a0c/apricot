@@ -11,8 +11,8 @@ import io.scan.HLDDScanner;
 import java.io.*;
 import java.util.*;
 
-import parsers.hldd.HLDDStructureBuilder;
-import parsers.hldd.HLDDStructureParser;
+import parsers.hldd.StructureBuilder;
+import parsers.hldd.StructureParser;
 
 /**
  * Class representing AGM BEH RTL DD.
@@ -47,8 +47,8 @@ public class BehModel {
 	public static BehModel parseHlddStructure(Object hlddSource, GraphVariableCreator graphVariableCreator) throws Exception {
 		/* Parse HLDD structure */
 		HLDDScanner scanner = new HLDDScanner(hlddSource);
-		HLDDStructureBuilder structureBuilder = new HLDDStructureBuilder(graphVariableCreator);
-		HLDDStructureParser parser = new HLDDStructureParser(scanner, structureBuilder);
+		StructureBuilder structureBuilder = new StructureBuilder(graphVariableCreator);
+		StructureParser parser = new StructureParser(scanner, structureBuilder);
 		parser.parse();
 		return structureBuilder.getModel();
 	}

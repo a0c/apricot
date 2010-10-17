@@ -88,7 +88,7 @@ public class PackageParserTest {
 
 	@Test
 	public void parseType() throws Exception {
-		VHDLStructureBuilder builder = new VHDLStructureBuilder();
+		StructureBuilder builder = new StructureBuilder();
 		/* ##########################################
 		* INTEGER RANGE 32767 DOWNTO -32768 */
 		/* INTEGER RANGE 0 TO 3

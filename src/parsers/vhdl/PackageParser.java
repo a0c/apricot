@@ -37,7 +37,7 @@ public class PackageParser {
 	 * @param builder		 where to add the package structure
 	 * @throws Exception if exception occurs while parsing the Package File
 	 */
-	public static void parse(File vhdlFile, String packageFileName, VHDLStructureBuilder builder) throws Exception {
+	public static void parse(File vhdlFile, String packageFileName, StructureBuilder builder) throws Exception {
 		/* Parse Package Structure */
 		Package aPackage = Package.parsePackageStructure(new File(vhdlFile.getParent(), packageFileName + ".vhd"));
 		/* Add package to builder */

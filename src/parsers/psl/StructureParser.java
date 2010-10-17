@@ -7,7 +7,7 @@ import base.psl.structure.VerificationDirective;
 /**
  * @author Anton Chepurov
  */
-public class PSLStructureParser {
+public class StructureParser {
 	private static final String PROPERTY_DIRECTIVE_START = " : ";
 	private static final String PROPERTY_NAME_REGEXP = "^" + LexemeType.IDENTIFIER.getRegexp() + PROPERTY_DIRECTIVE_START + ".*";
 	static final String MISSING_NAME_TEXT = "Property NAME is not specified for the following property: ";
@@ -18,12 +18,12 @@ public class PSLStructureParser {
 	static final String PROPERTY_BODY_END = ";";
 
 	private PSLScanner pslScanner;
-	private PSLStructureBuilder pslStructureBuilder;
+	private StructureBuilder structureBuilder;
 
 
-	public PSLStructureParser(PSLScanner pslScanner, PSLStructureBuilder pslStructureBuilder) {
+	public StructureParser(PSLScanner pslScanner, StructureBuilder structureBuilder) {
 		this.pslScanner = pslScanner;
-		this.pslStructureBuilder = pslStructureBuilder;
+		this.structureBuilder = structureBuilder;
 	}
 
 	public void parse() throws Exception {
@@ -34,7 +34,7 @@ public class PSLStructureParser {
 
 				if (true/* todo: token is a property */) {
 
-					pslStructureBuilder.buildProperty(extractPropertyName(token), extractVerificationDirective(token), extractPropertyBody(token), token);
+					structureBuilder.buildProperty(extractPropertyName(token), extractVerificationDirective(token), extractPropertyBody(token), token);
 
 				} else if (false/* todo: token is a configuration*/) {
 					/* todo: Extract the configuration name ... */

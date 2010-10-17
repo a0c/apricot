@@ -15,13 +15,13 @@ import java.util.TreeMap;
 /**
  * @author Anton Chepurov
  */
-public class HLDDStructureBuilder {
+public class StructureBuilder {
 	private int nodeCount, varCount, graphCount, inpCount, outpCount, constCount, funcCount;
 	private BehModel model;
 	private Collector collector;
 	private final GraphVariableCreator graphVariableCreator;
 
-	public HLDDStructureBuilder(GraphVariableCreator graphVariableCreator) {
+	public StructureBuilder(GraphVariableCreator graphVariableCreator) {
 		this.graphVariableCreator = graphVariableCreator;
 		collector = new Collector();
 	}

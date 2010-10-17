@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 /**
  * @author Anton Chepurov
  */
-public class VHDLStructureBuilder extends AbstractPackageBuilder {
+public class StructureBuilder extends AbstractPackageBuilder {
 
 	private Entity entity;
 

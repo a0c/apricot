@@ -10,8 +10,8 @@ import java.util.HashSet;
 import java.io.File;
 
 import io.scan.VHDLScanner;
-import parsers.vhdl.VHDLStructureBuilder;
-import parsers.vhdl.VHDLStructureParser;
+import parsers.vhdl.StructureBuilder;
+import parsers.vhdl.StructureParser;
 
 /**
  * @author Anton Chepurov
@@ -34,10 +34,10 @@ public class Entity implements Visitable {
 	public static Entity parseVhdlStructure(File vhdlFile) throws Exception {
 		/* Parse VHDL structure */
 		VHDLScanner vhdlScanner = new VHDLScanner(vhdlFile);
-		VHDLStructureBuilder vhdlStructureBuilder = new VHDLStructureBuilder();
-		VHDLStructureParser vhdlParser = new VHDLStructureParser(vhdlScanner, vhdlStructureBuilder);
-		vhdlParser.parse();
-		return vhdlStructureBuilder.getVHDLStructure();
+		StructureBuilder structureBuilder = new StructureBuilder();
+		StructureParser structureParser = new StructureParser(vhdlScanner, structureBuilder);
+		structureParser.parse();
+		return structureBuilder.getVHDLStructure();
 	}
 
 	public Entity(String name) {

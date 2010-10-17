@@ -25,7 +25,7 @@ import java.util.LinkedList;
 /**
  * @author Anton Chepurov
  */
-public class VHDLStructureBuilderTest {
+public class StructureBuilderTest {
 
 	@Test
 	public void othersTransitionCreatedCorrectly() throws Exception {
@@ -62,7 +62,7 @@ public class VHDLStructureBuilderTest {
 	private static Entity insertTransitionIntoEntity(String transitionValue) throws Exception {
 		String portName = "varName";
 		int portHighestSB = 7;
-		VHDLStructureBuilder builder = new VHDLStructureBuilder();
+		StructureBuilder builder = new StructureBuilder();
 		builder.buildEntity("EntityName");
 		builder.buildPort(portName, false, new Type(new Indices(portHighestSB, 0)));
 		builder.buildArchitecture("ArchitectureName", "ArchitectureAffiliation");
@@ -78,7 +78,7 @@ public class VHDLStructureBuilderTest {
 
 	@Test
 	public void correctListOfFiles() throws URISyntaxException {
-		VHDLStructureBuilder.ArchitectureFileFinder finder = initAdderFinder();
+		StructureBuilder.ArchitectureFileFinder finder = initAdderFinder();
 		List<File> fileList = finder.getListOfFiles();
 		assertNotNull(fileList);
 		assertEquals(2, fileList.size());
@@ -102,7 +102,7 @@ public class VHDLStructureBuilderTest {
 				"begin";
 		ByteArrayInputStream is = new ByteArrayInputStream(input.getBytes());
 		assertTrue("Architecture not detected in standard string",
-				new VHDLStructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
+				new StructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
 
 		input = "end;\n" +
 				"\n" +
@@ -111,7 +111,7 @@ public class VHDLStructureBuilderTest {
 				"begin";
 		is = new ByteArrayInputStream(input.getBytes());
 		assertTrue("Architecture not detected in string over 2 lines",
-				new VHDLStructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
+				new StructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
 
 		input = "end;\n" +
 				"\n" +
@@ -120,7 +120,7 @@ public class VHDLStructureBuilderTest {
 				"begin";
 		is = new ByteArrayInputStream(input.getBytes());
 		assertTrue("Architecture not detected in string over 2 lines with tabulation",
-				new VHDLStructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
+				new StructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
 
 		input = "end;\n" +
 				"\n" +
@@ -129,7 +129,7 @@ public class VHDLStructureBuilderTest {
 				"begin";
 		is = new ByteArrayInputStream(input.getBytes());
 		assertFalse("False architecture detected in string over 2 lines with tabulation",
-				new VHDLStructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
+				new StructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
 
 		input = "--end;\n" +
 				"--\n" +
@@ -138,7 +138,7 @@ public class VHDLStructureBuilderTest {
 				"--begin";
 		is = new ByteArrayInputStream(input.getBytes());
 		assertFalse("Architecture detected in comments over 2 lines",
-				new VHDLStructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
+				new StructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
 
 		input = "--end;\n" +
 				"--\n" +
@@ -146,34 +146,34 @@ public class VHDLStructureBuilderTest {
 				"--begin";
 		is = new ByteArrayInputStream(input.getBytes());
 		assertFalse("Architecture detected in a single line comment",
-				new VHDLStructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
+				new StructureBuilder.ArchitectureFileFinder.Detector(is, entityName).isDetected());
 
 	}
 
 	@Test
 	public void architectureDetectedInFiles() throws URISyntaxException, FileNotFoundException {
-		VHDLStructureBuilder.ArchitectureFileFinder finder = initAdderFinder();
+		StructureBuilder.ArchitectureFileFinder finder = initAdderFinder();
 		String entityName = "full_adder";
 		File falseFile = new File(finder.getSourceFile().getParent(), "ha.vhdl");
 		File correctFile = new File(finder.getSourceFile().getParent(), "va.vhdl");
 		assertFalse("Architecture detected in incorrect file",
-				new VHDLStructureBuilder.ArchitectureFileFinder.Detector(new FileInputStream(falseFile), entityName).isDetected());
+				new StructureBuilder.ArchitectureFileFinder.Detector(new FileInputStream(falseFile), entityName).isDetected());
 		assertTrue("Architecture not detected in correct file",
-				new VHDLStructureBuilder.ArchitectureFileFinder.Detector(new FileInputStream(correctFile), entityName).isDetected());
+				new StructureBuilder.ArchitectureFileFinder.Detector(new FileInputStream(correctFile), entityName).isDetected());
 	}
 
 	@Test
 	public void entityFoundForComponent() throws URISyntaxException {
-		VHDLStructureBuilder.ArchitectureFileFinder finder = initAdderFinder();
+		StructureBuilder.ArchitectureFileFinder finder = initAdderFinder();
 		File entityFile = finder.findArchitectureFileForEntity("full_adder");
 		assertNotNull("File with architecture not found for component", entityFile);
 		assertTrue(entityFile.exists());
 		assertTrue("Incorrect file found as a component architecture file", entityFile.getName().equals("va.vhdl"));
 	}
 
-	private VHDLStructureBuilder.ArchitectureFileFinder initAdderFinder() throws URISyntaxException {
-		URI uri = VHDLStructureBuilderTest.class.getResource("./../../designs/add4/add4.vhdl").toURI();
+	private StructureBuilder.ArchitectureFileFinder initAdderFinder() throws URISyntaxException {
+		URI uri = StructureBuilderTest.class.getResource("./../../designs/add4/add4.vhdl").toURI();
 		File sourceFile = new File(uri);
-		return new VHDLStructureBuilder.ArchitectureFileFinder(sourceFile);
+		return new StructureBuilder.ArchitectureFileFinder(sourceFile);
 	}
 }

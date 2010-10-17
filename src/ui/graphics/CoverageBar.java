@@ -1,7 +1,7 @@
 package ui.graphics;
 
 import ui.base.AbstractCoverage;
-import ui.base.SplittedCoverage;
+import ui.base.SplitCoverage;
 import ui.base.PureCoverage;
 
 import javax.swing.*;
@@ -46,11 +46,11 @@ public class CoverageBar extends JPanel {
 
 		/* Set BAR VALUES */
 		JProgressBar progressBar;
-		if (coverage instanceof SplittedCoverage) {
-			SplittedCoverage splittedCoverage = (SplittedCoverage) coverage;
-			progressBar = new JProgressBar(0, splittedCoverage.getTotal());
+		if (coverage instanceof SplitCoverage) {
+			SplitCoverage splitCoverage = (SplitCoverage) coverage;
+			progressBar = new JProgressBar(0, splitCoverage.getTotal());
 			progressBar.setUI(new BlackTitledProgressBarUI());
-			progressBar.setValue(splittedCoverage.getCovered());
+			progressBar.setValue(splitCoverage.getCovered());
 			progressBar.setString(coverage.percentageAsString() + "% (" + coverage.toString() + ")");
 		} else {
 			PureCoverage pureCoverage = (PureCoverage) coverage;

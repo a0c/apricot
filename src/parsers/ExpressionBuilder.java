@@ -1,7 +1,7 @@
 package parsers;
 
+import base.helpers.RegexpFactory;
 import base.vhdl.structure.*;
-import base.helpers.RegexFactory;
 import base.Indices;
 
 import java.util.*;
@@ -14,13 +14,13 @@ import java.util.regex.Pattern;
  */
 public class ExpressionBuilder {
 	private static final Pattern STD_LOGIC_VECTOR_CONV = Pattern.compile(
-			"^" + RegexFactory.createStringRegexp("STD_LOGIC_VECTOR") + " \\( .+ \\)$"
+			"^" + RegexpFactory.createStringRegexp("STD_LOGIC_VECTOR") + " \\( .+ \\)$"
 	);
 	private static final Pattern UNSIGNED_CONV = Pattern.compile(
-			"^" + RegexFactory.createStringRegexp("UNSIGNED") + " \\( .+ \\)$"
+			"^" + RegexpFactory.createStringRegexp("UNSIGNED") + " \\( .+ \\)$"
 	);
 	private static final Pattern CONV_INTEGER_CONV = Pattern.compile(
-			"^" + RegexFactory.createStringRegexp("CONV_INTEGER") + " \\( .+ \\)$"
+			"^" + RegexpFactory.createStringRegexp("CONV_INTEGER") + " \\( .+ \\)$"
 	);
 	private static final Pattern USER_DEFINED_CONV = Pattern.compile(
 			"^[a-zA-Z][\\w]* \\( .+ \\)$"

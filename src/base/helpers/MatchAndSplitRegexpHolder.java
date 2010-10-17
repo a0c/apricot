@@ -3,11 +3,11 @@ package base.helpers;
 /**
  * @author Anton Chepurov
  */
-public class MatchAndSplitRegexHolder {
+public class MatchAndSplitRegexpHolder {
 	private String matchingRegexp;
 	private String splittingRegexp;
 
-	public MatchAndSplitRegexHolder(String matchingRegexp, String splittingRegexp) {
+	public MatchAndSplitRegexpHolder(String matchingRegexp, String splittingRegexp) {
 		this.matchingRegexp = matchingRegexp;
 		this.splittingRegexp = splittingRegexp;
 	}

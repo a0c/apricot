@@ -538,7 +538,7 @@ public class ApplicationForm implements ActionListener {
 		IconAdder.setFrameIcon(frame);
 		frame.pack();
 		frame.setVisible(true);
-		UniversalFrameLocator.maximize(frame);
+		UniversalFrameManipulator.maximize(frame);
 
 		ToolTipManager.sharedInstance().setDismissDelay(15000);
 

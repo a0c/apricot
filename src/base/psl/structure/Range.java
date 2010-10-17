@@ -1,7 +1,7 @@
 package base.psl.structure;
 
 import io.PSLBufferedReader;
-import base.helpers.RegexFactory;
+import base.helpers.RegexpFactory;
 
 /**
  * @author Anton Chepurov
@@ -134,7 +134,7 @@ public class Range {
 	 * @throws Exception if unknown temporal modifier is used
 	 */
 	public static Range parseRangeNEXT(String expression) throws Exception {
-		String nextRegexp = RegexFactory.createStringRegexp("next");
+		String nextRegexp = RegexpFactory.createStringRegexp("next");
 
 		if (expression.matches(nextRegexp + "\\[.*")) { //todo: before was "\\s\\[.*"
 			/*      NEXT[i]      */

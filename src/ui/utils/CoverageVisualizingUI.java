@@ -7,8 +7,8 @@ import javax.swing.*;
 /**
  * @author Anton Chepurov
  */
-public class CoverageVizualizingUI extends UIThread {
-	public CoverageVizualizingUI(JFrame owner) {
+public class CoverageVisualizingUI extends UIThread {
+	public CoverageVisualizingUI(JFrame owner) {
 		super(
 				owner,
 				false,

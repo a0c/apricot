@@ -3,12 +3,12 @@ package ui.base;
 /**
  * @author Anton Chepurov
  */
-public class SplittedCoverage extends AbstractCoverage {
+public class SplitCoverage extends AbstractCoverage {
 	
 	private int covered;
 	private int total;
 
-	public SplittedCoverage(int covered, int total, String title) {
+	public SplitCoverage(int covered, int total, String title) {
 		super(title);
 		this.covered = covered;
 		this.total = total;

@@ -97,7 +97,7 @@ public class SimulationFrame extends JFrame {
 
 		mainPanel.add(linesScrollPane);
 		if (titlesScrollPane != null) {
-			SyncronousScrollBarsListener.linkScrollPanes(linesScrollPane, titlesScrollPane);
+			SynchronousScrollBarsListener.linkScrollPanes(linesScrollPane, titlesScrollPane);
 		}
 
 		return mainPanel;

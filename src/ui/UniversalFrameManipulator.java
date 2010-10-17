@@ -11,8 +11,9 @@ import java.awt.*;
  *
  * @author Anton Chepurov
  */
-public class UniversalFrameLocator {
+public class UniversalFrameManipulator {
 
+	@SuppressWarnings({"UnusedDeclaration"})
 	public static void centerFrame(JFrame frameToCenter) {
 		frameToCenter.setLocationRelativeTo(null);
 	}

@@ -14,7 +14,7 @@ import java.util.LinkedList;
 /**
  * @author Anton Chepurov
  */
-public class PSLStructureBuilderTest {
+public class StructureBuilderTest {
 	private final Collection[] sourceProps = {
 			new Collection("p1", VerificationDirective.ASSERT, PSLProperties.EXAMPLE_OPERATOR_ARRAY[0][0], "property source line 1"),
 			new Collection("p2", VerificationDirective.ASSERT, PSLProperties.EXAMPLE_OPERATOR_ARRAY[1][0], "property source line 2"),
@@ -28,11 +28,11 @@ public class PSLStructureBuilderTest {
 			new Collection("p10", VerificationDirective.ASSERT, PSLProperties.EXAMPLE_OPERATOR_ARRAY[9][0], "property source line 10")
 	};
 
-	private PSLStructureBuilder builder;
+	private StructureBuilder builder;
 
 	@Before
 	public void initBuilder() throws Exception {
-		builder = new PSLStructureBuilder(PPGLibraryTest.createLibrary());
+		builder = new StructureBuilder(PPGLibraryTest.createLibrary());
 	}
 
 	@Test

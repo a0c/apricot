@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * @author Anton Chepurov
  */
-public class VHDLStructureParserTest {
+public class StructureParserTest {
 
 	@SuppressWarnings({"InstanceMethodNamingConvention"})
 	@Test
@@ -29,11 +29,11 @@ public class VHDLStructureParserTest {
 		expect(mockVhdlScanner.next()).andReturn(null);
 		replay(mockVhdlScanner);
 		/* Create builder and build file base */
-		VHDLStructureBuilder structureBuilder = new VHDLStructureBuilder();
+		StructureBuilder structureBuilder = new StructureBuilder();
 		structureBuilder.buildEntity("EntityName");
 		structureBuilder.buildArchitecture("ArchitectureName", "ArchitectureAffiliation");
 		/* Create parser and trigger single parse step */
-		VHDLStructureParser parser = new VHDLStructureParser(mockVhdlScanner, structureBuilder);
+		StructureParser parser = new StructureParser(mockVhdlScanner, structureBuilder);
 		parser.parse();
 
 		/* ASSERT */
@@ -66,7 +66,7 @@ public class VHDLStructureParserTest {
 				{"some_name : PROCESS", new String[0]}
 		};
 		for (Object[] sensitivityList : sensitivityLists) {
-			Collection<String> createdList = VHDLStructureParser.extractSensitivityList(((String) sensitivityList[0]));
+			Collection<String> createdList = StructureParser.extractSensitivityList(((String) sensitivityList[0]));
 			assertArrayEquals(((String[]) sensitivityList[1]), createdList.toArray(new String[createdList.size()]));
 		}
 	}

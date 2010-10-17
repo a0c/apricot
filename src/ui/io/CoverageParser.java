@@ -1,7 +1,7 @@
 package ui.io;
 
 import ui.base.AbstractCoverage;
-import ui.base.SplittedCoverage;
+import ui.base.SplitCoverage;
 
 import java.util.Scanner;
 
@@ -35,15 +35,15 @@ public class CoverageParser {
 
 				if (checkNodes && line.startsWith(NODES_START)) {
 					SplitCoverageHolder covHolder = new SplitCoverageHolder(line);
-					nodeCoverage = new SplittedCoverage(covHolder.getCovered(), covHolder.getTotal(), "Node coverage");
+					nodeCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), "Node coverage");
 					checkNodes = false;
 				} else if (checkEdges && line.startsWith(EDGES_START)) {
 					SplitCoverageHolder covHolder = new SplitCoverageHolder(line);
-					edgeCoverage = new SplittedCoverage(covHolder.getCovered(), covHolder.getTotal(), "Edge coverage");
+					edgeCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), "Edge coverage");
 					checkEdges = false;
 				} else if (line.startsWith(TOTAL_START)) {
 					SplitCoverageHolder covHolder = new SplitCoverageHolder(line);
-					toggleCoverage = new SplittedCoverage(covHolder.getCovered(), covHolder.getTotal(), "Toggle coverage");
+					toggleCoverage = new SplitCoverage(covHolder.getCovered(), covHolder.getTotal(), "Toggle coverage");
 					break;
 				}
 			}

@@ -68,9 +68,9 @@ public class ParserShell {
 
 	private void readPSLFile() throws Exception {
 		consoleWriter.write("(2/4) Parsing PSL structure...");
-		PSLStructureBuilder pslStructureBuilder = new PSLStructureBuilder(library);
-		new PSLStructureParser(new PSLScanner(pslFile), pslStructureBuilder).parse();
-		newProperties = pslStructureBuilder.getProperties();
+		StructureBuilder structureBuilder = new StructureBuilder(library);
+		new StructureParser(new PSLScanner(pslFile), structureBuilder).parse();
+		newProperties = structureBuilder.getProperties();
 		consoleWriter.done();
 	}
 

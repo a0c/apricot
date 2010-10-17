@@ -12,11 +12,11 @@ import java.util.TreeMap;
 /**
  * @author Anton Chepurov
  */
-public class HLDDStructureParser {
+public class StructureParser {
 	private final HLDDScanner scanner;
-	private final HLDDStructureBuilder builder;
+	private final StructureBuilder builder;
 
-	public HLDDStructureParser(HLDDScanner scanner, HLDDStructureBuilder structureBuilder) {
+	public StructureParser(HLDDScanner scanner, StructureBuilder structureBuilder) {
 		this.scanner = scanner;
 		this.builder = structureBuilder;
 	}

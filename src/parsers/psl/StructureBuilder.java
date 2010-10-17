@@ -10,7 +10,7 @@ import parsers.ExpressionBuilder;
 /**
  * @author Anton Chepurov
  */
-public class PSLStructureBuilder {
+public class StructureBuilder {
 
 	private PPGLibrary library;
 	private List<Property> propertyList;
@@ -20,7 +20,7 @@ public class PSLStructureBuilder {
 	/**
 	 * @param library PPG Library that can extract operator with highest precedence from a specified line expression
 	 */
-	public PSLStructureBuilder(PPGLibrary library) {
+	public StructureBuilder(PPGLibrary library) {
 		this.library = library;
 		propertyList = new LinkedList<Property>();
 		booleanExpressionBuilder = new ExpressionBuilder();

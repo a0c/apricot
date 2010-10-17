@@ -1,10 +1,10 @@
 package ui;
 
+import ui.utils.CoverageVisualizingUI;
 import ui.utils.uiWithWorker.UIWithWorker;
-import ui.utils.CoverageVizualizingUI;
 import ui.utils.CoverageAnalyzingUI;
 import ui.utils.CoverageAnalyzingWorker;
-import ui.utils.CoverageVizualizingWorker;
+import ui.utils.CoverageVisualizingWorker;
 import ui.graphics.CoverageFrame;
 import ui.io.CoverageParser;
 import io.ConsoleWriter;
@@ -144,8 +144,8 @@ public class BusinessLogicCoverageAnalyzer {
 		}
 
 		/*  */
-		UIWithWorker.runUIWithWorker(new CoverageVizualizingUI(applicationForm.getFrame()),
-				new CoverageVizualizingWorker(vhdlFile, covFile, mappingFile, applicationForm, consoleWriter));
+		UIWithWorker.runUIWithWorker(new CoverageVisualizingUI(applicationForm.getFrame()),
+				new CoverageVisualizingWorker(vhdlFile, covFile, mappingFile, applicationForm, consoleWriter));
 
 	}
 }

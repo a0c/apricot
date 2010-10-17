@@ -1,10 +1,9 @@
 package io;
 
+import base.helpers.RegexpFactory;
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.variables.utils.PPGLibraryGraphVariableCreator;
-import base.psl.Regex;
-import base.helpers.RegexFactory;
-import base.helpers.MatchAndSplitRegexHolder;
+import base.helpers.MatchAndSplitRegexpHolder;
 import base.psl.structure.Range;
 import base.psl.structure.*;
 
@@ -19,6 +18,9 @@ import io.helpers.PSLOperatorDataHolder;
  * @author Anton Chepurov
  */
 public class PPGLibraryReader {
+
+	@SuppressWarnings({"ConstantNamingConvention"})
+	public static final String LITERAL_ENDS_WITH_SPACE_OR_BRACKET = "^[a-zA-Z][\\w]*[\\s\\(\\{]$";
 
 	private PPGLibrary ppgLibrary;
 
@@ -50,7 +52,7 @@ public class PPGLibraryReader {
 		String word;
 
 		/* Trim 'OPERATORS' */
-		word = pslBufReader.readWordMatchingRegexp(Regex.LITERAL_ENDS_WITH_WHITESPACE_OR_BRACKET);
+		word = pslBufReader.readWordMatchingRegexp(LITERAL_ENDS_WITH_SPACE_OR_BRACKET);
 		if (!word.equalsIgnoreCase("OPERATORS"))
 			throw new Exception("Malformed PPG Library file: \'OPERATORS\' expected to identify the beginning of the list of operators" + pslBufReader.printLog());
 
@@ -86,7 +88,7 @@ public class PPGLibraryReader {
 			/* Read PPG */
 			boolean nextPPGFound = pslBufReader.trySkippingToRegexp(".*\\{$");
 			if (!nextPPGFound) break;
-//			word = pslBufReader.readWordMatchingRegexp(Regex.LITERAL_ENDS_WITH_WHITESPACE_OR_BRACKET);
+//			word = pslBufReader.readWordMatchingRegexp(LITERAL_ENDS_WITH_SPACE_OR_BRACKET);
 //			word = pslBufReader.getLastReadWord();
 //			if (word == null) break;
 
@@ -111,7 +113,7 @@ public class PPGLibraryReader {
 		HashMap<String, Integer> operandIndexByName = new HashMap<String, Integer>();
 		boolean withWindow = false;
 		String[] windowPlaceholders = null;
-		MatchAndSplitRegexHolder regexps = new MatchAndSplitRegexHolder(null, null); // Temporal filler
+		MatchAndSplitRegexpHolder regexps = new MatchAndSplitRegexpHolder(null, null); // Temporal filler
 		/* Parse WINDOW */
 		if (Range.isRangeDeclaration(opDeclaration)) {
 			withWindow = true;
@@ -128,7 +130,7 @@ public class PPGLibraryReader {
 				/* Words in LowerCase are DELIMITERS. PSLOperator REGEXes must be formed on their basis. */
 //				operatorName = word;
 				splitLimit = 2;
-				regexps = RegexFactory.createMatchAndSplitRegexps(word, i == 0, withWindow);
+				regexps = RegexpFactory.createMatchAndSplitRegexps(word, i == 0, withWindow);
 
 			} else {
 

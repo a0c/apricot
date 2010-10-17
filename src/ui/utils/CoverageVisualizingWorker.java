@@ -16,7 +16,7 @@ import ui.ExtendedException;
 /**
  * @author Anton Chepurov
  */
-public class CoverageVizualizingWorker extends TaskSwingWorker {
+public class CoverageVisualizingWorker extends TaskSwingWorker {
 
 	private final File vhdlFile;
 	private final File covFile;
@@ -24,7 +24,7 @@ public class CoverageVizualizingWorker extends TaskSwingWorker {
 	private final ApplicationForm applicationForm;
 	private final ConsoleWriter consoleWriter;
 
-	public CoverageVizualizingWorker(File vhdlFile, File covFile, File mappingFile, ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
+	public CoverageVisualizingWorker(File vhdlFile, File covFile, File mappingFile, ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
 		this.vhdlFile = vhdlFile;
 		this.covFile = covFile;
 		this.mappingFile = mappingFile;
