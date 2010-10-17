@@ -5,42 +5,40 @@ import base.Type;
 import base.hldd.structure.Flags;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 13.10.2008
- * <br>Time: 23:27:20
+ * @author Anton Chepurov
  */
 public class PartedVariable extends Variable {
-    private final Indices partedIndices;
+	private final Indices partedIndices;
 
-    public PartedVariable(String varName, Type baseType, Indices partedIndices) {
+	public PartedVariable(String varName, Type baseType, Indices partedIndices) {
 		this(varName, baseType, partedIndices, new Flags());
-    }
+	}
 
 	public PartedVariable(String varName, Type baseType, Indices partedIndices, Flags flags) {
 		super(varName, baseType.derivePartedType(partedIndices), flags);
 		this.partedIndices = partedIndices;
 	}
 
-    public Indices getPartedIndices() {
-        return partedIndices;
-    }
+	public Indices getPartedIndices() {
+		return partedIndices;
+	}
 
-    public boolean isIdenticalTo(AbstractVariable comparedAbsVariable) {
-        /* Compare class */
-        if (comparedAbsVariable.getClass() != this.getClass()) return false;
-        /* Compare Indices */
-        Indices compIndices = ((PartedVariable) comparedAbsVariable).getPartedIndices();
-        if (!partedIndices.equals(compIndices)) return false;
-        /* Compare the remaining parts */
-        return super.isIdenticalTo(comparedAbsVariable);
-    }
+	public boolean isIdenticalTo(AbstractVariable comparedAbsVariable) {
+		/* Compare class */
+		if (comparedAbsVariable.getClass() != this.getClass()) return false;
+		/* Compare Indices */
+		Indices compIndices = ((PartedVariable) comparedAbsVariable).getPartedIndices();
+		if (!partedIndices.equals(compIndices)) return false;
+		/* Compare the remaining parts */
+		return super.isIdenticalTo(comparedAbsVariable);
+	}
 
-    public String getPureName() {
+	public String getPureName() {
 		return super.getName();
 	}
 
 	@Override
 	public String getName() {
-        return getPureName() + partedIndices.toString();
-    }
+		return getPureName() + partedIndices.toString();
+	}
 }

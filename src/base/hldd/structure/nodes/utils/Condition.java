@@ -6,11 +6,9 @@ import base.HashCodeUtil;
 import java.util.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 14.04.2010
- * <br>Time: 14:01:58
+ * @author Anton Chepurov
  */
-public final class Condition implements Comparable<Condition>{
+public final class Condition implements Comparable<Condition> {
 	/* Single value */
 	private int value = -1;
 //	/* Enum */
@@ -40,7 +38,7 @@ public final class Condition implements Comparable<Condition>{
 		return value;
 	}
 
-	public int getElementsCount () {
+	public int getElementsCount() {
 		return arrayConditions.length;
 	}
 
@@ -62,7 +60,7 @@ public final class Condition implements Comparable<Condition>{
 	}
 
 	private int getLeft() {
-		return isArray() ? arrayConditions[0].value : value ;
+		return isArray() ? arrayConditions[0].value : value;
 	}
 
 	private int getOrd() throws HLDDException {
@@ -136,7 +134,8 @@ public final class Condition implements Comparable<Condition>{
 		// here left and oLeft are equal, but the internal structure is different
 		Iterator<Condition> listIterator = asList().iterator();
 		Iterator<Condition> oListIterator = o.asList().iterator();
-		listIterator.next(); oListIterator.next(); // skip 1st items (here left and oLeft are equal anyway)
+		listIterator.next();
+		oListIterator.next(); // skip 1st items (here left and oLeft are equal anyway)
 		while (true) {
 			// the one with more items (conditions) is greater
 			if (listIterator.hasNext() ^ oListIterator.hasNext()) {
@@ -193,12 +192,13 @@ public final class Condition implements Comparable<Condition>{
 	public String[] toStringArray() {
 		String[] conditionAsString;
 		if (isArray()) {
-			conditionAsString = new String[arrayConditions.length]; int i = 0;
+			conditionAsString = new String[arrayConditions.length];
+			int i = 0;
 			for (Condition condition : arrayConditions) {
 				conditionAsString[i++] = String.valueOf(condition.value); //todo: enum (array of enums, like S_INIT | S_STOP | S_RESTART )
 			}
 		} else {
-			conditionAsString = new String[]{ String.valueOf(value) };
+			conditionAsString = new String[]{String.valueOf(value)};
 		} //todo: enum
 		return conditionAsString;
 	}
@@ -221,7 +221,7 @@ public final class Condition implements Comparable<Condition>{
 				return true;
 			}
 		}
-		
+
 		return conditionsToFind.isEmpty();
 		//todo: enum
 	}
@@ -273,6 +273,7 @@ public final class Condition implements Comparable<Condition>{
 	}
 
 	//todo: remove this method. use Collection in Condition's constructor
+
 	private static int[] integerList2IntArray(LinkedList<Integer> conditionsList) {
 		int[] filteredIntArray = new int[conditionsList.size()];
 		int i = 0;
@@ -320,7 +321,7 @@ public final class Condition implements Comparable<Condition>{
 	public static int countValues(Collection<Condition> conditions) {
 		int valuesCount = 0;
 		for (Condition condition : conditions) {
-			valuesCount += condition.isArray() ? condition.arrayConditions.length : 1 ;
+			valuesCount += condition.isArray() ? condition.arrayConditions.length : 1;
 		}
 		return valuesCount;
 	}

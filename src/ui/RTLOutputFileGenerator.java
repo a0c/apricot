@@ -6,9 +6,7 @@ import javax.swing.event.DocumentListener;
 import java.io.File;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 02.06.2010
- * <br>Time: 17:38:51
+ * @author Anton Chepurov
  */
 public class RTLOutputFileGenerator implements DocumentListener {
 	//todo: possibly generify this class to OutputFileGenerator...
@@ -38,7 +36,8 @@ public class RTLOutputFileGenerator implements DocumentListener {
 	}
 
 	@Override
-	public void removeUpdate(DocumentEvent e) {}
+	public void removeUpdate(DocumentEvent e) {
+	}
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {

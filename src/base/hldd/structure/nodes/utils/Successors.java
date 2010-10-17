@@ -8,13 +8,11 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 19.02.2010
- * <br>Time: 1:01:18
+ * @author Anton Chepurov
  */
 public class Successors {
 
-	private static final Logger LOG = Logger.getLogger(Successors.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Successors.class.getName());
 
 	private TreeMap<Condition, Node> successorByCondition = new TreeMap<Condition, Node>();
 	/**
@@ -31,13 +29,14 @@ public class Successors {
 	/**
 	 * <b>NB!</b> If specified condition is a part of some complex condition available in this <tt>Successors</tt> object,
 	 * <tt>null</tt> will be returned. To look inside complex conditions use {@link #getSuccessorInternal(Condition)}.
+	 *
 	 * @param condition exact condition to look for.
 	 * @return successor node where the specified condition leads to
 	 */
 	public Node getSuccessor(Condition condition) {
 
 		if (!hasExactCondition(condition)) {
-			LOG.fine("Trying to obtain successor for non-existent condition (" + condition + ") from " + this);
+			LOGGER.fine("Trying to obtain successor for non-existent condition (" + condition + ") from " + this);
 			return null;
 		}
 
@@ -102,7 +101,7 @@ public class Successors {
 		for (Map.Entry<Condition, Node> entry : successorByCondition.entrySet()) {
 			Condition condition = entry.getKey();
 			Node successor = entry.getValue();
-			
+
 			builder.append(condition.toString());
 			builder.append("=>");
 			builder.append(successor == null ? "null" : successor.getRelativeIndex());
@@ -149,6 +148,7 @@ public class Successors {
 
 	/**
 	 * Compacts conditions. Merges conditions with the same successor into a single condition.
+	 *
 	 * @throws base.HLDDException
 	 */
 	public void compact() throws HLDDException {
@@ -168,7 +168,7 @@ public class Successors {
 					mergedSuccessor = successor;
 					mergedConditions = new LinkedList<Condition>();
 				}
-				
+
 				if (successor == mergedSuccessor) { // collect condition
 					mergedConditions.add(condition);
 				}
@@ -197,7 +197,7 @@ public class Successors {
 	/**
 	 * @param condition whose holder (complex condition) is to be decompacted
 	 * @throws base.HLDDException if array-condition is specified as a parameter, or
-	 * 		if this object doesn't contain the specified condition
+	 *                            if this object doesn't contain the specified condition
 	 */
 	public void decompact(Condition condition) throws HLDDException {
 		if (condition.isArray()) {

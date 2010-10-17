@@ -9,12 +9,10 @@ import java.math.BigInteger;
 import static junit.framework.Assert.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 04.05.2010
- * <br>Time: 22:35:04
+ * @author Anton Chepurov
  */
 public class ConstantVariableTest {
-	@Test (expected = HLDDException.class)
+	@Test(expected = HLDDException.class)
 	public void testSubRange() throws HLDDException {
 
 		ConstantVariable const0100 = ConstantVariable.createNamedConstant(new BigInteger("4"), null, new Indices(3, 0));
@@ -42,6 +40,6 @@ public class ConstantVariableTest {
 		System.out.println(const010.toString());
 		System.out.println(const0100.toString());
 
-		const0100.subRange(new Indices(4,3));
+		const0100.subRange(new Indices(4, 3));
 	}
 }

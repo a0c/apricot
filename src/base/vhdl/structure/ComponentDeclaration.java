@@ -5,12 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 13.09.2010
- * <br>Time: 18:14:50
+ * @author Anton Chepurov
  */
 public class ComponentDeclaration {
-	
+
 	private final String name;
 
 	private final File sourceFile;

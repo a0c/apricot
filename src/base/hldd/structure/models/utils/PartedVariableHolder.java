@@ -7,65 +7,63 @@ import base.Indices;
 /**
  * Class is used to pass both a variable and its parted indices to and fro.
  *
- * <br><br>User: Anton Chepurov
- * <br>Date: 30.10.2008
- * <br>Time: 15:28:45
+ * @author Anton Chepurov
  */
 public class PartedVariableHolder {
-    public static final int NO_TRUE_VALUE = Integer.MIN_VALUE;
-    
-    private AbstractVariable variable;
-    private Indices partedIndices;
-    private final int trueValue;
+	public static final int NO_TRUE_VALUE = Integer.MIN_VALUE;
 
-    public PartedVariableHolder(AbstractVariable variable, Indices partedIndices, int trueValue) {
-        this.variable = variable;
-        this.partedIndices = partedIndices;
-        this.trueValue = trueValue;
-    }
+	private AbstractVariable variable;
+	private Indices partedIndices;
+	private final int trueValue;
 
-    public PartedVariableHolder(AbstractVariable variable, Indices partedIndices) {
-        this(variable, partedIndices, NO_TRUE_VALUE); //todo: instead of NO_TRUE_VALUE extend PartedVariableHolder class ...
-    }
+	public PartedVariableHolder(AbstractVariable variable, Indices partedIndices, int trueValue) {
+		this.variable = variable;
+		this.partedIndices = partedIndices;
+		this.trueValue = trueValue;
+	}
 
-    public AbstractVariable getVariable() {
-        return variable;
-    }
+	public PartedVariableHolder(AbstractVariable variable, Indices partedIndices) {
+		this(variable, partedIndices, NO_TRUE_VALUE); //todo: instead of NO_TRUE_VALUE extend PartedVariableHolder class ...
+	}
 
-    public Indices getPartedIndices() {
-        return partedIndices;
-    }
+	public AbstractVariable getVariable() {
+		return variable;
+	}
 
-    public int getTrueValue() {
-        return trueValue;
-    }
+	public Indices getPartedIndices() {
+		return partedIndices;
+	}
 
-    public boolean isInversed() {
-        return trueValue == 0;
-    }
+	public int getTrueValue() {
+		return trueValue;
+	}
+
+	public boolean isInverted() {
+		return trueValue == 0;
+	}
 
 	public boolean isParted() {
 		return partedIndices != null;
 	}
 
-    public boolean isIdenticalTo(PartedVariableHolder comparedHolder){
-        /* Compare Variables */
-        if (!variable.isIdenticalTo(comparedHolder.variable)) return false;
-        /* Compare Parted Indices */
-        return Indices.equals(partedIndices, comparedHolder.partedIndices);
-    }
+	public boolean isIdenticalTo(PartedVariableHolder comparedHolder) {
+		/* Compare Variables */
+		if (!variable.isIdenticalTo(comparedHolder.variable)) return false;
+		/* Compare Parted Indices */
+		return Indices.equals(partedIndices, comparedHolder.partedIndices);
+	}
 
-    public void setVariable(AbstractVariable variable) {
-        this.variable = variable;
-    }
+	public void setVariable(AbstractVariable variable) {
+		this.variable = variable;
+	}
 
 	public void setPartedIndices(Indices partedIndices) {
 		this.partedIndices = partedIndices;
 	}
 
-    public String toString() {
-        return variable + Indices.toString(partedIndices);
-    }
+	public String toString() {
+		return variable + Indices.toString(partedIndices);
+	}
 
 	@Override
 	public int hashCode() {
@@ -91,6 +89,6 @@ public class PartedVariableHolder {
 			return false;
 		}
 
-		return  trueValue == thatHolder.trueValue;
+		return trueValue == thatHolder.trueValue;
 	}
 }

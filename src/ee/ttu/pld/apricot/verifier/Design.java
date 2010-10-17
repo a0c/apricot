@@ -6,9 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 30.05.2010
- * <br>Time: 11:42:44
+ * @author Anton Chepurov
  */
 public class Design {
 	static final String NEW_DESIGN_DIR = "verif";

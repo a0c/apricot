@@ -16,7 +16,7 @@ public class FunctionVariableTest {
 		final int before = -1;
 		final int equal = 0;
 		final int after = 1;
-		
+
 		Comparator<FunctionVariable> comparator = FunctionVariable.getComparator();
 		assertNotNull("FunctionVariable.getComparator() returned null", comparator);
 

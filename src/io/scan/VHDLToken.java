@@ -9,138 +9,131 @@ import java.util.regex.Pattern;
  * 2) port_name { ‘,’ port_name }  ‘:’  ‘IN’ | ‘OUT’  type ‘;’
  * ...
  *
- * <br><br>User: Anton Chepurov
- * <br>Date: 04.02.2008
- * <br>Time: 22:18:40
+ * @author Anton Chepurov
  */
 public class VHDLToken {
 
-    private Type type;
+	private Type type;
 
-    private String value;
+	private String value;
 
-    public VHDLToken(Type type, String value) {
-        this.type = type;
-        this.value = value;
-    }
+	public VHDLToken(Type type, String value) {
+		this.type = type;
+		this.value = value;
+	}
 
-    public static Type diagnoseType(String newValue) {
-        return Type.diagnoseType(newValue);
-    }
+	public static Type diagnoseType(String newValue) {
+		return Type.diagnoseType(newValue);
+	}
 
-    /* GETTERS and SETTERS */
+	public Type getType() {
+		return type;
+	}
 
-    public Type getType() {
-        return type;
-    }
-
-    public String getValue() {
-        return value;
-    }
+	public String getValue() {
+		return value;
+	}
 
 	@Override
 	public String toString() {
 		return "{" + type + "} " + value;
 	}
 
-	interface Matcheable {
-        boolean matches(String line);
-    }
+	interface Matchable {
+		@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
+		boolean matches(String line);
+	}
 
-    /**
-     * Sub-Type for base {@link Type}
-     */
-    static enum Sub implements Matcheable {
-        LBL("[a-zA-Z][\\w]*"),
-        INTEGER("(\\-?\\d+)"),
-        BIT("(\"(0|1)+\")|('(0|1)+')"),
-        BOOLEAN("((TRUE)|(FALSE))"),
-        HEX("([\\da-fA-F]+)"),
-        BASED_LITERAL("(\\d+ # (" + HEX.regex + "|[\\._])+ #( [eE]\\+?\\d+)?)"),
-        EXPRESSION("(\\( )?.+( \\))?"),
-        TYPE("((BIT)" +
-                "|(STD_LOGIC)" +
-                "|(((BIT)|(STD_LOGIC))_VECTOR \\( " + EXPRESSION.regex + " DOWNTO " + EXPRESSION.regex + " \\))" + //"|(((BIT)|(STD_LOGIC))_VECTOR \\( " + Sub.INTEGER.regex + " DOWNTO " + Sub.INTEGER.regex + " \\))" +
-                "|(INTEGER)" +
-                "|(INTEGER RANGE " + EXPRESSION.regex + " ((DOWNTO)|(TO)) " + EXPRESSION.regex + ")" + //"|(INTEGER RANGE (\\( )?" + Sub.INTEGER.regex + "( \\))? ((DOWNTO)|(TO)) (\\( )?" + Sub.INTEGER.regex + "( \\))?)" +
-                "|(UNSIGNED \\( " + EXPRESSION.regex + " ((DOWNTO)|(TO)) " + EXPRESSION.regex + " \\))" +
-                "|(BOOLEAN)" +
-                "|(NATURAL)" +
-                "|(" + LBL.regex + "))"), // User declared type
-        NUMERIC_VALUE("(" + BIT.regex + "|" + INTEGER.regex + "|" + BOOLEAN.regex + "|" + HEX.regex + "|" + BASED_LITERAL.regex + ")"), 
-        INIT("( :=" + NUMERIC_VALUE.regex + ")?"),
-        MUST_INIT(" :=" + NUMERIC_VALUE.regex),
-        OPERAND("((" + LBL.regex + ")" +
-                "|(" + LBL.regex + " \\( [\\w\'\"]+? \\))" +
-                "|(" + LBL.regex + " \\( \\d+ DOWNTO \\d+ \\)))"),
-        ;
+	/**
+	 * Sub-Type for base {@link Type}
+	 */
+	@SuppressWarnings({"EnumeratedClassNamingConvention", "EnumeratedConstantNamingConvention"})
+	static enum Sub implements Matchable {
+		LBL("[a-zA-Z][\\w]*"),
+		INTEGER("(\\-?\\d+)"),
+		BIT("(\"(0|1)+\")|('(0|1)+')"),
+		BOOLEAN("((TRUE)|(FALSE))"),
+		HEX("([\\da-fA-F]+)"),
+		BASED_LITERAL("(\\d+ # (" + HEX.regexp + "|[\\._])+ #( [eE]\\+?\\d+)?)"),
+		EXPRESSION("(\\( )?.+( \\))?"),
+		TYPE("((BIT)" +
+				"|(STD_LOGIC)" +
+				"|(((BIT)|(STD_LOGIC))_VECTOR \\( " + EXPRESSION.regexp + " DOWNTO " + EXPRESSION.regexp + " \\))" +
+				"|(INTEGER)" +
+				"|(INTEGER RANGE " + EXPRESSION.regexp + " ((DOWNTO)|(TO)) " + EXPRESSION.regexp + ")" +
+				"|(UNSIGNED \\( " + EXPRESSION.regexp + " ((DOWNTO)|(TO)) " + EXPRESSION.regexp + " \\))" +
+				"|(BOOLEAN)" +
+				"|(NATURAL)" +
+				"|(" + LBL.regexp + "))"), // User declared type
+		NUMERIC_VALUE("(" + BIT.regexp + "|" + INTEGER.regexp + "|" + BOOLEAN.regexp + "|" + HEX.regexp + "|" + BASED_LITERAL.regexp + ")"),
+		INIT("( :=" + NUMERIC_VALUE.regexp + ")?"),
+		MUST_INIT(" :=" + NUMERIC_VALUE.regexp),
+		OPERAND("((" + LBL.regexp + ")" +
+				"|(" + LBL.regexp + " \\( [\\w\'\"]+? \\))" +
+				"|(" + LBL.regexp + " \\( \\d+ DOWNTO \\d+ \\)))"),;
 
-        private final String regex; // Label
-        private final Pattern pattern;
+		private final String regexp; // Label
+		private final Pattern pattern;
 
-        Sub(String regex) {
-            this.regex = regex;
-            this.pattern = Pattern.compile(regex);
-        }
+		Sub(String regexp) {
+			this.regexp = regexp;
+			this.pattern = Pattern.compile(regexp);
+		}
 
-        public boolean matches(String line) {
-            return pattern.matcher(line).matches();
-        }
-    }
+		@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
+		public boolean matches(String line) {
+			return pattern.matcher(line).matches();
+		}
+	}
 
-    public static enum Type implements Matcheable { //todo: it is probably possible to optimize the regexes: currently they are too complex to simply match the declaration.
-        USE_DECL("^USE .+;$"),
-        ENTITY_DECL("^ENTITY " + Sub.LBL.regex + " IS$"), // PORT \\($
-        DECL_CLOSE("^END .*;$"), // "^END " + Sub.LBL.regex + " (" + Sub.LBL.regex + " )?;$"
-        TYPE_ENUM_DECL("^TYPE " + Sub.LBL.regex + " IS \\( .* \\) ;$"),
-        TYPE_DECL("^TYPE " + Sub.LBL.regex + " IS .+ ;$"), // previously was TYPE_ARRAY_DECL
-        GENERIC_OPEN("^GENERIC \\($"),
-        GENERIC_DECL("^" + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* :" + Sub.TYPE.regex + Sub.INIT.regex + " ;$"),
-        PORT_OPEN("^PORT \\($"),
-        PORT_DECL("^(SIGNAL )?" + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* :((IN)|(OUT)) " + Sub.TYPE.regex + Sub.INIT.regex + " ;$"),
-        BEGIN("^BEGIN$"),
-        ARCHITECTURE_DECL("^ARCHITECTURE " + Sub.LBL.regex + " OF " + Sub.LBL.regex + " IS$"),
-        CONSTANT_DECL("^CONSTANT " + Sub.LBL.regex + " :" + Sub.TYPE.regex + Sub.MUST_INIT.regex + " ?;$"),
-        SIGNAL_DECL("^SIGNAL " + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* :" + Sub.TYPE.regex + Sub.INIT.regex + " ;$"),
-        VARIABLE_DECL("^VARIABLE " + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* :" + Sub.TYPE.regex + Sub.INIT.regex + " ;$"),
-        PROCESS_DECL("(" + Sub.LBL.regex + " :)?PROCESS \\( " + Sub.LBL.regex + "( , " + Sub.LBL.regex + ")* \\)$"),
-		COMPONENT_DECL("^COMPONENT " + Sub.LBL.regex + "$"),
-		PORT_MAP("^" + Sub.LBL.regex + " :" + Sub.LBL.regex + " PORT MAP \\( .* \\) ;$"),
-		ALIAS("^ALIAS " + Sub.LBL.regex + " :" + Sub.TYPE.regex + " IS .+ ;$"),
-        IF_STATEMENT("^IF .* THEN$"),
-        ELSIF_STATEMENT("^ELSIF .* THEN$"),
-        ELSE("ELSE"),
-        TRANSITION("((^" + Sub.OPERAND.regex + " ((:=)|(<=)).+? ;$)" +
-                "|(^NULL ;$))"),
-        CASE_STATEMENT("^CASE .* IS$"),
-        WHEN_STATEMENT("^WHEN .* =>$"),
-        PACKAGE_DECL("^PACKAGE(?!( BODY )) .+ IS$"),
-        PACKAGE_BODY_DECL("^PACKAGE BODY .+ IS$"),
-		WITH("^WITH " + Sub.LBL.regex + " SELECT .+ ;$"),
-        UNKNOWN("");
+	@SuppressWarnings({"EnumeratedClassNamingConvention", "EnumeratedConstantNamingConvention"})
+	public static enum Type implements Matchable { //todo: it is probably possible to optimize the regexps: currently they are too complex to simply match the declaration.
+		USE_DECL("^USE .+;$"),
+		ENTITY_DECL("^ENTITY " + Sub.LBL.regexp + " IS$"),
+		DECL_CLOSE("^END .*;$"),
+		TYPE_ENUM_DECL("^TYPE " + Sub.LBL.regexp + " IS \\( .* \\) ;$"),
+		TYPE_DECL("^TYPE " + Sub.LBL.regexp + " IS .+ ;$"),
+		GENERIC_OPEN("^GENERIC \\($"),
+		GENERIC_DECL("^" + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* :" + Sub.TYPE.regexp + Sub.INIT.regexp + " ;$"),
+		PORT_OPEN("^PORT \\($"),
+		PORT_DECL("^(SIGNAL )?" + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* :((IN)|(OUT)) " + Sub.TYPE.regexp + Sub.INIT.regexp + " ;$"),
+		BEGIN("^BEGIN$"),
+		ARCHITECTURE_DECL("^ARCHITECTURE " + Sub.LBL.regexp + " OF " + Sub.LBL.regexp + " IS$"),
+		CONSTANT_DECL("^CONSTANT " + Sub.LBL.regexp + " :" + Sub.TYPE.regexp + Sub.MUST_INIT.regexp + " ?;$"),
+		SIGNAL_DECL("^SIGNAL " + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* :" + Sub.TYPE.regexp + Sub.INIT.regexp + " ;$"),
+		VARIABLE_DECL("^VARIABLE " + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* :" + Sub.TYPE.regexp + Sub.INIT.regexp + " ;$"),
+		PROCESS_DECL("(" + Sub.LBL.regexp + " :)?PROCESS \\( " + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* \\)$"),
+		COMPONENT_DECL("^COMPONENT " + Sub.LBL.regexp + "$"),
+		PORT_MAP("^" + Sub.LBL.regexp + " :" + Sub.LBL.regexp + " PORT MAP \\( .* \\) ;$"),
+		ALIAS("^ALIAS " + Sub.LBL.regexp + " :" + Sub.TYPE.regexp + " IS .+ ;$"),
+		IF_STATEMENT("^IF .* THEN$"),
+		ELSIF_STATEMENT("^ELSIF .* THEN$"),
+		ELSE("ELSE"),
+		TRANSITION("((^" + Sub.OPERAND.regexp + " ((:=)|(<=)).+? ;$)" +
+				"|(^NULL ;$))"),
+		CASE_STATEMENT("^CASE .* IS$"),
+		WHEN_STATEMENT("^WHEN .* =>$"),
+		PACKAGE_DECL("^PACKAGE(?!( BODY )) .+ IS$"),
+		PACKAGE_BODY_DECL("^PACKAGE BODY .+ IS$"),
+		WITH("^WITH " + Sub.LBL.regexp + " SELECT .+ ;$"),
+		UNKNOWN("");
 
-        private final Pattern pattern;
+		private final Pattern pattern;
 
-        Type(String regex) {
-            this.pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        }
+		Type(String regexp) {
+			this.pattern = Pattern.compile(regexp, Pattern.CASE_INSENSITIVE);
+		}
 
+		@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
+		public boolean matches(String line) {
+			return pattern.matcher(line).matches();
+		}
 
-        public boolean matches(String line) {
-            return pattern.matcher(line).matches();
-        }
-
-        
-        private static Type diagnoseType(String newValue) {
-            for (Type type : Type.values()) {
-                // Below are subtypes used for representing standalone VHDL types (the subtypes are
-                // never used alone, but rather as a part of a standalone VHDL type):
-                /* Condition before introducing Sub:
-                        !(type == INTEGER || type == TYPE || type == CONST_TYPE || type == NUMERIC_VALUE
-                        || type == UNKNOWN || type == OPERAND || type == LBL)*/
-                if (type.matches(newValue)) return type;
-            }
-            return UNKNOWN;
-        }
-    }
+		private static Type diagnoseType(String newValue) {
+			for (Type type : Type.values()) {
+				if (type.matches(newValue)) return type;
+			}
+			return UNKNOWN;
+		}
+	}
 }

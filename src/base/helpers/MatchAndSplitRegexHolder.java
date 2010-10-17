@@ -1,24 +1,22 @@
 package base.helpers;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 27.10.2008
- * <br>Time: 9:47:38
+ * @author Anton Chepurov
  */
 public class MatchAndSplitRegexHolder {
-    private String matchingRegex;
-    private String splittingRegex;
+	private String matchingRegexp;
+	private String splittingRegexp;
 
-    public MatchAndSplitRegexHolder(String matchingRegex, String splittingRegex) {
-        this.matchingRegex = matchingRegex;
-        this.splittingRegex = splittingRegex;
-    }
+	public MatchAndSplitRegexHolder(String matchingRegexp, String splittingRegexp) {
+		this.matchingRegexp = matchingRegexp;
+		this.splittingRegexp = splittingRegexp;
+	}
 
-    public String getMatchingRegex() {
-        return matchingRegex;
-    }
+	public String getMatchingRegexp() {
+		return matchingRegexp;
+	}
 
-    public String getSplittingRegex() {
-        return splittingRegex;
-    }
+	public String getSplittingRegexp() {
+		return splittingRegexp;
+	}
 }

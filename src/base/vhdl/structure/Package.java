@@ -12,38 +12,36 @@ import io.scan.VHDLScanner;
 import base.Type;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 06.04.2009
- * <br>Time: 23:04:47
+ * @author Anton Chepurov
  */
 public class Package {
-    private final String name;
-    private final Set<Constant> constants = new HashSet<Constant>();
-    private final Map<String, Type> typeByName = new HashMap<String, Type>();
+	private final String name;
+	private final Set<Constant> constants = new HashSet<Constant>();
+	private final Map<String, Type> typeByName = new HashMap<String, Type>();
 
-    public static Package parsePackageStructure(File vhdlPackageFile) throws Exception {
-        PackageParser packageParser = new PackageParser(new VHDLScanner(vhdlPackageFile));
-        packageParser.parse();
-        return packageParser.getPackageStructure();
-    }
+	public static Package parsePackageStructure(File vhdlPackageFile) throws Exception {
+		PackageParser packageParser = new PackageParser(new VHDLScanner(vhdlPackageFile));
+		packageParser.parse();
+		return packageParser.getPackageStructure();
+	}
 
-    public Package(String name) {
-        this.name = name;
-    }
+	public Package(String name) {
+		this.name = name;
+	}
 
-    public void addConstant(Constant constant) {
-        constants.add(constant);
-    }
+	public void addConstant(Constant constant) {
+		constants.add(constant);
+	}
 
-    public Set<Constant> getConstants() {
-        return constants;
-    }
+	public Set<Constant> getConstants() {
+		return constants;
+	}
 
-    public void addTypeByName(Map<String, Type> typeByName) {
-        this.typeByName.putAll(typeByName);
-    }
+	public void addTypeByName(Map<String, Type> typeByName) {
+		this.typeByName.putAll(typeByName);
+	}
 
-    public Map<String, Type> getTypeByName() {
-        return typeByName;
-    }
+	public Map<String, Type> getTypeByName() {
+		return typeByName;
+	}
 }

@@ -1,21 +1,19 @@
 package ui.utils.uiWithWorker;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 29.06.2008
- * <br>Time: 16:32:48
+ * @author Anton Chepurov
  */
 public interface UIInterface {
 
-    void hideDialog();
+	void hideDialog();
 
-    void setWorker(TaskSwingWorker worker);
+	void setWorker(TaskSwingWorker worker);
 
-    void updateProgressBar(int value, int maxValue);
+	void updateProgressBar(int value, int maxValue);
 
-    void showSuccessDialog();
+	void showSuccessDialog();
 
-    void showErrorDialog(String consoleOutput);
+	void showErrorDialog(String consoleOutput);
 
-    void setVisible(boolean visible);
+	void setVisible(boolean visible);
 }

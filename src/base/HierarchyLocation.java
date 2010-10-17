@@ -8,7 +8,7 @@ import java.util.LinkedList;
 public class HierarchyLocation {
 
 	private final LinkedList<String> locations = new LinkedList<String>();
-	
+
 	public void addLocation(String location) {
 
 		locations.addFirst(location);

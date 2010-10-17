@@ -3,51 +3,49 @@ package io.helpers;
 import java.util.Map;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 27.10.2008
- * <br>Time: 10:06:30
+ * @author Anton Chepurov
  */
 public class PSLOperatorDataHolder {
-    private final String operatorName;
-    private final String matchingRegex;
-    private final String splittingRegex;
-    private final int splitLimit;
-    private final String[] windowPlaceholders;
-    private final Map<String, Integer> operandIndexByName;
+	private final String operatorName;
+	private final String matchingRegexp;
+	private final String splittingRegexp;
+	private final int splitLimit;
+	private final String[] windowPlaceholders;
+	private final Map<String, Integer> operandIndexByName;
 
-    public PSLOperatorDataHolder(String operatorName, String matchingRegex,
-                                 String splittingRegex, int splitLimit,
-                                 String[] windowPlaceholders,
-                                 Map<String, Integer> operandIndexByName) {
-        this.operatorName = operatorName;
-        this.matchingRegex = matchingRegex;
-        this.splittingRegex = splittingRegex;
-        this.splitLimit = splitLimit;
-        this.windowPlaceholders = windowPlaceholders;
-        this.operandIndexByName = operandIndexByName;
-    }
+	public PSLOperatorDataHolder(String operatorName, String matchingRegexp,
+								 String splittingRegexp, int splitLimit,
+								 String[] windowPlaceholders,
+								 Map<String, Integer> operandIndexByName) {
+		this.operatorName = operatorName;
+		this.matchingRegexp = matchingRegexp;
+		this.splittingRegexp = splittingRegexp;
+		this.splitLimit = splitLimit;
+		this.windowPlaceholders = windowPlaceholders;
+		this.operandIndexByName = operandIndexByName;
+	}
 
-    public String getOperatorName() {
-        return operatorName;
-    }
+	public String getOperatorName() {
+		return operatorName;
+	}
 
-    public String getMatchingRegex() {
-        return matchingRegex;
-    }
+	public String getMatchingRegexp() {
+		return matchingRegexp;
+	}
 
-    public String getSplittingRegex() {
-        return splittingRegex;
-    }
+	public String getSplittingRegexp() {
+		return splittingRegexp;
+	}
 
-    public int getSplitLimit() {
-        return splitLimit;
-    }
+	public int getSplitLimit() {
+		return splitLimit;
+	}
 
-    public String[] getWindowPlaceholders() {
-        return windowPlaceholders;
-    }
+	public String[] getWindowPlaceholders() {
+		return windowPlaceholders;
+	}
 
-    public Map<String, Integer> getOperandIndexByName() {
-        return operandIndexByName;
-    }
+	public Map<String, Integer> getOperandIndexByName() {
+		return operandIndexByName;
+	}
 }

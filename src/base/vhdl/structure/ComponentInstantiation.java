@@ -3,9 +3,7 @@ package base.vhdl.structure;
 import java.util.List;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 14.09.2010
- * <br>Time: 21:42:26
+ * @author Anton Chepurov
  */
 public class ComponentInstantiation {
 	private final String name;
@@ -33,7 +31,7 @@ public class ComponentInstantiation {
 
 	public void renameFormalMapping(String oldFormal, String newFormal) {
 
-		portMap.renameFormal(oldFormal, newFormal);		
+		portMap.renameFormal(oldFormal, newFormal);
 	}
 
 	public List<OperandImpl> findPartedOutputActuals() {

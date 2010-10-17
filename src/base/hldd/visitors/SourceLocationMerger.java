@@ -6,24 +6,22 @@ import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.GraphVariable;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 13.04.2009
- * <br>Time: 17:08:48
+ * @author Anton Chepurov
  */
 public class SourceLocationMerger implements HLDDVisitor {
-    private Node secondNode;
+	private Node secondNode;
 
-    public SourceLocationMerger(Node secondNode) {
-        this.secondNode = secondNode;
-    }
+	public SourceLocationMerger(Node secondNode) {
+		this.secondNode = secondNode;
+	}
 
 	public void visitNode(Node node) {
-        /* Add VHDL lines to node */        
-        node.addSource(secondNode.getSource());
-        /* For ControlNodes, merge the subtree as well */
-        if (node.isControlNode()) {
+		/* Add VHDL lines to node */
+		node.addSource(secondNode.getSource());
+		/* For ControlNodes, merge the sub-tree as well */
+		if (node.isControlNode()) {
 			int conditionsCount = node.getConditionsCount();
-            for (int idx = 0; idx < conditionsCount; idx++) {
+			for (int idx = 0; idx < conditionsCount; idx++) {
 				try {
 					Condition condition = node.getCondition(idx);
 					Node backupSecond = secondNode; // BACKUP
@@ -36,8 +34,9 @@ public class SourceLocationMerger implements HLDDVisitor {
 					throw new RuntimeException(e); // should not happen
 				}
 			}
-        }
-    }
+		}
+	}
 
-    public void visitGraphVariable(GraphVariable graphVariable) throws Exception {}
+	public void visitGraphVariable(GraphVariable graphVariable) throws Exception {
+	}
 }

@@ -9,13 +9,11 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 16.02.2010
- * <br>Time: 17:05:42
+ * @author Anton Chepurov
  */
 public class ConfigurationHandler {
 
-	private final static Logger LOG = Logger.getLogger(ConfigurationHandler.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(ConfigurationHandler.class.getName());
 
 	public static final String CONFIGURATION_FILE_PATH = "configuration_file_path";
 	public static final String SOURCE_FILE_PATH = "source_file_path";
@@ -55,11 +53,11 @@ public class ConfigurationHandler {
 				properties.load(new BufferedReader(new FileReader(propFile)));
 
 			} catch (IOException e) {
-				LOG.info("Error while reading configuration: " + e.getMessage());
+				LOGGER.info("Error while reading configuration: " + e.getMessage());
 				throw new RuntimeException("Error while reading configuration file: " + e.getMessage());
 			}
 		} else {
-			LOG.info("Configuration file is missing.");
+			LOGGER.info("Configuration file is missing.");
 		}
 
 		// empty properties, in case propFile == null
@@ -77,8 +75,9 @@ public class ConfigurationHandler {
 	/**
 	 * This method should not be used. State signals/variables must be rather detected with analysis of their usages.
 	 * todo: A different visitor should be implemented.
-	 * Moreover, state-flag is only required in pure RTL graphs, where there is a Control part and Datapath part.
+	 * Moreover, state-flag is only required in pure RTL graphs, where there is a Control part and DataPath part.
 	 * Yes, but the flag itself should be added by VHDL2HLDD converter :)
+	 *
 	 * @param name signal/variable name to check for being state
 	 * @return whether this is a state name
 	 */

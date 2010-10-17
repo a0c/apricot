@@ -7,10 +7,8 @@ import base.vhdl.structure.Operator;
 import java.util.LinkedList;
 
 /**
-* <br><br>User: Anton Chepurov
-* <br>Date: 24.05.2010
-* <br>Time: 12:43:22
-*/
+ * @author Anton Chepurov
+ */
 class BooleanOperandsCollector {
 	private PartedVariableHolder rootVarHolder;
 	private LinkedList<PartedVariableHolder> list = new LinkedList<PartedVariableHolder>();
@@ -46,7 +44,7 @@ class BooleanOperandsCollector {
 
 			Operator operator = functionVariable.getOperator();
 
-			if (operator.isLogical(length)) { // go inside logical functions only. Note: conditions like filt1fly='1' are represented by Variables, not FunctionVariables
+			if (operator.isLogical(length)) { // go inside logical functions only. Note: conditions like fly='1' are represented by Variables, not FunctionVariables
 				for (PartedVariableHolder operand : functionVariable.getOperands()) {
 					collect(operand);
 				}

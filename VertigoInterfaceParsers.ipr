@@ -101,7 +101,7 @@
           <option name="m_maxLength" value="64" />
         </inspection_tool>
         <inspection_tool class="BooleanMethodNameMustStartWithQuestion" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="questionString" value="is,can,has,should,could,will,shall,check,contains,equals,add,put,remove,startsWith,endsWith,was,are" />
+          <option name="questionString" value="is,can,has,should,could,will,shall,check,contains,equals,add,put,remove,startsWith,endsWith,was,are,try" />
         </inspection_tool>
         <inspection_tool class="ClassNamePrefixedWithPackageName" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ClassNameSameAsAncestorName" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -114,7 +114,7 @@
         <inspection_tool class="ConstantNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="onlyCheckImmutables" value="false" />
           <option name="m_regex" value="[A-Z_\d]*" />
-          <option name="m_minLength" value="5" />
+          <option name="m_minLength" value="4" />
           <option name="m_maxLength" value="32" />
         </inspection_tool>
         <inspection_tool class="DollarSignInName" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -125,7 +125,7 @@
         </inspection_tool>
         <inspection_tool class="EnumeratedConstantNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[A-Z][A-Za-z\d]*" />
-          <option name="m_minLength" value="5" />
+          <option name="m_minLength" value="4" />
           <option name="m_maxLength" value="32" />
         </inspection_tool>
         <inspection_tool class="ExceptionNameDoesntEndWithException" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -149,7 +149,7 @@
           <option name="m_ignoreCatchParameters" value="false" />
           <option name="m_regex" value="[a-z][A-Za-z\d]*" />
           <option name="m_minLength" value="1" />
-          <option name="m_maxLength" value="20" />
+          <option name="m_maxLength" value="30" />
         </inspection_tool>
         <inspection_tool class="MethodNameSameAsParentName" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MethodNamesDifferOnlyByCase" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -345,8 +345,29 @@
   <component name="ProjectDictionaryState">
     <dictionary name="Randy">
       <words>
+        <w>addr</w>
+        <w>args</w>
+        <w>arial</w>
         <w>delim</w>
+        <w>downto</w>
+        <w>elsif</w>
+        <w>focusable</w>
+        <w>generify</w>
+        <w>hldd</w>
+        <w>hlddsim</w>
+        <w>ieee</w>
         <w>indices</w>
+        <w>metadata</w>
+        <w>optimizable</w>
+        <w>replacer</w>
+        <w>simplifiable</w>
+        <w>smth</w>
+        <w>tahoma</w>
+        <w>thldd</w>
+        <w>throwable</w>
+        <w>tooltip</w>
+        <w>vhdl</w>
+        <w>voto</w>
       </words>
     </dictionary>
   </component>

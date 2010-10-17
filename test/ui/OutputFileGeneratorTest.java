@@ -10,13 +10,12 @@ import static org.junit.Assert.*;
 import static ui.BusinessLogic.HLDDRepresentationType.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 01.06.2010
- * <br>Time: 20:27:02
+ * @author Anton Chepurov
  */
 public class OutputFileGeneratorTest {
 
-	@Test public void returnNullForNullSourceFile() {
+	@Test
+	public void returnNullForNullSourceFile() {
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(null);
 		expect(form.getHlddRepresentationType()).andReturn(null);
@@ -27,7 +26,9 @@ public class OutputFileGeneratorTest {
 		assertNull(file);
 		verify(form);
 	}
-	@Test public void returnNullForNullHLDDType() {
+
+	@Test
+	public void returnNullForNullHLDDType() {
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(new File(""));
 		expect(form.getHlddRepresentationType()).andReturn(null);
@@ -38,7 +39,9 @@ public class OutputFileGeneratorTest {
 		assertNull(file);
 		verify(form);
 	}
-	@Test public void createCorrectFile() {
+
+	@Test
+	public void createCorrectFile() {
 
 		/* _F_FU */
 		ApplicationForm form = createApplicationForm(FULL_TREE);
@@ -97,7 +100,9 @@ public class OutputFileGeneratorTest {
 		assertEquals("D:\\WORKSPACE\\tr\\b13_M_FU.agm", file.getAbsolutePath());
 		verify(form);
 	}
-	@Test public void reactOnChangedState() {
+
+	@Test
+	public void reactOnChangedState() {
 		/* NULL */
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(null);
@@ -125,7 +130,9 @@ public class OutputFileGeneratorTest {
 		generator.stateChanged(null);
 		verify(form);
 	}
-	@Test public void reactOnInsertUpdate() {
+
+	@Test
+	public void reactOnInsertUpdate() {
 		/* NULL */
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(null);
@@ -153,7 +160,9 @@ public class OutputFileGeneratorTest {
 		generator.insertUpdate(null);
 		verify(form);
 	}
-	@Test public void reactOnChangeUpdate() {
+
+	@Test
+	public void reactOnChangeUpdate() {
 		/* NULL */
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(null);

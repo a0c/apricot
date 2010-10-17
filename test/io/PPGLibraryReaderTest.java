@@ -1,30 +1,26 @@
 package io;
 
 import org.junit.Test;
+
 import static junit.framework.Assert.*;
 
-import java.io.File;
-
 import base.psl.structure.PPGLibraryTest;
-import base.psl.structure.PSLOperator;
 import helpers.PSLOperators;
 import io.helpers.PSLOperatorDataHolder;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 18.06.2008
- * <br>Time: 12:57:10
+ * @author Anton Chepurov
  */
 public class PPGLibraryReaderTest {
 
-    @Test
-    public void splitToTokensTest() {
-        assertCorrect("always TOP", "always", "TOP");
-        assertCorrect("never TOP", "never", "TOP");
-        assertCorrect("BOP -> TOP", "BOP", "->", "TOP");
-        assertCorrect("BOP1 until BOP2", "BOP1", "until", "BOP2");
-        assertCorrect("next TOP", "next", "TOP");
-        assertCorrect("next[n] TOP", "next[n]", "TOP");
+	@Test
+	public void splitToTokensTest() {
+		assertCorrect("always TOP", "always", "TOP");
+		assertCorrect("never TOP", "never", "TOP");
+		assertCorrect("BOP -> TOP", "BOP", "->", "TOP");
+		assertCorrect("BOP1 until BOP2", "BOP1", "until", "BOP2");
+		assertCorrect("next TOP", "next", "TOP");
+		assertCorrect("next[n] TOP", "next[n]", "TOP");
 
 
 //        next_e[start to end] TOP;
@@ -33,48 +29,49 @@ public class PPGLibraryReaderTest {
 //        BOP and TOP;
 //        ! TOP;
 
-    }
+	}
 
-    private void assertCorrect(String fullOpDeclaration, String... expectedTokens) {
-        String[] actualTokens = PPGLibraryReader.splitToTokens(fullOpDeclaration);
-        /* Check number of splitted tokesn */
-        assertEquals(
-                "Wrong number of splitted tokens for operationDeclaration \"" + fullOpDeclaration + "\"",
-                expectedTokens.length,
-                actualTokens.length
-        );
-        /* Check each splitted token */
-        for (int i = 0; i < actualTokens.length; i++) {
-            assertEquals(expectedTokens[i], actualTokens[i]);
-        }
-    }
+	private void assertCorrect(String fullOpDeclaration, String... expectedTokens) {
+		String[] actualTokens = PPGLibraryReader.splitToTokens(fullOpDeclaration);
+		/* Check number of split tokens */
+		assertEquals(
+				"Wrong number of split tokens for operationDeclaration \"" + fullOpDeclaration + "\"",
+				expectedTokens.length,
+				actualTokens.length
+		);
+		/* Check each split token */
+		for (int i = 0; i < actualTokens.length; i++) {
+			assertEquals(expectedTokens[i], actualTokens[i]);
+		}
+	}
 
 
-    /**
-     * To be run in Debug mode
-     * @throws Exception if error occurs
-     */
-    @Test
-    public void tempTest() throws Exception {
+	/**
+	 * To be run in Debug mode
+	 *
+	 * @throws Exception if error occurs
+	 */
+	@Test
+	public void tempTest() throws Exception {
 
-        PPGLibraryTest.createLibrary();
-//        System.out.println("PPG Library read successfully");
+		/* Check PPG Library to be read successfully */
+		PPGLibraryTest.createLibrary();
 
-    }
+	}
 
-    @Test
-    public void correctOperationDeclarationParse() {
-        for (int i = 0; i < PSLOperators.operatorDeclarations.length; i++) {
-            String operatorDeclaration = PSLOperators.operatorDeclarations[i];
-            PSLOperatorDataHolder data = PPGLibraryReader.parseOperationDeclaration(operatorDeclaration);
-            /* Check MATCHING REGEX */
-            assertEquals("Matching regex is incorrect for operator \"" + operatorDeclaration + "\"",
-                    PSLOperators.matchingRegexes[i], data.getMatchingRegex());
-            /* Check SPLITTING REGEX */
-            assertEquals("Splitting regex is incorrect for operator \"" + operatorDeclaration + "\"",
-                    PSLOperators.splittingRegexes[i], data.getSplittingRegex());
-        }
+	@Test
+	public void correctOperationDeclarationParse() {
+		for (int i = 0; i < PSLOperators.OPERATOR_DECLARATIONS.length; i++) {
+			String operatorDeclaration = PSLOperators.OPERATOR_DECLARATIONS[i];
+			PSLOperatorDataHolder data = PPGLibraryReader.parseOperationDeclaration(operatorDeclaration);
+			/* Check MATCHING REGEXP */
+			assertEquals("Matching regexp is incorrect for operator \"" + operatorDeclaration + "\"",
+					PSLOperators.MATCHING_REGEXPS[i], data.getMatchingRegexp());
+			/* Check SPLITTING REGEXP */
+			assertEquals("Splitting regexp is incorrect for operator \"" + operatorDeclaration + "\"",
+					PSLOperators.SPLITTING_REGEXPS[i], data.getSplittingRegexp());
+		}
 
-    }
+	}
 
 }

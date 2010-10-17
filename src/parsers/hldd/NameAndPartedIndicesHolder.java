@@ -3,10 +3,8 @@ package parsers.hldd;
 import base.Indices;
 
 /**
-* <br><br>User: Anton Chepurov
-* <br>Date: 10.05.2010
-* <br>Time: 14:32:12
-*/
+ * @author Anton Chepurov
+ */
 class NameAndPartedIndicesHolder {
 	String name;
 	Indices partedIndices;

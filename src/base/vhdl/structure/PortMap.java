@@ -55,7 +55,7 @@ public class PortMap {
 			AbstractOperand actual = findActualFor(port.getName());
 
 			if (actual.isParted() && actual instanceof OperandImpl) {
-				
+
 				partedActuals.add(((OperandImpl) actual));
 			}
 

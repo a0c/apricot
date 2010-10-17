@@ -10,13 +10,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 30.05.2010
- * <br>Time: 11:41:07
+ * @author Anton Chepurov
  */
 public class DesignCreator {
 
 	private static final File TEST_DESIGNS_FILE;
+
 	static {
 		File file;
 		try {
@@ -28,7 +27,8 @@ public class DesignCreator {
 		TEST_DESIGNS_FILE = file;
 	}
 
-	private DesignCreator() {}
+	private DesignCreator() {
+	}
 
 	public static Collection<Design> create(Collection<String> hlddPaths, Statistics statistics) {
 

@@ -11,8 +11,8 @@ import base.vhdl.visitors.PartialSetVariableCollector;
 import java.util.*;
 
 /**
-* @author Anton Chepurov
-*/
+ * @author Anton Chepurov
+ */
 class PartialAssignmentManager {
 
 	private Map<base.vhdl.structure.Process, Map<String, Set<OperandImpl>>> partialAssignmentsByProcess = new HashMap<Process, Map<String, Set<OperandImpl>>>();
@@ -48,7 +48,8 @@ class PartialAssignmentManager {
 		boolean[] bits = new boolean[wholeLength.length()];
 		/* Check intersections: if any, inform about them */
 		for (OperandImpl partSetOperand : partialSets) {
-			if (!partSetOperand.isParted()) throw new Exception("Partial setting operand doesn't contain parted indices: " + partSetOperand);
+			if (!partSetOperand.isParted())
+				throw new Exception("Partial setting operand doesn't contain parted indices: " + partSetOperand);
 			Indices partedIndices = partSetOperand.getPartedIndices();
 			for (int index = partedIndices.getLowest(); index <= partedIndices.getHighest(); index++) {
 				/* If this bit has already been set, inform about intersection */
@@ -60,7 +61,7 @@ class PartialAssignmentManager {
 		/* Check missing partial setting variables: if any, fill the set with missing variables */
 		Collection<Indices> unsetIndicesCollect = extractUnsetIndices(bits);
 		for (Indices unsetIndices : unsetIndicesCollect) { //todo: It may occur, that the whole variable is unset. Consider this.
-			partialSets.add(new OperandImpl(varName, unsetIndices,  false));
+			partialSets.add(new OperandImpl(varName, unsetIndices, false));
 		}
 	}
 
@@ -76,7 +77,8 @@ class PartialAssignmentManager {
 			} else {
 				if (lowest != -1) {
 					indicesList.add(new Indices(highest, lowest));
-					lowest = -1; highest = -1;
+					lowest = -1;
+					highest = -1;
 				}
 			}
 		}

@@ -8,55 +8,53 @@ import java.util.LinkedList;
 import parsers.ExpressionBuilder;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 17.09.2008
- * <br>Time: 12:45:33
+ * @author Anton Chepurov
  */
 public class PSLStructureBuilder {
 
-    private PPGLibrary library;
-    private List<Property> propertyList;
+	private PPGLibrary library;
+	private List<Property> propertyList;
 
-    private ExpressionBuilder booleanExpressionBuilder;
+	private ExpressionBuilder booleanExpressionBuilder;
 
-    /**
-     * @param library PPG Library that can extract operator with highest precedence from a specified line expression
-     */
-    public PSLStructureBuilder(PPGLibrary library) {
-        this.library = library;
-        propertyList = new LinkedList<Property>();
-        booleanExpressionBuilder = new ExpressionBuilder();
-    }
+	/**
+	 * @param library PPG Library that can extract operator with highest precedence from a specified line expression
+	 */
+	public PSLStructureBuilder(PPGLibrary library) {
+		this.library = library;
+		propertyList = new LinkedList<Property>();
+		booleanExpressionBuilder = new ExpressionBuilder();
+	}
 
-    public void buildProperty(String propertyName, VerificationDirective directive, String propertyBody, String propertySourceLine) throws Exception {
-        
-        propertyList.add(new Property(propertySourceLine, propertyName, directive, buildExpression(propertyBody)));
-    }
+	public void buildProperty(String propertyName, VerificationDirective directive, String propertyBody, String propertySourceLine) throws Exception {
 
-    private AbstractExpression buildExpression(String expressionLine) throws Exception {
+		propertyList.add(new Property(propertySourceLine, propertyName, directive, buildExpression(propertyBody)));
+	}
 
-        expressionLine = ExpressionBuilder.trimEnclosingBrackets(expressionLine);
+	private AbstractExpression buildExpression(String expressionLine) throws Exception {
 
-        PSLOperator pslOperator = library.extractOperator(expressionLine);
+		expressionLine = ExpressionBuilder.trimEnclosingBrackets(expressionLine);
 
-        if (pslOperator == null) {
-            /* HDL Boolean ==> OperandImpl */
-            return new OperandImpl(booleanExpressionBuilder.buildExpression(expressionLine));
-        } else {
-            /* Temporal Operand ==> ExpressionImpl */
-            ExpressionImpl expression = new ExpressionImpl(pslOperator, Range.parseRangeNEXT(expressionLine));//todo... before was "if (pslOperator.isWithWindow())" 
+		PSLOperator pslOperator = library.extractOperator(expressionLine);
 
-            String[] operandLines = pslOperator.extractOperandLinesFrom(expressionLine);
-            for (String operandLine : operandLines) {
-                expression.addOperand(buildExpression(operandLine));
-            }
+		if (pslOperator == null) {
+			/* HDL Boolean ==> OperandImpl */
+			return new OperandImpl(booleanExpressionBuilder.buildExpression(expressionLine));
+		} else {
+			/* Temporal Operand ==> ExpressionImpl */
+			ExpressionImpl expression = new ExpressionImpl(pslOperator, Range.parseRangeNEXT(expressionLine));//todo... before was "if (pslOperator.isWithWindow())"
 
-            return expression;
-        }
+			String[] operandLines = pslOperator.extractOperandLinesFrom(expressionLine);
+			for (String operandLine : operandLines) {
+				expression.addOperand(buildExpression(operandLine));
+			}
 
-    }
+			return expression;
+		}
 
-    public Property[] getProperties() {
-        return propertyList.toArray(new Property[propertyList.size()]);
-    }
+	}
+
+	public Property[] getProperties() {
+		return propertyList.toArray(new Property[propertyList.size()]);
+	}
 }

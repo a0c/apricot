@@ -13,9 +13,7 @@ import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 29.05.2010
- * <br>Time: 22:29:20
+ * @author Anton Chepurov
  */
 public class AutomaticConverterVerifier {
 
@@ -95,7 +93,8 @@ public class AutomaticConverterVerifier {
 
 		byte[] buffer = new byte[1024];
 		try {
-			while (inputStream.read(buffer) != -1) {}
+			while (inputStream.read(buffer) != -1) {
+			}
 		} finally {
 			QuietCloser.closeQuietly(inputStream);
 		}
@@ -103,9 +102,9 @@ public class AutomaticConverterVerifier {
 		byte[] digest = md.digest();
 
 		// As String
-		StringBuilder builder  = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 		for (byte dig : digest) {
-			builder.append(Integer.toString( ( dig & 0xff ) + 0x100, 16).substring( 1 ));			
+			builder.append(Integer.toString((dig & 0xff) + 0x100, 16).substring(1));
 		}
 
 		return builder.toString();

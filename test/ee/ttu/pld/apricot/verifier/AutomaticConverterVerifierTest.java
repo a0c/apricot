@@ -9,13 +9,12 @@ import java.security.NoSuchAlgorithmException;
 import static org.junit.Assert.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 29.05.2010
- * <br>Time: 22:32:03
+ * @author Anton Chepurov
  */
 public class AutomaticConverterVerifierTest {
 
-	@Test public void testGetMD5() throws IOException, NoSuchAlgorithmException {
+	@Test
+	public void testGetMD5() throws IOException, NoSuchAlgorithmException {
 
 		String simpleString = "Some very simple string";
 		String md5 = AutomaticConverterVerifier.getMD5(new ByteArrayInputStream(simpleString.getBytes()));
@@ -30,7 +29,9 @@ public class AutomaticConverterVerifierTest {
 
 
 	}
-	@Test public void testEqualStrings() throws NoSuchAlgorithmException, IOException {
+
+	@Test
+	public void testEqualStrings() throws NoSuchAlgorithmException, IOException {
 
 		String simpleString = "Some very simple string";
 
@@ -47,7 +48,9 @@ public class AutomaticConverterVerifierTest {
 		assertFalse(AutomaticConverterVerifier.areEqual(is1, is2));
 
 	}
-	@Test public void testVerify() {
+
+	@Test
+	public void testVerify() {
 
 		Statistics statistics = Statistics.createByteArrayStatistics();
 		AutomaticConverterVerifier converterVerifier = new AutomaticConverterVerifier();

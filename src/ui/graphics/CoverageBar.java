@@ -5,84 +5,81 @@ import ui.base.SplittedCoverage;
 import ui.base.PureCoverage;
 
 import javax.swing.*;
-import javax.swing.plaf.ProgressBarUI;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 29.06.2008
- * <br>Time: 23:56:11
+ * @author Anton Chepurov
  */
 public class CoverageBar extends JPanel {
-    private static final int threshold_good = 90;
-    private static final int threshold_week = 50;
-    private static final Font FONT = new Font("arial", Font.BOLD, 14);
-    private static final Color FOREGROUND_COLOR = Color.BLACK;
+	private static final int THRESHOLD_GOOD = 90;
+	private static final int THRESHOLD_WEEK = 50;
+	private static final Font FONT = new Font("arial", Font.BOLD, 14);
+	private static final Color FOREGROUND_COLOR = Color.BLACK;
 
-    public CoverageBar(AbstractCoverage coverage) {
-        this.setBorder(BorderFactory.createEtchedBorder());
-        /* Create TopPanel */
-        JPanel topPanel = new JPanel();
-        topPanel.setPreferredSize(new Dimension(300, 25));
-        topPanel.setMinimumSize(new Dimension(300, 25));
-        topPanel.setMaximumSize(new Dimension(300, 25));
-        topPanel.setLayout(new BorderLayout());
-        /* Add TopPanel */
-        this.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.VERTICAL;
-        this.add(Box.createVerticalGlue(), c);
-        c.gridx = 0;
-        c.gridy = 1;
-        c.fill = GridBagConstraints.NONE;
-        this.add(topPanel, c);
-        c.gridx = 0;
-        c.gridy = 2;
-        c.fill = GridBagConstraints.VERTICAL;
-        this.add(Box.createVerticalGlue(), c);
+	public CoverageBar(AbstractCoverage coverage) {
+		this.setBorder(BorderFactory.createEtchedBorder());
+		/* Create TopPanel */
+		JPanel topPanel = new JPanel();
+		topPanel.setPreferredSize(new Dimension(300, 25));
+		topPanel.setMinimumSize(new Dimension(300, 25));
+		topPanel.setMaximumSize(new Dimension(300, 25));
+		topPanel.setLayout(new BorderLayout());
+		/* Add TopPanel */
+		this.setLayout(new GridBagLayout());
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.fill = GridBagConstraints.VERTICAL;
+		this.add(Box.createVerticalGlue(), constraints);
+		constraints.gridx = 0;
+		constraints.gridy = 1;
+		constraints.fill = GridBagConstraints.NONE;
+		this.add(topPanel, constraints);
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		constraints.fill = GridBagConstraints.VERTICAL;
+		this.add(Box.createVerticalGlue(), constraints);
 
-        JLabel titleLabel = new JLabel(coverage.getTitle());
-        titleLabel.setFont(FONT);
+		JLabel titleLabel = new JLabel(coverage.getTitle());
+		titleLabel.setFont(FONT);
 
-        /* Set BAR VALUES */
-        JProgressBar bar;
-        if (coverage instanceof SplittedCoverage) {
-            SplittedCoverage splittedCoverage = (SplittedCoverage) coverage;
-            bar = new JProgressBar(0, splittedCoverage.getTotal());
-            bar.setUI(new BlackTitledProgressBarUI());
-            bar.setValue(splittedCoverage.getCovered());
-            bar.setString(coverage.percentageAsString() +  "% (" + coverage.toString() + ")");
-        } else {
-            PureCoverage pureCoverage = (PureCoverage) coverage;
-            bar = new JProgressBar(0, 100);
-            bar.setUI(new BlackTitledProgressBarUI());
-            bar.setValue((int) (pureCoverage.getCoverage() * 100));
-            bar.setString(coverage.percentageAsString() + "%");
-            bar.setForeground(FOREGROUND_COLOR);
-        }
+		/* Set BAR VALUES */
+		JProgressBar progressBar;
+		if (coverage instanceof SplittedCoverage) {
+			SplittedCoverage splittedCoverage = (SplittedCoverage) coverage;
+			progressBar = new JProgressBar(0, splittedCoverage.getTotal());
+			progressBar.setUI(new BlackTitledProgressBarUI());
+			progressBar.setValue(splittedCoverage.getCovered());
+			progressBar.setString(coverage.percentageAsString() + "% (" + coverage.toString() + ")");
+		} else {
+			PureCoverage pureCoverage = (PureCoverage) coverage;
+			progressBar = new JProgressBar(0, 100);
+			progressBar.setUI(new BlackTitledProgressBarUI());
+			progressBar.setValue((int) (pureCoverage.getCoverage() * 100));
+			progressBar.setString(coverage.percentageAsString() + "%");
+			progressBar.setForeground(FOREGROUND_COLOR);
+		}
 
-        /* Set STRING */
-        bar.setStringPainted(true);
-        bar.setFont(FONT);
+		/* Set STRING */
+		progressBar.setStringPainted(true);
+		progressBar.setFont(FONT);
 
-        /* Set COLOR */
-        int percent = (int) (bar.getPercentComplete() * 100);
-        bar.setForeground(
-                percent >= threshold_good
-                        ? Color.GREEN.darker() : percent >= threshold_week
-                        ? Color.ORANGE : Color.RED
-        );
+		/* Set COLOR */
+		int percent = (int) (progressBar.getPercentComplete() * 100);
+		progressBar.setForeground(
+				percent >= THRESHOLD_GOOD
+						? Color.GREEN.darker() : percent >= THRESHOLD_WEEK
+						? Color.ORANGE : Color.RED
+		);
 
-        topPanel.add(titleLabel, BorderLayout.LINE_START);
-        topPanel.add(bar, BorderLayout.LINE_END);
-    }
+		topPanel.add(titleLabel, BorderLayout.LINE_START);
+		topPanel.add(progressBar, BorderLayout.LINE_END);
+	}
 
-    private class BlackTitledProgressBarUI extends BasicProgressBarUI {
-        public Color getSelectionForeground() {
-            return Color.BLACK;
-        }
-    }
+	private class BlackTitledProgressBarUI extends BasicProgressBarUI {
+		public Color getSelectionForeground() {
+			return Color.BLACK;
+		}
+	}
 }

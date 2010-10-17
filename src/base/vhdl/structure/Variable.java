@@ -3,33 +3,31 @@ package base.vhdl.structure;
 import base.Type;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 06.02.2008
- * <br>Time: 21:34:15
+ * @author Anton Chepurov
  */
 public class Variable {
 
-    private String name;
-    /* Highest Significant Bit. Is negative if signed. */
-    private Type type;
+	private String name;
 
-    public Variable(String name, Type type) {
-        this.name = name;
-        this.type = type;
-    }
+	private Type type;
 
-    /* GETTERS and SETTERS */
+	public Variable(String name, Type type) {
+		this.name = name;
+		this.type = type;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	/* GETTERS and SETTERS */
 
-    public String getName() {
-        return name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public Type getType() {
-        return type;
-    }
+	public String getName() {
+		return name;
+	}
+
+	public Type getType() {
+		return type;
+	}
 
 }

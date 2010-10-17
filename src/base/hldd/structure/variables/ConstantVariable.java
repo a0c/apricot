@@ -10,38 +10,36 @@ import java.math.BigInteger;
  * Class represents a CONSTANT VARIABLE as it is defined in AGM.<br>
  * This extends Variable class by introducing parameter <i>value</i>.
  *
- * <p>User: Anton Chepurov
- * <br>Date: 25.02.2007
- * <br>Time: 21:14:16
+ * @author Anton Chepurov
  */
 public class ConstantVariable extends Variable {
 
-    // ConstantVariable VALUE
-    private BigInteger value;
+	// ConstantVariable VALUE
+	private BigInteger value;
 
-	public ConstantVariable(String constantName, BigInteger value){
+	public ConstantVariable(String constantName, BigInteger value) {
 		this(constantName, value, deriveType(value));
 	}
 
-	public ConstantVariable(String constantName, BigInteger value, Type type){
+	public ConstantVariable(String constantName, BigInteger value, Type type) {
 		super(constantName, type == null ? deriveType(value) : type);
-        this.value = value;
-        setConstant(true);
-    }
+		this.value = value;
+		setConstant(true);
+	}
 
 	private static Type deriveType(BigInteger value) {
 		return new Type(Indices.deriveLengthForValues(value.intValue(), 0));
 	}
 
-    public String toString() {
-        return super.toString() + "\tVAL = " + value;
-    }
+	public String toString() {
+		return super.toString() + "\tVAL = " + value;
+	}
 
 	public static ConstantVariable createNamedConstant(BigInteger value, String name, Indices forcedLength) {
 
 		int length = forcedLength != null ? forcedLength.length() : Indices.deriveLengthForValues(value.intValue(), 0).length();
 
-		name = (name == null) ?  "CONST_" + value + "_BW" + length : name;
+		name = (name == null) ? "CONST_" + value + "_BW" + length : name;
 
 		ConstantVariable newConstant = new ConstantVariable(name, value);
 
@@ -51,17 +49,17 @@ public class ConstantVariable extends Variable {
 		return newConstant;
 	}
 
-    public boolean isIdenticalTo(AbstractVariable comparedAbsVariable) {
-        return comparedAbsVariable instanceof ConstantVariable && value.equals(((ConstantVariable) comparedAbsVariable).value);
-    }
+	public boolean isIdenticalTo(AbstractVariable comparedAbsVariable) {
+		return comparedAbsVariable instanceof ConstantVariable && value.equals(((ConstantVariable) comparedAbsVariable).value);
+	}
 
-    /* Setters and Getters START */
+	/* Setters and Getters START */
 
-    public BigInteger getValue() {
-        return value;
-    }
+	public BigInteger getValue() {
+		return value;
+	}
 
-    /* Setters and Getters END */
+	/* Setters and Getters END */
 
 	public ConstantVariable subRange(Indices rangeToExtract) throws HLDDException {
 		Indices length = getLength();

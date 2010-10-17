@@ -4,14 +4,12 @@ import base.hldd.structure.models.BehModel;
 import io.ConsoleWriter;
 import ui.ApplicationForm;
 import ui.BusinessLogic;
-import ui.ConfigurationHandler;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 30.05.2010
- * <br>Time: 23:12:22
+ * @author Anton Chepurov
  */
 public class UIWorkerFinalizerImpl extends AbstractWorkerFinalizer {
+
 	private final BusinessLogic businessLogic;
 	private final ConsoleWriter consoleWriter;
 
@@ -43,12 +41,12 @@ public class UIWorkerFinalizerImpl extends AbstractWorkerFinalizer {
 
 		applicationForm.doAskForComment();
 
-        applicationForm.doSaveConvertedModel();
+		applicationForm.doSaveConvertedModel();
 
-        consoleWriter.writeLn("");
+		consoleWriter.writeLn("");
 
-        if (applicationForm.getSelectedParserId() == BusinessLogic.ParserID.VhdlBeh2HlddBeh) {
-            businessLogic.doLoadHlddGraph();
-        }
+		if (applicationForm.getSelectedParserId() == BusinessLogic.ParserID.VhdlBeh2HlddBeh) {
+			businessLogic.doLoadHlddGraph();
+		}
 	}
 }

@@ -12,9 +12,7 @@ import java.util.HashSet;
 /**
  * Collects functions used by graphs.
  *
- * <br><br>User: Anton Chepurov
- * <br>Date: 24.05.2010
- * <br>Time: 10:06:32
+ * @author Anton Chepurov
  */
 public class UsedFunctionsCollectorImpl implements HLDDVisitor {
 	HashSet<FunctionVariable> usedFunctions = new HashSet<FunctionVariable>();

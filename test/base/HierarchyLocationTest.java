@@ -21,6 +21,7 @@ public class HierarchyLocationTest {
 		hierarchyLocation.addLocation("LOC2");
 		assertEquals("#LOC2#LOC1#", hierarchyLocation.toString());
 	}
+
 	@Test
 	public void testIsTopLevel() {
 

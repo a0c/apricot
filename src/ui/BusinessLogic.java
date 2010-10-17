@@ -13,197 +13,192 @@ import ui.utils.UIWorkerFinalizerImpl;
 
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 21.02.2008
- * <br>Time: 16:26:06
+ * @author Anton Chepurov
  */
 public class BusinessLogic {
 
-	private static final Logger LOG = Logger.getLogger(BusinessLogic.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BusinessLogic.class.getName());
 
-    private final ApplicationForm applicationForm;
-    private final ConsoleWriter consoleWriter;
+	private final ApplicationForm applicationForm;
+	private final ConsoleWriter consoleWriter;
 
-    private File sourceFile = null;
-    private File destFile = null;
-    private File baseModelFile = null;
+	private File sourceFile = null;
+	private File destinationFile = null;
+	private File baseModelFile = null;
 
-    private BehModel model;
+	private BehModel model;
 
-    /* Auxiliary fields */
 	private String comment;
 
-    public BusinessLogic(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
-        this.applicationForm = applicationForm;
-        this.consoleWriter = consoleWriter;
-    }
+	public BusinessLogic(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
+		this.applicationForm = applicationForm;
+		this.consoleWriter = consoleWriter;
+	}
 
-    public void processParse() throws ExtendedException {
-        /* Receive data from form */
-		ConverterSettings.Builder settingsBuilder = new ConverterSettings.Builder(applicationForm.getSelectedParserId(), sourceFile, destFile);
+	public void processParse() throws ExtendedException {
+		/* Receive data from form */
+		ConverterSettings.Builder settingsBuilder = new ConverterSettings.Builder(applicationForm.getSelectedParserId(), sourceFile, destinationFile);
 		settingsBuilder.setBaseModelFile(baseModelFile);
 		settingsBuilder.setDoSimplify(applicationForm.shouldSimplify());
 		settingsBuilder.setDoFlattenConditions(applicationForm.shouldFlattenCS());
 		settingsBuilder.setDoCreateCSGraphs(applicationForm.shouldCreateCSGraphs());
 		settingsBuilder.setDoCreateExtraCSGraphs(applicationForm.shouldCreateExtraCSGraphs());
 		settingsBuilder.setHlddType(applicationForm.getHlddRepresentationType());
-		
-        /* Perform PARSING and CONVERSIONS in a separate thread */
-        new ConvertingWorker(new UIWorkerFinalizerImpl(this, consoleWriter), consoleWriter, settingsBuilder.build()).execute();
 
-    }
+		/* Perform PARSING and CONVERSIONS in a separate thread */
+		new ConvertingWorker(new UIWorkerFinalizerImpl(this, consoleWriter), consoleWriter, settingsBuilder.build()).execute();
 
-    public void reset() {
+	}
+
+	public void reset() {
 		// Reset COMMENT
-        comment = null;
-    }
+		comment = null;
+	}
 
-    public void addComment(String comment) {
-        if (this.comment == null) {
-            this.comment = comment;
-        } else {
-            this.comment += comment;
-        }
-    }
+	public void addComment(String comment) {
+		if (this.comment == null) {
+			this.comment = comment;
+		} else {
+			this.comment += comment;
+		}
+	}
 
-    public void saveModel() throws ExtendedException {
+	public void saveModel() throws ExtendedException {
 
-        /* Save model to file */
-        try {
-            /* For PSL parser, change output file from *.PSL into *.TGM */
-            changeDestFile(".psl", ".tgm");
+		/* Save model to file */
+		try {
+			/* For PSL parser, change output file from *.PSL into *.TGM */
+			changeDestinationFile(".psl", ".tgm");
 
-            model.toFile(new FileOutputStream(destFile), comment);
-            consoleWriter.writeLn("Model saved to: " + destFile.getAbsolutePath());
-        } catch (IOException e) {
+			model.toFile(new FileOutputStream(destinationFile), comment);
+			consoleWriter.writeLn("Model saved to: " + destinationFile.getAbsolutePath());
+		} catch (IOException e) {
 			String message = "Error while saving file:\n" + e.getMessage();
-            throw new ExtendedException(message, ExtendedException.ERROR_TEXT);
-        } finally {
-            /* For PSL parser, change output file back from *.TGM into *.PSL */
-            changeDestFile(".tgm", ".psl");
-        }
+			throw new ExtendedException(message, ExtendedException.ERROR_TEXT);
+		} finally {
+			/* For PSL parser, change output file back from *.TGM into *.PSL */
+			changeDestinationFile(".tgm", ".psl");
+		}
 
-    }
+	}
 
-    private void changeDestFile(String from, String into) {
-        if (applicationForm.getSelectedParserId() == ParserID.PSL2THLDD) {
-            destFile = new File(destFile.getAbsolutePath().replace(from, into));
-        }
-    }
+	private void changeDestinationFile(String from, String into) {
+		if (applicationForm.getSelectedParserId() == ParserID.PSL2THLDD) {
+			destinationFile = new File(destinationFile.getAbsolutePath().replace(from, into));
+		}
+	}
 
-    public String getProposedFileName() {
-        if (destFile != null) return destFile.getAbsolutePath();
-        if (sourceFile == null) return null;
-        String proposedFileName = null;
-        String sourceName = sourceFile.getAbsolutePath();
-        ParserID selectedParserId = applicationForm.getSelectedParserId();
-        switch (selectedParserId) {
-            case VhdlBeh2HlddBeh:
-            case VhdlBehDd2HlddBeh:
-                proposedFileName = sourceName.substring(0, sourceName.lastIndexOf(".") + 1) + "agm";
-                break;
-            case HlddBeh2HlddRtl:
-                proposedFileName = sourceName.substring(0, sourceName.lastIndexOf(".")) + "_RTL.agm";
-        }
-        return proposedFileName;
-    }
+	public String getProposedFileName() {
+		if (destinationFile != null) return destinationFile.getAbsolutePath();
+		if (sourceFile == null) return null;
+		String proposedFileName = null;
+		String sourceName = sourceFile.getAbsolutePath();
+		ParserID selectedParserId = applicationForm.getSelectedParserId();
+		switch (selectedParserId) {
+			case VhdlBeh2HlddBeh:
+			case VhdlBehDd2HlddBeh:
+				proposedFileName = sourceName.substring(0, sourceName.lastIndexOf(".") + 1) + "agm";
+				break;
+			case HlddBeh2HlddRtl:
+				proposedFileName = sourceName.substring(0, sourceName.lastIndexOf(".")) + "_RTL.agm";
+		}
+		return proposedFileName;
+	}
 
-    public ApplicationForm getApplicationForm() {
-        return applicationForm;
-    }
+	public ApplicationForm getApplicationForm() {
+		return applicationForm;
+	}
 
-    public void setModel(BehModel model) {
-        this.model = model;
-    }
+	public void setModel(BehModel model) {
+		this.model = model;
+	}
 
-    public void setSourceFile(File sourceFile) {
-        this.sourceFile = sourceFile;
-    }
+	public void setSourceFile(File sourceFile) {
+		this.sourceFile = sourceFile;
+	}
 
-    public void setDestFile(File destFile) {
-        this.destFile = destFile;
-    }
+	public void setDestinationFile(File destinationFile) {
+		this.destinationFile = destinationFile;
+	}
 
-    public void setBaseModelFile(File baseModelFile) {
-        this.baseModelFile = baseModelFile;
-    }
+	public void setBaseModelFile(File baseModelFile) {
+		this.baseModelFile = baseModelFile;
+	}
 
 	public File getSourceFile() {
 		return sourceFile;
 	}
 
 	public void clearFiles() {
-        sourceFile = null;
-        destFile = null;
-        baseModelFile = null;
-    }
+		sourceFile = null;
+		destinationFile = null;
+		baseModelFile = null;
+	}
 
-    public File deriveBaseModelFileFrom(File pslFile) {
-        return deriveFileFrom(pslFile, ".psl", ".agm");
-    }
+	public File deriveBaseModelFileFrom(File pslFile) {
+		return deriveFileFrom(pslFile, ".psl", ".agm");
+	}
 
-    /**
-     *
-     * @param sourceFile
-     * @param sourceFileExtension
-     * @param derivedFileExtension
-     * @return derived file, if it exists, or <code>null</code> if it doesn't exist.
-     */
-    public static File deriveFileFrom(File sourceFile, String sourceFileExtension, String derivedFileExtension) {
+	/**
+	 * @param sourceFile file to derive from
+	 * @param sourceFileExtension extension to replace
+	 * @param derivedFileExtension target extension
+	 * @return derived file, if it exists, or <code>null</code> if it doesn't exist.
+	 */
+	public static File deriveFileFrom(File sourceFile, String sourceFileExtension, String derivedFileExtension) {
 		String sourcePath = sourceFile.getAbsolutePath().toUpperCase();
 		sourceFileExtension = sourceFileExtension.toUpperCase();
 		if (sourcePath.endsWith(sourceFileExtension)) {
 			File derivedFile = new File(sourcePath.replace(sourceFileExtension, derivedFileExtension));
 			return derivedFile.exists() ? derivedFile : null;
 		} else {
-			LOG.finer("Mismatch between real souceFile extension and provided sourceFileExtension: \"" +
+			LOGGER.finer("Mismatch between real sourceFile extension and provided sourceFileExtension: \"" +
 					sourcePath + "\" and \"" + sourceFileExtension + "\"");
-			throw new RuntimeException("Mismatch between real souceFile extension and provided sourceFileExtension: \"" +
+			throw new RuntimeException("Mismatch between real sourceFile extension and provided sourceFileExtension: \"" +
 					sourcePath + "\" and \"" + sourceFileExtension + "\"");
-			// using replace() only may result in leaving the sourcePath unchanged, then
-			// creating a File from it and returning it, stating that it exists.   
 		}
 	}
 
-    public void doLoadHlddGraph() {
-        applicationForm.doLoadHlddGraph(deriveFileFrom(destFile, ".agm", ".png"));
-    }
+	public void doLoadHlddGraph() {
+		applicationForm.doLoadHlddGraph(deriveFileFrom(destinationFile, ".agm", ".png"));
+	}
 
 
 	public enum ParserID {
-        VhdlBeh2HlddBeh("VHDL Beh => HLDD Beh"), /* VHDL Beh => HLDD Beh */
-        VhdlBehDd2HlddBeh("HIF => HLDD Beh"),    /* VHDL Beh DD => HLDD Beh */ 
-        HlddBeh2HlddRtl("HLDD Beh => HLDD RTL"), /* HLDD Beh => HLDD RTL */
-        PSL2THLDD("PSL => THLDD"); /* PSL => THLDD */
-                                                       
-        private final String title;
+		VhdlBeh2HlddBeh("VHDL Beh => HLDD Beh"), /* VHDL Beh => HLDD Beh */
+		VhdlBehDd2HlddBeh("HIF => HLDD Beh"),	/* VHDL Beh DD => HLDD Beh */
+		HlddBeh2HlddRtl("HLDD Beh => HLDD RTL"), /* HLDD Beh => HLDD RTL */
+		PSL2THLDD("PSL => THLDD"); /* PSL => THLDD */
 
-        ParserID(String title) {
-            this.title = title;
-        }
+		private final String title;
 
-        public String getTitle() {
-            return title;
-        }
+		ParserID(String title) {
+			this.title = title;
+		}
 
-        public static ParserID getSelected(int selectedIndex) {
-            switch (selectedIndex) {
-                case 0:
-                    return VhdlBeh2HlddBeh;
-                case 1:
-                    return VhdlBehDd2HlddBeh;
-                case 2:
-                    return HlddBeh2HlddRtl;
-                default:
-                    return PSL2THLDD;
-            }
-        }
-    }
+		public String getTitle() {
+			return title;
+		}
 
-    public enum HLDDRepresentationType {
-        FULL_TREE,
-        REDUCED,
-        MINIMIZED
-    }
-    
+		public static ParserID getSelected(int selectedIndex) {
+			switch (selectedIndex) {
+				case 0:
+					return VhdlBeh2HlddBeh;
+				case 1:
+					return VhdlBehDd2HlddBeh;
+				case 2:
+					return HlddBeh2HlddRtl;
+				default:
+					return PSL2THLDD;
+			}
+		}
+	}
+
+	@SuppressWarnings({"EnumeratedConstantNamingConvention"})
+	public enum HLDDRepresentationType {
+		FULL_TREE,
+		REDUCED,
+		MINIMIZED
+	}
+
 }

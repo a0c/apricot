@@ -7,9 +7,7 @@ import java.io.PrintStream;
 import java.text.MessageFormat;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 31.05.2010
- * <br>Time: 15:54:39
+ * @author Anton Chepurov
  */
 public class Statistics {
 	static final String SKIPPING_NON_EXISTENT_FILE = "Skipping non-existent file: ";
@@ -77,6 +75,7 @@ public class Statistics {
 	}
 
 	/* STATISTICAL ACTIONS */
+
 	public void skippedNonExistent(String filePath) {
 		print(SKIPPING_NON_EXISTENT_FILE + filePath);
 		skip();

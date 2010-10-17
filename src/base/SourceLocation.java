@@ -5,9 +5,7 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 17.09.2010
- * <br>Time: 15:23:49
+ * @author Anton Chepurov
  */
 public class SourceLocation {
 
@@ -24,7 +22,7 @@ public class SourceLocation {
 		vhdlLines = new TreeSet<Integer>(sourceVhdlLines);
 
 		if (vhdlLines.first() < 0) {
-			throw new IllegalArgumentException("SourceLocation: NEGATIVE SOURCE VHDL LINE passed to constructor");			
+			throw new IllegalArgumentException("SourceLocation: NEGATIVE SOURCE VHDL LINE passed to constructor");
 		}
 	}
 

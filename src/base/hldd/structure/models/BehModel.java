@@ -17,74 +17,71 @@ import parsers.hldd.HLDDStructureParser;
 /**
  * Class representing AGM BEH RTL DD.
  * 
- * User: Anton Chepurov
- * Date: 05.11.2007
- * Time: 17:57:20
+ * @author Anton Chepurov
  */
 public class BehModel {
 
-    protected int nodeCount;
-    protected int varCount;
-    protected int graphCount;
-    protected int inpCount;
-    protected int outpCount;
-    protected int constCount;
-    protected int funcCount;
+	protected int nodeCount;
+	protected int varCount;
+	protected int graphCount;
+	protected int inpCount;
+	protected int outpCount;
+	protected int constCount;
+	protected int funcCount;
 
 	private TreeMap<Integer, AbstractVariable> variableByIndex = new TreeMap<Integer, AbstractVariable>();
 	private LinkedList<AbstractVariable> variables = new LinkedList<AbstractVariable>();
 	private LinkedList<ConstantVariable> constants = new LinkedList<ConstantVariable>();
 
-    private String mode;
+	private String mode;
 
 
-    /**
-     *
-     * @param hlddSource {@link io.scan.HLDDScanner#HLDDScanner(Object)}
-     * @param graphVariableCreator creator for {@link GraphVariable}-s.
-     *        By default {@link base.hldd.structure.variables.utils.DefaultGraphVariableCreator}
-     *        is used.
-     * @return parsed BehModel
-     * @throws Exception {@link io.scan.HLDDScanner#HLDDScanner(Object)}.
-     */
-    public static BehModel parseHlddStructure(Object hlddSource, GraphVariableCreator graphVariableCreator) throws Exception {
-        /* Parse HLDD structure */
-        HLDDScanner scanner = new HLDDScanner(hlddSource);
-        HLDDStructureBuilder structureBuilder = new HLDDStructureBuilder(graphVariableCreator);
-        HLDDStructureParser parser = new HLDDStructureParser(scanner, structureBuilder);
-        parser.parse();
-        return structureBuilder.getModel();
-    }
+	/**
+	 * @param hlddSource		   {@link io.scan.HLDDScanner#HLDDScanner(Object)}
+	 * @param graphVariableCreator creator for {@link GraphVariable}-s.
+	 *                             By default {@link base.hldd.structure.variables.utils.DefaultGraphVariableCreator}
+	 *                             is used.
+	 * @return parsed BehModel
+	 * @throws Exception {@link io.scan.HLDDScanner#HLDDScanner(Object)}.
+	 */
+	public static BehModel parseHlddStructure(Object hlddSource, GraphVariableCreator graphVariableCreator) throws Exception {
+		/* Parse HLDD structure */
+		HLDDScanner scanner = new HLDDScanner(hlddSource);
+		HLDDStructureBuilder structureBuilder = new HLDDStructureBuilder(graphVariableCreator);
+		HLDDStructureParser parser = new HLDDStructureParser(scanner, structureBuilder);
+		parser.parse();
+		return structureBuilder.getModel();
+	}
 
-    /**
-     *
-     * @param hlddSource {@link io.scan.HLDDScanner#HLDDScanner(Object)}
-     * @return parsed BehModel
-     * @throws Exception .{@link io.scan.HLDDScanner#HLDDScanner (Object)}
-     */
-    public static BehModel parseHlddStructure(Object hlddSource) throws Exception {
-        return parseHlddStructure(hlddSource, new DefaultGraphVariableCreator());
-    }
+	/**
+	 * @param hlddSource {@link io.scan.HLDDScanner#HLDDScanner(Object)}
+	 * @return parsed BehModel
+	 * @throws Exception .{@link io.scan.HLDDScanner#HLDDScanner (Object)}
+	 */
+	public static BehModel parseHlddStructure(Object hlddSource) throws Exception {
+		return parseHlddStructure(hlddSource, new DefaultGraphVariableCreator());
+	}
 
 	/**
 	 * Constructor based on a collection of variables
+	 *
 	 * @param variables collection of variables containing both constants and variables
 	 */
 	public BehModel(Collection<AbstractVariable> variables) {
 		// fill convenience collections with variables
 		storeVariables(variables);
-    }
+	}
 
 	public AbstractVariable getVariableByIndex(int index) {
 		return variableByIndex.get(index);
-    }
+	}
 
-    private void storeVariables(Collection<AbstractVariable> variablesCollection) {
+	private void storeVariables(Collection<AbstractVariable> variablesCollection) {
 
 		LinkedList<AbstractVariable> variablesList = new LinkedList<AbstractVariable>(variablesCollection);
 
 		Collections.sort(variablesList);
-		
+
 		for (AbstractVariable absVariable : variablesList) {
 			/* map by index */
 			variableByIndex.put(absVariable.getIndex(), absVariable);
@@ -100,158 +97,166 @@ public class BehModel {
 		}
 	}
 
-    protected void addStat(AbstractVariable variable) {
-        /* Calculate STAT (statistical data) */
-        varCount++;
-        if (variable.isInput()) inpCount++;
-        else if (variable instanceof ConstantVariable) constCount++;
-        else if (variable instanceof FunctionVariable) funcCount++;
-        else if (variable instanceof GraphVariable) {
-            graphCount++;
-            GraphVariable graphVariable = (GraphVariable) variable;
+	protected void addStat(AbstractVariable variable) {
+		/* Calculate STAT (statistical data) */
+		varCount++;
+		if (variable.isInput()) inpCount++;
+		else if (variable instanceof ConstantVariable) constCount++;
+		else if (variable instanceof FunctionVariable) funcCount++;
+		else if (variable instanceof GraphVariable) {
+			graphCount++;
+			GraphVariable graphVariable = (GraphVariable) variable;
 
-            if (graphVariable.getGraph() != null)  nodeCount += graphVariable.getGraph().getSize();
-            if (variable.isOutput()) outpCount++;
-        }
-    }
+			if (graphVariable.getGraph() != null) nodeCount += graphVariable.getGraph().getSize();
+			if (variable.isOutput()) outpCount++;
+		}
+	}
 
-    public void toFile(OutputStream outputStream, String comment) throws IOException {
+	public void toFile(OutputStream outputStream, String comment) throws IOException {
 
-        String fileAsString = composeFileString(comment);
+		String fileAsString = composeFileString(comment);
 
-        writeStringToFile(outputStream, fileAsString);
+		writeStringToFile(outputStream, fileAsString);
 
 		QuietCloser.closeQuietly(outputStream);
-    }
+	}
 
-    private void writeStringToFile(OutputStream outputStream, String fileAsString) throws IOException {
+	private void writeStringToFile(OutputStream outputStream, String fileAsString) throws IOException {
 		BufferedWriter outBufWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
 		outBufWriter.write(fileAsString);
 		outBufWriter.flush();
-    }
+	}
 
-    protected String composeFileString(String comment) {
+	protected String composeFileString(String comment) {
 
-        StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 
-        // add COMMENT if exists
-        if (comment != null && !comment.equals("")) {
-            String[] lines = comment.split("\n");
-            for (String line : lines) {
-                sb.append(";").append(line).append("\n");
-            }
-        }
+		// add COMMENT if exists
+		if (comment != null && !comment.equals("")) {
+			String[] lines = comment.split("\n");
+			for (String line : lines) {
+				sb.append(";").append(line).append("\n");
+			}
+		}
 
-        sb.append("\nSTAT#\t").append(nodeCount).append(" Nods,  ");
-        sb.append(varCount).append(" Vars,  ");
-        sb.append(graphCount).append(" Grps,  ");
-        sb.append(inpCount).append(" Inps,  ");
-        sb.append(outpCount).append(" Outs,  ");
-        sb.append(constCount).append(" Cons,  ");
-        sb.append(funcCount).append(" Funs  ");
+		sb.append("\nSTAT#\t").append(nodeCount).append(" Nods,  ");
+		sb.append(varCount).append(" Vars,  ");
+		sb.append(graphCount).append(" Grps,  ");
+		sb.append(inpCount).append(" Inps,  ");
+		sb.append(outpCount).append(" Outs,  ");
+		sb.append(constCount).append(" Cons,  ");
+		sb.append(funcCount).append(" Funs  ");
 
-        sb.append("\n\nMODE#\t");
-        sb.append(mode == null ? "RTL" : mode);
-        sb.append("\n\n");
+		sb.append("\n\nMODE#\t");
+		sb.append(mode == null ? "RTL" : mode);
+		sb.append("\n\n");
 
-        for (int i = 0; i < varCount; i++) {
+		for (int i = 0; i < varCount; i++) {
 
-            if (i == inpOffset())
-                sb.append(";inputs\n");
-            if (i == constOffset())
-                sb.append("\n\n;constants\n");
-            if (i == funcOffset())
-                sb.append("\n\n;functions\n");
-            if (i == graphOffset())
-                sb.append("\n\n;graphs\n");
+			if (i == inpOffset())
+				sb.append(";inputs\n");
+			if (i == constOffset())
+				sb.append("\n\n;constants\n");
+			if (i == funcOffset())
+				sb.append("\n\n;functions\n");
+			if (i == graphOffset())
+				sb.append("\n\n;graphs\n");
 
-            sb.append(getVariableByIndex(i)).append("\n");
+			sb.append(getVariableByIndex(i)).append("\n");
 
-        }
+		}
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    /**
-     * Removes redundant (recurring) nodes.
-     */
-    public void minimize() {
-        /* Minimize rootNodes for every GraphVariable */
-        int rootNodeAbsIndex = 0;
-        for (int index = graphOffset(); index < varCount; index++) {
-            AbstractVariable absVar = getVariableByIndex(index);
-            if (absVar instanceof GraphVariable) {
-                GraphVariable graphVariable = (GraphVariable) absVar;
+	/**
+	 * Removes redundant (recurring) nodes.
+	 */
+	public void minimize() {
+		/* Minimize rootNodes for every GraphVariable */
+		int rootNodeAbsIndex = 0;
+		for (int index = graphOffset(); index < varCount; index++) {
+			AbstractVariable absVar = getVariableByIndex(index);
+			if (absVar instanceof GraphVariable) {
+				GraphVariable graphVariable = (GraphVariable) absVar;
 				if (!graphVariable.isExpansion()) {
 					graphVariable.getGraph().getRootNode().minimize(rootNodeAbsIndex);
 				}
 				rootNodeAbsIndex += graphVariable.getGraph().getSize();
-            }
-        }
-        /* Refresh internal state variable */
-        nodeCount = rootNodeAbsIndex;
-    }
+			}
+		}
+		/* Refresh internal state variable */
+		nodeCount = rootNodeAbsIndex;
+	}
 
-    public void reduce() {
-        /* Reduce rootNodes for every GraphVariable */
-        int rootNodeAbsIndex = 0;
-        for (int index = graphOffset(); index < varCount; index++) {
-            AbstractVariable absVar = getVariableByIndex(index);
-            if (absVar instanceof GraphVariable) {
-                Graph graph = ((GraphVariable) absVar).getGraph();
+	public void reduce() {
+		/* Reduce rootNodes for every GraphVariable */
+		int rootNodeAbsIndex = 0;
+		for (int index = graphOffset(); index < varCount; index++) {
+			AbstractVariable absVar = getVariableByIndex(index);
+			if (absVar instanceof GraphVariable) {
+				Graph graph = ((GraphVariable) absVar).getGraph();
 				if (!absVar.isExpansion()) {
 					graph.setRootNode(graph.getRootNode().reduce(rootNodeAbsIndex));
 				}
 				rootNodeAbsIndex += graph.getSize();
-            }
-        }
-        /* Refresh internal state variable */
-        nodeCount = rootNodeAbsIndex;
-    }
+			}
+		}
+		/* Refresh internal state variable */
+		nodeCount = rootNodeAbsIndex;
+	}
 
-    public void printMapFile(OutputStream outputStream) throws Exception {
-        SourceLocationCollector sourceCollector = new SourceLocationCollector();
-        for (int index = graphOffset(); index < varCount; index++) {
-            AbstractVariable absVar = getVariableByIndex(index);
-            if (absVar instanceof GraphVariable) {
-                ((GraphVariable) absVar).traverse(sourceCollector);
-            }
-        }
+	public void printMapFile(OutputStream outputStream) throws Exception {
+		SourceLocationCollector sourceCollector = new SourceLocationCollector();
+		for (int index = graphOffset(); index < varCount; index++) {
+			AbstractVariable absVar = getVariableByIndex(index);
+			if (absVar instanceof GraphVariable) {
+				((GraphVariable) absVar).traverse(sourceCollector);
+			}
+		}
 
 		writeStringToFile(outputStream, sourceCollector.getSourceAsString());
 
 		QuietCloser.closeQuietly(outputStream);
-    }
+	}
 
-	public int inpOffset() { return 0; }
+	public int inpOffset() {
+		return 0;
+	}
 
-    public int constOffset() { return inpOffset() + inpCount; }
+	public int constOffset() {
+		return inpOffset() + inpCount;
+	}
 
-    public int funcOffset() { return constOffset() + constCount; }
+	public int funcOffset() {
+		return constOffset() + constCount;
+	}
 
-    public int graphOffset() { return funcOffset() + funcCount; }
+	public int graphOffset() {
+		return funcOffset() + funcCount;
+	}
 
-    /* Getters START */
+	/* Getters START */
 
 	public int getNodeCount() {
-        return nodeCount;
-    }
+		return nodeCount;
+	}
 
-    public int getVarCount() {
-        return varCount;
-    }
+	public int getVarCount() {
+		return varCount;
+	}
 
-    public int getGraphCount() {
-        return graphCount;
-    }
+	public int getGraphCount() {
+		return graphCount;
+	}
 
 	public Collection<AbstractVariable> getVariables() {
-        return variables;
-    }
+		return variables;
+	}
 
-    public Collection<ConstantVariable> getConstants() {
-        return constants;
-    }
+	public Collection<ConstantVariable> getConstants() {
+		return constants;
+	}
 
 	public Collection<Variable> getInputPorts() {
 		ArrayList<Variable> inPorts = new ArrayList<Variable>(inpCount);
@@ -272,14 +277,14 @@ public class BehModel {
 		return outPorts;
 	}
 
-    /* Getters END */
+	/* Getters END */
 
-    /* Setters START*/
+	/* Setters START*/
 
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
 
-    /* Setters END*/
+	/* Setters END*/
 
 }

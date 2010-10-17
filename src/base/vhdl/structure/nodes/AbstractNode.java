@@ -6,44 +6,43 @@ import base.vhdl.processors.Processable;
 import base.vhdl.processors.NodeReplacerImpl;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 06.02.2008
- * <br>Time: 21:38:00
+ * @author Anton Chepurov
  */
 public abstract class AbstractNode implements Visitable, Processable {
 
-    protected AbstractNode parentNode;
+	protected AbstractNode parentNode;
 	/* Line numbers in VHDL file this Node was created from */
 	private SourceLocation source;
 
 	public abstract boolean isIdenticalTo(AbstractNode comparedNode);
 
-    /**
-     * Replaces the node with the specified replacingNode.
-     * May say whether any replacement took place or not
-     * (use {@link base.vhdl.processors.NodeReplacerImpl#isReplaced}
-     * for this).
-     * @param replacingNode node to replace with
-     * @param sourceProcess process which has this node in its tree. Required in case
-     *        the node is the root node of the process (i.e. has no parent node).
-     * @throws Exception if TerminalNode is being replaced
-     */
-    public void replaceWith(AbstractNode replacingNode, base.vhdl.structure.Process sourceProcess) throws Exception {
-        NodeReplacerImpl nodeReplacer = new NodeReplacerImpl(this, replacingNode);
-        if (parentNode == null) { // this node is the root node of the process
-            sourceProcess.getRootNode().process(nodeReplacer);
-        } else {
-            parentNode.process(nodeReplacer);
-        }
-    }
+	/**
+	 * Replaces the node with the specified replacingNode.
+	 * May say whether any replacement took place or not
+	 * (use {@link base.vhdl.processors.NodeReplacerImpl#isReplaced}
+	 * for this).
+	 *
+	 * @param replacingNode node to replace with
+	 * @param sourceProcess process which has this node in its tree. Required in case
+	 *                      the node is the root node of the process (i.e. has no parent node).
+	 * @throws Exception if TerminalNode is being replaced
+	 */
+	public void replaceWith(AbstractNode replacingNode, base.vhdl.structure.Process sourceProcess) throws Exception {
+		NodeReplacerImpl nodeReplacer = new NodeReplacerImpl(this, replacingNode);
+		if (parentNode == null) { // this node is the root node of the process
+			sourceProcess.getRootNode().process(nodeReplacer);
+		} else {
+			parentNode.process(nodeReplacer);
+		}
+	}
 
-    public void setParent(AbstractNode parentNode) {
-        this.parentNode = parentNode;
-    }
+	public void setParent(AbstractNode parentNode) {
+		this.parentNode = parentNode;
+	}
 
-    public AbstractNode getParentNode() {
-        return parentNode;
-    }
+	public AbstractNode getParentNode() {
+		return parentNode;
+	}
 
 	public void setSource(SourceLocation source) {
 		this.source = source;

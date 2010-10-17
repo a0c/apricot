@@ -10,11 +10,10 @@ import java.io.File;
 import static ui.BusinessLogic.HLDDRepresentationType.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 01.06.2010
- * <br>Time: 20:26:14
+ * @author Anton Chepurov
  */
 public class OutputFileGenerator implements ChangeListener, DocumentListener {
+
 	private final ApplicationForm applicationForm;
 	private JButton outputFileButton;
 
@@ -34,7 +33,8 @@ public class OutputFileGenerator implements ChangeListener, DocumentListener {
 	}
 
 	@Override
-	public void removeUpdate(DocumentEvent e) {}
+	public void removeUpdate(DocumentEvent e) {
+	}
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
@@ -74,7 +74,7 @@ public class OutputFileGenerator implements ChangeListener, DocumentListener {
 			name.append("_F");
 		} else if (hlddType == REDUCED) {
 			name.append("_R");
-		}  else if (hlddType == MINIMIZED) {
+		} else if (hlddType == MINIMIZED) {
 			name.append("_M");
 		} else {
 			throw new RuntimeException("OutputFileGenerator.generate(): unknown HLDDRepresentationType: " + hlddType);

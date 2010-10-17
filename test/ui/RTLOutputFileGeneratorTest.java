@@ -10,13 +10,12 @@ import static org.junit.Assert.*;
 import static ui.BusinessLogic.ParserID.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 02.06.2010
- * <br>Time: 17:39:01
+ * @author Anton Chepurov
  */
 public class RTLOutputFileGeneratorTest {
 
-	@Test public void returnNullForNullSourceFile() {
+	@Test
+	public void returnNullForNullSourceFile() {
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(null);
 		replay(form);
@@ -24,7 +23,9 @@ public class RTLOutputFileGeneratorTest {
 		assertNull(file);
 		verify(form);
 	}
-	@Test public void createCorrectFile() {
+
+	@Test
+	public void createCorrectFile() {
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(new File("SomeFile.agm"));
 		replay(form);
@@ -33,7 +34,9 @@ public class RTLOutputFileGeneratorTest {
 		assertEquals(new File("SomeFile_RTL.agm"), file);
 		verify(form);
 	}
-	@Test public void reactOnCorrectConverter() {
+
+	@Test
+	public void reactOnCorrectConverter() {
 		/* Don't react */
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSelectedParserId()).andReturn(VhdlBeh2HlddBeh);

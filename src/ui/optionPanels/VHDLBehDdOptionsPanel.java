@@ -6,16 +6,14 @@ import ui.OutputFileGenerator;
 import javax.swing.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 23.02.2008
- * <br>Time: 19:54:02
+ * @author Anton Chepurov
  */
 public class VHDLBehDdOptionsPanel {
-    private JPanel mainPanel;
-    private JCheckBox simplifyCheckBox;
-    private JRadioButton reducedRadioButton;
-    private JRadioButton minimizedRadioButton;
-    private JRadioButton expandCSCheckBox;
+	private JPanel mainPanel;
+	private JCheckBox simplifyCheckBox;
+	private JRadioButton reducedRadioButton;
+	private JRadioButton minimizedRadioButton;
+	private JRadioButton expandCSCheckBox;
 	private JRadioButton fullRadioButton;
 
 	public VHDLBehDdOptionsPanel(OutputFileGenerator outputFileGenerator) {
@@ -26,22 +24,22 @@ public class VHDLBehDdOptionsPanel {
 	}
 
 	public JPanel getMainPanel() {
-        return mainPanel;
-    }
+		return mainPanel;
+	}
 
-    public boolean shouldSimplify() {
-        return simplifyCheckBox.isSelected();
-    }
+	public boolean shouldSimplify() {
+		return simplifyCheckBox.isSelected();
+	}
 
-    public BusinessLogic.HLDDRepresentationType getHlddType() {
-        if (reducedRadioButton.isSelected()) {
-            return BusinessLogic.HLDDRepresentationType.REDUCED;
-        } else if (minimizedRadioButton.isSelected()) {
-            return BusinessLogic.HLDDRepresentationType.MINIMIZED;
-        } else return BusinessLogic.HLDDRepresentationType.FULL_TREE;
-    }
+	public BusinessLogic.HLDDRepresentationType getHlddType() {
+		if (reducedRadioButton.isSelected()) {
+			return BusinessLogic.HLDDRepresentationType.REDUCED;
+		} else if (minimizedRadioButton.isSelected()) {
+			return BusinessLogic.HLDDRepresentationType.MINIMIZED;
+		} else return BusinessLogic.HLDDRepresentationType.FULL_TREE;
+	}
 
-    public boolean shouldExpandCS() {
-        return expandCSCheckBox.isSelected();
-    }
+	public boolean shouldExpandCS() {
+		return expandCSCheckBox.isSelected();
+	}
 }

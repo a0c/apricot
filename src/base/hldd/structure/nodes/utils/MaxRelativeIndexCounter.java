@@ -6,43 +6,35 @@ import java.util.Set;
 import java.util.HashSet;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 30.09.2008
- * <br>Time: 19:39:15
+ * @author Anton Chepurov
  */
 public class MaxRelativeIndexCounter {
-    private final Node rootNode;
-    private final Set<Integer> checkedIndices;
+	private final Node rootNode;
+	private final Set<Integer> checkedIndices;
 
-    public MaxRelativeIndexCounter(Node rootNode) {
-        this.rootNode = rootNode;
-        checkedIndices = new HashSet<Integer>();
-    }
+	public MaxRelativeIndexCounter(Node rootNode) {
+		this.rootNode = rootNode;
+		checkedIndices = new HashSet<Integer>();
+	}
 
-    int count() {
-        return getMaxRelativeIndex(rootNode);
-    }
+	int count() {
+		return getMaxRelativeIndex(rootNode);
+	}
 
-    /**
-     * Traverse the tree from rootNode and adjust the maximum relative index.
-     *
-     * @param rootNode
-     * @return
-     */
-    private int getMaxRelativeIndex(Node rootNode) {
-        int maxIndex = rootNode.getRelativeIndex();
-        if (!checkedIndices.contains(maxIndex)) {
-            checkedIndices.add(maxIndex);
-            if (rootNode.isControlNode()) {
-                for (Node successor : rootNode.getSuccessors()) {
-					int succMaxIndex = getMaxRelativeIndex(successor);
-					if (succMaxIndex > maxIndex) {
-						maxIndex = succMaxIndex;
+	private int getMaxRelativeIndex(Node rootNode) {
+		int maxIndex = rootNode.getRelativeIndex();
+		if (!checkedIndices.contains(maxIndex)) {
+			checkedIndices.add(maxIndex);
+			if (rootNode.isControlNode()) {
+				for (Node successor : rootNode.getSuccessors()) {
+					int successorMaxIndex = getMaxRelativeIndex(successor);
+					if (successorMaxIndex > maxIndex) {
+						maxIndex = successorMaxIndex;
 					}
 				}
-            }
-        }
-        return maxIndex;
-    }
+			}
+		}
+		return maxIndex;
+	}
 
 }

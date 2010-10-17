@@ -3,39 +3,37 @@ package base.vhdl.structure;
 import base.Type;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 06.02.2008
- * <br>Time: 21:16:44
+ * @author Anton Chepurov
  */
 public class Port {
 
-    private String name;
+	private String name;
 
-    private boolean isInput;
-    
-    private Type type;
+	private boolean isInput;
 
-    public Port(String name, boolean isInput, Type type) {
-        this.name = name;
-        this.isInput = isInput;
-        this.type = type;
-    }
+	private Type type;
 
-    /* GETTERS and SETTER */
+	public Port(String name, boolean isInput, Type type) {
+		this.name = name;
+		this.isInput = isInput;
+		this.type = type;
+	}
 
-    public String getName() {
-        return name;
-    }
+	/* GETTERS and SETTER */
 
-    public boolean isInput() {
-        return isInput;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public boolean isOutput() {
-        return !isInput;
-    }
-    
-    public Type getType() {
-        return type;
-    }
+	public boolean isInput() {
+		return isInput;
+	}
+
+	public boolean isOutput() {
+		return !isInput;
+	}
+
+	public Type getType() {
+		return type;
+	}
 }

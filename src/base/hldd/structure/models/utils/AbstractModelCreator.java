@@ -10,145 +10,143 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 20.02.2008
- * <br>Time: 0:31:24
+ * @author Anton Chepurov
  */
 public abstract class AbstractModelCreator implements ModelCreator {
-    protected static final Logger LOG = Logger.getLogger(AbstractModelCreator.class.getName());
-    protected Collection<ConstantVariable> constants;
-    protected Collection<AbstractVariable> variables;
-    protected Collection<AbstractVariable> variablesCollection;
+	protected static final Logger LOGGER = Logger.getLogger(AbstractModelCreator.class.getName());
+	protected Collection<ConstantVariable> constants;
+	protected Collection<AbstractVariable> variables;
+	protected Collection<AbstractVariable> variablesCollection;
 
 	public AbstractModelCreator(Collection<ConstantVariable> constants, Collection<AbstractVariable> variables) {
-        this.constants = constants;
-        this.variables = variables;
-        variablesCollection = new LinkedList<AbstractVariable>();
-    }
+		this.constants = constants;
+		this.variables = variables;
+		variablesCollection = new LinkedList<AbstractVariable>();
+	}
 
-    public void create() {
+	public void create() {
 
-        /* Remove those CONSTANTS that are not used neither in FUNCTION VARIABLES, nor in GRAPH VARIABLES */
-        removeObsoleteConstants();
+		/* Remove those CONSTANTS that are not used neither in FUNCTION VARIABLES, nor in GRAPH VARIABLES */
+		removeObsoleteConstants();
 
 		removeObsoleteFunctions();
 		renameFunctions();
 
-        /* Perform INDEXATION */ //todo: ModelIndexator -> modelIndexator.indexate(constants, variables);
-        performIndexation();
+		/* Perform INDEXATION */ //todo: ModelIndexator -> modelIndexator.indexate(constants, variables);
+		performIndexation();
 
-        /* Hash indices and variables */
-        hashIndices();
+		/* Hash indices and variables */
+		hashIndices();
 
-        /* Create MODEL */
-        doCreateModel();
+		/* Create MODEL */
+		doCreateModel();
 
-    }
+	}
 
-    private void performIndexation() {
-        LOG.entering(LOG.getName(), "performIndexation(2/4)");
-        int varIndex = 0, graphIndex = 0, nodeIndex = 0;
+	private void performIndexation() {
+		LOGGER.entering(LOGGER.getName(), "performIndexation(2/4)");
+		int varIndex = 0, graphIndex = 0, nodeIndex = 0;
 
 //        /* Strip indices from all variables */
 //        for (AbstractVariable variable : variables) {
 //            variable.forceSetIndex(-1);
 //        }
 
-        /* Index INPUTS */
-        for (AbstractVariable variable : variables) {
-            if (variable instanceof Variable) {
-                Variable variable1 = (Variable) variable;
-                if (variable1.isInput()) {
-                    variable1.forceSetIndex(varIndex++);
-                }
-            }
-        }
-        /* Index CONSTANTS */
-        for (ConstantVariable constant : constants) {
-            constant.forceSetIndex(varIndex++);
-        }
-        /* Index FUNCTIONS */
-        for (AbstractVariable variable : variables) {
-            if (variable instanceof FunctionVariable) {
-                variable.forceSetIndex(varIndex++);
-            }
-        }
-        /* Index GRAPHS */
-        doIndexGraphs(varIndex, graphIndex, nodeIndex);
+		/* Index INPUTS */
+		for (AbstractVariable variable : variables) {
+			if (variable instanceof Variable) {
+				Variable variable1 = (Variable) variable;
+				if (variable1.isInput()) {
+					variable1.forceSetIndex(varIndex++);
+				}
+			}
+		}
+		/* Index CONSTANTS */
+		for (ConstantVariable constant : constants) {
+			constant.forceSetIndex(varIndex++);
+		}
+		/* Index FUNCTIONS */
+		for (AbstractVariable variable : variables) {
+			if (variable instanceof FunctionVariable) {
+				variable.forceSetIndex(varIndex++);
+			}
+		}
+		/* Index GRAPHS */
+		doIndexGraphs(varIndex, graphIndex, nodeIndex);
 
-        LOG.exiting(LOG.getName(), "performIndexation(2/4)");
-    }
+		LOGGER.exiting(LOGGER.getName(), "performIndexation(2/4)");
+	}
 
-    protected abstract void doIndexGraphs(int varIndex, int graphIndex, int nodeIndex);
+	protected abstract void doIndexGraphs(int varIndex, int graphIndex, int nodeIndex);
 
-    private void hashIndices() {
-        LOG.entering(LOG.getName(), "hashIndices(3/4)");
+	private void hashIndices() {
+		LOGGER.entering(LOGGER.getName(), "hashIndices(3/4)");
 
-        for (ConstantVariable constant : constants) {
-            if (constant.getIndex() == -1) {
-                String msg = "Unindexed constant: " + constant.getName();
-                LOG.warning(msg);
-                System.out.println(msg);
-                continue;
-            }
-            variablesCollection.add(constant);
-        }
-        for (AbstractVariable variable : variables) {
-            if (variable.getIndex() == -1) {
-                String msg = "Unindexed variable: " + variable.getName();
-                LOG.warning(msg);
-                System.out.println(msg);
-                continue;
-            }
-            variablesCollection.add(variable);
-        }
+		for (ConstantVariable constant : constants) {
+			if (constant.getIndex() == -1) {
+				String msg = "Unindexed constant: " + constant.getName();
+				LOGGER.warning(msg);
+				System.out.println(msg);
+				continue;
+			}
+			variablesCollection.add(constant);
+		}
+		for (AbstractVariable variable : variables) {
+			if (variable.getIndex() == -1) {
+				String msg = "Unindexed variable: " + variable.getName();
+				LOGGER.warning(msg);
+				System.out.println(msg);
+				continue;
+			}
+			variablesCollection.add(variable);
+		}
 
-        LOG.exiting(LOG.getName(), "hashIndices(3/4)");
-    }
+		LOGGER.exiting(LOGGER.getName(), "hashIndices(3/4)");
+	}
 
-    protected abstract void doCreateModel();
+	protected abstract void doCreateModel();
 
-    private void removeObsoleteConstants() {
-        LOG.entering(LOG.getName(), "removeObsoleteConstants(1/4)");
-        LinkedList<ConstantVariable> usedConstants = new LinkedList<ConstantVariable>();
+	private void removeObsoleteConstants() {
+		LOGGER.entering(LOGGER.getName(), "removeObsoleteConstants(1/4)");
+		LinkedList<ConstantVariable> usedConstants = new LinkedList<ConstantVariable>();
 
-        for (ConstantVariable constant : constants) {
-            boolean isUsed = false;
+		for (ConstantVariable constant : constants) {
+			boolean isUsed = false;
 
-            for (AbstractVariable variable : variables) {
-                if (variable instanceof FunctionVariable) {
+			for (AbstractVariable variable : variables) {
+				if (variable instanceof FunctionVariable) {
 
-                    FunctionVariable functionVariable = (FunctionVariable) variable;
+					FunctionVariable functionVariable = (FunctionVariable) variable;
 
-                    for (PartedVariableHolder
-                            operandHolder : functionVariable.getOperands()) {
-                        if (operandHolder.getVariable() == constant) {
-                            isUsed = true;
-                            break;
-                        }
-                    }
-                    
-                } else if (variable instanceof GraphVariable) {
+					for (PartedVariableHolder
+							operandHolder : functionVariable.getOperands()) {
+						if (operandHolder.getVariable() == constant) {
+							isUsed = true;
+							break;
+						}
+					}
 
-                    GraphVariable graphVariable = (GraphVariable) variable;
-                    Node rootNode = graphVariable.getGraph().getRootNode();
-                    if (Utility.isVariableUsedAsTerminal(rootNode, constant)) {
-                        isUsed = true;
-                        break;
-                    }
+				} else if (variable instanceof GraphVariable) {
 
-                }
+					GraphVariable graphVariable = (GraphVariable) variable;
+					Node rootNode = graphVariable.getGraph().getRootNode();
+					if (Utility.isVariableUsedAsTerminal(rootNode, constant)) {
+						isUsed = true;
+						break;
+					}
 
-            }
+				}
 
-            if (isUsed) {
-                usedConstants.add(constant);
-            }
-        }
+			}
 
-        constants = usedConstants;
-        LOG.exiting(LOG.getName(), "removeObsoleteConstants(1/4)");
-    }
+			if (isUsed) {
+				usedConstants.add(constant);
+			}
+		}
+
+		constants = usedConstants;
+		LOGGER.exiting(LOGGER.getName(), "removeObsoleteConstants(1/4)");
+	}
 
 	private void removeObsoleteFunctions() {
 		LinkedList<AbstractVariable> usedVars = new LinkedList<AbstractVariable>();
@@ -207,7 +205,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 
 	/**
 	 * For Delay graphs, no order constraints exist (since their values get assigned at the end of a cycle).
-	 *
+	 * <p/>
 	 * Non-Delay graphs must be ordered in such a way that for every graph those node dependent variables
 	 * that are Non-Delays must precede the graph (typical dependency ordering).
 	 */
@@ -219,7 +217,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 
 		/**
 		 * For Delay graphs, no order constraints exist (since their values get assigned at the end of a cycle).
-		 *
+		 * <p/>
 		 * Non-Delay graphs must be ordered in such a way that for every graph those node dependent variables
 		 * that are Non-Delays must precede the graph (typical dependency ordering).
 		 *
@@ -325,7 +323,8 @@ public abstract class AbstractModelCreator implements ModelCreator {
 
 		/**
 		 * Collect Non-Delay dependent variables of nodes and map them to graph
-		 * @param graphVariable
+		 *
+		 * @param graphVariable where to look for dependencies
 		 */
 		private void collectDependencies(GraphVariable graphVariable) {
 			/* Create an empty set of dependent variables and map it to graph */

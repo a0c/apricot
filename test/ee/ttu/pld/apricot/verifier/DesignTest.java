@@ -10,13 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 31.05.2010
- * <br>Time: 0:40:15
+ * @author Anton Chepurov
  */
 public class DesignTest {
 
-	@Test public void initNewDesignFile() throws ConverterSettings.ConverterSettingsParseException {
+	@Test
+	public void initNewDesignFile() throws ConverterSettings.ConverterSettingsParseException {
 		File hlddFile = new File("D:\\WORKSPACE\\tr\\b13_M_EX.agm");
 		File newDesignFile = new File("D:\\WORKSPACE\\tr\\verif\\b13_M_EX.agm");
 		Design design = new Design(hlddFile, ConverterSettings.parse(hlddFile.getAbsolutePath()));
@@ -24,7 +23,9 @@ public class DesignTest {
 		assertEquals("Design(): should create newDesignFile in \'" + Design.NEW_DESIGN_DIR + "\' folder.",
 				newDesignFile, design.getNewDesignFile());
 	}
-	@Test public void createNewDesignDir() throws IOException, ConverterSettings.ConverterSettingsParseException {
+
+	@Test
+	public void createNewDesignDir() throws IOException, ConverterSettings.ConverterSettingsParseException {
 		File hlddFile = new File("D:\\WORKSPACE\\tr\\b13_M_EX.agm");
 		Design design = new Design(hlddFile, ConverterSettings.parse(hlddFile.getAbsolutePath()));
 
@@ -32,11 +33,13 @@ public class DesignTest {
 
 		File newDesignDir = design.getNewDesignFile().getParentFile();
 		newDesignDir.deleteOnExit();
-		
+
 		assertTrue("Design.createNewDesignDir(): should create new directory \'" + Design.NEW_DESIGN_DIR + "\'.",
 				newDesignDir.exists() || newDesignDir.isDirectory());
 	}
-	@Test public void initNewMapFile() throws ConverterSettings.ConverterSettingsParseException {
+
+	@Test
+	public void initNewMapFile() throws ConverterSettings.ConverterSettingsParseException {
 		File hlddFile = new File("D:\\WORKSPACE\\tr\\b13_M_EX.agm");
 		File newMapFile = new File("D:\\WORKSPACE\\tr\\verif\\b13_M_EX.map");
 		Design design = new Design(hlddFile, ConverterSettings.parse(hlddFile.getAbsolutePath()));

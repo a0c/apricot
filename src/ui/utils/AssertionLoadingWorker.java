@@ -12,91 +12,71 @@ import ui.BusinessLogicAssertionChecker;
 import ui.ApplicationForm;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 29.06.2008
- * <br>Time: 20:39:33
+ * @author Anton Chepurov
  */
 public class AssertionLoadingWorker extends TaskSwingWorker {
-    private final File simulFile;
-    private final BusinessLogicAssertionChecker businessLogicAssertionChecker;
-    private AssertionCheckReader simulReader;
+	private final File simulationFile;
+	private final BusinessLogicAssertionChecker businessLogicAssertionChecker;
+	private AssertionCheckReader simulationReader;
 
-    public AssertionLoadingWorker(final File simulFile, BusinessLogicAssertionChecker businessLogicAC) {
-        this.simulFile = simulFile;
-        this.businessLogicAssertionChecker = businessLogicAC;
-        executableRunnable = new Runnable() {
-            public void run() {
-                try {
-                    enableUI(false);
-                    simulReader = new AssertionCheckReader(simulFile, uiHolder, 1);
-                    simulReader.readAssertions();
-                    isProcessFinished = true;
+	public AssertionLoadingWorker(final File simulationFile, BusinessLogicAssertionChecker businessLogicAC) {
+		this.simulationFile = simulationFile;
+		this.businessLogicAssertionChecker = businessLogicAC;
+		executableRunnable = new Runnable() {
+			public void run() {
+				try {
+					enableUI(false);
+					simulationReader = new AssertionCheckReader(simulationFile, uiHolder, 1);
+					simulationReader.readAssertions();
+					isProcessFinished = true;
 
-                } catch (Exception e) {
-                    businessLogicAssertionChecker.getApplicationForm().updateChkFileTextField(null);
-                    occurredException = new ExtendedException("IO Error occurred while reading simulation file:\n" +
-                    e.getMessage(), ExtendedException.IO_ERROR_TEXT);
-                    isProcessFinished = false;
-                }
-            }
-        };
-    }
+				} catch (Exception e) {
+					businessLogicAssertionChecker.getApplicationForm().updateChkFileTextField(null);
+					occurredException = new ExtendedException("IO Error occurred while reading simulation file:\n" +
+							e.getMessage(), ExtendedException.IO_ERROR_TEXT);
+					isProcessFinished = false;
+				}
+			}
+		};
+	}
 
-//    protected Boolean doInBackground() {
-//        try {
-//            simulReader = new AssertionCheckReader(simulFile, uiHolder, 1);
-//            simulReader.readAssertions();
-//            return true;
-//        } catch (Exception e) {
-//            businessLogicAssertionChecker.getApplicationForm().updateChkFileTextField("", null);
-//            occurredException = new ExtendedException("IO Error occurred while reading simulation file:\n" +
-//                    e.getMessage(), "I/O Error");
-//            return false;
-//        }
-//    }
+	protected void done() {
+		super.done();
+		try {
+			if (get()) {
+				updateUI(simulationFile, simulationReader.getPatternsSize());
+				/* Set simulationReader */
+				businessLogicAssertionChecker.setSimulationReader(simulationReader);
+			}
+		} catch (InterruptedException e) {/* Do nothing. */} catch (ExecutionException e) {/* Do nothing. */}
+		catch (CancellationException e) {
+			/* Do nothing  */
+		}
 
-//    protected void process(List<Integer> chunks) {
-//        businessLogicAssertionChecker.getApplicationForm();
-//
-//    }
+	}
 
-    protected void done() {
-        super.done();
-        try {
-            if (get()) {
-                updateUI(simulFile, simulReader.getPatternsSize());
-                /* Set simulReader */
-                businessLogicAssertionChecker.setSimulReader(simulReader);
-            }
-        } catch (InterruptedException e) {/* Do nothing. */} catch (ExecutionException e) {/* Do nothing. */}
-        catch (CancellationException e) {
-            /* Do nothing  */
-        }
+	private void enableUI(boolean enable) {
+		businessLogicAssertionChecker.getApplicationForm().setEnableDrawButton(enable);
+	}
 
-    }
+	private void updateUI(File simulationFile, int maxValue) {
+		ApplicationForm applicationForm = businessLogicAssertionChecker.getApplicationForm();
+		/* Update text field and spinner */
+		if (simulationFile != null) {
+			applicationForm.updateChkFileTextField(simulationFile);
+			applicationForm.updateDrawSpinner(maxValue);
+		} else {
+			applicationForm.updateChkFileTextField(null);
+		}
 
-    private void enableUI(boolean enable) {
-        businessLogicAssertionChecker.getApplicationForm().setEnableDrawButton(enable);
-    }    
+		/* In any case, enable UI */
+		enableUI(true);
+	}
 
-    private void updateUI(File simulFile, int maxValue) {
-        ApplicationForm applicationForm = businessLogicAssertionChecker.getApplicationForm();
-        /* Update text field and spinner */
-        if (simulFile != null) {
-            applicationForm.updateChkFileTextField(simulFile);
-            applicationForm.updateDrawSpinner(maxValue);
-        } else {
-            applicationForm.updateChkFileTextField(null);
-        }
-
-        /* In any case, enable UI */
-        enableUI(true);
-    }
-
-    public void stopWorker() {
-        super.stopWorker();
-        /* Update UI and BL */
-        businessLogicAssertionChecker.setSimulFile(null);
-        updateUI(null, 0);
-    }
+	public void stopWorker() {
+		super.stopWorker();
+		/* Update UI and BL */
+		businessLogicAssertionChecker.setSimulationFile(null);
+		updateUI(null, 0);
+	}
 }

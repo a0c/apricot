@@ -1,74 +1,78 @@
 package base.vhdl.visitors;
 
 import org.junit.Test;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 02.10.2008
- * <br>Time: 11:57:18
+ * @author Anton Chepurov
  */
 public class GraphGeneratorTest {
-    private static final String[] correctResetNames = {
-            "RESET",
-            "reset",
-            "Reset",
-            "ReSeT",
-            "ResEt",
-            "SRESET",
-            "O_THAT_IS_RESET_YES",
-            "is_reset"
-    };
-    private static final String[] incorrectResetNames = {
-            "bla",
-            "Rese",
-            "RST"
-    };
-    private static final String[] correctClockNames = {
-            "CLOCK",
-            "clock",
-            "Clock",
-            "ClOcK",
-            "SCLOCK",
-            "O_THAT_IS_CLOCK_YES",
-            "is_clock",
-            "CLK",
-            "clk",
-            "Clk",
-            "ClK",
-            "SCLK",
-            "O_THAT_IS_CLK_YES",
-            "is_clk",            
-    };
+	private static final String[] CORRECT_RESET_NAMES = {
+			"RESET",
+			"reset",
+			"Reset",
+			"ReSeT",
+			"ResEt",
+			"SRESET",
+			"O_THAT_IS_RESET_YES",
+			"is_reset"
+	};
+	private static final String[] INCORRECT_RESET_NAMES = {
+			"bla",
+			"Rese",
+			"RST"
+	};
+	private static final String[] CORRECT_CLOCK_NAMES = {
+			"CLOCK",
+			"clock",
+			"Clock",
+			"ClOcK",
+			"SCLOCK",
+			"O_THAT_IS_CLOCK_YES",
+			"is_clock",
+			"CLK",
+			"clk",
+			"Clk",
+			"ClK",
+			"SCLK",
+			"O_THAT_IS_CLK_YES",
+			"is_clk",
+	};
 
 
-    @Test public void correctResetNameAccepted() {
-        for (String validRstName : correctResetNames) {
-            assertTrue(GraphGenerator.isResetName(validRstName));
-        }
-    }
+	@Test
+	public void correctResetNameAccepted() {
+		for (String validRstName : CORRECT_RESET_NAMES) {
+			assertTrue(GraphGenerator.isResetName(validRstName));
+		}
+	}
 
-    @Test public void incorrectResetDenied() {
-        for (String invalidRstName : incorrectResetNames) {
-            assertFalse(GraphGenerator.isResetName(invalidRstName));
-        }
-    }
+	@Test
+	public void incorrectResetDenied() {
+		for (String invalidRstName : INCORRECT_RESET_NAMES) {
+			assertFalse(GraphGenerator.isResetName(invalidRstName));
+		}
+	}
 
-    @Test public void correctClockNameAccepted() {
-        for (String validClkName : correctClockNames) {
-            assertTrue("\"" + validClkName + "\" is not recognized as CLOCK name", 
-                    GraphGenerator.isClockName(validClkName));
-        }
-    }
-    
-    @Test public void incorrectClockNameDenied() {
-        String validClkName = "CLOOK";
-        assertFalse("\"" + validClkName + "\" is recognized as CLOCK name",
-                GraphGenerator.isClockName(validClkName));
-    }
+	@Test
+	public void correctClockNameAccepted() {
+		for (String validClkName : CORRECT_CLOCK_NAMES) {
+			assertTrue("\"" + validClkName + "\" is not recognized as CLOCK name",
+					GraphGenerator.isClockName(validClkName));
+		}
+	}
 
-    @Test public void someTest() {
+	@Test
+	public void incorrectClockNameDenied() {
+		String validClkName = "CLOOK";
+		assertFalse("\"" + validClkName + "\" is recognized as CLOCK name",
+				GraphGenerator.isClockName(validClkName));
+	}
+
+	@Test
+	public void someTest() {
 /*
         ### /// ### /// ### /// ### /// ### /// ###
         Here remember that ":=" is a Blocking assignment,
@@ -115,5 +119,5 @@ public class GraphGeneratorTest {
         
 
 */
-    }
+	}
 }

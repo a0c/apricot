@@ -8,12 +8,10 @@ import java.io.OutputStream;
 import static ui.BusinessLogic.ParserID.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 29.05.2010
- * <br>Time: 9:57:53
+ * @author Anton Chepurov
  */
 public class ConverterSettings {
-	
+
 	public static final String PARSE_FAILED_FOR = "ConverterSettings parse failed for ";
 	public static final String VALIDATION_FAILED_FOR = "ConverterSettings validation failed for ";
 	public static final String PARSER_ID_IS_NULL = "Mandatory field ParserId is null.";
@@ -81,7 +79,7 @@ public class ConverterSettings {
 
 	/**
 	 * @return whether to inline Composite conditions into a set of Control Nodes (true value),
-	 * 		or create a single node function (false value)
+	 * 		   or create a single node function (false value)
 	 */
 	public boolean isDoFlattenConditions() {
 		return doFlattenConditions;
@@ -137,7 +135,7 @@ public class ConverterSettings {
 		}
 
 		boolean doSimplify = false;
-		boolean doFlattenConditions =  false;
+		boolean doFlattenConditions = false;
 		boolean doCreateCSGraphs = false;
 		boolean doCreateExCSGraphs = false;
 		BusinessLogic.HLDDRepresentationType hlddType = null;

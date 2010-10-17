@@ -2,14 +2,13 @@ package base.hldd.structure.nodes.utils;
 
 import base.hldd.structure.nodes.Node;
 import org.junit.Test;
+
 import static junit.framework.Assert.*;
 
 import java.util.TreeMap;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 28.04.2010
- * <br>Time: 12:20:41
+ * @author Anton Chepurov
  */
 public class ConditionTest {
 	@Test
@@ -21,17 +20,17 @@ public class ConditionTest {
 		assertEquals(Condition.createCondition(0), Condition.parse("0"));
 		assertEquals(Condition.createCondition(2010), Condition.parse("2010"));
 
-		assertEquals(Condition.createCondition(1,2,8,1991), Condition.parse("1,2,8,1991"));
+		assertEquals(Condition.createCondition(1, 2, 8, 1991), Condition.parse("1,2,8,1991"));
 
-		assertEquals(Condition.createCondition(1,2), Condition.parse("1-2"));
-		assertEquals(Condition.createCondition(1,2,3), Condition.parse("1-3"));
-		assertEquals(Condition.createCondition(0,1,2,3,4,5,6,7,8,9,10), Condition.parse("0-10"));
+		assertEquals(Condition.createCondition(1, 2), Condition.parse("1-2"));
+		assertEquals(Condition.createCondition(1, 2, 3), Condition.parse("1-3"));
+		assertEquals(Condition.createCondition(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), Condition.parse("0-10"));
 
-		assertEquals(Condition.createCondition(0,1,2,3,4,7,8,90,91,92,93,94,95,96,97,98,99,100), Condition.parse("0-4, 7-8, 90-100"));
+		assertEquals(Condition.createCondition(0, 1, 2, 3, 4, 7, 8, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100), Condition.parse("0-4, 7-8, 90-100"));
 
-		assertEquals(Condition.createCondition(0,1,3,4,5,6), Condition.parse("0-1,3-6"));
-		assertEquals(Condition.createCondition(1,2,5), Condition.parse("1-2,5"));
-		assertEquals(Condition.createCondition(0,3), Condition.parse("0 , 3"));
+		assertEquals(Condition.createCondition(0, 1, 3, 4, 5, 6), Condition.parse("0-1,3-6"));
+		assertEquals(Condition.createCondition(1, 2, 5), Condition.parse("1-2,5"));
+		assertEquals(Condition.createCondition(0, 3), Condition.parse("0 , 3"));
 
 	}
 

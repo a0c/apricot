@@ -5,13 +5,12 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 31.05.2010
- * <br>Time: 15:55:17
+ * @author Anton Chepurov
  */
 public class StatisticsTest {
 
-	@Test public void checkCounters() {
+	@Test
+	public void checkCounters() {
 
 		Statistics statistics = Statistics.createByteArrayStatistics();
 
@@ -24,7 +23,8 @@ public class StatisticsTest {
 		assertEquals("Statistics: should count failed map files correctly.", 1, statistics.getMapFailedCount());
 	}
 
-	@Test public void checkInfo() {
+	@Test
+	public void checkInfo() {
 		String firstMessage = "First Message!!!";
 		String secondMessage = "Second Message.";
 		String failedMessage = "Failed file message goes here.";
@@ -43,11 +43,12 @@ public class StatisticsTest {
 
 		statistics.fail(failedMessage);
 		assertEquals("Statistics: should handle info messages correctly.", firstMessage + nl + secondMessage + nl
-				+ Statistics.CHANGED_FILE + failedMessage ,
+				+ Statistics.CHANGED_FILE + failedMessage,
 				statistics.getMessage());
 	}
 
-	@Test public void correctToString() {
+	@Test
+	public void correctToString() {
 
 		Statistics statistics = Statistics.createByteArrayStatistics();
 		doSomeActions(statistics);
@@ -74,7 +75,7 @@ public class StatisticsTest {
 		statistics = Statistics.createByteArrayStatistics();
 		statistics.pass();
 		skip(statistics);
-		
+
 		assertEquals("1 file PASSED. 3 SKIPPED.", statistics.toString());
 
 		statistics = Statistics.createByteArrayStatistics();
@@ -91,7 +92,9 @@ public class StatisticsTest {
 		assertEquals("All files SKIPPED. Total: 6 files.", statistics.toString());
 
 	}
-	@Test public void correctMapToString() {
+
+	@Test
+	public void correctMapToString() {
 
 		Statistics statistics = Statistics.createByteArrayStatistics();
 		assertEquals("No MAP files.", statistics.mapToString());
@@ -121,6 +124,7 @@ public class StatisticsTest {
 			statistics.pass();
 		}
 	}
+
 	private void passMap(Statistics statistics, int count) {
 		for (int i = 0; i < count; i++) {
 			statistics.passMap();

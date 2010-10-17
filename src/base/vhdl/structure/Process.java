@@ -10,96 +10,97 @@ import base.vhdl.visitors.Visitable;
 import base.vhdl.visitors.AbstractVisitor;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 06.02.2008
- * <br>Time: 21:31:50
+ * @author Anton Chepurov
  */
 public class Process implements Visitable {
 
-    private String name;
-    private final Collection<String> sensitivityList;
+	private String name;
+	private final Collection<String> sensitivityList;
 
-    private Set<Variable> variables = new HashSet<Variable>();
+	private Set<Variable> variables = new HashSet<Variable>();
 
-    private Set<Constant> constants = new HashSet<Constant>();
+	private Set<Constant> constants = new HashSet<Constant>();
 
-    private CompositeNode rootNode;
+	private CompositeNode rootNode;
 
-    public Process(String name, Collection<String> sensitivityList) {
-        this.name = name;
-        this.sensitivityList = sensitivityList;
-    }
+	public Process(String name, Collection<String> sensitivityList) {
+		this.name = name;
+		this.sensitivityList = sensitivityList;
+	}
 
-    public void addVariable(Variable newVariable) {
-        variables.add(newVariable);
-    }
+	public void addVariable(Variable newVariable) {
+		variables.add(newVariable);
+	}
 
-    public void addConstant(Constant newConstant) {
-        constants.add(newConstant);
-    }
+	public void addConstant(Constant newConstant) {
+		constants.add(newConstant);
+	}
 
-    /* GETTERS and SETTERS */
-    public CompositeNode getRootNode() {
-        if (rootNode == null) {
-            rootNode = new CompositeNode();
-        }
-        return rootNode;
-    }
+	/* GETTERS and SETTERS */
 
-    public String getName() {
-        return name;
-    }
+	public CompositeNode getRootNode() {
+		if (rootNode == null) {
+			rootNode = new CompositeNode();
+		}
+		return rootNode;
+	}
 
-    public Collection<String> getSensitivityList() {
-        return sensitivityList;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public Set<Variable> getVariables() {
-        return variables;
-    }
+	public Collection<String> getSensitivityList() {
+		return sensitivityList;
+	}
 
-    public Set<Constant> getConstants() {
-        return constants;
-    }
+	public Set<Variable> getVariables() {
+		return variables;
+	}
 
-    public String toString() {
+	public Set<Constant> getConstants() {
+		return constants;
+	}
 
-        StringBuilder builder = new StringBuilder();
-        if (name != null) {
-            builder.append(name).append(": ");
-        }
-        builder.append("PROCESS");
-        if (!sensitivityList.isEmpty()) {
-            builder.append(" (");
-            for (String sensitiveSignal : sensitivityList) {
-                builder.append(sensitiveSignal).append(", ");
-            }
-            builder.delete(builder.length() - 2, builder.length());
-            builder.append(")");
-        }
+	public String toString() {
 
-        return builder.toString().trim();
-    }
+		StringBuilder builder = new StringBuilder();
+		if (name != null) {
+			builder.append(name).append(": ");
+		}
+		builder.append("PROCESS");
+		if (!sensitivityList.isEmpty()) {
+			builder.append(" (");
+			for (String sensitiveSignal : sensitivityList) {
+				builder.append(sensitiveSignal).append(", ");
+			}
+			builder.delete(builder.length() - 2, builder.length());
+			builder.append(")");
+		}
 
-    public void traverse(AbstractVisitor visitor) throws Exception {
-        visitor.visitProcess(this);
-    }
+		return builder.toString().trim();
+	}
 
-    public Variable resolveVariable(String variableName) {
-        for (Variable variable : variables) {
-            if (variable.getName().equals(variableName)) {
-                return variable;
-            }
-        }
-        return null;
-    }
+	public void traverse(AbstractVisitor visitor) throws Exception {
+		visitor.visitProcess(this);
+	}
 
-    public Constant resolveConstant(String constantName) {
-        for (Constant constant : constants) {
-            if (constant.getName().equals(constantName)) {
-                return constant;
-            }
-        }
-        return null;
-    }
+	public Variable resolveVariable(String variableName) {
+		//todo: for storing Variables, use Map instead of set
+		for (Variable variable : variables) {
+			if (variable.getName().equals(variableName)) {
+				return variable;
+			}
+		}
+		return null;
+	}
+
+	public Constant resolveConstant(String constantName) {
+		//todo: for storing Constants, use Map instead of set
+		for (Constant constant : constants) {
+			if (constant.getName().equals(constantName)) {
+				return constant;
+			}
+		}
+		return null;
+	}
 }

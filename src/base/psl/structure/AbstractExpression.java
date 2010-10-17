@@ -1,9 +1,7 @@
 package base.psl.structure;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 24.09.2008
- * <br>Time: 13:27:09
+ * @author Anton Chepurov
  */
 public abstract class AbstractExpression {
 }

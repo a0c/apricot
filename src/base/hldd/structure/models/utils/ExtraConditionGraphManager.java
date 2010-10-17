@@ -17,9 +17,7 @@ import base.vhdl.structure.nodes.IfNode;
 import java.util.LinkedList;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 24.05.2010
- * <br>Time: 12:53:57
+ * @author Anton Chepurov
  */
 public class ExtraConditionGraphManager {
 	private final ModelManager modelCollector;
@@ -48,19 +46,19 @@ public class ExtraConditionGraphManager {
 
 				AbstractVariable operandVar = boolOperand.getVariable();
 				Indices partedIndices = boolOperand.getPartedIndices();
-				boolean isInversed = boolOperand.isInversed();
+				boolean isInverted = boolOperand.isInverted();
 
 				String name = baseName + "__" + operandVar.getName() + Indices.toString(partedIndices);
 
 				Node controlNode = new Node.Builder(operandVar).partedIndices(partedIndices).createSuccessors(2).build();
 
-				controlNode.setSuccessor(Condition.TRUE, new Node.Builder(isInversed ? constant0 : constant1).build());
-				controlNode.setSuccessor(Condition.FALSE, new Node.Builder(isInversed ? constant1 : constant0).build());
+				controlNode.setSuccessor(Condition.TRUE, new Node.Builder(isInverted ? constant0 : constant1).build());
+				controlNode.setSuccessor(Condition.FALSE, new Node.Builder(isInverted ? constant1 : constant0).build());
 
-				Variable baseVariable = new Variable(name, Type.BOOL_TYPE, new Flags().setExpansion(true));
+				Variable baseVariable = new Variable(name, Type.BOOLEAN_TYPE, new Flags().setExpansion(true));
 
 				GraphVariable graphVariable = new GraphVariable(baseVariable, controlNode);
-				
+
 				modelCollector.getIdenticalVariable(graphVariable);
 
 			}

@@ -6,62 +6,63 @@ import java.awt.event.MouseEvent;
 import java.awt.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 18.12.2008
- * <br>Time: 16:11:57
+ * @author Anton Chepurov
  */
 public class ColorChangingMouseAdapter extends MouseAdapter {
-    private final static ColorStore colorStore = new ColorStore();
-    private final TableForm tableForm;
 
-    public ColorChangingMouseAdapter(TableForm tableForm) {
-        this.tableForm = tableForm;
-    }
+	private final static ColorStore COLOR_STORE = new ColorStore();
+	
+	private final TableForm tableForm;
 
-    public void mouseClicked(MouseEvent e) {
-        Object source = e.getSource();
-        if (e.getButton() == MouseEvent.BUTTON3 && source instanceof JCheckBox) {
-            toggleColor(((JCheckBox) source));
-        }
-    }
+	public ColorChangingMouseAdapter(TableForm tableForm) {
+		this.tableForm = tableForm;
+	}
 
-    private void toggleColor(JCheckBox checkBox) {
-        tableForm.setColorFor(checkBox, colorStore.next(checkBox.getBackground()));
-    }
+	public void mouseClicked(MouseEvent e) {
+		Object source = e.getSource();
+		if (e.getButton() == MouseEvent.BUTTON3 && source instanceof JCheckBox) {
+			toggleColor(((JCheckBox) source));
+		}
+	}
 
-    private static class ColorStore {
-        private Color next(Color currentColor) {
-            return ColorsEnum.deriveEnum(currentColor).next();
-        }
+	private void toggleColor(JCheckBox checkBox) {
+		tableForm.setColorFor(checkBox, COLOR_STORE.next(checkBox.getBackground()));
+	}
 
-        private enum ColorsEnum {
-            YELLOW (Color.YELLOW),
-            MAGENTA (Color.MAGENTA),
-            CYAN (Color.CYAN),
-            ORANGE (Color.ORANGE),
-            PINK (Color.PINK),
-            LIGHT_GREY (Color.LIGHT_GRAY),
-            GREEN (Color.GREEN);
+	private static class ColorStore {
+		private Color next(Color currentColor) {
+			return ColorsEnum.deriveEnum(currentColor).next();
+		}
 
-            private final Color color;
+		@SuppressWarnings({"EnumeratedConstantNamingConvention", "UnusedDeclaration"})
+		private enum ColorsEnum {
+			YELLOW(Color.YELLOW),
+			MAGENTA(Color.MAGENTA),
+			CYAN(Color.CYAN),
+			ORANGE(Color.ORANGE),
+			PINK(Color.PINK),
+			LIGHT_GREY(Color.LIGHT_GRAY),
+			GREEN(Color.GREEN);
 
-            ColorsEnum(Color color) {
-                this.color = color;
-            }
+			private final Color color;
 
-            Color next() {
-                int nextIndex = (ordinal() + 1) % values().length;
-                return values()[nextIndex].color;
-            }
+			ColorsEnum(Color color) {
+				this.color = color;
+			}
 
-            static ColorsEnum deriveEnum(Color color) {
-                for (ColorsEnum colorEnum : values()) {
-                    if (colorEnum.color == color) {
-                        return colorEnum;
-                    }
-                }
-                return null;
-            }
-        }
-    }
+			Color next() {
+				int nextIndex = (ordinal() + 1) % values().length;
+				return values()[nextIndex].color;
+			}
+
+			static ColorsEnum deriveEnum(Color color) {
+				for (ColorsEnum colorEnum : values()) {
+					if (colorEnum.color == color) {
+						return colorEnum;
+					}
+				}
+				return null;
+			}
+		}
+	}
 }

@@ -18,13 +18,11 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
- * <br><br>User: Anton Chepurov
- * <br>Date: 18.05.2010
- * <br>Time: 19:53:43
+ * @author Anton Chepurov
  */
 public class ConditionGraphManager {
 	private ModelManager modelCollector;
-	private Map<GraphVariable, Map<Condition, Condition>> portmapByGraph = new HashMap<GraphVariable, Map<Condition, Condition>>();
+	private Map<GraphVariable, Map<Condition, Condition>> portMapByGraph = new HashMap<GraphVariable, Map<Condition, Condition>>();
 
 	public ConditionGraphManager(ModelManager modelCollector) {
 		this.modelCollector = modelCollector;
@@ -119,7 +117,7 @@ public class ConditionGraphManager {
 		/* GRAPH */
 		GraphVariable graphVariable = new GraphVariable(baseVariable, rootNode);
 
-		portmapByGraph.put(graphVariable, conditionMapping);
+		portMapByGraph.put(graphVariable, conditionMapping);
 
 		return graphVariable;
 	}
@@ -130,7 +128,7 @@ public class ConditionGraphManager {
 
 		Node rootNode = new FullTreeCreator(conditionVarHolder, ifNode).create();
 
-		Variable baseVariable = new Variable(createName(ifNode), Type.BOOL_TYPE, new Flags().setExpansion(true));
+		Variable baseVariable = new Variable(createName(ifNode), Type.BOOLEAN_TYPE, new Flags().setExpansion(true));
 
 		return new GraphVariable(baseVariable, rootNode);
 
@@ -154,7 +152,7 @@ public class ConditionGraphManager {
 	}
 
 	public Condition mapDirect(GraphVariable graphVariable, Condition whenCondition) throws HLDDException {
-		Map<Condition, Condition> portMap = portmapByGraph.get(graphVariable);
+		Map<Condition, Condition> portMap = portMapByGraph.get(graphVariable);
 		if (portMap == null) {
 			throw new HLDDException("Lacking port map for Graph Variable " + graphVariable.getBaseVariable());
 		}
@@ -170,7 +168,7 @@ public class ConditionGraphManager {
 		if (condition == null) {
 			return null; // excessive OTHERS (not actually needed)
 		}
-		Map<Condition, Condition> portMap = portmapByGraph.get(graphVariable);
+		Map<Condition, Condition> portMap = portMapByGraph.get(graphVariable);
 		if (portMap == null) {
 			throw new HLDDException("Lacking port map for Graph Variable " + graphVariable.getBaseVariable());
 		}
