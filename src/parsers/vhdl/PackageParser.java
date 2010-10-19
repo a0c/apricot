@@ -162,8 +162,6 @@ public class PackageParser {
 
 		if (OTHERS_0_PATTERN.matcher(valueAsString).matches()) {
 			return new ConstantValueAndLengthHolder(BigInteger.valueOf(0), null);
-		} else if (OTHERS_1_PATTERN.matcher(valueAsString).matches()) {
-			return new ConstantValueAndLengthHolder(BigInteger.valueOf(1), null);
 		}
 
 		RadixEnum radix = RadixEnum.parseRadix(valueAsString);
@@ -191,11 +189,11 @@ public class PackageParser {
 
 		/* Initialization VALUE */
 		String valueAsString = extractInitializationString(typeString);
-		BigInteger valueInt = valueAsString == null ? null : parseConstantValue(valueAsString);
 		if (typeString.contains(":=")) {
 			typeString = typeString.substring(0, typeString.lastIndexOf(":=")).trim();
 		}
 
+		Type type;
 		if (typeString.startsWith("ARRAY ")) {
 			/* ARRAY ((PROCESSOR_WIDTH -1) DOWNTO -1) OF STD_LOGIC; */
 			/* todo: ARRAY ( NATURAL RANGE <> ) OF STD_LOGIC_VECTOR ( 31 DOWNTO 0 ) ; */
@@ -210,14 +208,14 @@ public class PackageParser {
 					ExpressionBuilder.trimEnclosingBrackets(typeString.substring(6, ofIndex)));
 			//todo: signed? what does the last -1 mean here: "(PROCESSOR_WIDTH -1) DOWNTO -1"
 
-			return new TypeAndValueHolder(new Type(indices), valueInt);
+			type = new Type(indices);
 
 		} else if (typeString.contains(" RANGE ")) {
 			/* INTEGER RANGE 32767 DOWNTO -32768 */
 			/* INTEGER RANGE 0 TO 3 */
 			Indices valueRange = builder.buildIndices(typeString.substring(typeString.indexOf(" RANGE ") + 7));
 
-			return new TypeAndValueHolder(Type.createFromValues(valueRange), valueInt); /*todo: , valueRange.isDescending() ? */   // todo: <== isDescending() for #length#
+			type = Type.createFromValues(valueRange);/*todo: , valueRange.isDescending() ? */   // todo: <== isDescending() for #length#
 
 		} else if ((typeString.startsWith("BIT_VECTOR ") || typeString.startsWith("STD_LOGIC_VECTOR ") || typeString.startsWith("UNSIGNED"))
 				&& ExpressionBuilder.BIT_RANGE_PATTERN.matcher(typeString).matches()) {
@@ -225,23 +223,59 @@ public class PackageParser {
 			/* {IN} STD_LOGIC_VECTOR(MOD_EN_BITS-3 DOWNTO 0) */
 			Indices indices = builder.buildIndices(typeString);
 
-			return new TypeAndValueHolder(new Type(indices), valueInt);
+			type = new Type(indices);
 
 		} else if (builder.containsType(typeString)) {
-			return new TypeAndValueHolder(builder.getType(typeString), valueInt);
+			type = builder.getType(typeString);
 		} else if (typeString.equals("BIT") || typeString.equals("STD_LOGIC")) {
-			return new TypeAndValueHolder(Type.BIT_TYPE, valueInt);
+			type = Type.BIT_TYPE;
 		} else if (typeString.equals("BOOLEAN")) {
-			return new TypeAndValueHolder(Type.BOOLEAN_TYPE, valueInt);
+			type = Type.BOOLEAN_TYPE;
 		} else if (typeString.equals("INTEGER") || typeString.equals("NATURAL")) {
+			BigInteger valueInt = valueAsString == null ? null : parseConstantValue(valueAsString);
 			if (valueInt == null) {
 				throw new UnsupportedConstructException("Unconstrained type " + typeString + " is not synthesizable.\n" +
 						"Cannot derive the length of the variable.", typeString);
 			}
-			return new TypeAndValueHolder(Type.createFromValues(valueInt.intValue(), 0), valueInt);
+			type = Type.createFromValues(valueInt.intValue(), 0);
 		} else {
 			throw new UnsupportedConstructException("Unsupported type: \'" + typeString + "\'", typeString);
 		}
+
+		valueAsString = replaceOthersValue(valueAsString, type.getLength());
+
+		BigInteger valueInt = valueAsString == null ? null : parseConstantValue(valueAsString);
+
+		return new TypeAndValueHolder(type, valueInt, valueAsString);
+	}
+
+	public static String replaceOthersValue(String valueAsString, Indices length) {
+
+		if (valueAsString == null) {
+			return null;
+		}
+
+		char bit;
+		if (OTHERS_0_PATTERN.matcher(valueAsString).matches()) {
+			bit = '0';
+		} else if (OTHERS_1_PATTERN.matcher(valueAsString).matches()) {
+			bit = '1';
+		} else {
+			return valueAsString;
+		}
+
+		/* Create a new String and fill it with 0 or 1 */
+		StringBuilder sb = new StringBuilder(length.length());
+		sb.append("\"");
+		for (int i = 0; i < length.length(); i++) { /*length + 1*/
+			sb.append(bit);
+		}
+		sb.append("\"");
+		return sb.toString();
+	}
+
+	public static boolean isOthers(String valueAsString) {
+		return OTHERS_0_PATTERN.matcher(valueAsString).matches() || OTHERS_1_PATTERN.matcher(valueAsString).matches();
 	}
 
 	enum RadixEnum {

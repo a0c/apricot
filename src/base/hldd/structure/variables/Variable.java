@@ -31,6 +31,11 @@ public class Variable extends AbstractVariable {
 	private Flags flags = new Flags();
 
 	/**
+	 * Default initialisation value
+	 */
+	private ConstantVariable defaultValue = null;
+
+	/**
 	 * Constructor for OVERRIDING in inherited classes (ConstantVariable)
 	 */
 	protected Variable() {
@@ -94,6 +99,10 @@ public class Variable extends AbstractVariable {
 
 	public Type getType() {
 		return type;
+	}
+
+	public ConstantVariable getDefaultValue() {
+		return defaultValue;
 	}
 
 	public int getIndex() {
@@ -193,6 +202,9 @@ public class Variable extends AbstractVariable {
 		return flags.isExpansion();
 	}
 
+	public void setDefaultValue(ConstantVariable defaultValue) {
+		this.defaultValue = defaultValue;
+	}
 	/* Setters END */
 
 }

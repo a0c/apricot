@@ -17,6 +17,10 @@ public abstract class AbstractVariable implements Comparable<AbstractVariable> {
 
 	public abstract int getIndex();
 
+	public abstract void setDefaultValue(ConstantVariable defaultValue);
+
+	public abstract ConstantVariable getDefaultValue();
+
 	public abstract boolean isInput();
 
 	public abstract boolean isOutput();

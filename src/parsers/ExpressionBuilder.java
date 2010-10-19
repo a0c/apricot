@@ -232,13 +232,13 @@ public class ExpressionBuilder {
 		/* Check every validRegion to contain operator */
 		for (Region region : validRegions) {
 			short startIndex;
-			short endIndex = 0;
+			short endIndex;
 			int lineStartIndex = 0;
 			String regionString = region.toString();
 			/* If the region contains the operator, then add new ValidOperatorRegion
 			* to the list and check the rest of the region to contain the operator */
 			while (Operator.containsOperator(operator, regionString.substring(lineStartIndex))) {
-				short operatorIndex = (short) regionString.indexOf(operatorDelim, endIndex);
+				short operatorIndex = (short) regionString.indexOf(operatorDelim, lineStartIndex);
 				startIndex = (short) (region.start + operatorIndex);
 				endIndex = (short) (startIndex + operatorDelim.length());
 				regionsList.add(new Region(startIndex, endIndex, region.baseLine));

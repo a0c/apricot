@@ -62,11 +62,16 @@ public class ConstantVariable extends Variable {
 	/* Setters and Getters END */
 
 	public ConstantVariable subRange(Indices rangeToExtract) throws HLDDException {
+
 		Indices length = getLength();
+
 		if (!length.contain(rangeToExtract)) {
 			throw new HLDDException("ConstantVariable: subRange(): rangeToExtract is out of bounds: " + rangeToExtract + " out of " + length);
 		}
-		//todo: if rangeToExtract.equals(length)...
+
+		if (rangeToExtract.equals(length)) {
+			return this;
+		}
 		/* As string, ... */
 		StringBuilder builder = new StringBuilder(value.toString(2)); // 4 -> '100'
 		/* ... , fill with '0'-s up to the desired length, ...*/

@@ -19,10 +19,8 @@ public class BehGraphGenerator extends GraphGenerator {
 
 	public void visitProcess(base.vhdl.structure.Process process) throws Exception {
 
-		if (modelCollector.hasPartialAssignmentsIn(process)) {
-			/* At first, process partial settings, like "Parity(7) <= something;" */
-			processPartialSettings(process);
-		}
+		/* At first, process partial settings, like "Parity(7) <= something;" */
+		processPartialSettings(modelCollector.getPartialAssignmentsFor(process), process.getRootNode());
 
 		/* (Re)Traverse the root node until all the variables
 		*  that are set within this process are processed. */

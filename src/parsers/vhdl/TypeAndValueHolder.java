@@ -10,9 +10,11 @@ import java.math.BigInteger;
 class TypeAndValueHolder {
 	final Type type;
 	final BigInteger value;
+	final String valueAsString;
 
-	TypeAndValueHolder(Type type, BigInteger value) {
+	TypeAndValueHolder(Type type, BigInteger value, String valueAsString) {
 		this.type = type;
 		this.value = value;
+		this.valueAsString = valueAsString;
 	}
 }

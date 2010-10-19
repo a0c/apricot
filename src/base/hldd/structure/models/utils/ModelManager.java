@@ -426,6 +426,13 @@ public class ModelManager {
 
 	public ConstantVariable extractSubConstant(ConstantVariable baseConstant, Indices rangeToExtract) throws HLDDException {
 
+		if (baseConstant == null) {
+			return null;
+		}
+		if (rangeToExtract == null) {
+			throw new IllegalArgumentException("null rangeToExtract is not allowed as an input parameter for SubConstant extraction");
+		}
+
 		ConstantVariable subConstant = baseConstant.subRange(rangeToExtract);
 
 		return variableManager.getConstantByValue(subConstant.getValue(), subConstant.getLength());
@@ -456,13 +463,13 @@ public class ModelManager {
 		/* Sort by index */
 		Collections.sort(partialSetList, new OperandImplComparator());
 		/* Create CAT Expression */
-		Expression catExpession = new Expression(Operator.CAT, false);
+		Expression catExpression = new Expression(Operator.CAT, false);
 		/* Add all inputs to the expression */
 		for (OperandImpl partialSet : partialSetList) {
-			catExpession.addOperand(partialSet);
+			catExpression.addOperand(partialSet);
 		}
 		/* Add the Expression to ModelCollector */
-		return (FunctionVariable) convertOperandToVariable(catExpession, null, true);
+		return (FunctionVariable) convertOperandToVariable(catExpression, null, true);
 	}
 
 	private PartialAssignmentManager getPartialAssignmentManager() {
@@ -472,16 +479,16 @@ public class ModelManager {
 		return partialAssignmentManager;
 	}
 
-	public void collectPartialSettings(Process process) throws Exception {
-		getPartialAssignmentManager().collectPartialSettings(process);
+	public void collectPartialSettings(Architecture architecture) throws Exception {
+		getPartialAssignmentManager().collectPartialSettings(architecture);
 	}
 
 	public boolean hasPartialAssignmentsIn(Process process) {
 		return getPartialAssignmentManager().hasPartialAssignmentsIn(process);
 	}
 
-	public Map<String, Set<OperandImpl>> getPartialAssignmentsFor(Process process) {
-		return getPartialAssignmentManager().getPartialAssignmentsFor(process);
+	public Map<String, Set<OperandImpl>> getPartialAssignmentsFor(Object astObject) {
+		return getPartialAssignmentManager().getPartialAssignmentsFor(astObject);
 	}
 
 	public void finalizeAndCheckForCompleteness(Set<OperandImpl> partialSets, Indices wholeLength, String varName) throws Exception {
@@ -695,6 +702,9 @@ public class ModelManager {
 			}
 			// Search for identical and add variable to collector if needed
 			return getIdenticalVariable(udFunctionVariable);
+
+		} else if (operand == null) {
+			return null;
 		}
 		throw new Exception("Obtaining VHDL structure variables from " + operand.getClass().getSimpleName() +
 				"instances is not supported");

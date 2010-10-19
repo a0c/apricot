@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
  *
  * @author Anton Chepurov
  */
+@SuppressWarnings({"EnumeratedConstantNamingConvention"})
 public enum Operator {
 	/* CONDITIONS */
 	EQ("=", true, false, 2),

@@ -1,7 +1,7 @@
 package base.vhdl.visitors;
 
-import base.hldd.structure.models.utils.ModelManager;
 import base.vhdl.structure.*;
+import base.vhdl.structure.Process;
 import base.vhdl.structure.nodes.IfNode;
 import base.vhdl.structure.nodes.TransitionNode;
 import base.vhdl.structure.nodes.CaseNode;
@@ -14,22 +14,48 @@ import java.util.*;
  * @author Anton Chepurov
  */
 public class PartialSetVariableCollector extends AbstractVisitor {
-	private Map<String, Set<OperandImpl>> partialSettingsMap = new HashMap<String, Set<OperandImpl>>();
 
-	private final ModelManager modelManager;
+	private Map<String, Set<OperandImpl>> partialSettingsMap;
 
-	public PartialSetVariableCollector(ModelManager modelManager) {
-		this.modelManager = modelManager;
-	}
+	private final Map<base.vhdl.structure.Process, Map<String, Set<OperandImpl>>> partialAssignmentsByProcess = new HashMap<Process, Map<String, Set<OperandImpl>>>();
+
+	private Map.Entry<Architecture, Map<String, Set<OperandImpl>>> concurrentPartialAssignments = null;
 
 	public void visitEntity(Entity entity) throws Exception {
 	}
 
 	public void visitArchitecture(Architecture architecture) throws Exception {
+
+		clearSettings();
+
+		architecture.getTransitions().traverse(this);
+
+		if (hasPartialSettings()) {
+
+			concurrentPartialAssignments = new AbstractMap.SimpleImmutableEntry<Architecture, Map<String, Set<OperandImpl>>>
+					(architecture, getPartialSettings());
+		}
+
 	}
 
-	public void visitProcess(base.vhdl.structure.Process process) throws Exception {
+	public void visitProcess(Process process) throws Exception {
+
+		clearSettings();
+
 		process.getRootNode().traverse(this);
+
+		if (hasPartialSettings()) {
+
+			partialAssignmentsByProcess.put(process, getPartialSettings());
+		}
+	}
+
+	private void clearSettings() {
+		partialSettingsMap = new HashMap<String, Set<OperandImpl>>();
+	}
+
+	private boolean hasPartialSettings() {
+		return !partialSettingsMap.isEmpty();
 	}
 
 	public void visitIfNode(IfNode ifNode) throws Exception {
@@ -68,7 +94,7 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 		whenNode.getTransitions().traverse(this);
 	}
 
-	public Map<String, Set<OperandImpl>> getPartialSettingsMap() {
+	private Map<String, Set<OperandImpl>> getPartialSettings() {
 		doDisinterlapPartialSettings();
 		return partialSettingsMap;
 	}
@@ -82,6 +108,7 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 		for (String varName : partialSettingsMap.keySet()) {
 			/* create a new set of parted variable operands... */
 			HashSet<OperandImpl> newPartedVarSet = new HashSet<OperandImpl>();
+			Set<OperandImpl> oldPartedVarSet = partialSettingsMap.get(varName);
 			/* and fill it with non-intersecting parted variable operands. */
 
 			/* Use 2 SortedSets: a separate one for START and END markers.
@@ -92,20 +119,22 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 			* */
 			SortedSet<Integer> startsSet = new TreeSet<Integer>();
 			SortedSet<Integer> endsSet = new TreeSet<Integer>();
-			int lowerBound = -1;
-			int upperBound = modelManager.getVariable(varName).getLength().length();
+			int lowerBound = getLowest(oldPartedVarSet);
+			int upperBound = getHighest(oldPartedVarSet);
 			/* Fill SortedSets */
-			for (OperandImpl partialSetOperand : partialSettingsMap.get(varName)) {
+			for (OperandImpl partialSetOperand : oldPartedVarSet) {
 				Indices partedIndices = partialSetOperand.getPartedIndices();
 				/* Starting index */
-				startsSet.add(partedIndices.getLowest());
-				if (partedIndices.getLowest() - 1 > lowerBound) {
-					endsSet.add(partedIndices.getLowest() - 1);
+				int start = partedIndices.getLowest();
+				startsSet.add(start);
+				if (start - 1 >= lowerBound) {
+					endsSet.add(start - 1);
 				}
 				/* Ending index */
-				endsSet.add(partedIndices.getHighest());
-				if (partedIndices.getHighest() + 1 < upperBound) {
-					startsSet.add(partedIndices.getHighest() + 1);
+				int end = partedIndices.getHighest();
+				endsSet.add(end);
+				if (end + 1 <= upperBound) {
+					startsSet.add(end + 1);
 				}
 			}
 			/* Check number of markers */
@@ -125,5 +154,66 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 			partialSettingsMap.put(varName, newPartedVarSet);
 		}
 
+	}
+
+	public boolean hasPartialAssignmentsIn(Process process) {
+		return partialAssignmentsByProcess.containsKey(process);
+	}
+
+	public Map<String, Set<OperandImpl>> getPartialAssignmentsFor(Object astObject) {
+
+		if (astObject instanceof Process) {
+
+			Process process = (Process) astObject;
+
+			if (partialAssignmentsByProcess.containsKey(process)) {
+
+				return partialAssignmentsByProcess.get(process);
+
+			}
+
+		} else if (astObject instanceof Architecture) {
+
+			Architecture architecture = (Architecture) astObject;
+
+			if (concurrentPartialAssignments != null && concurrentPartialAssignments.getKey() == architecture) {
+
+				return concurrentPartialAssignments.getValue();
+
+			}
+
+		}
+
+		return Collections.emptyMap();
+	}
+
+	private static int getHighest(Set<OperandImpl> operands) {
+		int max = -1;
+		for (OperandImpl operand : operands) {
+			int highest = operand.getPartedIndices().getHighest();
+			if (highest > max) {
+				max = highest;
+			}
+		}
+		if (max == -1) {
+			throw new RuntimeException("Possibly failed to calculate upperBound while disinterlaping partial settings" +
+					": Upper bound = -1");
+		}
+		return max;
+	}
+
+	private static int getLowest(Set<OperandImpl> operands) {
+		int min = Integer.MAX_VALUE;
+		for (OperandImpl operand : operands) {
+			int lowest = operand.getPartedIndices().getLowest();
+			if (lowest < min) {
+				min = lowest;
+			}
+		}
+		if (min == Integer.MAX_VALUE) {
+			throw new RuntimeException("Possibly failed to calculate lowerBound while disinterlaping partial settings" +
+					": Lower bound = Integer.MAX_VALUE");
+		}
+		return min;
 	}
 }

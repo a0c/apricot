@@ -100,7 +100,7 @@ public class VHDLToken {
 		BEGIN("^BEGIN$"),
 		ARCHITECTURE_DECL("^ARCHITECTURE " + Sub.LBL.regexp + " OF " + Sub.LBL.regexp + " IS$"),
 		CONSTANT_DECL("^CONSTANT " + Sub.LBL.regexp + " :" + Sub.TYPE.regexp + Sub.MUST_INIT.regexp + " ?;$"),
-		SIGNAL_DECL("^SIGNAL " + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* :" + Sub.TYPE.regexp + Sub.INIT.regexp + " ;$"),
+		SIGNAL_DECL("^SIGNAL " + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* :" + Sub.TYPE.regexp + ".*" + " ;$"),
 		VARIABLE_DECL("^VARIABLE " + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* :" + Sub.TYPE.regexp + Sub.INIT.regexp + " ;$"),
 		PROCESS_DECL("(" + Sub.LBL.regexp + " :)?PROCESS \\( " + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* \\)$"),
 		COMPONENT_DECL("^COMPONENT " + Sub.LBL.regexp + "$"),

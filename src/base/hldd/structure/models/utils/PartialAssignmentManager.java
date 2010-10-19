@@ -15,33 +15,26 @@ import java.util.*;
  */
 class PartialAssignmentManager {
 
-	private Map<base.vhdl.structure.Process, Map<String, Set<OperandImpl>>> partialAssignmentsByProcess = new HashMap<Process, Map<String, Set<OperandImpl>>>();
+	private final PartialSetVariableCollector partAssignCollector;
 
 	private final ModelManager modelManager;
 
 	PartialAssignmentManager(ModelManager modelManager) {
 		this.modelManager = modelManager;
+		this.partAssignCollector = new PartialSetVariableCollector();
 	}
 
-	void collectPartialSettings(Process process) throws Exception {
+	void collectPartialSettings(Architecture architecture) throws Exception {
 
-		PartialSetVariableCollector partAssignCollector = new PartialSetVariableCollector(modelManager);
-
-		process.traverse(partAssignCollector);
-
-		Map<String, Set<OperandImpl>> partialSettingsMap = partAssignCollector.getPartialSettingsMap();
-		if (!partialSettingsMap.isEmpty()) {
-			partialAssignmentsByProcess.put(process, partialSettingsMap);
-		}
-
+		architecture.traverse(partAssignCollector);
 	}
 
 	boolean hasPartialAssignmentsIn(Process process) {
-		return partialAssignmentsByProcess.containsKey(process);
+		return partAssignCollector.hasPartialAssignmentsIn(process);
 	}
 
-	Map<String, Set<OperandImpl>> getPartialAssignmentsFor(Process process) {
-		return partialAssignmentsByProcess.get(process);
+	Map<String, Set<OperandImpl>> getPartialAssignmentsFor(Object astObject) {
+		return partAssignCollector.getPartialAssignmentsFor(astObject);
 	}
 
 	static void finalizeAndCheckForCompleteness(Set<OperandImpl> partialSets, Indices wholeLength, String varName) throws Exception {

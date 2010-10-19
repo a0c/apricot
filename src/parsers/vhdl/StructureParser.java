@@ -142,7 +142,7 @@ public class StructureParser {
 						/* Signal HIGHEST SIGNIFICANT BIT */
 						typeAndValue = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder);
 						/* Create new SIGNAL */
-						builder.buildSignal(name, typeAndValue.type, typeAndValue.value);
+						builder.buildSignal(name, typeAndValue.type, typeAndValue.valueAsString);
 					}
 					break;
 				case ALIAS:

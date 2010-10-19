@@ -19,7 +19,7 @@ public class BehDDGraphGenerator extends GraphGenerator {
 
 		if (modelCollector.hasPartialAssignmentsIn(process)) {
 			/* Process partial settings, like "Parity(7) <= something;" */
-			processPartialSettings(process);
+			processPartialSettings(modelCollector.getPartialAssignmentsFor(process), process.getRootNode());
 		} else {
 			/* Process process NAME */
 			String graphVarName = extractVariableName(process);

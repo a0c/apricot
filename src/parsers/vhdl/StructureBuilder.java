@@ -156,11 +156,16 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		}
 	}
 
-	public void buildSignal(String signalName, Type type, BigInteger defaultValue) {
+	public void buildSignal(String signalName, Type type, String defaultValue) throws Exception {
 		Object objectUnderConstruction = contextStack.peek();
 		if (objectUnderConstruction instanceof Architecture) {
 			Architecture architecture = (Architecture) objectUnderConstruction;
-			architecture.addSignal(new Signal(signalName, type, defaultValue));
+			AbstractOperand defaultValueOperand = defaultValue == null ? null : expressionBuilder.buildExpression(defaultValue);
+			if (defaultValueOperand != null && !(defaultValueOperand instanceof OperandImpl)) {
+				throw new UnsupportedConstructException("Simple operand expected as signal's DEFAULT VALUE, actual: "
+						+ defaultValueOperand.getClass().getSimpleName(), defaultValue);
+			}
+			architecture.addSignal(new Signal(signalName, type, (OperandImpl) defaultValueOperand));
 			variableNames.add(signalName);
 		}
 	}
@@ -251,12 +256,9 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		if (variableValue.equals("NULL")) {
 			/* ##### NULL #####*/
 			transition = new Transition();
-		} else if (variableValue.startsWith("(") && variableValue.endsWith(")") && variableValue.contains("OTHERS =>")) {
+		} else if (PackageParser.isOthers(variableValue)) {
 			/* ##### OTHERS #####*/
-			variableValue = variableValue.substring(variableValue.indexOf("=>") + 2, variableValue.indexOf(")")).trim();
-			/* Check that 0 or 1 is set. Otherwise say that implementation is missing. */
-			doCheckOthers(variableValue);
-			variableValue = replaceOthersValue(getLengthFor(variableName), variableValue);
+			variableValue = PackageParser.replaceOthersValue(variableValue, getLengthFor(variableName));
 			transition = new Transition((OperandImpl) expressionBuilder.buildExpression(variableName), expressionBuilder.buildExpression(variableValue));
 		} else {
 			/* ##### NORMAL #####*/
@@ -267,19 +269,6 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		transitionNode.setSource(source);
 		/* Add TransitionNode to Current Context */
 		addNodeToCurrentContext(transitionNode);
-	}
-
-	private String replaceOthersValue(Indices length, String variableValue) {
-		/* Cut off Single quotes */
-		variableValue = variableValue.substring(1, 2);
-		/* Create a new String and fill it with 0 or 1 */
-		StringBuilder sb = new StringBuilder(length.length());
-		sb.append("\"");
-		for (int i = 0; i < length.length(); i++) { /*length + 1*/
-			sb.append(variableValue);
-		}
-		sb.append("\"");
-		return sb.toString();
 	}
 
 	private Indices getLengthFor(String variableName) {
@@ -305,12 +294,6 @@ public class StructureBuilder extends AbstractPackageBuilder {
 			}
 		}
 		return null;
-	}
-
-	private void doCheckOthers(String valueString) throws Exception {
-		if (!(valueString.equals("\'0\'") || valueString.equals("\'1\'")))
-			throw new Exception("Unsupported OTHERS construct is met: " + valueString +
-					"\nCurrent implementation only supports filling signals with constant values 0 and 1.");
 	}
 
 	/**

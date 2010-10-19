@@ -125,6 +125,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			Flags flags = new Flags();
 			if (config.isStateName(signal.getName())) flags.setState(true).setDelay(true);
 			base.hldd.structure.variables.Variable signalVariable = new base.hldd.structure.variables.Variable(signal.getName(), signal.getType(), flags);
+			setDefaultValue(signalVariable, signal.getDefaultValue(), signal.getName());
 			modelCollector.addVariable(signalVariable);
 		}
 
@@ -146,12 +147,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		/* Update partially assigned signals with components' output port mappings */
 		modelCollector.splitPartiallyAssignedSignals(components);
 
-		for (Process process : architecture.getProcesses()) {
-			/* Collect partialSet variables */
-			collectPartialSettings(process);
-		}
+		/* Collect partialSet variables */
+		modelCollector.collectPartialSettings(architecture);
 
 		/* Process process-external transitions of the Architecture */
+		processPartialSettings(modelCollector.getPartialAssignmentsFor(architecture), architecture.getTransitions());
 		for (AbstractNode archTransNode : architecture.getTransitions().getChildren()) {
 			couldProcessNextGraphVariable(null, archTransNode);
 		}
@@ -160,6 +160,17 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		for (ComponentInstantiation component : components) {
 			loadComponent(component);
 		}
+	}
+
+	private void setDefaultValue(base.hldd.structure.variables.Variable signalVariable,
+								 OperandImpl defaultValueOperand, String signalName) throws Exception {
+		AbstractVariable defaultValue = modelCollector.convertOperandToVariable(defaultValueOperand, signalVariable.getLength(), true);
+		if (defaultValue != null && !(defaultValue instanceof ConstantVariable)) {
+			throw new ExtendedException("Non-constant DEFAULT VALUE variable created for signal " + signalName +
+					"\nExpected: " + ConstantVariable.class.getSimpleName() + ". Actual: " + defaultValue.getClass().getSimpleName(),
+					ExtendedException.ERROR_TEXT);
+		}
+		signalVariable.setDefaultValue((ConstantVariable) defaultValue);
 	}
 
 	private void loadComponent(ComponentInstantiation component) throws ExtendedException {
@@ -452,11 +463,6 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		architecture.traverse(new OperandLengthAdjuster());
 	}
 
-	private void collectPartialSettings(Process process) throws Exception {
-
-		modelCollector.collectPartialSettings(process);
-	}
-
 	/**
 	 * @param initGraphVariable variable to initialize {@link #graphVariable} with
 	 * @param rootNode		  where to start processing traversal from
@@ -473,7 +479,10 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		rootNode.traverse(this);
 
 		if (graphVariableRootNode == null) {
-			return false;
+			graphVariableRootNode = getDefaultValueNode();
+			if (graphVariableRootNode == null) {
+				return false;
+			}
 		}
 		/* Create new GraphVariable and replace old one */
 		GraphVariable newGraphVariable = modelCollector.createAndReplaceNewGraph(graphVariable, graphVariableRootNode, isDelay(graphVariable.getName()));
@@ -490,11 +499,12 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	protected abstract boolean isDelay(String variableName);
 
-	protected void processPartialSettings(Process process) throws Exception {
+	protected void processPartialSettings(Map<String, Set<OperandImpl>> partialAssignments,
+										  base.vhdl.structure.nodes.CompositeNode rootNode) throws Exception {
 		/* For each partially assigned variable in process, traverse the tree once for each partial assigned variable */
-		for (Map.Entry<String, Set<OperandImpl>> partialAssignments : modelCollector.getPartialAssignmentsFor(process).entrySet()) {
-			String varName = partialAssignments.getKey();
-			Set<OperandImpl> partialSets = partialAssignments.getValue();
+		for (Map.Entry<String, Set<OperandImpl>> varPartialAssignments : partialAssignments.entrySet()) {
+			String varName = varPartialAssignments.getKey();
+			Set<OperandImpl> partialSets = varPartialAssignments.getValue();
 			AbstractVariable wholeVariable = modelCollector.getVariable(varName); // base variable of partial setting variables
 			/* Check for missing CAT inputs and for intersections (throw Exception).*/
 			modelCollector.finalizeAndCheckForCompleteness(partialSets, wholeVariable.getLength(), varName);
@@ -503,23 +513,42 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			for (OperandImpl partSetOperand : partialSets) {
 				/* Create new variable */ //todo: may be substitute with couldProcessNextGraphVariable(). Check ModelCollector.replace() to act equally to modelCollector.addVariable() met below:
 				setGraphVariable(new PartedVariable(partSetOperand.getName(), wholeVariable.getType(), partSetOperand.getPartedIndices()));
+				graphVariable.setDefaultValue(modelCollector.extractSubConstant(wholeVariable.getDefaultValue(), partSetOperand.getPartedIndices()));
 				graphVariableRootNode = null;
 				contextManager.clear();
-				process.getRootNode().traverse(this);
-				if (graphVariableRootNode != null) {
-					GraphVariable newGraphVariable = new GraphVariable(graphVariable, graphVariableRootNode);
-					modelCollector.addVariable(partSetOperand.toString(), newGraphVariable);
-					//todo: Remove redundant resets?
-					partialSetList.add(partSetOperand);
-					processedGraphVars.add(partSetOperand.toString());
-				} else
-					throw new Exception("Partial setting variable " + graphVariable + " is never set.");
+				rootNode.traverse(this);
+				if (graphVariableRootNode == null) {
+					graphVariableRootNode = getDefaultValueNode();
+					if (graphVariableRootNode == null) {
+						throw new Exception("Partial setting variable " + graphVariable + " is never set.");
+					}
+				}
+				GraphVariable newGraphVariable = new GraphVariable(graphVariable, graphVariableRootNode);
+				modelCollector.addVariable(partSetOperand.toString(), newGraphVariable);
+				//todo: Remove redundant resets?
+				partialSetList.add(partSetOperand);
+				processedGraphVars.add(partSetOperand.toString());
 			}
 
 			modelCollector.concatenatePartialAssignments(wholeVariable, partialSetList, isDelay(varName));
 
 			processedGraphVars.add(varName);
 		}
+	}
+
+	private Node getDefaultValueNode() {
+
+		if (graphVariable == null) {
+			return null;
+		}
+
+		AbstractVariable defaultValueVariable = graphVariable.getDefaultValue();
+
+		if (defaultValueVariable == null) {
+			return null;
+		}
+
+		return new Node.Builder(defaultValueVariable).build();
 	}
 
 	/* AUXILIARY methods and classes */
@@ -585,7 +614,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			updateDefaultValue(fillingNode);
 
 			/* Add Node to Current Context if the stack is NOT empty.
-						 * If the stack is empty, initiate the root node. */
+			* If the stack is empty, initiate the root node. */
 			if (!contextStack.isEmpty()) {
 				getCurrentContext().fill(fillingNode);
 			} else {

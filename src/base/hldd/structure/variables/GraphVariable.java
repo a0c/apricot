@@ -80,6 +80,16 @@ public class GraphVariable extends AbstractVariable implements Visitable {
 		return baseVariable.getIndex();
 	}
 
+	@Override
+	public void setDefaultValue(ConstantVariable defaultValue) {
+		baseVariable.setDefaultValue(defaultValue);
+	}
+
+	@Override
+	public ConstantVariable getDefaultValue() {
+		return baseVariable.getDefaultValue();
+	}
+
 	public boolean isOutput() {
 		return baseVariable.isOutput();
 	}

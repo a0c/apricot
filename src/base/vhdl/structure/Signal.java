@@ -2,8 +2,6 @@ package base.vhdl.structure;
 
 import base.Type;
 
-import java.math.BigInteger;
-
 /**
  * @author Anton Chepurov
  */
@@ -13,9 +11,9 @@ public class Signal {
 
 	private final Type type;
 
-	private final BigInteger defaultValue;
+	private final OperandImpl defaultValue;
 
-	public Signal(String name, Type type, BigInteger defaultValue) {
+	public Signal(String name, Type type, OperandImpl defaultValue) {
 		this.name = name;
 		this.type = type;
 		this.defaultValue = defaultValue;
@@ -29,7 +27,7 @@ public class Signal {
 		return type;
 	}
 
-	public BigInteger getDefaultValue() {
+	public OperandImpl getDefaultValue() {
 		return defaultValue;
 	}
 }
