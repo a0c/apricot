@@ -135,12 +135,4 @@ public class BusinessLogicAssertionChecker {
 		this.simulationReader = simulationReader;
 	}
 
-	public File derivePatternsFileFrom(File hlddFile) {
-		return BusinessLogic.deriveFileFrom(hlddFile, ".agm", ".tst");
-	}
-
-	public File deriveTGMFileFrom(File hlddFile) {
-		return BusinessLogic.deriveFileFrom(hlddFile, ".agm", ".tgm");
-	}
-
 }

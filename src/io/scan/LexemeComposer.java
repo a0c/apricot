@@ -36,7 +36,7 @@ public class LexemeComposer {
 	 * @param sourceString the source of lexemes
 	 */
 	public LexemeComposer(String sourceString) {
-		this(new StringReader(sourceString));
+		this(new StringReader(sourceString), null);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class LexemeComposer {
 	 * @throws FileNotFoundException see {@link java.io.FileReader#FileReader(java.io.File)}
 	 */
 	public LexemeComposer(File sourceFile) throws FileNotFoundException {
-		this(new FileReader(sourceFile));
+		this(new FileReader(sourceFile), sourceFile);
 	}
 
 	/**
@@ -55,12 +55,12 @@ public class LexemeComposer {
 	 * @param stream the source of lexemes
 	 */
 	public LexemeComposer(InputStream stream) {
-		this(new InputStreamReader(stream));
+		this(new InputStreamReader(stream), null);
 	}
 
-	private LexemeComposer(Reader reader) {
+	private LexemeComposer(Reader reader, File sourceFile) {
 		bReader = new BufferedReader(reader);
-		vhdlLinesTracker = new VHDLLinesTracker();
+		vhdlLinesTracker = new VHDLLinesTracker(sourceFile);
 	}
 
 
@@ -154,8 +154,10 @@ public class LexemeComposer {
 		private char lastChar;
 		private StringBuilder line;
 		private int currentLineCount;
+		private final File sourceFile;
 
-		private VHDLLinesTracker() {
+		private VHDLLinesTracker(File sourceFile) {
+			this.sourceFile = sourceFile;
 			lastChar = 0;
 			currentLineCount = 1;
 			line = new StringBuilder();
@@ -164,7 +166,7 @@ public class LexemeComposer {
 		public SourceLocation getCurrentSource() {
 			/* Add any non-empty lines being currently under processing */
 			addLineToCurrentLines();
-			return currentLines.isEmpty() ? null : new SourceLocation(currentLines);
+			return currentLines.isEmpty() ? null : new SourceLocation(sourceFile, currentLines);
 		}
 
 		private void addLineToCurrentLines() {

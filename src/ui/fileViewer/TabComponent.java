@@ -11,7 +11,7 @@ import java.awt.event.*;
 public class TabComponent extends JPanel {
 
 	private final JTabbedPane tabbedPane;
-	
+
 	private final TabButton button;
 
 	public TabComponent(JTabbedPane tabbedPane, String title, String toolTip, MouseListener mouseListener) {
@@ -35,6 +35,20 @@ public class TabComponent extends JPanel {
 
 	public JButton getButton() {
 		return button;
+	}
+
+	public static void setBackgroundFor(Component component, boolean isDirty) {
+
+		if (component instanceof JPanel) {
+			JPanel tabComponent = (JPanel) component;
+
+			if (isDirty) {
+				tabComponent.setOpaque(true);
+				component.setBackground(Color.ORANGE);
+			} else {
+				tabComponent.setOpaque(false);
+			}
+		}
 	}
 
 	private class TabButton extends JButton implements ActionListener {

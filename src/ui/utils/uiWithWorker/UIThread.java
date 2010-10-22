@@ -80,12 +80,10 @@ public abstract class UIThread extends Thread implements UIInterface {
 		if (completeMessage == null || completeTitle == null) {
 			return;
 		}
-		Toolkit.getDefaultToolkit().beep();
 		JOptionPane.showMessageDialog(dialog.getOwner(), completeMessage, completeTitle, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public void showErrorDialog(String consoleOutput) {
-		Toolkit.getDefaultToolkit().beep();
 		JOptionPane.showMessageDialog(dialog.getOwner(), ERROR_MESSAGE + consoleOutput, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 	}
 

@@ -3,7 +3,6 @@ package ui;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import base.hldd.structure.models.BehModel;
 import io.ConsoleWriter;
@@ -17,8 +16,6 @@ import ui.utils.UIWorkerFinalizerImpl;
  */
 public class BusinessLogic {
 
-	private static final Logger LOGGER = Logger.getLogger(BusinessLogic.class.getName());
-
 	private final ApplicationForm applicationForm;
 	private final ConsoleWriter consoleWriter;
 
@@ -29,6 +26,8 @@ public class BusinessLogic {
 	private BehModel model;
 
 	private String comment;
+
+	private ConverterSettings settings;
 
 	public BusinessLogic(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
 		this.applicationForm = applicationForm;
@@ -44,9 +43,10 @@ public class BusinessLogic {
 		settingsBuilder.setDoCreateCSGraphs(applicationForm.shouldCreateCSGraphs());
 		settingsBuilder.setDoCreateExtraCSGraphs(applicationForm.shouldCreateExtraCSGraphs());
 		settingsBuilder.setHlddType(applicationForm.getHlddRepresentationType());
+		settings = settingsBuilder.build();
 
 		/* Perform PARSING and CONVERSIONS in a separate thread */
-		new ConvertingWorker(new UIWorkerFinalizerImpl(this, consoleWriter), consoleWriter, settingsBuilder.build()).execute();
+		new ConvertingWorker(new UIWorkerFinalizerImpl(this, consoleWriter), consoleWriter, settings).execute();
 
 	}
 
@@ -70,7 +70,7 @@ public class BusinessLogic {
 			/* For PSL parser, change output file from *.PSL into *.TGM */
 			changeDestinationFile(".psl", ".tgm");
 
-			model.toFile(new FileOutputStream(destinationFile), comment);
+			model.toFile(new FileOutputStream(destinationFile), comment, settings);
 			consoleWriter.writeLn("Model saved to: " + destinationFile.getAbsolutePath());
 		} catch (IOException e) {
 			String message = "Error while saving file:\n" + e.getMessage();
@@ -135,32 +135,8 @@ public class BusinessLogic {
 		baseModelFile = null;
 	}
 
-	public File deriveBaseModelFileFrom(File pslFile) {
-		return deriveFileFrom(pslFile, ".psl", ".agm");
-	}
-
-	/**
-	 * @param sourceFile file to derive from
-	 * @param sourceFileExtension extension to replace
-	 * @param derivedFileExtension target extension
-	 * @return derived file, if it exists, or <code>null</code> if it doesn't exist.
-	 */
-	public static File deriveFileFrom(File sourceFile, String sourceFileExtension, String derivedFileExtension) {
-		String sourcePath = sourceFile.getAbsolutePath().toUpperCase();
-		sourceFileExtension = sourceFileExtension.toUpperCase();
-		if (sourcePath.endsWith(sourceFileExtension)) {
-			File derivedFile = new File(sourcePath.replace(sourceFileExtension, derivedFileExtension));
-			return derivedFile.exists() ? derivedFile : null;
-		} else {
-			LOGGER.finer("Mismatch between real sourceFile extension and provided sourceFileExtension: \"" +
-					sourcePath + "\" and \"" + sourceFileExtension + "\"");
-			throw new RuntimeException("Mismatch between real sourceFile extension and provided sourceFileExtension: \"" +
-					sourcePath + "\" and \"" + sourceFileExtension + "\"");
-		}
-	}
-
 	public void doLoadHlddGraph() {
-		applicationForm.doLoadHlddGraph(deriveFileFrom(destinationFile, ".agm", ".png"));
+		applicationForm.doLoadHlddGraph(FileDependencyResolver.derivePngFile(destinationFile));
 	}
 
 

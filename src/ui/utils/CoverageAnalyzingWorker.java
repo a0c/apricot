@@ -1,5 +1,6 @@
 package ui.utils;
 
+import ui.FileDependencyResolver;
 import ui.utils.uiWithWorker.TaskSwingWorker;
 import io.ConsoleWriter;
 
@@ -55,14 +56,14 @@ public class CoverageAnalyzingWorker extends TaskSwingWorker {
 	private void showVHDLCoverage() {
 		/* Automatically load COV and VHDL files, if available */
 		ApplicationForm applicationForm = businessLogic.getApplicationForm();
-		File covFile = businessLogic.deriveFileFrom(businessLogic.getHlddFile(), ".agm", ".cov");
+		File hlddFile = businessLogic.getHlddFile();
+		File covFile = FileDependencyResolver.deriveCovFile(hlddFile);
 		if (covFile != null) {
 			applicationForm.updateCovTextField(covFile);
 			businessLogic.setCovFile(covFile);
 		}
 
-		File vhdlFile = businessLogic.deriveFileFrom(businessLogic.getHlddFile(), ".agm", ".vhdl");
-		if (vhdlFile == null) vhdlFile = businessLogic.deriveFileFrom(businessLogic.getHlddFile(), ".agm", ".vhd");
+		File vhdlFile = FileDependencyResolver.deriveVhdlFile(hlddFile);
 		if (vhdlFile != null) {
 			applicationForm.updateVhdlCovTextField(vhdlFile);
 			businessLogic.setVhdlFile(vhdlFile);

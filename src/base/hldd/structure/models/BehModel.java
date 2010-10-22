@@ -13,10 +13,11 @@ import java.util.*;
 
 import parsers.hldd.StructureBuilder;
 import parsers.hldd.StructureParser;
+import ui.ConverterSettings;
 
 /**
  * Class representing AGM BEH RTL DD.
- * 
+ *
  * @author Anton Chepurov
  */
 public class BehModel {
@@ -112,9 +113,9 @@ public class BehModel {
 		}
 	}
 
-	public void toFile(OutputStream outputStream, String comment) throws IOException {
+	public void toFile(OutputStream outputStream, String comment, ConverterSettings settings) throws IOException {
 
-		String fileAsString = composeFileString(comment);
+		String fileAsString = composeFileString(comment, settings);
 
 		writeStringToFile(outputStream, fileAsString);
 
@@ -127,15 +128,21 @@ public class BehModel {
 		outBufWriter.flush();
 	}
 
-	protected String composeFileString(String comment) {
+	protected String composeFileString(String comment, ConverterSettings settings) {
 
 		StringBuilder sb = new StringBuilder();
 
+		// add SETTINGS, if any
+		if (settings != null) {
+			settings.writeSmartComment(sb);
+		}
 		// add COMMENT if exists
+		String newLine = System.getProperty("line.separator");
 		if (comment != null && !comment.equals("")) {
+			sb.append(";").append(newLine);
 			String[] lines = comment.split("\n");
 			for (String line : lines) {
-				sb.append(";").append(line).append("\n");
+				sb.append(";").append(line).append(newLine);
 			}
 		}
 

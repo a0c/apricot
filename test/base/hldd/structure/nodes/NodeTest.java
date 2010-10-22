@@ -10,6 +10,7 @@ import base.hldd.structure.Flags;
 import base.Indices;
 import base.Type;
 
+import java.io.File;
 import java.util.Collections;
 
 /**
@@ -49,21 +50,22 @@ public class NodeTest {
 		assertEquals(partedIndices, node.getPartedIndices());
 
 		// Terminal node with source
-		node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).source(new SourceLocation(Collections.singleton(2))).build();
+		File sourceFile = new File("SuperFile.aga");
+		node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).source(new SourceLocation(sourceFile, Collections.singleton(2))).build();
 		assertTrue(node.isTerminalNode());
 		assertNotNull(node.getSource());
-		assertEquals("2", node.getSource().toString());
+		assertEquals("SuperFile.aga 2", node.getSource().toString());
 
 		// Control node with parted indices and source
 		partedIndices = new Indices(2, 1);
-		node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2).partedIndices(partedIndices).source(new SourceLocation(Collections.singleton(199))).build();
+		node = new Node.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2).partedIndices(partedIndices).source(new SourceLocation(sourceFile, Collections.singleton(199))).build();
 		assertTrue(node.isControlNode());
 		assertNotNull(node.getSuccessors());
 		assertEquals(2, node.getConditionValuesCount());
 		assertNotNull(node.getPartedIndices());
 		assertEquals(partedIndices, node.getPartedIndices());
 		assertNotNull(node.getSource());
-		assertEquals("199", node.getSource().toString());
+		assertEquals("SuperFile.aga 199", node.getSource().toString());
 
 	}
 

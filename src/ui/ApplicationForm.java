@@ -347,14 +347,14 @@ public class ApplicationForm implements ActionListener {
 	private void triggerAutomaticSelection(File selectedFile, JButton pressedButton) {
 		if (pressedButton == hlddButton && selectedParserId == ParserID.PSL2THLDD) {
 			/* Automatically look for identical PSL Base Model file */
-			File baseModelFile = businessLogic.deriveBaseModelFileFrom(selectedFile);
+			File baseModelFile = FileDependencyResolver.deriveBaseModelFile(selectedFile);
 			if (baseModelFile != null) {
 				businessLogic.setBaseModelFile(baseModelFile);
 				updateTextFieldFor(vhdlButton, baseModelFile);
 			}
 		} else if (pressedButton == hlddAssertButton) {
 			/* Automatically look for identical TGM file */
-			File tgmFile = businessLogicAssertionChecker.deriveTGMFileFrom(selectedFile);
+			File tgmFile = FileDependencyResolver.deriveTgmFile(selectedFile);
 			if (tgmFile != null) {
 				checkAssertionCheckBox.setSelected(true);
 				businessLogicAssertionChecker.setTgmFile(tgmFile);
@@ -362,12 +362,12 @@ public class ApplicationForm implements ActionListener {
 			}
 
 			/* Automatically look for identical Patterns file */
-			selectIdenticalTSTFile(businessLogicAssertionChecker.derivePatternsFileFrom(selectedFile),
+			selectIdenticalTSTFile(FileDependencyResolver.deriveTstFile(selectedFile),
 					tstAssertRadioButton, randomAssertRadioButton, patternNrSpinnerAssert);
 
 		} else if (pressedButton == hlddCoverageButton) {
 			/* Automatically look for identical Patterns file */
-			selectIdenticalTSTFile(businessLogicCoverageAnalyzer.derivePatternsFileFrom(selectedFile),
+			selectIdenticalTSTFile(FileDependencyResolver.deriveTstFile(selectedFile),
 					tstCovRadioButton, randomCovRadioButton, patternNrSpinnerCoverage);
 		}
 	}
@@ -779,23 +779,28 @@ public class ApplicationForm implements ActionListener {
 				tabbedPane = fileViewerTabbedPane1;
 			}
 			addFileViewerTab(tabbedPane, selectedFile.getName(), selectedFile.getAbsolutePath(), new TableForm(selectedFile,
-					tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1).getWidth(), nodesLines, edgesLines).getMainPanel());
+					tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1).getWidth(), nodesLines, edgesLines).getMainPanel(),
+					nodesLines != null && !nodesLines.isEmpty());
 		}
 
 	}
 
-	public void addFileViewerTab(JTabbedPane tabbedPane, String tabTitle, String tabToolTip, JComponent component) {
+	public void addFileViewerTab(JTabbedPane tabbedPane, String tabTitle, String tabToolTip, JComponent component, boolean isDirty) {
 		/* Search for equal existing tab */
 		int insertionIndex = getIdenticalTabIndex(tabbedPane, tabToolTip);
 		if (insertionIndex == -1) {
 			/* Previously existing tab is not found. Create a new one. */
 			insertionIndex = tabbedPane.getTabCount() - 1;
 			tabbedPane.insertTab(tabTitle, null, component, null, insertionIndex);
-			tabbedPane.setTabComponentAt(insertionIndex, new TabComponent(tabbedPane, tabTitle, tabToolTip,
-					tabbedPane == fileViewerTabbedPane1 ? tabbedPaneListener : tabbedPaneListener2));
+			TabComponent tabComponent = new TabComponent(tabbedPane, tabTitle, tabToolTip,
+					tabbedPane == fileViewerTabbedPane1 ? tabbedPaneListener : tabbedPaneListener2);
+			TabComponent.setBackgroundFor(tabComponent, isDirty);
+			tabbedPane.setTabComponentAt(insertionIndex, tabComponent);
 		} else {
 			/* Previously existing tab is found. Replace its component with a new one (the specified one). */
+			TabComponent.setBackgroundFor(tabbedPane.getTabComponentAt(insertionIndex), isDirty);
 			tabbedPane.setComponentAt(insertionIndex, component);
+			tabbedPane.repaint();
 			System.gc();
 		}
 		/* Activate new tab */
@@ -803,7 +808,7 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public void addSimulation(String tabTitle, String tabToolTip, JComponent component) {
-		addFileViewerTab(fileViewerTabbedPane2, tabTitle, tabToolTip, component);
+		addFileViewerTab(fileViewerTabbedPane2, tabTitle, tabToolTip, component, false);
 	}
 
 	public void addPictureTab(String tabTitle, String tabToolTip, JComponent component) {
@@ -847,7 +852,7 @@ public class ApplicationForm implements ActionListener {
 		for (int index = 0; index < tabbedPane.getTabCount(); index++) {
 			Component tabComponent = tabbedPane.getTabComponentAt(index);
 			if (tabComponent instanceof TabComponent) {
-				if (((TabComponent) tabComponent).getToolTipText().equals(tabToolTip)) {
+				if (((TabComponent) tabComponent).getToolTipText().equalsIgnoreCase(tabToolTip)) {
 					return index;
 				}
 			}

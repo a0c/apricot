@@ -43,7 +43,31 @@ public class Design {
 
 	@SuppressWarnings({"ResultOfMethodCallIgnored"})
 	public void createNewDesignDir() throws IOException {
-		newDesignFile.getParentFile().mkdir();
+		getNewDesignDir().mkdir();
 	}
 
+	public boolean tryDeletingNewDesignDir() {
+
+		File newDesignDir = getNewDesignDir();
+
+		if (!newDesignDir.exists()) {
+			return true;
+		}
+
+		File[] files = newDesignDir.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				boolean isDeleted = file.delete();
+				if (!isDeleted) {
+					return false;
+				}
+			}
+		}
+
+		return newDesignDir.delete();
+	}
+
+	private File getNewDesignDir() {
+		return newDesignFile.getParentFile();
+	}
 }

@@ -19,7 +19,7 @@ public class PSLMain {
 				null);
 		pslParserShell.parse();
 
-		pslParserShell.getModel().toFile(new FileOutputStream(new File("D:\\Documents and Settings\\Randy\\My Documents\\Anton\\TTU\\RAIK\\VERTIGO docs\\PSL\\latw_dummy_ETS08.agm")), pslParserShell.getComment());
+		pslParserShell.getModel().toFile(new FileOutputStream(new File("D:\\Documents and Settings\\Randy\\My Documents\\Anton\\TTU\\RAIK\\VERTIGO docs\\PSL\\latw_dummy_ETS08.agm")), pslParserShell.getComment(), null);
 
 	}
 

@@ -1,5 +1,6 @@
 package ui.utils;
 
+import base.SourceLocation;
 import ui.utils.uiWithWorker.TaskSwingWorker;
 import ui.io.HLDD2VHDLMappingReader;
 import ui.io.CoverageReader;
@@ -49,10 +50,26 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					consoleWriter.done();
 
 					/* Extract lines for uncovered nodes */
-					Collection<Integer> uncoveredNodeLines = hldd2VHDLMapping.getLinesFor(uncoveredNodeItems);
+					SourceLocation uncoveredSources = hldd2VHDLMapping.getSourceFor(uncoveredNodeItems);
 
 					/* Add tab to the FileViewer */
-					applicationForm.addFileViewerTabFromFile(vhdlFile, uncoveredNodeLines, null, null);
+					if (uncoveredSources != null) {
+						Collection<File> uncoveredFiles = uncoveredSources.getFiles();
+						for (File uncoveredFile : uncoveredFiles) {
+							Collection<Integer> uncoveredLines = uncoveredSources.getLinesForFile(uncoveredFile);
+							applicationForm.addFileViewerTabFromFile(uncoveredFile, uncoveredLines, null, null);
+						}
+						if (!uncoveredFiles.contains(vhdlFile)) {
+							applicationForm.addFileViewerTabFromFile(vhdlFile, null, null, null);
+						}
+					} else {
+						applicationForm.addFileViewerTabFromFile(vhdlFile, null, null, null);
+
+						SourceLocation allSources = hldd2VHDLMapping.getAllSources();
+						for (File coveredFile : allSources.getFiles()) {
+							applicationForm.addFileViewerTabFromFile(coveredFile, null, null, null);
+						}
+					}
 
 					isProcessFinished = true;
 				} catch (Exception e) {

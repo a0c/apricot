@@ -35,6 +35,8 @@ public class ComponentLoader {
 
 			new PrefixAdder(model, component).addPrefix(component.getName());
 
+			baseSettings.addSourceFiles(settings);
+
 			return model;
 
 		} catch (InterruptedException e) {

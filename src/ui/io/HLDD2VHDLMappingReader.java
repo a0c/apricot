@@ -1,5 +1,6 @@
 package ui.io;
 
+import base.SourceLocation;
 import ui.base.HLDD2VHDLMapping;
 import ui.base.NodeItem;
 import io.QuietCloser;
@@ -35,10 +36,26 @@ public class HLDD2VHDLMappingReader {
 				}
 
 				/* Parse line numbers */
-				String[] lineNumbersAsStrings = lineParts[1].split(",");
-				Collection<Integer> lines = new HashSet<Integer>();
-				for (String lineNumberAsString : lineNumbersAsStrings) {
-					lines.add(Integer.parseInt(lineNumberAsString.trim()) - OFFSET);
+				SourceLocation sourceLocation = null;
+				for (String fileLines : lineParts[1].split(";")) {
+
+					String[] fileNameAndLines = fileLines.trim().split(" ", 2);
+
+					String fileName = fileNameAndLines[0].trim();
+
+					String[] lineNumbersAsStrings = fileNameAndLines[1].split(",");
+					Collection<Integer> lines = new HashSet<Integer>();
+					for (String lineNumberAsString : lineNumbersAsStrings) {
+						lines.add(Integer.parseInt(lineNumberAsString.trim()) - OFFSET);
+					}
+
+					SourceLocation nextLocation = new SourceLocation(new File(mappingFile.getParent(), fileName), lines);
+
+					if (sourceLocation == null) {
+						sourceLocation = nextLocation;
+					} else {
+						sourceLocation = sourceLocation.addSource(nextLocation);
+					}
 				}
 
 				/* Parse indices */
@@ -46,7 +63,7 @@ public class HLDD2VHDLMappingReader {
 				if (indices.length == 2) {
 					int graphIndex = Integer.parseInt(indices[0].trim());
 					int nodeIndex = Integer.parseInt(indices[1].trim());
-					mapping.addMapping(new NodeItem(graphIndex, nodeIndex), lines);
+					mapping.addMapping(new NodeItem(graphIndex, nodeIndex), sourceLocation);
 				} //todo: EdgeMappingItem, etc...
 			}
 		} finally {

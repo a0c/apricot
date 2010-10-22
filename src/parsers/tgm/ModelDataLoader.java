@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.io.File;
 
-import ui.BusinessLogic;
+import ui.FileDependencyResolver;
 
 /**
  * @author Anton Chepurov
@@ -158,11 +158,11 @@ public class ModelDataLoader {
 		public File deriveModelFile(File patternFile) {
 			switch (this) {
 				case CHKfile:
-					return BusinessLogic.deriveFileFrom(patternFile, CHK_EXTENSION, TGM_EXTENSION);
+					return FileDependencyResolver.deriveFileFrom(patternFile, CHK_EXTENSION, TGM_EXTENSION);
 				case SIMfile:
-					return BusinessLogic.deriveFileFrom(patternFile, SIM_EXTENSION, AGM_EXTENSION);
+					return FileDependencyResolver.deriveFileFrom(patternFile, SIM_EXTENSION, AGM_EXTENSION);
 				case TSTFile:
-					return BusinessLogic.deriveFileFrom(patternFile, TST_EXTENSION, AGM_EXTENSION);
+					return FileDependencyResolver.deriveFileFrom(patternFile, TST_EXTENSION, AGM_EXTENSION);
 				default:
 					return null;
 			}

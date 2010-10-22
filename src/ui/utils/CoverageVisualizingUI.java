@@ -14,8 +14,8 @@ public class CoverageVisualizingUI extends UIThread {
 				false,
 				"Coverage Visualizer",
 				"Mapping files",
-				"Coverage visualization completed",
-				"Visualization done",
+				null,
+				null,
 				true);
 	}
 }

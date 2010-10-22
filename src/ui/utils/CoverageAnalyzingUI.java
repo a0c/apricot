@@ -14,8 +14,8 @@ public class CoverageAnalyzingUI extends UIThread {
 				false,
 				"Coverage analyzer",
 				"Analyzing coverage...",
-				"Coverage analysis completed",
-				"Analysis done",
+				null,
+				null,
 				true);
 	}
 }

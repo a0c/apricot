@@ -11,6 +11,7 @@ import base.psl.structure.Range;
 import base.Indices;
 import base.Type;
 
+import java.io.File;
 import java.util.Collections;
 
 /**
@@ -39,7 +40,7 @@ public class TemporalNodeTest {
 
 		// Check correctness of super-class methods
 		Indices partedIndices = new Indices(9, 2);
-		SourceLocation source = new SourceLocation(Collections.singleton(1991));
+		SourceLocation source = new SourceLocation(new File("Buba.aqa"), Collections.singleton(1991));
 		node = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags()))
 				.createSuccessors(2)
 				.partedIndices(partedIndices)
@@ -50,7 +51,7 @@ public class TemporalNodeTest {
 		assertEquals(partedIndices, node.getPartedIndices());
 		assertNotNull(node.getSource());
 		assertEquals(source, node.getSource());
-		assertEquals("1991", node.getSource().toString());
+		assertEquals("Buba.aqa 1991", node.getSource().toString());
 
 		// Check class of the chained builder
 		Node.Builder builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2);

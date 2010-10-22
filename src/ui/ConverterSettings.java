@@ -1,9 +1,12 @@
 package ui;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import io.QuietCloser;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static ui.BusinessLogic.ParserID.*;
 
@@ -33,6 +36,7 @@ public class ConverterSettings {
 	private final boolean doCreateCSGraphs;
 	private final boolean doCreateExtraCSGraphs;
 	private final BusinessLogic.HLDDRepresentationType hlddType;
+	private final Set<File> sourceFiles = new TreeSet<File>();
 	/* Mutable fields */
 	private OutputStream mapFileStream;
 
@@ -79,7 +83,7 @@ public class ConverterSettings {
 
 	/**
 	 * @return whether to inline Composite conditions into a set of Control Nodes (true value),
-	 * 		   or create a single node function (false value)
+	 *         or create a single node function (false value)
 	 */
 	public boolean isDoFlattenConditions() {
 		return doFlattenConditions;
@@ -117,15 +121,15 @@ public class ConverterSettings {
 
 	public static ConverterSettings parse(String filePath) throws ConverterSettingsParseException {
 		final File originalFile = new File(filePath);
-		String fileName = originalFile.getName().toUpperCase();
+		String fileName = originalFile.getName();
 		File baseModelFile = null;
 		File sourceFile = null;
 
 		BusinessLogic.ParserID parserId;
 
-		if (fileName.endsWith(".AGM")) {
+		if (fileName.endsWith(".agm")) {
 			parserId = hasAmongstParents("trees", originalFile) ? VhdlBehDd2HlddBeh : VhdlBeh2HlddBeh;
-		} else if (fileName.endsWith(".TGM")) {
+		} else if (fileName.endsWith(".tgm")) {
 			parserId = PSL2THLDD;
 			baseModelFile = new File(originalFile.getAbsolutePath().replaceFirst(".tgm$", ".agm"));
 			sourceFile = new File(originalFile.getAbsolutePath().replaceFirst(".tgm$", ".psl"));
@@ -141,7 +145,7 @@ public class ConverterSettings {
 		BusinessLogic.HLDDRepresentationType hlddType = null;
 
 		if (parserId != PSL2THLDD) {
-			fileName = cutFromEnd(fileName, ".AGM"); // cut extension
+			fileName = cutFromEnd(fileName, ".agm"); // cut extension
 			// parse RTL
 			if (fileName.endsWith("_RTL")) {
 				parserId = BusinessLogic.ParserID.HlddBeh2HlddRtl;
@@ -276,6 +280,162 @@ public class ConverterSettings {
 		result = 31 * result + (hlddType != null ? hlddType.hashCode() : 0);
 		result = 31 * result + (mapFileStream != null ? mapFileStream.hashCode() : 0);
 		return result;
+	}
+
+	public void addSourceFiles(ConverterSettings otherSettings) {
+
+		addSources(Arrays.asList(otherSettings.sourceFile));
+
+		addSources(otherSettings.sourceFiles);
+	}
+
+	private void addSources(Collection<File> sourceFiles) {
+
+		this.sourceFiles.addAll(sourceFiles);
+	}
+
+	public void writeSmartComment(StringBuilder sb) {
+
+		String newLine = System.getProperty("line.separator");
+		//todo: replace all stuff below with formatted print. see how Zamia does this.
+		sb.append(";  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!").append(newLine);
+		sb.append(";").append(newLine);
+		sb.append("; SOURCE FILE:").append(newLine);
+		sb.append(";        ").append(sourceFile.getName()).append(newLine);
+		if (!sourceFiles.isEmpty()) {
+			sb.append("; COMPONENTS:").append(newLine);
+		}
+		for (File sourceFile : sourceFiles) {
+			sb.append(";        ").append(sourceFile.getName()).append(newLine);
+		}
+		sb.append(";").append(newLine);
+		sb.append("; CONVERTER:").append(newLine);
+		sb.append(";        ").append(parserId).append(newLine);
+		sb.append(";").append(newLine);
+		sb.append("; MODEL COMPACTNESS:").append(newLine);
+		sb.append(";        ").append(hlddType).
+				append(hlddType == BusinessLogic.HLDDRepresentationType.MINIMIZED ? " (default)" : "").append(newLine);
+		sb.append(";").append(newLine);
+		sb.append("; CONDITIONAL STATEMENTS:").append(newLine);
+		String conditionalStatements =
+				doFlattenConditions ? "Flatten" :
+						doCreateCSGraphs ? "Graphs" :
+								doCreateExtraCSGraphs ? "Functions + Extra-Graphs" :
+										"Functions (default)";
+		sb.append(";        ").append(conditionalStatements).append(newLine);
+		sb.append(";").append(newLine);
+		sb.append(";  <<<<<<< GENERATOR INFO").append(newLine);
+	}
+
+	public static ConverterSettings loadSmartComment(File hlddFile) {
+
+		ConverterSettings settings = null;
+
+		BufferedReader reader = null;
+		try {
+
+			String sourceFileName = null;
+			BusinessLogic.ParserID parserId = null;
+			Set<File> sourceFiles = new TreeSet<File>();
+			BusinessLogic.HLDDRepresentationType hlddType = null;
+			boolean doFlattenConditions = false;
+			boolean doCreateCSGraphs = false;
+			boolean doCreateExtraCSGraphs = false;
+
+			boolean isReadingSourceFile = false;
+			boolean isReadingComponents = false;
+			boolean isReadingConverter = false;
+			boolean isReadingModelCompactness = false;
+			boolean isReadingConditionalStatements = false;
+
+			reader = new BufferedReader(new FileReader(hlddFile));
+			while (true) {
+
+				String line = reader.readLine();
+				/* Terminate */
+				if (line == null) {
+					break;
+				}
+				if (line.length() == 0) {
+					continue;
+				}
+				if (!line.startsWith(";")) {
+					break;
+				}
+				line = line.substring(1).trim();
+				if (line.length() < 1) {
+					continue;
+				}
+				/* Set values */
+				if (isReadingSourceFile) {
+					sourceFileName = line;
+					isReadingSourceFile = false;
+				}
+				if (isReadingComponents) {
+					sourceFiles.add(new File(hlddFile.getParent(), line));
+				}
+				if (isReadingConverter) {
+					parserId = BusinessLogic.ParserID.valueOf(line);
+					isReadingConverter = false;
+				}
+				if (isReadingModelCompactness) {
+					String defaultLine = "(default)";
+					if (line.endsWith(defaultLine)) {
+						line = line.substring(0, line.lastIndexOf(defaultLine)).trim();
+					}
+					hlddType = BusinessLogic.HLDDRepresentationType.valueOf(line);
+					isReadingModelCompactness = false;
+				}
+				if (isReadingConditionalStatements) {
+					if (line.equals("Flatten")) {
+						doFlattenConditions = true;
+					} else if (line.equals("Graphs")) {
+						doCreateCSGraphs = true;
+					} else if (line.equals("Functions + Extra-Graphs")) {
+						doCreateExtraCSGraphs = true;
+					}
+					isReadingConditionalStatements = false;
+				}
+				/* Set mode */
+				if (line.equals("SOURCE FILE:")) {
+					isReadingSourceFile = true;
+					continue;
+				}
+				if (line.equals("COMPONENTS:")) {
+					isReadingComponents = true;
+				}
+				if (line.equals("CONVERTER:")) {
+					isReadingComponents = false;
+					isReadingConverter = true;
+				}
+				if (line.equals("MODEL COMPACTNESS:")) {
+					isReadingModelCompactness = true;
+				}
+				if (line.equals("CONDITIONAL STATEMENTS:")) {
+					isReadingConditionalStatements = true;
+				}
+
+			}
+
+			Builder builder = new Builder(parserId, new File(hlddFile.getParent(), sourceFileName), hlddFile);
+			builder.setHlddType(hlddType);
+			builder.setDoCreateExtraCSGraphs(doCreateExtraCSGraphs);
+			builder.setDoCreateCSGraphs(doCreateCSGraphs);
+			builder.setDoFlattenConditions(doFlattenConditions);
+
+			settings = builder.build();
+			settings.addSources(sourceFiles);
+
+		} catch (FileNotFoundException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		} catch (ExtendedException e) {
+			throw new RuntimeException(e); /* Should never happen */
+		} finally {
+			QuietCloser.closeQuietly(reader);
+		}
+		return settings;
 	}
 
 	public static class ConverterSettingsParseException extends Exception {

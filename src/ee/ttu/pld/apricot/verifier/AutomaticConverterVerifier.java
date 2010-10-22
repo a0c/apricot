@@ -22,6 +22,14 @@ public class AutomaticConverterVerifier {
 		Collection<Design> designs = DesignCreator.create(statistics);
 
 		for (Design design : designs) {
+			boolean isDeleted = design.tryDeletingNewDesignDir();
+			if (!isDeleted) {
+				System.out.printf("### ERROR ###   Could not remove VERIF dirs");
+				return;
+			}
+		}
+
+		for (Design design : designs) {
 			verify(design, statistics);
 		}
 
@@ -42,12 +50,12 @@ public class AutomaticConverterVerifier {
 			// Convert
 			BehModel model = ConvertingWorker.convertAndWait(settings);
 			// Compare
-			model.toFile(modelStream, null);
+			model.toFile(modelStream, null, settings);
 			if (areEqual(new FileInputStream(hlddFile), new ByteArrayInputStream(modelStream.toByteArray()))) {
 				statistics.pass();
 			} else {
 				design.createNewDesignDir();
-				model.toFile(new FileOutputStream(design.getNewDesignFile()), null);
+				model.toFile(new FileOutputStream(design.getNewDesignFile()), null, settings);
 				statistics.fail(hlddFilePath);
 			}
 			// Compare MAP file

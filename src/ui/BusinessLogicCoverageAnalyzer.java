@@ -117,14 +117,6 @@ public class BusinessLogicCoverageAnalyzer {
 		return applicationForm;
 	}
 
-	public File derivePatternsFileFrom(File hlddFile) {
-		return BusinessLogic.deriveFileFrom(hlddFile, ".agm", ".tst");
-	}
-
-	public File deriveFileFrom(File sourceFile, String sourceFileExtension, String derivedFileExtension) {
-		return BusinessLogic.deriveFileFrom(sourceFile, sourceFileExtension, derivedFileExtension);
-	}
-
 	public void processShow() throws ExtendedException {
 		/* Check all files to be selected */
 		String fileDescription = null;
@@ -135,7 +127,7 @@ public class BusinessLogicCoverageAnalyzer {
 		} else if (mappingFile == null) {
 			fileDescription = "Mapping";
 			//todo: temporary fix
-			mappingFile = BusinessLogic.deriveFileFrom(covFile, ".cov", ".map");
+			mappingFile = FileDependencyResolver.deriveMapFile(covFile);
 			fileDescription = mappingFile == null ? "Mapping" : null;
 			//todo: temporary fix
 		}

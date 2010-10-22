@@ -1,7 +1,8 @@
 package ui.base;
 
+import base.SourceLocation;
+
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -10,20 +11,36 @@ import java.util.HashMap;
  */
 public class HLDD2VHDLMapping {
 
-	Map<? super AbstractItem, Collection<Integer>> mapping = new HashMap<AbstractItem, Collection<Integer>>();
+	Map<? super AbstractItem, SourceLocation> mapping = new HashMap<AbstractItem, SourceLocation>();
 
-	public void addMapping(AbstractItem newItem, Collection<Integer> lines) {
+	public void addMapping(AbstractItem newItem, SourceLocation lines) {
 		mapping.put(newItem, lines);
 	}
 
-
-	public Collection<Integer> getLinesFor(Collection<? extends AbstractItem> uncoveredItems) {
-		Collection<Integer> lines = new HashSet<Integer>();
+	public SourceLocation getSourceFor(Collection<? extends AbstractItem> uncoveredItems) {
+		SourceLocation location = null;
 		for (AbstractItem uncoveredItem : uncoveredItems) {
 			if (mapping.containsKey(uncoveredItem)) {
-				lines.addAll(mapping.get(uncoveredItem));
+				SourceLocation uncoveredLocation = mapping.get(uncoveredItem);
+				if (location == null) {
+					location = uncoveredLocation;
+				} else {
+					location = location.addSource(uncoveredLocation);
+				}
 			}
 		}
-		return lines;
+		return location;
+	}
+
+	public SourceLocation getAllSources() {
+		SourceLocation location = null;
+		for (SourceLocation source : mapping.values()) {
+			if (location == null) {
+				location = source;
+			} else {
+				location = location.addSource(source);
+			}
+		}
+		return location;
 	}
 }

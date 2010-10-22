@@ -1,6 +1,7 @@
 package base.hldd.structure.models;
 
 import base.hldd.structure.variables.AbstractVariable;
+import ui.ConverterSettings;
 
 import java.util.Collection;
 
@@ -17,15 +18,21 @@ public class Model extends BehModel {
 		super(variables);
 	}
 
-	protected String composeFileString(String comment) {
+	protected String composeFileString(String comment, ConverterSettings settings) {
 
 		StringBuilder sb = new StringBuilder();
 
+		// add SETTINGS, if any
+		if (settings != null) {
+			settings.writeSmartComment(sb);
+		}
 		// add COMMENT if exists
+		String newLine = System.getProperty("line.separator");
 		if (comment != null && !comment.equals("")) {
+			sb.append(";").append(newLine);
 			String[] lines = comment.split("\n");
 			for (String line : lines) {
-				sb.append(";").append(line).append("\n");
+				sb.append(";").append(line).append(newLine);
 			}
 		}
 
