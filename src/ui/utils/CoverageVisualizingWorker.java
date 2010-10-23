@@ -70,8 +70,9 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					int total = hldd2VHDLMapping.getAllSources().getTotalLinesNum();
 					int uncovered = uncoveredSources == null ? 0 : uncoveredSources.getTotalLinesNum();
 					CoveragePanel coveragePanel = new CoveragePanel(new SplitCoverage(total - uncovered, total, SplitCoverage.STATEMENT_COVERAGE));
-					applicationForm.addCoverage(BusinessLogicCoverageAnalyzer.generateTabTitle(vhdlFile),
-							BusinessLogicCoverageAnalyzer.generateTabTooltip(vhdlFile), true, coveragePanel);
+					coveragePanel.setToolTipText("Coverage for top level: " + vhdlFile.getPath());
+					applicationForm.addCoverage(BusinessLogicCoverageAnalyzer.generateTabTitle(mappingFile),
+							BusinessLogicCoverageAnalyzer.generateTabTooltip(mappingFile), true, coveragePanel);
 
 					isProcessFinished = true;
 				} catch (Exception e) {
