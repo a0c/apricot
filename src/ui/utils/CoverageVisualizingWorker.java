@@ -10,6 +10,7 @@ import io.ConsoleWriter;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import ui.ApplicationForm;
 import ui.ExtendedException;
@@ -50,25 +51,16 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					consoleWriter.done();
 
 					/* Extract lines for uncovered nodes */
+					SourceLocation allSources = hldd2VHDLMapping.getAllSources();
 					SourceLocation uncoveredSources = hldd2VHDLMapping.getSourceFor(uncoveredNodeItems);
 
 					/* Add tab to the FileViewer */
-					if (uncoveredSources != null) {
-						Collection<File> uncoveredFiles = uncoveredSources.getFiles();
-						for (File uncoveredFile : uncoveredFiles) {
-							Collection<Integer> uncoveredLines = uncoveredSources.getLinesForFile(uncoveredFile);
-							applicationForm.addFileViewerTabFromFile(uncoveredFile, uncoveredLines, null, null);
-						}
-						if (!uncoveredFiles.contains(vhdlFile)) {
-							applicationForm.addFileViewerTabFromFile(vhdlFile, null, null, null);
-						}
-					} else {
-						applicationForm.addFileViewerTabFromFile(vhdlFile, null, null, null);
-
-						SourceLocation allSources = hldd2VHDLMapping.getAllSources();
-						for (File coveredFile : allSources.getFiles()) {
-							applicationForm.addFileViewerTabFromFile(coveredFile, null, null, null);
-						}
+					LinkedList<File> allSourceFiles = new LinkedList<File>(allSources.getFiles());
+					allSourceFiles.add(vhdlFile); // just in case it is not in allSources list (no transitions in it, only component instantiations)
+					java.util.Collections.sort(allSourceFiles);
+					for (File sourceFile : allSourceFiles) {
+						Collection<Integer> highlightedLines = uncoveredSources == null ? null : uncoveredSources.getLinesForFile(sourceFile);
+						applicationForm.addFileViewerTabFromFile(sourceFile, highlightedLines, null, null);    
 					}
 
 					isProcessFinished = true;
