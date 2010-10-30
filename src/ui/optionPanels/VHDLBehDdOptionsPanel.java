@@ -1,7 +1,7 @@
 package ui.optionPanels;
 
+import ui.ApplicationForm.FileDropHandler;
 import ui.BusinessLogic;
-import ui.OutputFileGenerator;
 
 import javax.swing.*;
 
@@ -15,12 +15,15 @@ public class VHDLBehDdOptionsPanel {
 	private JRadioButton minimizedRadioButton;
 	private JRadioButton expandCSCheckBox;
 	private JRadioButton fullRadioButton;
+	private JRadioButton collapseCheckBox;
 
-	public VHDLBehDdOptionsPanel(OutputFileGenerator outputFileGenerator) {
-		fullRadioButton.addChangeListener(outputFileGenerator);
-		reducedRadioButton.addChangeListener(outputFileGenerator);
-		minimizedRadioButton.addChangeListener(outputFileGenerator);
-		//todo: update ConditionStatement Modes
+	public VHDLBehDdOptionsPanel(FileDropHandler fileDropHandler) {
+		fullRadioButton.addKeyListener(fileDropHandler);
+		reducedRadioButton.addKeyListener(fileDropHandler);
+		minimizedRadioButton.addKeyListener(fileDropHandler);
+		expandCSCheckBox.addKeyListener(fileDropHandler);
+		collapseCheckBox.addKeyListener(fileDropHandler);
+		simplifyCheckBox.addKeyListener(fileDropHandler);
 	}
 
 	public JPanel getMainPanel() {

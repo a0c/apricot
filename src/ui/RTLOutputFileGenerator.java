@@ -1,6 +1,5 @@
 package ui;
 
-import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.io.File;
@@ -9,13 +8,11 @@ import java.io.File;
  * @author Anton Chepurov
  */
 public class RTLOutputFileGenerator implements DocumentListener {
-	//todo: possibly generify this class to OutputFileGenerator...
-	private final ApplicationForm applicationForm;
-	private JButton outputFileButton;
 
-	public RTLOutputFileGenerator(ApplicationForm applicationForm, JButton outputFileButton) {
+	private final ApplicationForm applicationForm;
+
+	public RTLOutputFileGenerator(ApplicationForm applicationForm) {
 		this.applicationForm = applicationForm;
-		this.outputFileButton = outputFileButton;
 	}
 
 	public File generate() {
@@ -50,8 +47,7 @@ public class RTLOutputFileGenerator implements DocumentListener {
 
 			File file = generate();
 
-			applicationForm.setDestFile(file);
-			applicationForm.updateTextFieldFor(outputFileButton, file);
+			applicationForm.setRtlRtlFile(file);
 
 		}
 	}

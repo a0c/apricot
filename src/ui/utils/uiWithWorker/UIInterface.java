@@ -11,8 +11,6 @@ public interface UIInterface {
 
 	void updateProgressBar(int value, int maxValue);
 
-	void showSuccessDialog();
-
 	void showErrorDialog(String consoleOutput);
 
 	void setVisible(boolean visible);

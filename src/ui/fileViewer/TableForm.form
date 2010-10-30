@@ -27,7 +27,7 @@
             <constraints/>
             <properties>
               <autoResizeMode value="0"/>
-              <fillsViewportHeight value="false"/>
+              <fillsViewportHeight value="true"/>
               <focusable value="false"/>
             </properties>
           </component>

@@ -48,7 +48,7 @@
                     <rowspec value="top:4dlu:noGrow"/>
                     <rowspec value="center:5px:noGrow"/>
                     <rowspec value="top:4dlu:noGrow"/>
-                    <rowspec value="center:max(d;4px):noGrow"/>
+                    <rowspec value="fill:54px:noGrow"/>
                     <rowspec value="top:4dlu:noGrow"/>
                     <rowspec value="fill:156px:noGrow"/>
                     <rowspec value="top:1dlu:noGrow"/>
@@ -64,6 +64,8 @@
                         <rowspec value="center:22px:noGrow"/>
                         <colspec value="center:79px:noGrow"/>
                         <colspec value="left:4dlu:noGrow"/>
+                        <colspec value="fill:max(d;4px):noGrow"/>
+                        <colspec value="left:51dlu:noGrow"/>
                         <colspec value="fill:max(d;4px):noGrow"/>
                         <constraints>
                           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -98,83 +100,31 @@
                               <opaque value="true"/>
                             </properties>
                           </component>
+                          <component id="2056a" class="javax.swing.JCheckBox" binding="commentCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <horizontalTextPosition value="10"/>
+                              <text value="+ Commen&amp;t"/>
+                              <toolTipText value="Ask for comment to be added to the beginning of output file"/>
+                            </properties>
+                          </component>
                         </children>
                       </grid>
-                      <grid id="81d57" layout-manager="FormLayout">
-                        <rowspec value="center:max(d;4px):noGrow"/>
-                        <rowspec value="top:4dlu:noGrow"/>
-                        <rowspec value="center:max(d;4px):noGrow"/>
-                        <colspec value="fill:88px:noGrow"/>
-                        <colspec value="left:5dlu:noGrow"/>
-                        <colspec value="fill:d:grow"/>
-                        <colspec value="left:1dlu:noGrow"/>
-                        <colspec value="fill:1px:noGrow"/>
+                      <grid id="81d57" binding="buttonsPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
                         <constraints>
                           <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                           <forms/>
                         </constraints>
                         <properties/>
                         <border type="none"/>
-                        <children>
-                          <component id="c1a5" class="javax.swing.JButton" binding="vhdlButton" default-binding="true">
-                            <constraints>
-                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                              <forms/>
-                            </constraints>
-                            <properties>
-                              <text value="&amp;VHDL"/>
-                            </properties>
-                          </component>
-                          <component id="2a9e7" class="javax.swing.JButton" binding="hlddButton" default-binding="true">
-                            <constraints>
-                              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                              <forms/>
-                            </constraints>
-                            <properties>
-                              <text value="&amp;HLDD"/>
-                            </properties>
-                          </component>
-                          <component id="b61a" class="javax.swing.JTextField" binding="vhdlTextField">
-                            <constraints>
-                              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                                <preferred-size width="150" height="50"/>
-                              </grid>
-                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                            </constraints>
-                            <properties>
-                              <background color="-1"/>
-                              <editable value="false"/>
-                              <focusable value="false"/>
-                              <opaque value="false"/>
-                              <text value=""/>
-                            </properties>
-                          </component>
-                          <component id="7f48d" class="javax.swing.JTextField" binding="hlddTextField">
-                            <constraints>
-                              <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                                <preferred-size width="150" height="50"/>
-                              </grid>
-                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                            </constraints>
-                            <properties>
-                              <background color="-1"/>
-                              <editable value="false"/>
-                              <focusable value="false"/>
-                              <opaque value="false"/>
-                              <text value=""/>
-                            </properties>
-                          </component>
-                          <hspacer id="e2877">
-                            <constraints>
-                              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                              <forms defaultalign-horz="false"/>
-                            </constraints>
-                          </hspacer>
-                        </children>
+                        <children/>
                       </grid>
                       <vspacer id="d9f39">
                         <constraints>
-                          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
                           <forms defaultalign-vert="false"/>
                         </constraints>
                       </vspacer>
@@ -344,7 +294,7 @@
                           </component>
                           <component id="b4492" class="javax.swing.JRadioButton" binding="randomAssertRadioButton">
                             <constraints>
-                              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
+                              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="2" indent="1" use-parent-layout="false"/>
                               <forms defaultalign-vert="false"/>
                             </constraints>
                             <properties>
@@ -450,16 +400,6 @@
                         <properties/>
                         <border type="none" title="Coverage Analyzer"/>
                         <children>
-                          <component id="3b4f4" class="javax.swing.JButton" binding="hlddCoverageButton">
-                            <constraints>
-                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                              <forms/>
-                            </constraints>
-                            <properties>
-                              <font style="0"/>
-                              <text value="&amp;HLDD"/>
-                            </properties>
-                          </component>
                           <component id="640a5" class="javax.swing.JTextField" binding="hlddCoverageTextField">
                             <constraints>
                               <grid row="0" column="2" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false">
@@ -565,6 +505,16 @@
                               <forms defaultalign-horz="false" defaultalign-vert="false"/>
                             </constraints>
                             <properties/>
+                          </component>
+                          <component id="3b4f4" class="javax.swing.JButton" binding="hlddCoverageButton">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <font style="0"/>
+                              <text value="&amp;HLDD"/>
+                            </properties>
                           </component>
                         </children>
                       </grid>

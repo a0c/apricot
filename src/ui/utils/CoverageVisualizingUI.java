@@ -13,9 +13,7 @@ public class CoverageVisualizingUI extends UIThread {
 				owner,
 				false,
 				"Coverage Visualizer",
-				"Mapping files",
-				null,
-				null,
+				"Mapping files...",
 				true);
 	}
 }

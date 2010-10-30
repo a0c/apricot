@@ -49,6 +49,10 @@ public class SourceLocation {
 		return linesByFile.values().iterator().next().first();
 	}
 
+	public boolean hasFile(File file) {
+		return linesByFile.containsKey(file);
+	}
+
 	public Collection<File> getFiles() {
 		return linesByFile.keySet();
 	}

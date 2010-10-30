@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ui.buttonPanels.BehDDButtons">
+  <grid id="27dc6" binding="mainPanel" layout-manager="FormLayout">
+    <rowspec value="center:d:noGrow"/>
+    <rowspec value="top:4dlu:noGrow"/>
+    <rowspec value="center:max(d;4px):noGrow"/>
+    <colspec value="fill:88px:noGrow"/>
+    <colspec value="left:5dlu:noGrow"/>
+    <colspec value="fill:d:grow"/>
+    <colspec value="left:1dlu:noGrow"/>
+    <colspec value="fill:1px:noGrow"/>
+    <constraints>
+      <xy x="20" y="20" width="374" height="106"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="b03a2" class="javax.swing.JButton" binding="hlddButton" default-binding="true">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties>
+          <text value="&amp;HLDD"/>
+        </properties>
+      </component>
+      <component id="b3a86" class="javax.swing.JTextField" binding="hlddTextField">
+        <constraints>
+          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="50"/>
+          </grid>
+          <forms defaultalign-horz="false" defaultalign-vert="false"/>
+        </constraints>
+        <properties>
+          <background color="-1"/>
+          <editable value="false"/>
+          <focusable value="false"/>
+          <opaque value="false"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <hspacer id="c2540">
+        <constraints>
+          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <forms defaultalign-horz="false"/>
+        </constraints>
+      </hspacer>
+      <component id="d1174" class="javax.swing.JButton" binding="vhdlButton">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties>
+          <text value="H&amp;IF"/>
+        </properties>
+      </component>
+      <component id="fbfb1" class="javax.swing.JTextField" binding="vhdlTextField">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="50"/>
+          </grid>
+          <forms defaultalign-horz="false" defaultalign-vert="false"/>
+        </constraints>
+        <properties>
+          <background color="-1"/>
+          <editable value="false"/>
+          <focusable value="false"/>
+          <opaque value="false"/>
+          <text value=""/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

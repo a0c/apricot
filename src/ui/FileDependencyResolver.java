@@ -98,4 +98,40 @@ public class FileDependencyResolver {
 		}
 	}
 
+	public static boolean isVHDL(File file) {
+		String fileName = file.getName().toLowerCase();
+		return fileName.endsWith(".vhdl") || fileName.endsWith(".vhd");
+	}
+
+	public static boolean isCOV(File file) {
+		return file.getName().toLowerCase().endsWith(".cov");
+	}
+
+	public static boolean isHLDD(File file) {
+		return file.getName().toLowerCase().endsWith(".agm");
+	}
+
+	public static boolean isPPG(File file) {
+		return file.getName().toLowerCase().endsWith(".lib");
+	}
+
+	public static boolean isWaveform(File file) {
+		return isCHK(file) || isSIM(file) || isTST(file);
+	}
+
+	public static boolean isCHK(File file) {
+		return file.getName().toLowerCase().endsWith(".chk");
+	}
+
+	public static boolean isSIM(File file) {
+		return file.getName().toLowerCase().endsWith(".sim");
+	}
+
+	public static boolean isTST(File file) {
+		return file.getName().toLowerCase().endsWith(".tst");
+	}
+
+	public static boolean isPSL(File file) {
+		return file.getName().toLowerCase().endsWith(".psl");
+	}
 }

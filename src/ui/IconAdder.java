@@ -8,7 +8,7 @@ import java.net.URL;
  * @author Anton Chepurov
  */
 public class IconAdder {
-	
+
 	private static final URL DEFAULT_ICON_URL = IconAdder.class.getResource("synchronize.jpg");
 
 	public static void setFrameIcon(JFrame frame) {

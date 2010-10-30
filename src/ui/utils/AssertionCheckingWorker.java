@@ -1,14 +1,13 @@
 package ui.utils;
 
-import ui.utils.uiWithWorker.TaskSwingWorker;
 import io.ConsoleWriter;
+import ui.BusinessLogicAssertionChecker;
+import ui.utils.uiWithWorker.TaskSwingWorker;
 
+import java.io.File;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.io.OutputStream;
-import java.io.File;
-
-import ui.BusinessLogicAssertionChecker;
 
 /**
  * @author Anton Chepurov
@@ -17,10 +16,10 @@ public class AssertionCheckingWorker extends TaskSwingWorker {
 	private final BusinessLogicAssertionChecker businessLogic;
 	private final String simulationFilePath;
 
-	public AssertionCheckingWorker(List<String> executableCommand, OutputStream infoOut, OutputStream errorOut,
+	public AssertionCheckingWorker(List<String> executableCommand, OutputStream errorOut,
 								   BusinessLogicAssertionChecker businessLogic, String simulationFilePath,
 								   ConsoleWriter consoleWriter) {
-		super(executableCommand, infoOut, errorOut, consoleWriter);
+		super(executableCommand, errorOut, consoleWriter);
 		this.businessLogic = businessLogic;
 		this.simulationFilePath = simulationFilePath;
 	}

@@ -2,12 +2,12 @@ package ui;
 
 import org.junit.Test;
 
-import javax.swing.*;
 import java.io.File;
 
 import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
-import static ui.BusinessLogic.HLDDRepresentationType.*;
+import static ui.BusinessLogic.HLDDRepresentationType.FULL_TREE;
+import static ui.BusinessLogic.HLDDRepresentationType.MINIMIZED;
 
 /**
  * @author Anton Chepurov
@@ -21,7 +21,7 @@ public class OutputFileGeneratorTest {
 		expect(form.getHlddRepresentationType()).andReturn(null);
 		replay(form);
 
-		OutputFileGenerator generator = new OutputFileGenerator(form, null);
+		OutputFileGenerator generator = new OutputFileGenerator(form);
 		File file = generator.generate();
 		assertNull(file);
 		verify(form);
@@ -34,7 +34,7 @@ public class OutputFileGeneratorTest {
 		expect(form.getHlddRepresentationType()).andReturn(null);
 		replay(form);
 
-		OutputFileGenerator generator = new OutputFileGenerator(form, null);
+		OutputFileGenerator generator = new OutputFileGenerator(form);
 		File file = generator.generate();
 		assertNull(file);
 		verify(form);
@@ -49,7 +49,7 @@ public class OutputFileGeneratorTest {
 		expect(form.shouldCreateExtraCSGraphs()).andReturn(false);
 		expect(form.shouldFlattenCS()).andReturn(false);
 		replay(form);
-		OutputFileGenerator generator = new OutputFileGenerator(form, null);
+		OutputFileGenerator generator = new OutputFileGenerator(form);
 		File file = generator.generate();
 		assertNotNull("OutputFileGenerator.generate(): should create correct file. Actual: null.", file);
 		assertEquals("D:\\WORKSPACE\\tr\\b13_F_FU.agm", file.getAbsolutePath());
@@ -60,7 +60,7 @@ public class OutputFileGeneratorTest {
 		expect(form.shouldCreateExtraCSGraphs()).andReturn(true);
 		expect(form.shouldFlattenCS()).andReturn(false);
 		replay(form);
-		generator = new OutputFileGenerator(form, null);
+		generator = new OutputFileGenerator(form);
 		file = generator.generate();
 		assertNotNull("OutputFileGenerator.generate(): should create correct file. Actual: null.", file);
 		assertEquals("D:\\WORKSPACE\\tr\\b13_F_EX.agm", file.getAbsolutePath());
@@ -71,7 +71,7 @@ public class OutputFileGeneratorTest {
 		expect(form.shouldCreateExtraCSGraphs()).andReturn(false);
 		expect(form.shouldFlattenCS()).andReturn(false);
 		replay(form);
-		generator = new OutputFileGenerator(form, null);
+		generator = new OutputFileGenerator(form);
 		file = generator.generate();
 		assertNotNull("OutputFileGenerator.generate(): should create correct file. Actual: null.", file);
 		assertEquals("D:\\WORKSPACE\\tr\\b13_F_GR.agm", file.getAbsolutePath());
@@ -82,7 +82,7 @@ public class OutputFileGeneratorTest {
 		expect(form.shouldCreateExtraCSGraphs()).andReturn(false);
 		expect(form.shouldFlattenCS()).andReturn(true);
 		replay(form);
-		generator = new OutputFileGenerator(form, null);
+		generator = new OutputFileGenerator(form);
 		file = generator.generate();
 		assertNotNull("OutputFileGenerator.generate(): should create correct file. Actual: null.", file);
 		assertEquals("D:\\WORKSPACE\\tr\\b13_F_FL.agm", file.getAbsolutePath());
@@ -94,7 +94,7 @@ public class OutputFileGeneratorTest {
 		expect(form.shouldCreateExtraCSGraphs()).andReturn(false);
 		expect(form.shouldFlattenCS()).andReturn(false);
 		replay(form);
-		generator = new OutputFileGenerator(form, null);
+		generator = new OutputFileGenerator(form);
 		file = generator.generate();
 		assertNotNull("OutputFileGenerator.generate(): should create correct file. Actual: null.", file);
 		assertEquals("D:\\WORKSPACE\\tr\\b13_M_FU.agm", file.getAbsolutePath());
@@ -104,29 +104,32 @@ public class OutputFileGeneratorTest {
 	@Test
 	public void reactOnChangedState() {
 		/* NULL */
+		//todo: use Mockito
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
+		expect(form.getSelectedParserId()).andReturn(BusinessLogic.ParserID.VhdlBeh2HlddBeh);
+		expect(form.areSmartNamesAllowed()).andReturn(true);
 		expect(form.getSourceFile()).andReturn(null);
 		expect(form.getHlddRepresentationType()).andReturn(null);
 		replay(form);
 
-		JButton outputFileButton = new JButton("BlaBlaBLaaa");
-		OutputFileGenerator generator = new OutputFileGenerator(form, outputFileButton);
+		OutputFileGenerator generator = new OutputFileGenerator(form);
 		generator.stateChanged(null);
 		verify(form);
 
 		/* NON-NULL */
 		form = createStrictMock(ApplicationForm.class);
+		expect(form.getSelectedParserId()).andReturn(BusinessLogic.ParserID.VhdlBeh2HlddBeh);
+		expect(form.areSmartNamesAllowed()).andReturn(true);
 		expect(form.getSourceFile()).andReturn(new File("D:\\WORKSPACE\\tr\\b13.vhd")).anyTimes();
 		expect(form.getHlddRepresentationType()).andReturn(MINIMIZED).anyTimes();
 		expect(form.shouldCreateCSGraphs()).andReturn(true);
 		expect(form.shouldCreateExtraCSGraphs()).andReturn(false);
 		expect(form.shouldFlattenCS()).andReturn(false);
 		File outputFile = new File("D:\\WORKSPACE\\tr\\b13_M_GR.agm");
-		form.setDestFile(eq(outputFile));
-		form.updateTextFieldFor(eq(outputFileButton), eq(outputFile));
+		form.setBehHlddFile(eq(outputFile));
 		replay(form);
 
-		generator = new OutputFileGenerator(form, outputFileButton);
+		generator = new OutputFileGenerator(form);
 		generator.stateChanged(null);
 		verify(form);
 	}
@@ -135,28 +138,30 @@ public class OutputFileGeneratorTest {
 	public void reactOnInsertUpdate() {
 		/* NULL */
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
+		expect(form.getSelectedParserId()).andReturn(BusinessLogic.ParserID.VhdlBeh2HlddBeh);
+		expect(form.areSmartNamesAllowed()).andReturn(true);
 		expect(form.getSourceFile()).andReturn(null);
 		expect(form.getHlddRepresentationType()).andReturn(null);
 		replay(form);
 
-		JButton outputFileButton = new JButton("BlaBlaBLaaa");
-		OutputFileGenerator generator = new OutputFileGenerator(form, outputFileButton);
+		OutputFileGenerator generator = new OutputFileGenerator(form);
 		generator.insertUpdate(null);
 		verify(form);
 
 		/* NON-NULL */
 		form = createStrictMock(ApplicationForm.class);
+		expect(form.getSelectedParserId()).andReturn(BusinessLogic.ParserID.VhdlBeh2HlddBeh);
+		expect(form.areSmartNamesAllowed()).andReturn(true);
 		expect(form.getSourceFile()).andReturn(new File("D:\\WORKSPACE\\tr\\b13.vhd")).anyTimes();
 		expect(form.getHlddRepresentationType()).andReturn(MINIMIZED).anyTimes();
 		expect(form.shouldCreateCSGraphs()).andReturn(true);
 		expect(form.shouldCreateExtraCSGraphs()).andReturn(false);
 		expect(form.shouldFlattenCS()).andReturn(false);
 		File outputFile = new File("D:\\WORKSPACE\\tr\\b13_M_GR.agm");
-		form.setDestFile(eq(outputFile));
-		form.updateTextFieldFor(eq(outputFileButton), eq(outputFile));
+		form.setBehHlddFile(eq(outputFile));
 		replay(form);
 
-		generator = new OutputFileGenerator(form, outputFileButton);
+		generator = new OutputFileGenerator(form);
 		generator.insertUpdate(null);
 		verify(form);
 	}
@@ -165,28 +170,30 @@ public class OutputFileGeneratorTest {
 	public void reactOnChangeUpdate() {
 		/* NULL */
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
+		expect(form.getSelectedParserId()).andReturn(BusinessLogic.ParserID.VhdlBeh2HlddBeh);
+		expect(form.areSmartNamesAllowed()).andReturn(true);
 		expect(form.getSourceFile()).andReturn(null);
 		expect(form.getHlddRepresentationType()).andReturn(null);
 		replay(form);
 
-		JButton outputFileButton = new JButton("BlaBlaBLaaa");
-		OutputFileGenerator generator = new OutputFileGenerator(form, outputFileButton);
+		OutputFileGenerator generator = new OutputFileGenerator(form);
 		generator.changedUpdate(null);
 		verify(form);
 
 		/* NON-NULL */
 		form = createStrictMock(ApplicationForm.class);
+		expect(form.getSelectedParserId()).andReturn(BusinessLogic.ParserID.VhdlBeh2HlddBeh);
+		expect(form.areSmartNamesAllowed()).andReturn(true);
 		expect(form.getSourceFile()).andReturn(new File("D:\\WORKSPACE\\tr\\b13.vhd")).anyTimes();
 		expect(form.getHlddRepresentationType()).andReturn(MINIMIZED).anyTimes();
 		expect(form.shouldCreateCSGraphs()).andReturn(true);
 		expect(form.shouldCreateExtraCSGraphs()).andReturn(false);
 		expect(form.shouldFlattenCS()).andReturn(false);
 		File outputFile = new File("D:\\WORKSPACE\\tr\\b13_M_GR.agm");
-		form.setDestFile(eq(outputFile));
-		form.updateTextFieldFor(eq(outputFileButton), eq(outputFile));
+		form.setBehHlddFile(eq(outputFile));
 		replay(form);
 
-		generator = new OutputFileGenerator(form, outputFileButton);
+		generator = new OutputFileGenerator(form);
 		generator.changedUpdate(null);
 		verify(form);
 	}

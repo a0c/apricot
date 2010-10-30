@@ -1,5 +1,6 @@
 package ui.optionPanels;
 
+import ui.ApplicationForm.FileDropHandler;
 import ui.BusinessLogic.HLDDRepresentationType;
 import ui.OutputFileGenerator;
 
@@ -19,7 +20,7 @@ public class VHDLBehOptionsPanel {
 	private JRadioButton fullRadioButton;
 
 
-	public VHDLBehOptionsPanel(OutputFileGenerator outputFileGenerator) {
+	public VHDLBehOptionsPanel(OutputFileGenerator outputFileGenerator, FileDropHandler fileDropHandler) {
 		fullRadioButton.addChangeListener(outputFileGenerator);
 		reducedRadioButton.addChangeListener(outputFileGenerator);
 		minimizedRadioButton.addChangeListener(outputFileGenerator);
@@ -27,6 +28,14 @@ public class VHDLBehOptionsPanel {
 		asGraphsRadioButton.addChangeListener(outputFileGenerator);
 		flattenRadioButton.addChangeListener(outputFileGenerator);
 		extraGraphsRadioButton.addChangeListener(outputFileGenerator);
+
+		fullRadioButton.addKeyListener(fileDropHandler);
+		reducedRadioButton.addKeyListener(fileDropHandler);
+		minimizedRadioButton.addKeyListener(fileDropHandler);
+		asFunctionRadioButton.addKeyListener(fileDropHandler);
+		extraGraphsRadioButton.addKeyListener(fileDropHandler);
+		asGraphsRadioButton.addKeyListener(fileDropHandler);
+		flattenRadioButton.addKeyListener(fileDropHandler);
 	}
 
 	public JPanel getMainPanel() {

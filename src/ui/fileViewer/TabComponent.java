@@ -10,7 +10,12 @@ import java.awt.event.*;
  */
 public class TabComponent extends JPanel {
 
+	private static final Color DIRTY_COLOR = Color.ORANGE;
+	private Color defaultColor;
+
 	private final JTabbedPane tabbedPane;
+
+	private final String title;
 
 	private final TabButton button;
 
@@ -18,7 +23,9 @@ public class TabComponent extends JPanel {
 
 		super(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		this.tabbedPane = tabbedPane;
+		this.title = title;
 		setOpaque(false);
+		defaultColor = getBackground();
 
 		/* Make JLabel read title from tabbedPane */
 		JLabel label = new JLabel(title);
@@ -37,18 +44,27 @@ public class TabComponent extends JPanel {
 		return button;
 	}
 
+	public String getTitle() {
+		return title;
+	}
+
 	public static void setBackgroundFor(Component component, boolean isDirty) {
 
-		if (component instanceof JPanel) {
-			JPanel tabComponent = (JPanel) component;
+		if (component instanceof TabComponent) {
+			TabComponent tabComponent = (TabComponent) component;
 
 			if (isDirty) {
 				tabComponent.setOpaque(true);
-				component.setBackground(Color.ORANGE);
+				component.setBackground(DIRTY_COLOR);
 			} else {
 				tabComponent.setOpaque(false);
+				component.setBackground(tabComponent.defaultColor);
 			}
 		}
+	}
+
+	public static boolean isDirty(TabComponent tabComponent) {
+		return tabComponent.getBackground() == DIRTY_COLOR;
 	}
 
 	private class TabButton extends JButton implements ActionListener {

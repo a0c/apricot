@@ -1,28 +1,30 @@
 package ui.utils;
 
-import io.ConsoleWriter;
-
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.models.Model;
 import base.hldd.structure.models.utils.BehModelCreatorImpl;
-import base.hldd.structure.models.utils.ModelManager;
 import base.hldd.structure.models.utils.ModelCreator;
+import base.hldd.structure.models.utils.ModelManager;
 import base.vhdl.structure.Entity;
 import base.vhdl.visitors.*;
-
-import java.io.*;
-import java.util.concurrent.ExecutionException;
-import java.util.Date;
-import java.util.logging.Logger;
-import java.text.DateFormat;
-
+import io.ConsoleWriter;
 import parsers.Beh2RtlTransformer;
 import parsers.psl.ParserShell;
+import ui.BusinessLogic.HLDDRepresentationType;
+import ui.BusinessLogic.ParserID;
+import ui.ConfigurationHandler;
+import ui.ConverterSettings;
+import ui.ExtendedException;
 
 import javax.swing.*;
-
-import ui.*;
-import ui.BusinessLogic.*;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
 
 /**
  * @author Anton Chepurov
@@ -39,7 +41,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 	private String comment = "";
 
 	private final File sourceFile;
-	private File pslFile;
+	private final File pslFile;
 	private final File baseModelFile;
 	private final HLDDRepresentationType hlddType;
 	private final boolean shouldSimplify;

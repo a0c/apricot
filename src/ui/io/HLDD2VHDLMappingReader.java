@@ -1,13 +1,17 @@
 package ui.io;
 
 import base.SourceLocation;
+import io.QuietCloser;
 import ui.base.HLDD2VHDLMapping;
 import ui.base.NodeItem;
-import io.QuietCloser;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 /**
  * @author Anton Chepurov
@@ -15,6 +19,7 @@ import java.util.HashSet;
 public class HLDD2VHDLMappingReader {
 
 	private final static int OFFSET = 1;
+	private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
 
 	private HLDD2VHDLMapping mapping = null;
 	private final File mappingFile;
@@ -42,6 +47,10 @@ public class HLDD2VHDLMappingReader {
 					String[] fileNameAndLines = fileLines.trim().split(" ", 2);
 
 					String fileName = fileNameAndLines[0].trim();
+
+					if (fileNameAndLines.length < 2 || NUMBER_PATTERN.matcher(fileName).matches()) {
+						throw new IOException("Mapping file is malformed (probably old format): missing VHDL file name on line:\n" + line);
+					}
 
 					String[] lineNumbersAsStrings = fileNameAndLines[1].split(",");
 					Collection<Integer> lines = new HashSet<Integer>();

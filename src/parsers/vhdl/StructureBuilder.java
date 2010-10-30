@@ -1,19 +1,18 @@
 package parsers.vhdl;
 
+import base.Indices;
 import base.SourceLocation;
-import base.vhdl.structure.Process;
-import base.vhdl.structure.nodes.*;
-import base.vhdl.structure.Transition;
-import base.vhdl.structure.Expression;
+import base.Type;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Package;
-import base.Indices;
-import base.Type;
+import base.vhdl.structure.Process;
+import base.vhdl.structure.nodes.*;
 import io.QuietCloser;
+import ui.FileDependencyResolver;
 
 import java.io.*;
-import java.util.*;
 import java.math.BigInteger;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -300,7 +299,7 @@ public class StructureBuilder extends AbstractPackageBuilder {
 	 * @param conditionString a string representation of a condition
 	 * @param source		  corresponding lines in source VHDL file
 	 * @throws Exception if and error occurs during the creation of a condition
-	 * 					 or a preceding IF statement was not found for the ELSIF statement
+	 *                   or a preceding IF statement was not found for the ELSIF statement
 	 */
 	public void buildElsifStatement(String conditionString, SourceLocation source) throws Exception {
 		/* Mark falsePart for current IfNode on top of Context Stack */
@@ -396,11 +395,11 @@ public class StructureBuilder extends AbstractPackageBuilder {
 			return Arrays.asList(sourceFile.getParentFile().listFiles(new FileFilter() {
 				@Override
 				public boolean accept(File pathname) {
+					//noinspection SimplifiableIfStatement
 					if (pathname.equals(sourceFile)) {
 						return false;
 					}
-					String fileName = pathname.getName().toLowerCase();
-					return fileName.endsWith(".vhd") || fileName.endsWith(".vhdl");
+					return FileDependencyResolver.isVHDL(pathname);
 				}
 			}));
 		}

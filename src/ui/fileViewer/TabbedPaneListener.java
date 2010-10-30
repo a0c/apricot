@@ -1,14 +1,16 @@
 package ui.fileViewer;
 
 import ui.ApplicationForm;
-import ui.SingleFileSelector;
 import ui.ExtendedException;
+import ui.SingleFileSelector;
 import ui.TooltipShowingFocusAdapter;
 
 import javax.swing.*;
-import java.awt.event.*;
 import java.awt.*;
-import java.io.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
 
 /**
  * @author Anton Chepurov
@@ -19,8 +21,8 @@ public class TabbedPaneListener extends MouseSelectionAdapter {
 
 	private final JPanel clickMePanel;
 
-	public TabbedPaneListener(ApplicationForm applicationForm, JTabbedPane tabbedPane, JPanel clickMePanel) {
-		super(tabbedPane);
+	public TabbedPaneListener(ApplicationForm applicationForm, JTabbedPane tabbedPane, JPanel clickMePanel, JTabbedPane otherTabbedPane) {
+		super(tabbedPane, otherTabbedPane);
 		this.applicationForm = applicationForm;
 		this.clickMePanel = clickMePanel;
 		addMouseListenerToTab();
@@ -42,7 +44,7 @@ public class TabbedPaneListener extends MouseSelectionAdapter {
 				invalidFileMessage = null;
 			}
 			SingleFileSelector fileSelector = SingleFileSelector.getInstance(SingleFileSelector.DialogType.OPEN,
-					extensions, null, title, invalidFileMessage);
+					extensions, null, title, invalidFileMessage, applicationForm.getFrame());
 			if (fileSelector.isFileSelected()) {
 				try {
 					fileSelector.validateFile();
@@ -58,6 +60,22 @@ public class TabbedPaneListener extends MouseSelectionAdapter {
 				}
 				applicationForm.addFileViewerTabFromFile(selectedFile, null, null, tabbedPane);
 			}
+		} else if (e.getClickCount() == 2) {
+
+			Component component = e.getComponent();
+			if (!(component instanceof TabComponent)) {
+				super.mouseClicked(e);
+				return;
+			}
+			TabComponent tabComponent = (TabComponent) component;
+
+			Component selectedComponent = tabbedPane.getSelectedComponent();
+
+			applicationForm.addFileViewerTab(otherTabbedPane, tabComponent.getTitle(), tabComponent.getToolTipText(),
+					(JComponent) selectedComponent, TabComponent.isDirty(tabComponent));
+
+			tabbedPane.remove(selectedComponent);
+
 		} else {
 			super.mouseClicked(e);
 		}

@@ -1,16 +1,15 @@
 package ui.utils;
 
-import ui.FileDependencyResolver;
-import ui.utils.uiWithWorker.TaskSwingWorker;
 import io.ConsoleWriter;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.io.OutputStream;
-import java.io.File;
-
 import ui.ApplicationForm;
 import ui.BusinessLogicCoverageAnalyzer;
+import ui.FileDependencyResolver;
+import ui.utils.uiWithWorker.TaskSwingWorker;
+
+import java.io.File;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Anton Chepurov
@@ -19,9 +18,9 @@ public class CoverageAnalyzingWorker extends TaskSwingWorker {
 
 	private final BusinessLogicCoverageAnalyzer businessLogic;
 
-	public CoverageAnalyzingWorker(List<String> executableCommand, OutputStream infoOut, OutputStream errorOut,
+	public CoverageAnalyzingWorker(List<String> executableCommand, OutputStream errorOut,
 								   BusinessLogicCoverageAnalyzer businessLogic, ConsoleWriter consoleWriter) {
-		super(executableCommand, infoOut, errorOut, consoleWriter);
+		super(executableCommand, errorOut, consoleWriter);
 		this.businessLogic = businessLogic;
 	}
 
@@ -40,7 +39,6 @@ public class CoverageAnalyzingWorker extends TaskSwingWorker {
 		try {
 			if (get()) {
 				/* Display coverage */
-				businessLogic.displayCoverage();
 				showVHDLCoverage();
 			}
 		} catch (InterruptedException e) {/* Do nothing. */} catch (ExecutionException e) {/* Do nothing. */}
@@ -49,28 +47,20 @@ public class CoverageAnalyzingWorker extends TaskSwingWorker {
 
 	private void setEnableUI(boolean enable) {
 		ApplicationForm applicationForm = businessLogic.getApplicationForm();
-		applicationForm.setEnableHlddCoverageButton(enable);
-		applicationForm.setEnableAnalyzeButton(enable);
+		applicationForm.enableCoverageAnalyzer(enable);
 	}
 
 	private void showVHDLCoverage() {
-		/* Automatically load COV and VHDL files, if available */
+		/* Automatically load COV and VHDL files, if available and if asked/possible */
 		ApplicationForm applicationForm = businessLogic.getApplicationForm();
+		if (!applicationForm.isDoAnalyzeCoverage()) {
+			return;
+		}
 		File hlddFile = businessLogic.getHlddFile();
 		File covFile = FileDependencyResolver.deriveCovFile(hlddFile);
 		if (covFile != null) {
-			applicationForm.updateCovTextField(covFile);
-			businessLogic.setCovFile(covFile);
+			applicationForm.setCovFile(covFile);
 		}
 
-		File vhdlFile = FileDependencyResolver.deriveVhdlFile(hlddFile);
-		if (vhdlFile != null) {
-			applicationForm.updateVhdlCovTextField(vhdlFile);
-			businessLogic.setVhdlFile(vhdlFile);
-		}
-		/* Automatically click Show button, if both files are set */
-		if (vhdlFile != null && covFile != null) {
-			applicationForm.doClickShowButton();
-		}
 	}
 }

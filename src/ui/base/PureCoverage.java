@@ -4,11 +4,11 @@ package ui.base;
  * @author Anton Chepurov
  */
 public class PureCoverage extends AbstractCoverage {
-	
+
 	private double coverage;
 
-	public PureCoverage(double coverage, String title) {
-		super(title);
+	public PureCoverage(double coverage, String title, String tooltip) {
+		super(title, tooltip);
 		this.coverage = coverage;
 	}
 

@@ -43,6 +43,8 @@ public class UIWorkerFinalizerImpl extends AbstractWorkerFinalizer {
 
 		applicationForm.doSaveConvertedModel();
 
+		applicationForm.paintCreatedFileGreen();
+
 		consoleWriter.writeLn("");
 
 		if (applicationForm.getSelectedParserId() == BusinessLogic.ParserID.VhdlBeh2HlddBeh) {

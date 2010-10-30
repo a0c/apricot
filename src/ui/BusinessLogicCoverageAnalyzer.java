@@ -1,23 +1,20 @@
 package ui;
 
-import ui.utils.CoverageVisualizingUI;
-import ui.graphics.CoveragePanel;
-import ui.utils.uiWithWorker.UIWithWorker;
+import io.ConsoleWriter;
 import ui.utils.CoverageAnalyzingUI;
 import ui.utils.CoverageAnalyzingWorker;
+import ui.utils.CoverageVisualizingUI;
 import ui.utils.CoverageVisualizingWorker;
-import ui.io.CoverageParser;
-import io.ConsoleWriter;
+import ui.utils.uiWithWorker.UIWithWorker;
 
 import java.io.File;
-import java.io.ByteArrayOutputStream;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Anton Chepurov
  */
-public class BusinessLogicCoverageAnalyzer {
+public class BusinessLogicCoverageAnalyzer implements Lockable {
 
 	private final ApplicationForm applicationForm;
 	private final ConsoleWriter consoleWriter;
@@ -25,8 +22,8 @@ public class BusinessLogicCoverageAnalyzer {
 	private File vhdlFile;
 	private File covFile;
 	private File mappingFile;
-	private ByteArrayOutputStream byteArrayOutputStream;
-	private static final int DEFAULT_SIZE = 32768;
+
+	private final SimpleLock simpleLock = new SimpleLock();
 
 	public BusinessLogicCoverageAnalyzer(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
 		this.applicationForm = applicationForm;
@@ -80,44 +77,17 @@ public class BusinessLogicCoverageAnalyzer {
 		commandList.add(hlddFile.getAbsolutePath().replace(".agm", ""));
 
 		/* Execute command */
-		byteArrayOutputStream = new ByteArrayOutputStream(DEFAULT_SIZE);
 		UIWithWorker.runUIWithWorker(
 				new CoverageAnalyzingUI(applicationForm.getFrame()),
 				new CoverageAnalyzingWorker(
 						commandList,
-						byteArrayOutputStream,
 						System.err,
 						this,
 						consoleWriter
 				)
 		);
 
-		/* displayCoverage() is invoked in CoverageAnalyzingWorker after it ("assert") has completed its work */
-	}
-
-	public void displayCoverage() {
-
-		CoverageParser parser = new CoverageParser(byteArrayOutputStream.toString());
-		CoveragePanel coveragePanel = new CoveragePanel(
-				parser.getNodeCoverage(),
-				parser.getEdgeCoverage(),
-				parser.getToggleCoverage());
-		applicationForm.addCoverage(generateTabTitle(hlddFile), generateTabTooltip(hlddFile), false, coveragePanel);
-//		applicationForm.addFileViewerTab(generateTabTitle(hlddFile), hlddFile.getAbsolutePath(), coveragePanel.getMainPanel());
-	}
-
-	public static String generateTabTitle(File aFile) {
-		StringBuilder sb = new StringBuilder(aFile.getName());
-		sb.delete(sb.lastIndexOf("."), sb.length());
-		sb.append(":Coverage");
-		return sb.toString();
-	}
-
-	public static String generateTabTooltip(File aFile) {
-		StringBuilder sb = new StringBuilder(aFile.getAbsolutePath());
-		sb.delete(sb.lastIndexOf("."), sb.length());
-		sb.append("  (agm/vhd)");
-		return sb.toString();
+		/* showVHDLCoverage() is invoked in CoverageAnalyzingWorker after it ("assert") has completed its work */
 	}
 
 	public ApplicationForm getApplicationForm() {
@@ -144,7 +114,22 @@ public class BusinessLogicCoverageAnalyzer {
 
 		/*  */
 		UIWithWorker.runUIWithWorker(new CoverageVisualizingUI(applicationForm.getFrame()),
-				new CoverageVisualizingWorker(vhdlFile, covFile, mappingFile, applicationForm, consoleWriter));
+				new CoverageVisualizingWorker(vhdlFile, covFile, mappingFile, applicationForm, consoleWriter, simpleLock));
 
+	}
+
+	@Override
+	public boolean isLocked() {
+		return simpleLock.isLocked();
+	}
+
+	@Override
+	public void lock() {
+		simpleLock.lock();
+	}
+
+	@Override
+	public void unlock() {
+		simpleLock.unlock();
 	}
 }

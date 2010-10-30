@@ -2,6 +2,7 @@ package ui;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
 import java.io.File;
 
 /**
@@ -10,13 +11,12 @@ import java.io.File;
 public class SingleFileSelector {
 	/* Static fields */
 	public static final String INVALID_FILE_TEXT = "Incompatible file selected";
-	private static final File NO_FILE = new File("");
 
 	/* The only instance of the class */
 	private static final SingleFileSelector INSTANCE = new SingleFileSelector();
 
 	/* Instance fields */
-	private File selectedFile;
+	private File selectedFile = null;
 	private String[] extensions;
 	private String invalidFileMessage;
 	private JFileChooser fileChooser = new JFileChooser(File.listRoots()[0]);
@@ -38,22 +38,19 @@ public class SingleFileSelector {
 	}
 
 	/**
-	 * @param extensions		 <code>null</code> to accept any extension
-	 * @param title dialog title
+	 * @param extensions <code>null</code> to accept any extension
+	 * @param title	dialog title
 	 * @param invalidFileMessage message to show on invalid file selection
-	 * @param dialogType		 OPEN or SAVE
+	 * @param parent parent to take icon from
+	 * @param dialogType OPEN or SAVE
 	 * @param proposedFileName file to be selected by default
 	 * @return file selector, modified by method parameters
 	 */
 	public static SingleFileSelector getInstance(DialogType dialogType, String[] extensions, String proposedFileName,
-												 String title, String invalidFileMessage) {
-		if (INSTANCE.selectedFile != null && !INSTANCE.selectedFile.exists()) {
-			File file = INSTANCE.selectedFile.getParentFile();
-			while (!file.exists()) {
-				file = file.getParentFile();
-			}
-			INSTANCE.fileChooser.setCurrentDirectory(file);
-		}
+												 String title, String invalidFileMessage, Component parent) {
+
+		setCurrentDirectory(INSTANCE.selectedFile);
+
 		INSTANCE.isFileSelected = false;
 		INSTANCE.extensions = extensions;
 		INSTANCE.invalidFileMessage = invalidFileMessage;
@@ -69,19 +66,17 @@ public class SingleFileSelector {
 		INSTANCE.fileChooser.setDialogTitle(dialogTitle);
 
 		/* Select proposed file or remove selection of already set file */
-		if (proposedFileName == null) {
-			INSTANCE.fileChooser.setSelectedFile(NO_FILE);
-		} else {
+		if (proposedFileName != null) {
 			INSTANCE.fileChooser.setSelectedFile(new File(proposedFileName));
 		}
 		/* Show "OPEN/SAVE file" dialog */
 		int selection = JFileChooser.CANCEL_OPTION;
 		if (dialogType == DialogType.OPEN) {
-			selection = INSTANCE.fileChooser.showOpenDialog(null);
+			selection = INSTANCE.fileChooser.showOpenDialog(parent);
 		} else if (dialogType == DialogType.SAVE) {
-			selection = INSTANCE.fileChooser.showSaveDialog(null);
+			selection = INSTANCE.fileChooser.showSaveDialog(parent);
 		} else {
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(parent,
 					"Wrong parameter for ShowDialog.\nMust be 'open' or 'save'. ",
 					"Error",
 					JOptionPane.WARNING_MESSAGE);
@@ -92,6 +87,18 @@ public class SingleFileSelector {
 			INSTANCE.isFileSelected = true;
 		}
 		return INSTANCE;
+	}
+
+	public static void setCurrentDirectory(File currentFile) {
+		if (currentFile != null) {
+			while (currentFile != null && !currentFile.exists()) {
+				currentFile = currentFile.getParentFile();
+			}
+			if (currentFile != null) {
+				INSTANCE.fileChooser.setCurrentDirectory(currentFile);
+			}
+		}
+		// default directory fileChooser is initialised to on Win is C:\\
 	}
 
 	private static FileFilter createFileFilter(String[] extensions) {

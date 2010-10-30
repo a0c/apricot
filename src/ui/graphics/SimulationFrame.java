@@ -3,7 +3,6 @@ package ui.graphics;
 import sun.awt.VerticalBagLayout;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.util.Collection;
 
@@ -15,23 +14,23 @@ public class SimulationFrame extends JFrame {
 	private JComponent mainPanel;
 
 	public SimulationFrame(long[][] variableValuesArray, char[][] assertionValuesArray, String[] variableNames,
-						   Collection booleanIndices, int patternCount, String title) {
+						   Collection booleanIndices, int patternCount, String title, Component parent) {
 		super(title);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		/* Create panels from input data and add them to the frame */
-		mainPanel = createPanel(variableValuesArray, assertionValuesArray, variableNames, booleanIndices, patternCount);
+		mainPanel = createPanel(variableValuesArray, assertionValuesArray, variableNames, booleanIndices, patternCount, parent);
 		add(mainPanel, BorderLayout.CENTER);
 	}
 
 	private JComponent createPanel(long[][] variableValuesArray, char[][] assertionValuesArray,
-								   String[] variableNames, Collection booleanIndices, int patternCount) {
+								   String[] variableNames, Collection booleanIndices, int patternCount, Component parent) {
 		/* Check the number of Variable Names to be equal to the total number of variable and assertion values.
 		* If their amounts are different, then discard Variable Names*/
 		if (variableNames != null && variableNames.length != variableValuesArray.length + assertionValuesArray.length) {
 			variableNames = null;
 			String message = "Number of variables in TGM/AGM file is different from the one in CHK/SIM file." +
 					"\nVariable and property names will not be shown on the waveform.";
-			JOptionPane.showMessageDialog(null, message, "Note!", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(parent, message, "Note!", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 		int variableNameIndex = 0;
@@ -97,7 +96,7 @@ public class SimulationFrame extends JFrame {
 
 		mainPanel.add(linesScrollPane);
 		if (titlesScrollPane != null) {
-			SynchronousScrollBarsListener.linkScrollPanes(linesScrollPane, titlesScrollPane);
+			titlesScrollPane.getVerticalScrollBar().setModel(linesScrollPane.getVerticalScrollBar().getModel());
 		}
 
 		return mainPanel;

@@ -2,7 +2,6 @@ package ui;
 
 import org.junit.Test;
 
-import javax.swing.*;
 import java.io.File;
 
 import static org.easymock.classextension.EasyMock.*;
@@ -19,7 +18,7 @@ public class RTLOutputFileGeneratorTest {
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(null);
 		replay(form);
-		File file = new RTLOutputFileGenerator(form, null).generate();
+		File file = new RTLOutputFileGenerator(form).generate();
 		assertNull(file);
 		verify(form);
 	}
@@ -29,7 +28,7 @@ public class RTLOutputFileGeneratorTest {
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSourceFile()).andReturn(new File("SomeFile.agm"));
 		replay(form);
-		File file = new RTLOutputFileGenerator(form, null).generate();
+		File file = new RTLOutputFileGenerator(form).generate();
 		assertNotNull(file);
 		assertEquals(new File("SomeFile_RTL.agm"), file);
 		verify(form);
@@ -41,28 +40,26 @@ public class RTLOutputFileGeneratorTest {
 		ApplicationForm form = createStrictMock(ApplicationForm.class);
 		expect(form.getSelectedParserId()).andReturn(VhdlBeh2HlddBeh);
 		replay(form);
-		new RTLOutputFileGenerator(form, null).react();
+		new RTLOutputFileGenerator(form).react();
 		verify(form);
 		/* Don't react */
 		form = createStrictMock(ApplicationForm.class);
 		expect(form.getSelectedParserId()).andReturn(VhdlBehDd2HlddBeh);
 		replay(form);
-		new RTLOutputFileGenerator(form, null).react();
+		new RTLOutputFileGenerator(form).react();
 		verify(form);
 		/* Don't react */
 		form = createStrictMock(ApplicationForm.class);
 		expect(form.getSelectedParserId()).andReturn(PSL2THLDD);
 		replay(form);
-		new RTLOutputFileGenerator(form, null).react();
+		new RTLOutputFileGenerator(form).react();
 		verify(form);
 		/* React */
-		JButton fileButton = new JButton("asdfasdfsad");
 		form = createStrictMock(ApplicationForm.class);
-		RTLOutputFileGenerator fileGenerator = new RTLOutputFileGenerator(form, fileButton);
+		RTLOutputFileGenerator fileGenerator = new RTLOutputFileGenerator(form);
 		expect(form.getSelectedParserId()).andReturn(HlddBeh2HlddRtl);
 		expect(form.getSourceFile()).andReturn(new File("SomeFile.agm"));
-		form.setDestFile(isA(File.class));
-		form.updateTextFieldFor(eq(fileButton), isA(File.class));
+		form.setRtlRtlFile(isA(File.class));
 		replay(form);
 		fileGenerator.react();
 		verify(form);

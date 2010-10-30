@@ -301,7 +301,7 @@ public class ConverterSettings {
 		sb.append(";  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!").append(newLine);
 		sb.append(";").append(newLine);
 		sb.append("; SOURCE FILE:").append(newLine);
-		sb.append(";        ").append(sourceFile.getName()).append(newLine);
+		sb.append(";        ").append(isPslParser() ? pslFile.getName() : sourceFile.getName()).append(newLine);
 		if (!sourceFiles.isEmpty()) {
 			sb.append("; COMPONENTS:").append(newLine);
 		}
@@ -312,19 +312,25 @@ public class ConverterSettings {
 		sb.append("; CONVERTER:").append(newLine);
 		sb.append(";        ").append(parserId).append(newLine);
 		sb.append(";").append(newLine);
-		sb.append("; MODEL COMPACTNESS:").append(newLine);
-		sb.append(";        ").append(hlddType).
-				append(hlddType == BusinessLogic.HLDDRepresentationType.MINIMIZED ? " (default)" : "").append(newLine);
-		sb.append(";").append(newLine);
-		sb.append("; CONDITIONAL STATEMENTS:").append(newLine);
-		String conditionalStatements =
-				doFlattenConditions ? "Flatten" :
-						doCreateCSGraphs ? "Graphs" :
-								doCreateExtraCSGraphs ? "Functions + Extra-Graphs" :
-										"Functions (default)";
-		sb.append(";        ").append(conditionalStatements).append(newLine);
-		sb.append(";").append(newLine);
+		if (!isPslParser()) {
+			sb.append("; MODEL COMPACTNESS:").append(newLine);
+			sb.append(";        ").append(hlddType).
+					append(hlddType == BusinessLogic.HLDDRepresentationType.MINIMIZED ? " (default)" : "").append(newLine);
+			sb.append(";").append(newLine);
+			sb.append("; CONDITIONAL STATEMENTS:").append(newLine);
+			String conditionalStatements =
+					doFlattenConditions ? "Flatten" :
+							doCreateCSGraphs ? "Graphs" :
+									doCreateExtraCSGraphs ? "Functions + Extra-Graphs" :
+											"Functions (default)";
+			sb.append(";        ").append(conditionalStatements).append(newLine);
+			sb.append(";").append(newLine);
+		}
 		sb.append(";  <<<<<<< GENERATOR INFO").append(newLine);
+	}
+
+	private boolean isPslParser() {
+		return parserId == BusinessLogic.ParserID.PSL2THLDD;
 	}
 
 	public static ConverterSettings loadSmartComment(File hlddFile) {
@@ -415,6 +421,10 @@ public class ConverterSettings {
 					isReadingConditionalStatements = true;
 				}
 
+			}
+
+			if (parserId == null || sourceFileName == null || hlddType == null) {
+				return null;
 			}
 
 			Builder builder = new Builder(parserId, new File(hlddFile.getParent(), sourceFileName), hlddFile);

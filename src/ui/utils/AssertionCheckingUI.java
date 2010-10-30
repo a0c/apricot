@@ -13,8 +13,6 @@ public class AssertionCheckingUI extends UIThread {
 				owner,
 				false, "Assertion checker",
 				"Checking assertions...",
-				"Assertions checking completed",
-				"Checking done",
 				true);
 	}
 }

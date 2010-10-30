@@ -13,9 +13,7 @@ public class AssertionLoadingWaiterUI extends UIThread {
 				owner,
 				false,
 				"Drawing",
-				"Drawing stimuli",
-				null,
-				null,
+				"Drawing stimuli...",
 				visible);
 	}
 }

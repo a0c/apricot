@@ -1,15 +1,13 @@
 package ui;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import base.hldd.structure.models.BehModel;
 import io.ConsoleWriter;
-
 import ui.utils.ConvertingWorker;
 import ui.utils.UIWorkerFinalizerImpl;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * @author Anton Chepurov
@@ -19,15 +17,20 @@ public class BusinessLogic {
 	private final ApplicationForm applicationForm;
 	private final ConsoleWriter consoleWriter;
 
-	private File sourceFile = null;
-	private File destinationFile = null;
-	private File baseModelFile = null;
-
 	private BehModel model;
 
 	private String comment;
 
 	private ConverterSettings settings;
+	private File baseModelFile = null;
+	private File rtlBehFile;
+	private File behDDVhdlFile;
+	private File behVhdlFile;
+	private File ppgLibFile;
+	private File pslFile;
+	private File rtlRtlFile;
+	private File behDDHlddFile;
+	private File behHlddFile;
 
 	public BusinessLogic(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
 		this.applicationForm = applicationForm;
@@ -36,7 +39,7 @@ public class BusinessLogic {
 
 	public void processParse() throws ExtendedException {
 		/* Receive data from form */
-		ConverterSettings.Builder settingsBuilder = new ConverterSettings.Builder(applicationForm.getSelectedParserId(), sourceFile, destinationFile);
+		ConverterSettings.Builder settingsBuilder = new ConverterSettings.Builder(getParserId(), getSourceFile(), getDestinationFile());
 		settingsBuilder.setBaseModelFile(baseModelFile);
 		settingsBuilder.setDoSimplify(applicationForm.shouldSimplify());
 		settingsBuilder.setDoFlattenConditions(applicationForm.shouldFlattenCS());
@@ -56,6 +59,9 @@ public class BusinessLogic {
 	}
 
 	public void addComment(String comment) {
+		if (comment == null) {
+			return;
+		}
 		if (this.comment == null) {
 			this.comment = comment;
 		} else {
@@ -67,42 +73,61 @@ public class BusinessLogic {
 
 		/* Save model to file */
 		try {
-			/* For PSL parser, change output file from *.PSL into *.TGM */
-			changeDestinationFile(".psl", ".tgm");
 
-			model.toFile(new FileOutputStream(destinationFile), comment, settings);
-			consoleWriter.writeLn("Model saved to: " + destinationFile.getAbsolutePath());
+			File outputFile = getOutputFile();
+
+			model.toFile(new FileOutputStream(outputFile), comment, settings);
+
+			consoleWriter.writeLn("Model saved to: " + outputFile.getAbsolutePath());
+
 		} catch (IOException e) {
 			String message = "Error while saving file:\n" + e.getMessage();
 			throw new ExtendedException(message, ExtendedException.ERROR_TEXT);
-		} finally {
-			/* For PSL parser, change output file back from *.TGM into *.PSL */
-			changeDestinationFile(".tgm", ".psl");
 		}
-
 	}
 
-	private void changeDestinationFile(String from, String into) {
-		if (applicationForm.getSelectedParserId() == ParserID.PSL2THLDD) {
-			destinationFile = new File(destinationFile.getAbsolutePath().replace(from, into));
+	private File getOutputFile() {
+		if (getParserId() == ParserID.PSL2THLDD) {
+			return new File(baseModelFile.getAbsolutePath().replace(".agm", ".tgm"));
 		}
+		return getDestinationFile();
 	}
 
 	public String getProposedFileName() {
+		File destinationFile = getDestinationFile();
 		if (destinationFile != null) return destinationFile.getAbsolutePath();
-		if (sourceFile == null) return null;
 		String proposedFileName = null;
-		String sourceName = sourceFile.getAbsolutePath();
-		ParserID selectedParserId = applicationForm.getSelectedParserId();
+		String sourceName;
+		File sourceFile = getSourceFile();
+		ParserID selectedParserId = getParserId();
 		switch (selectedParserId) {
 			case VhdlBeh2HlddBeh:
 			case VhdlBehDd2HlddBeh:
+				if (sourceFile == null) {
+					return null;
+				}
+				sourceName = sourceFile.getAbsolutePath();
 				proposedFileName = sourceName.substring(0, sourceName.lastIndexOf(".") + 1) + "agm";
 				break;
 			case HlddBeh2HlddRtl:
+				if (sourceFile == null) {
+					return null;
+				}
+				sourceName = sourceFile.getAbsolutePath();
 				proposedFileName = sourceName.substring(0, sourceName.lastIndexOf(".")) + "_RTL.agm";
+				break;
+			case PSL2THLDD:
+				if (baseModelFile == null) {
+					return null;
+				}
+				sourceName = baseModelFile.getAbsolutePath();
+				proposedFileName = sourceName.substring(0, sourceName.lastIndexOf(".") + 1) + "psl";
 		}
 		return proposedFileName;
+	}
+
+	private ParserID getParserId() {
+		return applicationForm.getSelectedParserId();
 	}
 
 	public ApplicationForm getApplicationForm() {
@@ -113,30 +138,76 @@ public class BusinessLogic {
 		this.model = model;
 	}
 
-	public void setSourceFile(File sourceFile) {
-		this.sourceFile = sourceFile;
-	}
-
-	public void setDestinationFile(File destinationFile) {
-		this.destinationFile = destinationFile;
-	}
-
 	public void setBaseModelFile(File baseModelFile) {
 		this.baseModelFile = baseModelFile;
 	}
 
 	public File getSourceFile() {
-		return sourceFile;
+		ParserID parserId = getParserId();
+		switch (parserId) {
+			case VhdlBeh2HlddBeh:
+				return behVhdlFile;
+			case VhdlBehDd2HlddBeh:
+				return behDDVhdlFile;
+			case HlddBeh2HlddRtl:
+				return rtlBehFile;
+			case PSL2THLDD:
+				return ppgLibFile;
+			default:
+				throw new RuntimeException("Cannot obtain SOURCE FILE for specified ParserID: " + parserId);
+		}
 	}
 
-	public void clearFiles() {
-		sourceFile = null;
-		destinationFile = null;
-		baseModelFile = null;
+	public File getDestinationFile() {
+		ParserID parserId = getParserId();
+		switch (parserId) {
+			case VhdlBeh2HlddBeh:
+				return behHlddFile;
+			case VhdlBehDd2HlddBeh:
+				return behDDHlddFile;
+			case HlddBeh2HlddRtl:
+				return rtlRtlFile;
+			case PSL2THLDD:
+				return pslFile;
+			default:
+				throw new RuntimeException("Cannot obtain DESTINATION FILE for specified ParserID: " + parserId);
+		}
 	}
 
 	public void doLoadHlddGraph() {
-		applicationForm.doLoadHlddGraph(FileDependencyResolver.derivePngFile(destinationFile));
+		applicationForm.doLoadHlddGraph(FileDependencyResolver.derivePngFile(getDestinationFile()));
+	}
+
+	public void setRtlBehFile(File rtlBehFile) {
+		this.rtlBehFile = rtlBehFile;
+	}
+
+	public void setBehDDVhdlFile(File behDDVhdlFile) {
+		this.behDDVhdlFile = behDDVhdlFile;
+	}
+
+	public void setBehVhdlFile(File behVhdlFile) {
+		this.behVhdlFile = behVhdlFile;
+	}
+
+	public void setPpgLibFile(File ppgLibFile) {
+		this.ppgLibFile = ppgLibFile;
+	}
+
+	public void setPslFile(File pslFile) {
+		this.pslFile = pslFile;
+	}
+
+	public void setRtlRtlFile(File rtlRtlFile) {
+		this.rtlRtlFile = rtlRtlFile;
+	}
+
+	public void setBehDDHlddFile(File behDDHlddFile) {
+		this.behDDHlddFile = behDDHlddFile;
+	}
+
+	public void setBehHlddFile(File behHlddFile) {
+		this.behHlddFile = behHlddFile;
 	}
 
 
@@ -154,19 +225,6 @@ public class BusinessLogic {
 
 		public String getTitle() {
 			return title;
-		}
-
-		public static ParserID getSelected(int selectedIndex) {
-			switch (selectedIndex) {
-				case 0:
-					return VhdlBeh2HlddBeh;
-				case 1:
-					return VhdlBehDd2HlddBeh;
-				case 2:
-					return HlddBeh2HlddRtl;
-				default:
-					return PSL2THLDD;
-			}
 		}
 	}
 

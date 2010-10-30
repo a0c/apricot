@@ -15,18 +15,15 @@ public abstract class UIThread extends Thread implements UIInterface {
 	private JProgressBar progressBar;
 
 	private final boolean withProgressBar;
-	private final String completeMessage;
-	private final String completeTitle;
 	private static final String ERROR_MESSAGE = "Error occurred:\n";
 	private static final String ERROR_TITLE = "Error";
 
-	protected UIThread(JFrame owner, boolean withProgressBar, String title, String label, String completeMessage, String completeTitle, boolean visible) {
+	protected UIThread(JFrame owner, boolean withProgressBar, String title, String label, boolean visible) {
 		this.withProgressBar = withProgressBar;
-		this.completeMessage = completeMessage;
-		this.completeTitle = completeTitle;
 
 		/* Initialize dialog */
 		dialog = new JDialog(owner, title, false);
+		dialog.setIconImage(owner.getIconImage());
 		UIThreadDialogWithProgressBar dialogWithProgressBar = new UIThreadDialogWithProgressBar();
 		dialogWithProgressBar.getLabel().setText(label);
 		progressBar = dialogWithProgressBar.getProgressBar();
@@ -74,13 +71,6 @@ public abstract class UIThread extends Thread implements UIInterface {
 
 	public void setVisible(boolean visible) {
 		dialog.setVisible(visible);
-	}
-
-	public void showSuccessDialog() {
-		if (completeMessage == null || completeTitle == null) {
-			return;
-		}
-		JOptionPane.showMessageDialog(dialog.getOwner(), completeMessage, completeTitle, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public void showErrorDialog(String consoleOutput) {

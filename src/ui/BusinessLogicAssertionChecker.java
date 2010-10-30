@@ -1,21 +1,20 @@
 package ui;
 
-import ui.io.AssertionCheckReader;
-import ui.graphics.SimulationFrame;
-import ui.utils.uiWithWorker.UIWithWorker;
-import ui.utils.*;
 import io.ConsoleWriter;
+import parsers.tgm.ModelDataLoader;
+import ui.graphics.SimulationFrame;
+import ui.io.AssertionCheckReader;
+import ui.utils.*;
+import ui.utils.uiWithWorker.UIWithWorker;
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
-
-import parsers.tgm.ModelDataLoader;
+import java.util.List;
 
 /**
  * @author Anton Chepurov
  */
-public class BusinessLogicAssertionChecker {
+public class BusinessLogicAssertionChecker implements Lockable {
 
 	private final ApplicationForm applicationForm;
 	private final ConsoleWriter consoleWriter;
@@ -25,6 +24,8 @@ public class BusinessLogicAssertionChecker {
 	private File tgmFile;
 	private File simulationFile = null;
 	volatile private AssertionCheckReader simulationReader = null;
+
+	private final SimpleLock simpleLock = new SimpleLock();
 
 	public BusinessLogicAssertionChecker(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
 		this.applicationForm = applicationForm;
@@ -72,8 +73,22 @@ public class BusinessLogicAssertionChecker {
 		SimulationFrame simulationFrame = new SimulationFrame(simulationReader.getVariablePatterns(),
 				simulationReader.getAssertionPatterns(),
 				new ModelDataLoader(simulationFile).getVariableNames(),
-				simulationReader.getBooleanIndices(), drawPatternCount, simulationFile.getName());
+				simulationReader.getBooleanIndices(), drawPatternCount, simulationFile.getName(), applicationForm.getFrame());
 		applicationForm.addSimulation(simulationFile.getName(), simulationFile.getAbsolutePath(), simulationFrame.getMainPanel());
+
+		unlock();
+	}
+
+	public boolean isLocked() {
+		return simpleLock.isLocked();
+	}
+
+	public void lock() {
+		simpleLock.lock();
+	}
+
+	public void unlock() {
+		simpleLock.unlock();
 	}
 
 	public String getProposedFileName() {
@@ -118,7 +133,6 @@ public class BusinessLogicAssertionChecker {
 				new AssertionCheckingUI(applicationForm.getFrame()),
 				new AssertionCheckingWorker(
 						commandList,
-						System.out,
 						System.err,
 						this,
 						hlddFile.getAbsolutePath().replace(".agm", ".chk"),

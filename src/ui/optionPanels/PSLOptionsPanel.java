@@ -1,5 +1,7 @@
 package ui.optionPanels;
 
+import ui.ApplicationForm.FileDropHandler;
+
 import javax.swing.*;
 
 /**
@@ -10,9 +12,11 @@ public class PSLOptionsPanel {
 	private JTextField ppgLibTextField;
 	private JPanel mainPanel;
 
-	public PSLOptionsPanel() {
+	public PSLOptionsPanel(FileDropHandler fileDropHandler) {
 		ppgLibTextField.setOpaque(false);
 		ppgLibTextField.setFocusable(false);
+
+		ppgLibButton.addKeyListener(fileDropHandler);
 	}
 
 	public JButton getPpgLibButton() {

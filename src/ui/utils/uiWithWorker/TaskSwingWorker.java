@@ -1,16 +1,15 @@
 package ui.utils.uiWithWorker;
 
+import io.ConsoleWriter;
+import io.QuietCloser;
 import ui.ExtendedException;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Arrays;
-
-import io.ConsoleWriter;
-import io.QuietCloser;
+import java.util.List;
 
 /**
  * @author Anton Chepurov
@@ -23,7 +22,6 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 	private final String[] executableCommand;
 	protected Runnable executableRunnable;
 	private int executionTimeout;
-	private OutputStream infoOut;
 	private OutputStream errorOut;
 	private ConsoleWriter consoleWriter;
 
@@ -32,12 +30,11 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 
 	protected ExtendedException occurredException;
 
-	protected TaskSwingWorker(List<String> executableCommand, OutputStream infoOut, OutputStream errorOut, ConsoleWriter consoleWriter) {
+	protected TaskSwingWorker(List<String> executableCommand, OutputStream errorOut, ConsoleWriter consoleWriter) {
 		this.errorOut = errorOut;
 		this.consoleWriter = consoleWriter;
 		this.executableCommand = executableCommand.toArray(new String[executableCommand.size()]);
 		this.executionTimeout = NO_TIMEOUT;
-		this.infoOut = infoOut;
 		/* Disable alternative */
 		executableRunnable = null;
 	}
@@ -69,11 +66,10 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 					if (byteCount > 0) {
 						for (int i = 0; i < byteCount; i++) {
 							int aChar = inputStream.read();
-							infoOut.write(aChar); //todo: read N at once. + use buffered reader??
+							//todo: read N at once. + use buffered reader??
 							consoleWriter.write(String.valueOf((char) aChar));
 							consoleTracer.append((char) aChar);
 						}
-						infoOut.flush();
 					}
 					/* Read ERROR */
 					int errorBytesAvailable = errorStream.available();
@@ -118,11 +114,7 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 				}
 				if (isProcessFinished) {
 					// finished running
-					if (exitValue == 0) {
-						infoOut.write("Terminated without errors".getBytes());
-						infoOut.flush();
-						uiHolder.showSuccessDialog();
-					} else {
+					if (exitValue != 0) {
 						errorOut.write(("Exit code " + exitValue + " while performing command " + Arrays.toString(executableCommand)).getBytes());
 						errorOut.flush();
 						if (consoleTracer.length() > 0) {
@@ -151,9 +143,7 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 		} else if (executableRunnable != null) {
 
 			executableRunnable.run();
-			if (occurredException == null) {
-				uiHolder.showSuccessDialog();
-			}
+
 			return isProcessFinished;
 
 		}

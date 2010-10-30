@@ -1,8 +1,8 @@
 package ui.utils;
 
-import ui.utils.uiWithWorker.TaskSwingWorker;
 import ui.BusinessLogicAssertionChecker;
 import ui.ExtendedException;
+import ui.utils.uiWithWorker.TaskSwingWorker;
 
 /**
  * @author Anton Chepurov
@@ -23,7 +23,7 @@ public class AssertionLoadingWaiter extends TaskSwingWorker {
 							/* If loading of CHK file is cancelled, stop waiting and terminate the thread*/
 							Thread.currentThread().interrupt();
 						}
-						Thread.sleep(500);
+						Thread.sleep(200);
 					} catch (InterruptedException e) {
 						return;
 					}

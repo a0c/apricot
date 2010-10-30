@@ -1,19 +1,21 @@
 package base.hldd.structure.models;
 
+import base.hldd.structure.Graph;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.variables.utils.DefaultGraphVariableCreator;
 import base.hldd.structure.variables.utils.GraphVariableCreator;
-import base.hldd.structure.Graph;
 import base.hldd.visitors.SourceLocationCollector;
 import io.QuietCloser;
 import io.scan.HLDDScanner;
-
-import java.io.*;
-import java.util.*;
-
 import parsers.hldd.StructureBuilder;
 import parsers.hldd.StructureParser;
 import ui.ConverterSettings;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.*;
 
 /**
  * Class representing AGM BEH RTL DD.
@@ -138,11 +140,12 @@ public class BehModel {
 		}
 		// add COMMENT if exists
 		String newLine = System.getProperty("line.separator");
-		if (comment != null && !comment.equals("")) {
+		if (comment != null && !comment.isEmpty()) {
+			sb.append(";").append("#########################").append(newLine);
 			sb.append(";").append(newLine);
 			String[] lines = comment.split("\n");
 			for (String line : lines) {
-				sb.append(";").append(line).append(newLine);
+				sb.append(";").append("\t").append(line).append(newLine);
 			}
 		}
 

@@ -1,17 +1,20 @@
 package ui.fileViewer;
 
 import io.QuietCloser;
+import ui.ApplicationForm.FileDropHandler;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.io.*;
-import java.util.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
+import java.io.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * @author Anton Chepurov
@@ -39,7 +42,8 @@ public class TableForm {
 
 	private String maxLine = "";
 
-	public TableForm(File selectedFile, int totalVisibleWidth, Collection<Integer> nodesLines, Collection<Integer> edgesLines) {
+	public TableForm(File selectedFile, int totalVisibleWidth, Collection<Integer> nodesLines, Collection<Integer> edgesLines, FileDropHandler fileDropHandler) {
+		nodesCheckBox.addKeyListener(fileDropHandler);
 		this.nodesLines = nodesLines;
 		this.edgesLines = edgesLines;
 		/* Read File */

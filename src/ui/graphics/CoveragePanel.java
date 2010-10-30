@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.Collection;
 
 
 /**
@@ -13,35 +14,45 @@ import java.awt.*;
  */
 public class CoveragePanel extends JPanel {
 
-	private JPanel hlddPanel, vhdlPanel;
-	private AbstractCoverage vhdlNodeCoverage;
-	private AbstractCoverage vhdlEdgeCoverage;
-	private AbstractCoverage vhdlToggleCoverage;
+	private JPanel hlddInternalPanel;
+	private JPanel vhdlInternalPanel;
 
 	private CoveragePanel() {
 		setLayout(new GridLayout(1, 2));
 
-		hlddPanel = new JPanel();
+		JPanel hlddPanel = new JPanel();
 		hlddPanel.setLayout(new BoxLayout(hlddPanel, BoxLayout.PAGE_AXIS));
-		Border hlddBorder = BorderFactory.createCompoundBorder();
-		hlddBorder = BorderFactory.createTitledBorder(hlddBorder, "HLDD", TitledBorder.CENTER, TitledBorder.ABOVE_TOP);
+		Border hlddBorder = BorderFactory.createEtchedBorder();
+		hlddBorder = BorderFactory.createTitledBorder(hlddBorder, "HLDD", TitledBorder.CENTER, TitledBorder.TOP);
 		hlddPanel.setBorder(hlddBorder);
+		hlddInternalPanel = new JPanel();
+		hlddInternalPanel.setLayout(new BoxLayout(hlddInternalPanel, BoxLayout.PAGE_AXIS));
+		JScrollPane hlddScrollPane = new JScrollPane(hlddInternalPanel);
+		hlddScrollPane.setBorder(null);
+		hlddPanel.add(hlddScrollPane);
 
-		vhdlPanel = new JPanel();
-		vhdlPanel.setLayout(new GridLayout(3, 1));
-		Border vhdlBorder = BorderFactory.createCompoundBorder();
-		vhdlBorder = BorderFactory.createTitledBorder(vhdlBorder, "VHDL", TitledBorder.CENTER, TitledBorder.ABOVE_TOP);
+		JPanel vhdlPanel = new JPanel();
+		vhdlPanel.setLayout(new BoxLayout(vhdlPanel, BoxLayout.PAGE_AXIS));
+		Border vhdlBorder = BorderFactory.createEtchedBorder();
+		vhdlBorder = BorderFactory.createTitledBorder(vhdlBorder, "VHDL", TitledBorder.CENTER, TitledBorder.TOP);
 		vhdlPanel.setBorder(vhdlBorder);
+		vhdlInternalPanel = new JPanel();
+		vhdlInternalPanel.setLayout(new BoxLayout(vhdlInternalPanel, BoxLayout.PAGE_AXIS));
+		JScrollPane vhdlScrollPane = new JScrollPane(vhdlInternalPanel);
+		vhdlScrollPane.setBorder(null);
+		vhdlPanel.add(vhdlScrollPane);
 
 		add(hlddPanel);
 		add(vhdlPanel);
 	}
 
-	public CoveragePanel(AbstractCoverage hlddNodeCoverage, AbstractCoverage hlddEdgeCoverage, AbstractCoverage hlddToggleCoverage) {
+	public CoveragePanel(AbstractCoverage hlddNodeCoverage, AbstractCoverage hlddEdgeCoverage, AbstractCoverage hlddToggleCoverage,
+						 Collection<? extends AbstractCoverage> vhdlNodeCoverages) {
 		this();
 
 		/* Don't show the frame if none of the coverages is available */ //todo...
-		if (hlddNodeCoverage == null && hlddEdgeCoverage == null && hlddToggleCoverage == null) {
+		if (hlddNodeCoverage == null && hlddEdgeCoverage == null && hlddToggleCoverage == null
+				&& (vhdlNodeCoverages == null || vhdlNodeCoverages.isEmpty())) {
 			return;
 		}
 
@@ -50,52 +61,27 @@ public class CoveragePanel extends JPanel {
 		addHLDDCoverage(hlddEdgeCoverage);
 		addHLDDCoverage(hlddToggleCoverage);
 
+		if (vhdlNodeCoverages != null) {
+			for (AbstractCoverage vhdlNodeCoverage : vhdlNodeCoverages) {
+				addVHDLCoverage(vhdlNodeCoverage, vhdlNodeCoverage.getTooltip());
+			}
+		}
 	}
 
-	public CoveragePanel(AbstractCoverage vhdlNodeCoverage) {
-		this();
-
-		this.vhdlNodeCoverage = vhdlNodeCoverage;
-
-		addVHDLCoverage(vhdlNodeCoverage);
-
-	}
-
-	public void addVHDLCoverage(AbstractCoverage vhdlCoverage) {
-		addCoverage(vhdlCoverage, vhdlPanel);
+	public void addVHDLCoverage(AbstractCoverage vhdlCoverage, String toolTipText) {
+		addCoverage(vhdlCoverage, vhdlInternalPanel, toolTipText);
 	}
 
 	public void addHLDDCoverage(AbstractCoverage hlddCoverage) {
-		addCoverage(hlddCoverage, hlddPanel);
+		addCoverage(hlddCoverage, hlddInternalPanel, null);
 	}
 
-	private void addCoverage(AbstractCoverage coverage, JPanel destinationPanel) {
+	private void addCoverage(AbstractCoverage coverage, JPanel destinationPanel, String toolTipText) {
 		/* Only show those coverages that are available */
 		if (coverage != null) {
 			CoverageBar coverageBar = new CoverageBar(coverage);
+			coverageBar.setToolTipText(toolTipText);
 			destinationPanel.add(coverageBar);
 		}
-	}
-
-	public void addVHDLCoverageFrom(CoveragePanel vhdlCoveragePanel) {
-
-		vhdlPanel.removeAll();
-
-		AbstractCoverage vhdlCov;
-
-		if ((vhdlCov = vhdlCoveragePanel.vhdlNodeCoverage) != null) {
-			vhdlNodeCoverage = vhdlCov;
-			addVHDLCoverage(vhdlCov);
-		}
-		if ((vhdlCov = vhdlCoveragePanel.vhdlEdgeCoverage) != null) {
-			vhdlEdgeCoverage = vhdlCov;
-			addVHDLCoverage(vhdlCov);
-		}
-		if ((vhdlCov = vhdlCoveragePanel.vhdlToggleCoverage) != null) {
-			vhdlToggleCoverage = vhdlCov;
-			addVHDLCoverage(vhdlCov);
-		}
-
-		vhdlPanel.validate();
 	}
 }

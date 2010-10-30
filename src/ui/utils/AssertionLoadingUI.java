@@ -13,9 +13,7 @@ public class AssertionLoadingUI extends UIThread {
 				owner,
 				true,
 				"Simulation stimuli loader",
-				"Loading simulation stimuli",
-				null,
-				null,
+				"Loading simulation stimuli...",
 				true);
 	}
 }

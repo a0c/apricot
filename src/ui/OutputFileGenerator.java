@@ -1,6 +1,5 @@
 package ui;
 
-import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -12,24 +11,23 @@ import static ui.BusinessLogic.HLDDRepresentationType.*;
 /**
  * @author Anton Chepurov
  */
+//todo: rename to BehHlddFileGenerator
 public class OutputFileGenerator implements ChangeListener, DocumentListener {
 
 	private final ApplicationForm applicationForm;
-	private JButton outputFileButton;
 
-	public OutputFileGenerator(ApplicationForm applicationForm, JButton outputFileButton) {
+	public OutputFileGenerator(ApplicationForm applicationForm) {
 		this.applicationForm = applicationForm;
-		this.outputFileButton = outputFileButton;
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		react();
+		react(e);
 	}
 
 	@Override
 	public void insertUpdate(DocumentEvent e) {
-		react();
+		react(e);
 	}
 
 	@Override
@@ -38,18 +36,44 @@ public class OutputFileGenerator implements ChangeListener, DocumentListener {
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-		react();
+		react(e);
 	}
 
-	private void react() {
+	private void react(Object event) {
+
+		if (!isAcceptedParser()) {
+			return;
+		}
+
+		if (!applicationForm.areSmartNamesAllowed()) {
+			if (isVhdlChanged(event)) {
+				applicationForm.setBehHlddFile(null);
+			}
+			return;
+		}
+
 		File outputFile = generate();
 
 		if (outputFile != null) {
 
-			applicationForm.setDestFile(outputFile);
-
-			applicationForm.updateTextFieldFor(outputFileButton, outputFile);
+			applicationForm.setBehHlddFile(outputFile);
 		}
+	}
+
+	private boolean isVhdlChanged(Object event) {
+		if (event instanceof ChangeEvent) {
+			/* selecting radio button => user action (manual) */
+			return false;
+		} else if (event instanceof DocumentEvent) {
+			/* VHDL file changes => auto action */
+			return true;
+		} else {
+			throw new RuntimeException("Class of specified event object is not accepted for detecting VHDL file change: " + event.getClass().getSimpleName());
+		}
+	}
+
+	private boolean isAcceptedParser() {
+		return applicationForm.getSelectedParserId() == BusinessLogic.ParserID.VhdlBeh2HlddBeh;
 	}
 
 	public File generate() {

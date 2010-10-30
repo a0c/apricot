@@ -1,15 +1,14 @@
 package ui.utils;
 
+import ui.ApplicationForm;
+import ui.BusinessLogicAssertionChecker;
+import ui.ExtendedException;
 import ui.io.AssertionCheckReader;
 import ui.utils.uiWithWorker.TaskSwingWorker;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.CancellationException;
 import java.io.File;
-
-import ui.ExtendedException;
-import ui.BusinessLogicAssertionChecker;
-import ui.ApplicationForm;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Anton Chepurov
@@ -56,7 +55,7 @@ public class AssertionLoadingWorker extends TaskSwingWorker {
 	}
 
 	private void enableUI(boolean enable) {
-		businessLogicAssertionChecker.getApplicationForm().setEnableDrawButton(enable);
+		businessLogicAssertionChecker.getApplicationForm().enableAssertionLoader(enable);
 	}
 
 	private void updateUI(File simulationFile, int maxValue) {

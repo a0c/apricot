@@ -1,8 +1,8 @@
 package ui.graphics;
 
 import ui.base.AbstractCoverage;
-import ui.base.SplitCoverage;
 import ui.base.PureCoverage;
+import ui.base.SplitCoverage;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicProgressBarUI;
@@ -18,13 +18,16 @@ public class CoverageBar extends JPanel {
 	private static final Color FOREGROUND_COLOR = Color.BLACK;
 
 	public CoverageBar(AbstractCoverage coverage) {
-		this.setBorder(BorderFactory.createEtchedBorder());
 		/* Create TopPanel */
 		JPanel topPanel = new JPanel();
-		topPanel.setPreferredSize(new Dimension(300, 25));
-		topPanel.setMinimumSize(new Dimension(300, 25));
-		topPanel.setMaximumSize(new Dimension(300, 25));
+		Dimension fixedSize = new Dimension(300, 24);
+		topPanel.setPreferredSize(fixedSize);
+		topPanel.setMinimumSize(fixedSize);
+		topPanel.setMaximumSize(fixedSize);
 		topPanel.setLayout(new BorderLayout());
+		this.setMinimumSize(fixedSize);
+		this.setMaximumSize(fixedSize);
+
 		/* Add TopPanel */
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints constraints = new GridBagConstraints();
