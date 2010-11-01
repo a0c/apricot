@@ -35,7 +35,7 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		for (Package aPackage : packages) {
 			/* Copy constants */
 			for (Constant constant : aPackage.getConstants()) {
-				buildGeneric(constant.getName(), constant.getType(), constant.getValue());
+				buildGeneric(constant.getName(), constant.getType(), constant.getValue(), null);
 			}
 			/* Copy typeByName */
 			for (Map.Entry<String, Type> hsbByTNameEntry : aPackage.getTypeByName().entrySet()) {
@@ -53,11 +53,16 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		}
 	}
 
-	public void buildGeneric(String genericConstantName, Type type, BigInteger value) {
+	public void buildGeneric(String genericConstantName, Type type, BigInteger value, String typeAsString) {
 		if (entity != null) {
 			Constant newConstant = new Constant(genericConstantName, type, value);
 			registerConstant(newConstant);
-			entity.addGenericConstant(newConstant);
+			Object currentContext = contextStack.peek();
+			if (currentContext instanceof Entity) {
+				entity.addGenericConstant(newConstant);
+			} else if (isComponentDeclarationBeingBuilt()) {
+				((ComponentDeclaration) currentContext).addGeneric(newConstant, typeAsString);
+			}
 		}
 	}
 
@@ -68,29 +73,52 @@ public class StructureBuilder extends AbstractPackageBuilder {
 			if (currentContext instanceof Entity) {
 				variableNames.add(portName);
 				entity.addPort(newPort);
-			} else if (currentContext instanceof ComponentDeclaration) {
+			} else if (isComponentDeclarationBeingBuilt()) {
 				((ComponentDeclaration) currentContext).addPort(newPort);
 			}
 		}
 	}
 
-	public void buildComponentInstantiation(String componentName, String componentUnitName, List<Map.Entry<String, String>> portMappingEntries) throws Exception {
-		PortMap portMap = new PortMap(portMappingEntries.size());
-		for (Map.Entry<String, String> portMappingEntry : portMappingEntries) {
-			AbstractOperand formal = expressionBuilder.buildExpression(portMappingEntry.getKey());
-			AbstractOperand actual = expressionBuilder.buildExpression(portMappingEntry.getValue());
-			if (!(formal instanceof OperandImpl)) {
-				throw new Exception("Simple operand expected as a Formal in port map " + portMappingEntry);
-			}
-			portMap.addMapping((OperandImpl) formal, actual);
+	boolean isComponentDeclarationBeingBuilt() {
+		return contextStack.peek() instanceof ComponentDeclaration;
+	}
+
+	public void buildComponentInstantiation(String componentName, String componentUnitName,
+											List<Map.Entry<String, TypeAndValueHolder>> genericsList,
+											List<Map.Entry<String, String>> portMapEntries) throws Exception {
+		Collection<Constant> generics = new ArrayList<Constant>(genericsList.size());
+		for (Map.Entry<String, TypeAndValueHolder> entry : genericsList) {
+			TypeAndValueHolder typeAndValue = entry.getValue();
+			generics.add(new Constant(entry.getKey(), typeAndValue.type, typeAndValue.value));
 		}
+		PortMap portMap = buildMapping(portMapEntries);
 		ComponentDeclaration componentDeclaration = entity.resolveComponentDeclaration(componentUnitName);
-		ComponentInstantiation compInst = new ComponentInstantiation(componentName, componentDeclaration, portMap);
+		ComponentInstantiation compInst = new ComponentInstantiation(componentName, componentDeclaration, generics, portMap);
 
 		Object currentContext = contextStack.peek();
 		if (currentContext instanceof Architecture) {
 			((Architecture) currentContext).addComponent(compInst);
 		}
+	}
+
+	private PortMap buildMapping(List<Map.Entry<String, String>> mappingEntries) throws Exception {
+		PortMap map = new PortMap(mappingEntries.size());
+		for (Map.Entry<String, String> mappingEntry : mappingEntries) {
+			AbstractOperand formal = expressionBuilder.buildExpression(mappingEntry.getKey());
+			AbstractOperand actual = expressionBuilder.buildExpression(mappingEntry.getValue());
+			if (!(formal instanceof OperandImpl)) {
+				throw new Exception("Simple operand expected as a Formal in port/generic map " + mappingEntry);
+			}
+			map.addMapping((OperandImpl) formal, actual);
+		}
+		return map;
+	}
+
+	public String getGenericTypeAsString(String componentName, String genericName) {
+
+		ComponentDeclaration componentDecl = entity.resolveComponentDeclaration(componentName);
+
+		return componentDecl.getGenericTypeAsString(genericName);
 	}
 
 	public void buildArchitecture(String name, String affiliation) {

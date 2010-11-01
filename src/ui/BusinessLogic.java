@@ -49,7 +49,7 @@ public class BusinessLogic {
 		settings = settingsBuilder.build();
 
 		/* Perform PARSING and CONVERSIONS in a separate thread */
-		new ConvertingWorker(new UIWorkerFinalizerImpl(this, consoleWriter), consoleWriter, settings).execute();
+		new ConvertingWorker(new UIWorkerFinalizerImpl(this, consoleWriter), consoleWriter, settings, null).execute();
 
 	}
 

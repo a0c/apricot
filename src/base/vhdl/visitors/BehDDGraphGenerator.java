@@ -1,18 +1,22 @@
 package base.vhdl.visitors;
 
-import base.vhdl.structure.nodes.*;
-import base.vhdl.structure.*;
+import base.vhdl.structure.Architecture;
+import base.vhdl.structure.Constant;
+import base.vhdl.structure.Entity;
 import base.vhdl.structure.Process;
+import base.vhdl.structure.nodes.*;
 import ui.ConfigurationHandler;
 import ui.ConverterSettings;
+
+import java.util.Collection;
 
 /**
  * @author Anton Chepurov
  */
 public class BehDDGraphGenerator extends GraphGenerator {
 
-	public BehDDGraphGenerator(ConfigurationHandler config, ConverterSettings settings) {
-		super(config, settings, GeneratorType.BehaviouralDD);
+	public BehDDGraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<Constant> generics) {
+		super(config, settings, generics, GeneratorType.BehaviouralDD);
 	}
 
 	public void visitProcess(base.vhdl.structure.Process process) throws Exception {

@@ -1,13 +1,12 @@
 package parsers.vhdl;
 
 import base.SourceLocation;
+import base.Type;
 import io.scan.VHDLScanner;
 import io.scan.VHDLToken;
 
 import java.text.ParseException;
 import java.util.*;
-
-import base.Type;
 
 /**
  * @author Anton Chepurov
@@ -72,10 +71,11 @@ public class StructureParser {
 						/* Generic NAME */
 						name = value.substring(0, value.indexOf(":")).trim();
 						/* Generic TYPE and VALUE*/
-						typeAndValue = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder);
+						String typeAndValueAsString = value.substring(value.indexOf(":") + 1).trim();
+						typeAndValue = PackageParser.parseTypeAndValue(typeAndValueAsString, builder);
 						if (typeAndValue.value == null)
 							throw new Exception("Generic constant " + name + " is not initialized");
-						builder.buildGeneric(name, typeAndValue.type, typeAndValue.value);
+						builder.buildGeneric(name, typeAndValue.type, typeAndValue.value, PackageParser.extractTypeString(typeAndValueAsString));
 					}
 					break;
 				case PORT_DECL:
@@ -88,32 +88,38 @@ public class StructureParser {
 						String[] typeString = value.substring(value.indexOf(":") + 1).trim().split("\\s", 2);
 						isInput = typeString[0].trim().equals("IN");
 						/* Port HIGHEST SIGNIFICANT BIT */
-						type = PackageParser.parseType(typeString[1].trim(), builder).type;
+						type = builder.isComponentDeclarationBeingBuilt() ? null : PackageParser.parseTypeAndValue(typeString[1].trim(), builder).type;
 						/* Create new PORT */
 						builder.buildPort(name, isInput, type);
 					}
 					break;
-				case PORT_MAP:
-					String[] valueParts = value.split(":|(PORT MAP)", 3);
-					if (valueParts.length != 3)
+				case COMPONENT_INST:
+					boolean hasGenerics = value.contains("GENERIC MAP");
+					int splitLimit = hasGenerics ? 4 : 3;
+					String[] valueParts = value.split(":|(GENERIC MAP)|(PORT MAP)", splitLimit);
+					if (valueParts.length != splitLimit)
 						throw new Exception("Sorry, don't know how to parse this port mapping: " + value);
 					name = valueParts[0].trim();
-					String pm = valueParts[2].trim();
-					String[] portMappings = pm.substring(pm.indexOf("(") + 1, pm.lastIndexOf(")")).split(",");
-					List<Map.Entry<String, String>> portMappingEntries = new ArrayList<Map.Entry<String, String>>();
-					for (String portMapping : portMappings) {
-						if (!portMapping.contains("=>")) {
-							//todo POSITIONAL ASSOCIATION in port map
-							throw new ParseException("Implementation is missing for POSITIONAL ASSOCIATION in port map "
-									+ Arrays.toString(portMappings), 0);
+					String unitName = valueParts[1].trim();
+					List<Map.Entry<String, TypeAndValueHolder>> generics = Collections.emptyList();
+					if (hasGenerics) {
+						String gm = valueParts[2].trim();
+						List<Map.Entry<String, String>> genericEntries = parseMap(gm);
+						generics = new ArrayList<Map.Entry<String, TypeAndValueHolder>>(genericEntries.size());
+						for (Map.Entry<String, String> genericEntry : genericEntries) {
+							String genericName = genericEntry.getKey();
+							String typeString = builder.getGenericTypeAsString(unitName, genericName);
+							typeAndValue = PackageParser.parseTypeAndValue(typeString, genericEntry.getValue(), builder);
+							AbstractMap.SimpleImmutableEntry<String, TypeAndValueHolder> entry =
+									new AbstractMap.SimpleImmutableEntry<String, TypeAndValueHolder>(
+											genericName, typeAndValue
+									);
+							generics.add(entry);
 						}
-						String[] parts = portMapping.split("=>", 2);
-						if (parts.length != 2) {
-							throw new ParseException("Invalid port mapping: " + portMapping, 0);
-						}
-						portMappingEntries.add(new AbstractMap.SimpleImmutableEntry<String, String>(parts[0].trim(), parts[1].trim()));
 					}
-					builder.buildComponentInstantiation(name, valueParts[1].trim(), portMappingEntries);
+					String pm = valueParts[hasGenerics ? 3 : 2].trim();
+					List<Map.Entry<String, String>> portMappingEntries = parseMap(pm);
+					builder.buildComponentInstantiation(name, unitName, generics, portMappingEntries);
 					break;
 				case DECL_CLOSE:
 					builder.buildCloseDeclaration();
@@ -140,7 +146,7 @@ public class StructureParser {
 						/* Signal NAME */
 						name = value.substring(6, value.indexOf(":")).trim();
 						/* Signal HIGHEST SIGNIFICANT BIT */
-						typeAndValue = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder);
+						typeAndValue = PackageParser.parseTypeAndValue(value.substring(value.indexOf(":") + 1).trim(), builder);
 						/* Create new SIGNAL */
 						builder.buildSignal(name, typeAndValue.type, typeAndValue.valueAsString);
 					}
@@ -149,7 +155,7 @@ public class StructureParser {
 					int colonIndex = value.indexOf(":");
 					int isIndex = value.indexOf(" IS ");
 					name = value.substring(6, colonIndex).trim();
-					type = PackageParser.parseType(value.substring(colonIndex + 1, isIndex).trim(), builder).type;
+					type = PackageParser.parseTypeAndValue(value.substring(colonIndex + 1, isIndex).trim(), builder).type;
 					value = value.substring(isIndex + 4, value.length() - 1);
 					builder.buildAlias(name, type, value);
 					break;
@@ -164,7 +170,7 @@ public class StructureParser {
 						/* Variable NAME */
 						name = value.substring(8, value.indexOf(":")).trim();
 						/* Variable HIGHEST SIGNIFICANT BIT */
-						type = PackageParser.parseType(value.substring(value.indexOf(":") + 1).trim(), builder).type;
+						type = PackageParser.parseTypeAndValue(value.substring(value.indexOf(":") + 1).trim(), builder).type;
 						/* Create new VARIABLE */
 						builder.buildVariable(name, type);
 					}
@@ -266,6 +272,27 @@ public class StructureParser {
 		}
 	}
 
+	private List<Map.Entry<String, String>> parseMap(String map) throws ParseException {
+		if (map.contains("(") && map.contains(")")) {
+			map = map.substring(map.indexOf("(") + 1, map.lastIndexOf(")"));
+		}
+		String[] mappings = map.split(",");
+		List<Map.Entry<String, String>> mappingEntries = new ArrayList<Map.Entry<String, String>>(mappings.length);
+		for (String mapping : mappings) {
+			if (!mapping.contains("=>")) {
+				//todo POSITIONAL ASSOCIATION in port map
+				throw new ParseException("Implementation is missing for POSITIONAL ASSOCIATION in port/generic map "
+						+ Arrays.toString(mappings), 0);
+			}
+			String[] parts = mapping.split("=>", 2);
+			if (parts.length != 2) {
+				throw new ParseException("Invalid mapping: " + mapping, 0);
+			}
+			mappingEntries.add(new AbstractMap.SimpleImmutableEntry<String, String>(parts[0].trim(), parts[1].trim()));
+		}
+		return mappingEntries;
+	}
+
 	static Collection<String> extractSensitivityList(String processDeclString) {
 		Collection<String> sensitivityList = new LinkedList<String>();
 		if (processDeclString.contains("(") && processDeclString.contains(")")) {
@@ -288,7 +315,7 @@ public class StructureParser {
 	 * @param token a token which declares N (1, 2 etc) variables/constants/signals
 	 * @return an array of Tokens that contains N single variable/constant/signal declarations.
 	 * @throws Exception if token to be split doesn't declare neither PORT,
-	 * 					 nor VARIABLE, nor CONSTANT, nor SIGNAL and nor GENERIC
+	 *                   nor VARIABLE, nor CONSTANT, nor SIGNAL and nor GENERIC
 	 */
 	private VHDLToken[] splitMultipleDeclaration(VHDLToken token) throws Exception {
 

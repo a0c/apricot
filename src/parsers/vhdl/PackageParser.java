@@ -1,16 +1,15 @@
 package parsers.vhdl;
 
+import base.Indices;
+import base.Type;
+import base.vhdl.structure.Package;
 import io.scan.VHDLScanner;
 import io.scan.VHDLToken;
-import base.vhdl.structure.Package;
-import base.Type;
-import base.Indices;
+import parsers.ExpressionBuilder;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.regex.Pattern;
-import java.io.File;
-
-import parsers.ExpressionBuilder;
 
 /**
  * @author Anton Chepurov
@@ -74,7 +73,7 @@ public class PackageParser {
 		String name = parseTypeName(vhdlLine);
 		Type type = null;
 		try {
-			type = parseType(vhdlLine.substring(vhdlLine.indexOf(" IS ") + 4), (AbstractPackageBuilder) builder).type;
+			type = parseTypeAndValue(vhdlLine.substring(vhdlLine.indexOf(" IS ") + 4), (AbstractPackageBuilder) builder).type;
 		} catch (UnsupportedConstructException e) {
 			System.out.println("Skipping unsupported type: " + e.getUnsupportedConstruct());
 		}
@@ -116,7 +115,7 @@ public class PackageParser {
 		/* Constant NAME */
 		String name = vhdlLine.substring(8, vhdlLine.indexOf(":")).trim();
 		/* Constant TYPE and VALUE*/
-		TypeAndValueHolder typeAndValue = parseType(vhdlLine.substring(vhdlLine.indexOf(":") + 1).trim(), builder);
+		TypeAndValueHolder typeAndValue = parseTypeAndValue(vhdlLine.substring(vhdlLine.indexOf(":") + 1).trim(), builder);
 		if (typeAndValue.value == null) throw new Exception("Constant " + name + " is not initialized");
 
 		/* Create new CONSTANT */
@@ -142,8 +141,8 @@ public class PackageParser {
 	 *
 	 * @param valueAsString constant-declaring line
 	 * @return BigInteger value of a constant declared with the specified String
-	 * 		   or <code>null</code> if the string doesn't declare a constant
-	 * 		   (for named constants <code>null</code> is returned as well).
+	 *         or <code>null</code> if the string doesn't declare a constant
+	 *         (for named constants <code>null</code> is returned as well).
 	 */
 	public static BigInteger parseConstantValue(String valueAsString) {
 		ConstantValueAndLengthHolder varHolder = parseConstantValueWithLength(valueAsString);
@@ -155,8 +154,8 @@ public class PackageParser {
 	 *
 	 * @param valueAsString constant-declaring line
 	 * @return BigInteger value of a constant declared with the specified String and the length of the constant,
-	 * 		   or <code>null</code> if the string doesn't declare a constant (for named constants <code>null</code>
-	 * 		   is returned as well).
+	 *         or <code>null</code> if the string doesn't declare a constant (for named constants <code>null</code>
+	 *         is returned as well).
 	 */
 	public static ConstantValueAndLengthHolder parseConstantValueWithLength(String valueAsString) {
 
@@ -177,69 +176,71 @@ public class PackageParser {
 		return vhdlLine.substring(5, vhdlLine.indexOf(" IS ")).trim();
 	}
 
-	public static TypeAndValueHolder parseType(String typeString, AbstractPackageBuilder builder) throws Exception {
+	public static TypeAndValueHolder parseTypeAndValue(String type, String value, StructureBuilder builder) throws Exception {
+		return parseTypeAndValue(type + " := " + value, builder);
+	}
+
+	public static TypeAndValueHolder parseTypeAndValue(String typeAndValue, AbstractPackageBuilder builder) throws Exception {
 
 		//todo: Here, use ExpressionBuilder to see, whether it produces OperandImpl or ExpressionImpl:
 		//todo: Actually, no need for distinguishing between them: make AbstractOperand Interpretable!
 
 		// Trim ';'
-		if (typeString.endsWith(";")) {
-			typeString = typeString.substring(0, typeString.length() - 1).trim();
+		if (typeAndValue.endsWith(";")) {
+			typeAndValue = typeAndValue.substring(0, typeAndValue.length() - 1).trim();
 		}
 
 		/* Initialization VALUE */
-		String valueAsString = extractInitializationString(typeString);
-		if (typeString.contains(":=")) {
-			typeString = typeString.substring(0, typeString.lastIndexOf(":=")).trim();
-		}
+		String valueAsString = extractInitializationString(typeAndValue);
+		typeAndValue = extractTypeString(typeAndValue);
 
 		Type type;
-		if (typeString.startsWith("ARRAY ")) {
+		if (typeAndValue.startsWith("ARRAY ")) {
 			/* ARRAY ((PROCESSOR_WIDTH -1) DOWNTO -1) OF STD_LOGIC; */
 			/* todo: ARRAY ( NATURAL RANGE <> ) OF STD_LOGIC_VECTOR ( 31 DOWNTO 0 ) ; */
 			/* Check subtype */
-			int ofIndex = typeString.lastIndexOf(" OF ");
-			String subType = typeString.substring(ofIndex + 4).trim();
+			int ofIndex = typeAndValue.lastIndexOf(" OF ");
+			String subType = typeAndValue.substring(ofIndex + 4).trim();
 			if (!(subType.equals("BIT") || subType.equals("STD_LOGIC")))
-				throw new UnsupportedConstructException("Unsupported type: \'" + typeString + "\'\n" +
-						"Only BIT and STD_LOGIC are supported as array subtypes.", typeString);
+				throw new UnsupportedConstructException("Unsupported type: \'" + typeAndValue + "\'\n" +
+						"Only BIT and STD_LOGIC are supported as array subtypes.", typeAndValue);
 			/* Parse indices */
 			Indices indices = builder.buildIndices(
-					ExpressionBuilder.trimEnclosingBrackets(typeString.substring(6, ofIndex)));
+					ExpressionBuilder.trimEnclosingBrackets(typeAndValue.substring(6, ofIndex)));
 			//todo: signed? what does the last -1 mean here: "(PROCESSOR_WIDTH -1) DOWNTO -1"
 
 			type = new Type(indices);
 
-		} else if (typeString.contains(" RANGE ")) {
+		} else if (typeAndValue.contains(" RANGE ")) {
 			/* INTEGER RANGE 32767 DOWNTO -32768 */
 			/* INTEGER RANGE 0 TO 3 */
-			Indices valueRange = builder.buildIndices(typeString.substring(typeString.indexOf(" RANGE ") + 7));
+			Indices valueRange = builder.buildIndices(typeAndValue.substring(typeAndValue.indexOf(" RANGE ") + 7));
 
 			type = Type.createFromValues(valueRange);/*todo: , valueRange.isDescending() ? */   // todo: <== isDescending() for #length#
 
-		} else if ((typeString.startsWith("BIT_VECTOR ") || typeString.startsWith("STD_LOGIC_VECTOR ") || typeString.startsWith("UNSIGNED"))
-				&& ExpressionBuilder.BIT_RANGE_PATTERN.matcher(typeString).matches()) {
+		} else if ((typeAndValue.startsWith("BIT_VECTOR ") || typeAndValue.startsWith("STD_LOGIC_VECTOR ") || typeAndValue.startsWith("UNSIGNED"))
+				&& ExpressionBuilder.BIT_RANGE_PATTERN.matcher(typeAndValue).matches()) {
 			/* BIT_VECTOR ( 8 DOWNTO 0) */
 			/* {IN} STD_LOGIC_VECTOR(MOD_EN_BITS-3 DOWNTO 0) */
-			Indices indices = builder.buildIndices(typeString);
+			Indices indices = builder.buildIndices(typeAndValue);
 
 			type = new Type(indices);
 
-		} else if (builder.containsType(typeString)) {
-			type = builder.getType(typeString);
-		} else if (typeString.equals("BIT") || typeString.equals("STD_LOGIC")) {
+		} else if (builder.containsType(typeAndValue)) {
+			type = builder.getType(typeAndValue);
+		} else if (typeAndValue.equals("BIT") || typeAndValue.equals("STD_LOGIC")) {
 			type = Type.BIT_TYPE;
-		} else if (typeString.equals("BOOLEAN")) {
+		} else if (typeAndValue.equals("BOOLEAN")) {
 			type = Type.BOOLEAN_TYPE;
-		} else if (typeString.equals("INTEGER") || typeString.equals("NATURAL")) {
+		} else if (typeAndValue.equals("INTEGER") || typeAndValue.equals("NATURAL")) {
 			BigInteger valueInt = valueAsString == null ? null : parseConstantValue(valueAsString);
 			if (valueInt == null) {
-				throw new UnsupportedConstructException("Unconstrained type " + typeString + " is not synthesizable.\n" +
-						"Cannot derive the length of the variable.", typeString);
+				throw new UnsupportedConstructException("Unconstrained type " + typeAndValue + " is not synthesizable.\n" +
+						"Cannot derive the length of the variable.", typeAndValue);
 			}
 			type = Type.createFromValues(valueInt.intValue(), 0);
 		} else {
-			throw new UnsupportedConstructException("Unsupported type: \'" + typeString + "\'", typeString);
+			throw new UnsupportedConstructException("Unsupported type: \'" + typeAndValue + "\'", typeAndValue);
 		}
 
 		valueAsString = replaceOthersValue(valueAsString, type.getLength());
@@ -247,6 +248,13 @@ public class PackageParser {
 		BigInteger valueInt = valueAsString == null ? null : parseConstantValue(valueAsString);
 
 		return new TypeAndValueHolder(type, valueInt, valueAsString);
+	}
+
+	public static String extractTypeString(String typeString) {
+		if (typeString.contains(":=")) {
+			typeString = typeString.substring(0, typeString.lastIndexOf(":=")).trim();
+		}
+		return typeString;
 	}
 
 	public static String replaceOthersValue(String valueAsString, Indices length) {

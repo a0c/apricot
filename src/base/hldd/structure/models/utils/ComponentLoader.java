@@ -2,6 +2,7 @@ package base.hldd.structure.models.utils;
 
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.variables.AbstractVariable;
+import base.hldd.structure.variables.ConstantVariable;
 import base.vhdl.structure.ComponentDeclaration;
 import base.vhdl.structure.ComponentInstantiation;
 import ui.ConverterSettings;
@@ -31,7 +32,7 @@ public class ComponentLoader {
 
 			ConverterSettings settings = new ConverterSettings.Builder(baseSettings).setSourceFile(sourceFile).build();
 
-			BehModel model = ConvertingWorker.convertInSeparateThreadAndWait(settings);
+			BehModel model = ConvertingWorker.convertInSeparateThreadAndWait(settings, component.getGenerics());
 
 			new PrefixAdder(model, component).addPrefix(component.getName());
 
@@ -73,6 +74,14 @@ public class ComponentLoader {
 
 			}
 
+			for (ConstantVariable constantVariable : model.getConstants()) {
+
+				String oldName = constantVariable.getName();
+
+				constantVariable.addNamePrefix(contextPrefix);
+
+				component.renameGeneric(oldName, constantVariable.getName());
+			}
 		}
 	}
 

@@ -1,20 +1,20 @@
 package base.vhdl.visitors;
 
 import base.HLDDException;
+import base.Indices;
+import base.hldd.structure.Flags;
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.models.utils.*;
-import base.hldd.structure.nodes.utils.Condition;
-import base.vhdl.structure.nodes.*;
-import base.vhdl.structure.Process;
-import base.vhdl.structure.*;
-import base.vhdl.structure.Variable;
 import base.hldd.structure.models.utils.ModelManager.CompositeFunctionVariable;
-import base.hldd.structure.variables.*;
-import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.CompositeNode;
-import base.hldd.structure.Flags;
+import base.hldd.structure.nodes.Node;
+import base.hldd.structure.nodes.utils.Condition;
+import base.hldd.structure.variables.*;
 import base.hldd.visitors.ObsoleteResetRemoverImpl;
-import base.Indices;
+import base.vhdl.structure.*;
+import base.vhdl.structure.Process;
+import base.vhdl.structure.Variable;
+import base.vhdl.structure.nodes.*;
 import parsers.vhdl.OperandLengthSetter;
 import ui.ConfigurationHandler;
 import ui.ConverterSettings;
@@ -43,6 +43,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	private final ConfigurationHandler config;
 	private final ConverterSettings settings;
+	private final Collection<Constant> generics;
 	protected ModelManager modelCollector;
 	private ConditionGraphManager conditionGraphManager;
 	private ExtraConditionGraphManager extraConditionGraphManager;
@@ -69,11 +70,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	/**
 	 * @param config		optional settings from .config file
 	 * @param settings	  base settings for conversion
+	 * @param generics	  from component instantiation
 	 * @param generatorType generator's type. Used for initialization of isNullTransition only.
 	 */
-	protected GraphGenerator(ConfigurationHandler config, ConverterSettings settings, GeneratorType generatorType) {
+	protected GraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<Constant> generics, GeneratorType generatorType) {
 		this.config = config;
 		this.settings = settings;
+		this.generics = generics != null ? generics : Collections.<Constant>emptyList();
 		modelCollector = new ModelManager();
 		this.doFlattenConditions = settings.isDoFlattenConditions();
 		this.doCreateGraphsForCS = settings.isDoCreateCSGraphs(); // todo: should be represented as Enum (CSMode or ConditionalStatementMode)
@@ -97,7 +100,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 		/* Collect CONSTANTS */
 		collectConstants(entity.getConstants());
-		collectConstants(entity.getGenericConstants());
+		collectConstants(mergeGenerics(entity.getGenericConstants(), generics)); // override default generics with instantiated generics
 
 		/* Process PORTS */
 		Set<Port> ports = entity.getPorts();
@@ -109,6 +112,23 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			modelCollector.addVariable(portVariable);
 		}
 
+	}
+
+	private Collection<Constant> mergeGenerics(Set<Constant> genericConstants, Collection<Constant> instanceGenerics) {
+
+		Map<String, Constant> mergedGenerics = new HashMap<String, Constant>(genericConstants.size() + instanceGenerics.size());
+
+		for (Constant instGeneric : instanceGenerics) {
+			mergedGenerics.put(instGeneric.getName(), instGeneric);
+		}
+
+		for (Constant generic : genericConstants) {
+			String name = generic.getName();
+			if (!mergedGenerics.containsKey(name)) {
+				mergedGenerics.put(name, generic);
+			}
+		}
+		return mergedGenerics.values();
 	}
 
 	public void visitArchitecture(Architecture architecture) throws Exception {
@@ -180,7 +200,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		new ComponentMerger(component, model).mergeTo(modelCollector);
 	}
 
-	private void collectConstants(Set<Constant> constants) throws Exception {
+	private void collectConstants(Collection<Constant> constants) throws Exception {
 		for (Constant constant : constants) {
 			ConstantVariable constantVariable = new ConstantVariable(constant.getName(), constant.getValue(), constant.getType());
 			modelCollector.addVariable(constantVariable);
@@ -190,7 +210,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	/**
 	 * @param ifNode IfNode being visited
 	 * @throws Exception {@link base.hldd.structure.nodes.Node#isEmptyControlNode() cause1 }
-	 * 					 {@link base.hldd.structure.models.utils.ModelManager#getConditionValuesCount(AbstractVariable)  cause 2 }
+	 *                   {@link base.hldd.structure.models.utils.ModelManager#getConditionValuesCount(AbstractVariable)  cause 2 }
 	 */
 	public void visitIfNode(IfNode ifNode) throws Exception {
 
@@ -683,7 +703,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		 *
 		 * @param nodeToFill where to fill empty successors
 		 * @throws Exception {@link base.hldd.structure.nodes.Node#isEmptyControlNode()},
-		 * 					 {@link Node#fillEmptySuccessorsWith(base.hldd.structure.nodes.Node)}
+		 *                   {@link Node#fillEmptySuccessorsWith(base.hldd.structure.nodes.Node)}
 		 */
 		private void fillEmptySuccessorsFor(Node nodeToFill) throws Exception {
 			/* For non-empty ControlNodes fill the missing successors with the latest defaultValue */
@@ -699,7 +719,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 		/**
 		 * @return current Default Value Node from the stack or value
-		 * 		   retaining node, if the stack of Default Values is empty
+		 *         retaining node, if the stack of Default Values is empty
 		 */
 		private Node getDefaultValueNode() {
 			if (defaultValueStack.isEmpty()) {

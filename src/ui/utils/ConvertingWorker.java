@@ -5,6 +5,7 @@ import base.hldd.structure.models.Model;
 import base.hldd.structure.models.utils.BehModelCreatorImpl;
 import base.hldd.structure.models.utils.ModelCreator;
 import base.hldd.structure.models.utils.ModelManager;
+import base.vhdl.structure.Constant;
 import base.vhdl.structure.Entity;
 import base.vhdl.visitors.*;
 import io.ConsoleWriter;
@@ -22,6 +23,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
@@ -46,12 +48,14 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 	private final HLDDRepresentationType hlddType;
 	private final boolean shouldSimplify;
 	private final AbstractWorkerFinalizer workerFinalizer;
-	private ConverterSettings settings;
+	private final ConverterSettings settings;
+	private final Collection<Constant> generics;
 	private ConfigurationHandler config;
 
-	public ConvertingWorker(AbstractWorkerFinalizer workerFinalizer, ConsoleWriter consoleWriter, ConverterSettings settings) {
+	public ConvertingWorker(AbstractWorkerFinalizer workerFinalizer, ConsoleWriter consoleWriter, ConverterSettings settings, Collection<Constant> generics) {
 		this.workerFinalizer = workerFinalizer;
 		this.settings = settings;
+		this.generics = generics;
 		this.parserId = settings.getParserId();
 		this.consoleWriter = consoleWriter;
 		this.sourceFile = settings.getSourceFile();
@@ -105,7 +109,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
 					/* Generate Graphs (GraphVariables) and collect all variables */
 					consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-					graphCreatingVisitor = new BehGraphGenerator(config, settings, delayCollector.getDFlagNames());
+					graphCreatingVisitor = new BehGraphGenerator(config, settings, generics, delayCollector.getDFlagNames());
 					entity.traverse(graphCreatingVisitor);
 					modelCollector = graphCreatingVisitor.getModelCollector();
 					consoleWriter.done();
@@ -159,7 +163,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
 					/* Generate Graphs (GraphVariables) and collect all variables */
 					consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-					graphCreatingVisitor = new BehDDGraphGenerator(config, settings);
+					graphCreatingVisitor = new BehDDGraphGenerator(config, settings, generics);
 					entity.traverse(graphCreatingVisitor);
 					modelCollector = graphCreatingVisitor.getModelCollector();
 					consoleWriter.done();
@@ -291,7 +295,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 		ConvertingWorker converter = new ConvertingWorker(
 				AbstractWorkerFinalizer.getStub(),
 				ConsoleWriter.getStub(),
-				settings);
+				settings, null);
 
 		converter.execute();
 
@@ -304,12 +308,12 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 		return converter.get();
 	}
 
-	public static BehModel convertInSeparateThreadAndWait(ConverterSettings settings) throws InterruptedException, ExecutionException {
+	public static BehModel convertInSeparateThreadAndWait(ConverterSettings settings, Collection<Constant> genericMap) throws InterruptedException, ExecutionException {
 
 		ConvertingWorker converter = new ConvertingWorker(
 				AbstractWorkerFinalizer.getStub(),
 				ConsoleWriter.getStub(),
-				settings);
+				settings, genericMap);
 
 		Thread thread = new Thread(converter);
 

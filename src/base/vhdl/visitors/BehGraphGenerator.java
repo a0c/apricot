@@ -1,6 +1,8 @@
 package base.vhdl.visitors;
 
-import base.vhdl.structure.nodes.*;
+import base.vhdl.structure.Constant;
+import base.vhdl.structure.nodes.IfNode;
+import base.vhdl.structure.nodes.WhenNode;
 import ui.ConfigurationHandler;
 import ui.ConverterSettings;
 
@@ -12,8 +14,8 @@ import java.util.Collection;
 public class BehGraphGenerator extends GraphGenerator {
 	private Collection<String> registers;
 
-	public BehGraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<String> registers) {
-		super(config, settings, GeneratorType.Behavioural);
+	public BehGraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<Constant> generics, Collection<String> registers) {
+		super(config, settings, generics, GeneratorType.Behavioural);
 		this.registers = registers;
 	}
 
