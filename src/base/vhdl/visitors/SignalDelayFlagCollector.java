@@ -5,6 +5,7 @@ import base.vhdl.structure.nodes.IfNode;
 import base.vhdl.structure.nodes.TransitionNode;
 import base.vhdl.structure.nodes.CaseNode;
 import base.vhdl.structure.nodes.WhenNode;
+import ui.ConfigurationHandler;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,6 +27,15 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 	 * Collection of names of {@link base.vhdl.structure.Signal}-s from processed {@link base.vhdl.structure.Architecture}
 	 */
 	private final Collection<String> sigNames = new HashSet<String>();
+
+	private final ConfigurationHandler config;
+
+	private final ClockEventRemover clockEventRemover;
+
+	public SignalDelayFlagCollector(ConfigurationHandler config) {
+		this.config = config;
+		clockEventRemover = new ClockEventRemover(config);
+	}
 
 	public Collection<String> getDFlagNames() {
 		return dFlagNames;
@@ -66,7 +76,7 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 		boolean wasInsideClock = isInsideClock;
 
 		/* Process CONDITION */
-		if (ClockEventRemover.isClockingExpression(ifNode.getConditionExpression())) {
+		if (clockEventRemover.isClockingExpression(ifNode.getConditionExpression())) {
 			isInsideClock = true;
 		}
 
@@ -117,7 +127,7 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 
 	private boolean hasClockInSensitivityList(Collection<String> sensitivityList) {
 		for (String signalName : sensitivityList) {
-			if (GraphGenerator.isClockName(signalName)) return true;
+			if (config.isClockName(signalName)) return true;
 		}
 		return false;
 	}

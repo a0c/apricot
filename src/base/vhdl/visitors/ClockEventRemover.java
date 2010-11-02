@@ -4,6 +4,7 @@ import base.vhdl.structure.nodes.*;
 import base.vhdl.structure.Expression;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Process;
+import ui.ConfigurationHandler;
 
 /**
  * @author Anton Chepurov
@@ -14,6 +15,11 @@ public class ClockEventRemover extends AbstractVisitor {
 	 */
 	private boolean isDone;
 	private Process currentProcess;
+	private final ConfigurationHandler config;
+
+	public ClockEventRemover(ConfigurationHandler config) {
+		this.config = config;
+	}
 
 	public void visitEntity(Entity entity) throws Exception {
 	}
@@ -66,7 +72,7 @@ public class ClockEventRemover extends AbstractVisitor {
 	 * @return <code>true</code> if the <code>condition</code> represents a clocking expression.
 	 *         <code>false</code> otherwise.
 	 */
-	public static boolean isClockingExpression(Expression condition) {
+	boolean isClockingExpression(Expression condition) {
 		return condition.getOperator() == Operator.AND
 				&& (condition.getOperands().get(0) instanceof OperandImpl)
 				&& ((OperandImpl) condition.getOperands().get(0)).getName().contains("\'EVENT")
@@ -75,20 +81,18 @@ public class ClockEventRemover extends AbstractVisitor {
 
 	/**
 	 * Checks whether the expression compares the CLOCK signal with smth.
-	 * {@link base.vhdl.visitors.GraphGenerator#isClockName(String)} is
-	 * used for this.
 	 *
 	 * @param expression expression to check
 	 * @return <code>true</code> if the specified expression compares the
 	 * 		   CLOCK signal with something. <code>false</code> otherwise.
 	 */
-	static boolean isComparingClockForEquality(Expression expression) {
+	boolean isComparingClockForEquality(Expression expression) {
 		/* Check to be the EQ expression */
 		if (expression.getOperator() != Operator.EQ) return false;
 		/* Search for CLOCK variable amongst operands */
 		for (AbstractOperand operand : expression.getOperands()) {
 			if (operand instanceof OperandImpl) {
-				if (GraphGenerator.isClockName(((OperandImpl) operand).getName())) {
+				if (config.isClockName(((OperandImpl) operand).getName())) {
 					return true;
 				}
 			}

@@ -6,6 +6,7 @@ import base.vhdl.structure.nodes.IfNode;
 import base.vhdl.structure.nodes.TransitionNode;
 import base.vhdl.structure.nodes.CaseNode;
 import base.vhdl.structure.nodes.WhenNode;
+import ui.ConfigurationHandler;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,7 +26,11 @@ import java.util.HashSet;
  */
 public class DelayFlagCollector extends AbstractVisitor {
 	private final Collection<String> dFlagNames = new HashSet<String>();
+	private final ConfigurationHandler config;
 
+	public DelayFlagCollector(ConfigurationHandler config) {
+		this.config = config;
+	}
 
 	public Collection<String> getDFlagNames() {
 		return dFlagNames;
@@ -36,7 +41,7 @@ public class DelayFlagCollector extends AbstractVisitor {
 		###### Collect SIGNALS ######
 		###########################*/
 		/* Traverse the architecture with a new SignalDelayFlagCollector */
-		SignalDelayFlagCollector sigCollector = new SignalDelayFlagCollector();
+		SignalDelayFlagCollector sigCollector = new SignalDelayFlagCollector(config);
 		entity.traverse(sigCollector);
 		/* Add collected Signal dFlagNames to the global dFlagNames collection */
 		dFlagNames.addAll(sigCollector.getDFlagNames());

@@ -3,9 +3,13 @@ package base.vhdl.visitors;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import parsers.ExpressionBuilder;
 import base.vhdl.structure.Expression;
+import ui.ConfigurationHandler;
 
 /**
  * @author Anton Chepurov
@@ -31,18 +35,24 @@ public class ClockEventRemoverTest {
 	@Test
 	public void correctClockExpressionAccepted() throws Exception {
 		Expression[] correctExpressions = buildExpressions(CORRECT_CLOCK_EXPRESSIONS);
+		ConfigurationHandler config = mock(ConfigurationHandler.class);
+		when(config.isClockName(anyString())).thenReturn(true);
+		ClockEventRemover clockEventRemover = new ClockEventRemover(config);
 		for (Expression correctExpression : correctExpressions) {
 			assertTrue("Expression " + correctExpression + " is regarded to be incorrect compareClockExpression",
-					ClockEventRemover.isComparingClockForEquality(correctExpression));
+					clockEventRemover.isComparingClockForEquality(correctExpression));
 		}
 	}
 
 	@Test
 	public void incorrectClockExpressionRejected() throws Exception {
 		Expression[] incorrectExpressions = buildExpressions(INCORRECT_CLOCK_EXPRESSIONS);
+		ConfigurationHandler config = mock(ConfigurationHandler.class);
+		when(config.isClockName(anyString())).thenReturn(false);
+		ClockEventRemover clockEventRemover = new ClockEventRemover(config);
 		for (Expression incorrectExpression : incorrectExpressions) {
 			assertTrue("Expression " + incorrectExpression + " is regarded to be correct compareClockExpression",
-					!ClockEventRemover.isComparingClockForEquality(incorrectExpression));
+					!clockEventRemover.isComparingClockForEquality(incorrectExpression));
 		}
 	}
 

@@ -8,17 +8,10 @@ import base.vhdl.structure.nodes.IfNode;
 import base.vhdl.structure.nodes.TransitionNode;
 import base.vhdl.structure.nodes.WhenNode;
 
-import java.util.regex.Pattern;
-
-
 /**
  * @author Anton Chepurov
  */
 public abstract class AbstractVisitor {
-//	private static final Pattern CLOCK_PATTERN = Pattern.compile("((CLOCK)|(CLK))", Pattern.CASE_INSENSITIVE); //todo: !!! temporarily commented, for uart_receiver.vhd => RXCLK
-	private static final Pattern CLOCK_PATTERN = Pattern.compile(".*((CLOCK)|(CLK)).*", Pattern.CASE_INSENSITIVE);
-	private static final Pattern RESET_PATTERN = Pattern.compile(".*RESET.*", Pattern.CASE_INSENSITIVE);
-
 
 	public abstract void visitEntity(Entity entity) throws Exception;
 
@@ -34,15 +27,4 @@ public abstract class AbstractVisitor {
 
 	public abstract void visitWhenNode(WhenNode whenNode) throws Exception;
 
-	/**
-	 * todo: see {@link ui.ConfigurationHandler#isStateName(String)}
-	 */
-	@Deprecated
-	static boolean isClockName(String varName) {
-		return CLOCK_PATTERN.matcher(varName).matches();
-	}
-
-	static boolean isResetName(String operandName) {
-		return RESET_PATTERN.matcher(operandName).matches();
-	}
 }

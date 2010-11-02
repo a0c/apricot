@@ -65,7 +65,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 		this.shouldSimplify = settings.isDoSimplify();
 		/* Load Configuration */
 		if (parserId == ParserID.VhdlBeh2HlddBeh || parserId == ParserID.VhdlBehDd2HlddBeh) {
-			config = ConfigurationHandler.loadConfiguration(sourceFile);
+			config = ConfigurationHandler.loadConfiguration(sourceFile, consoleWriter);
 		}
 
 	}
@@ -102,9 +102,9 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 					/* Process received VHDL structure */
 					consoleWriter.write(stat(current++, total) + "Pre-processing VHDL structure...");
 					entity.traverse(new VariableNameReplacerImpl(config)); // todo: varNR.getStateName()
-					DelayFlagCollector delayCollector = new DelayFlagCollector();
+					DelayFlagCollector delayCollector = new DelayFlagCollector(config);
 					entity.traverse(delayCollector);
-					entity.traverse(new ClockEventRemover());
+					entity.traverse(new ClockEventRemover(config));
 					consoleWriter.done();
 
 					/* Generate Graphs (GraphVariables) and collect all variables */
@@ -153,7 +153,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 					startTime = System.currentTimeMillis();
 					/* Process received VHDL structure */
 					consoleWriter.write(stat(current++, total) + "Pre-processing HIF structure...");
-					entity.traverse(new ClockEventRemover());
+					entity.traverse(new ClockEventRemover(config));
 					consoleWriter.done();
 					if (shouldSimplify) {
 						consoleWriter.write(stat(current++, total) + "Pre-simplifying HIF structure...");

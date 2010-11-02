@@ -106,8 +106,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		Set<Port> ports = entity.getPorts();
 		for (Port port : ports) {
 			/* Skip CLOCKING port */
-			if (isClockName(port.getName())) continue;
-			Flags flags = new Flags().setInput(port.isInput()).setOutput(!port.isInput()).setReset(isResetName(port.getName()));
+			if (config.isClockName(port.getName())) continue;
+			Flags flags = new Flags().setInput(port.isInput()).setOutput(!port.isInput()).setReset(config.isResetName(port.getName()));
 			base.hldd.structure.variables.Variable portVariable = new base.hldd.structure.variables.Variable(port.getName(), port.getType(), flags);
 			modelCollector.addVariable(portVariable);
 		}

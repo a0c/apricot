@@ -41,6 +41,7 @@
     <orderEntry type="library" name="JUnit" level="project" />
     <orderEntry type="library" name="Lib" level="project" />
     <orderEntry type="library" name="LibExternal" level="project" />
+    <orderEntry type="library" name="Mockito" level="application" />
   </component>
 </module>
 

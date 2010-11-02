@@ -1,6 +1,8 @@
 package ui;
 
 
+import io.ConsoleWriter;
+
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,7 +19,10 @@ public class ConfigurationHandler {
 
 	public static final String CONFIGURATION_FILE_PATH = "configuration_file_path";
 	public static final String SOURCE_FILE_PATH = "source_file_path";
+	public static final String SOURCE_FILE_NAME = "source_file_name";
 	public static final String STATE_NAME = "state_name";
+	public static final String CLOCK_NAME = "clock_name";
+	public static final String RESET_NAME = "reset_name";
 
 
 	private final Properties properties;
@@ -26,10 +31,11 @@ public class ConfigurationHandler {
 		this.properties = properties;
 	}
 
-	public static ConfigurationHandler loadConfiguration(File sourceFile) {
+	public static ConfigurationHandler loadConfiguration(File sourceFile, ConsoleWriter consoleWriter) {
 		Properties properties = new Properties();
 
 		properties.setProperty(SOURCE_FILE_PATH, sourceFile.getAbsolutePath());
+		properties.setProperty(SOURCE_FILE_NAME, sourceFile.getName());
 
 		File propFile = FileDependencyResolver.deriveConfigFile(sourceFile);
 
@@ -47,10 +53,27 @@ public class ConfigurationHandler {
 			}
 		} else {
 			LOGGER.info("Configuration file is missing.");
+			consoleWriter.writeLn("### WARNING ###  Configuration file is N/A for source " + properties.getProperty(SOURCE_FILE_NAME));
 		}
 
 		// empty properties, in case propFile == null
-		return new ConfigurationHandler(properties);
+		ConfigurationHandler configurationHandler = new ConfigurationHandler(properties);
+		if (propFile != null) {
+			configurationHandler.verify(consoleWriter);
+		}
+		return configurationHandler;
+	}
+
+	private void verify(ConsoleWriter consoleWriter) {
+		if (getStateVarName() == null) {
+			consoleWriter.writeLn("### WARNING ###  STATE name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME));
+		}
+		if (getClockName() == null) {
+			consoleWriter.writeLn("### WARNING ###  CLOCK name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME));
+		}
+		if (getResetName() == null) {
+			consoleWriter.writeLn("### WARNING ###  RESET name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME));
+		}
 	}
 
 	public String getStateVarName() {
@@ -59,6 +82,14 @@ public class ConfigurationHandler {
 
 	public void setStateVarName(String stateVarName) {
 		properties.setProperty(STATE_NAME, stateVarName);
+	}
+
+	private String getClockName() {
+		return properties.getProperty(CLOCK_NAME);
+	}
+
+	private String getResetName() {
+		return properties.getProperty(RESET_NAME);
 	}
 
 	/**
@@ -71,7 +102,18 @@ public class ConfigurationHandler {
 	 * @return whether this is a state name
 	 */
 	public boolean isStateName(String name) {
-		String stateName = getStateVarName();
-		return stateName != null && stateName.equalsIgnoreCase(name);
+		return areNamesEqual(getStateVarName(), name);
+	}
+
+	public boolean isClockName(String name) {
+		return areNamesEqual(getClockName(), name);
+	}
+
+	public boolean isResetName(String name) {
+		return areNamesEqual(getResetName(), name);
+	}
+
+	private boolean areNamesEqual(String targetName, String name) {
+		return targetName != null && targetName.equalsIgnoreCase(name);
 	}
 }
