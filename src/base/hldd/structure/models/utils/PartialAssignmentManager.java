@@ -38,6 +38,14 @@ class PartialAssignmentManager {
 	}
 
 	static void finalizeAndCheckForCompleteness(Set<OperandImpl> partialSets, Indices wholeLength, String varName) throws Exception {
+		if (PartialSetVariableCollector.containsDynamicSlice(partialSets)) {
+			/* Split to bits */
+			partialSets.clear();
+			for (int index = 0; index < wholeLength.length(); index++) {
+				partialSets.add(new OperandImpl(varName, new Indices(index, index), false));
+			}
+			return;
+		}
 		boolean[] bits = new boolean[wholeLength.length()];
 		/* Check intersections: if any, inform about them */
 		for (OperandImpl partSetOperand : partialSets) {

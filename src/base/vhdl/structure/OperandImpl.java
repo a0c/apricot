@@ -9,17 +9,26 @@ import base.HashCodeUtil;
 public class OperandImpl extends AbstractOperand {
 
 	private String name;
+	private final String dynamicSlice;
 	private Indices partedIndices;
 
 	public OperandImpl(String name) {
 		super(false);
 		this.name = name;
+		this.dynamicSlice = null;
 	}
 
 	public OperandImpl(String name, Indices partedIndices, boolean isInverted) {
 		super(isInverted);
 		this.name = name;
 		this.partedIndices = partedIndices;
+		this.dynamicSlice = null;
+	}
+
+	public OperandImpl(String name, String dynamicSlice, boolean isInverted) {
+		super(isInverted);
+		this.name = name;
+		this.dynamicSlice = dynamicSlice;
 	}
 
 	public void setName(String name) {
@@ -36,6 +45,14 @@ public class OperandImpl extends AbstractOperand {
 
 	public boolean isParted() {
 		return partedIndices != null;
+	}
+
+	public boolean isDynamicSlice() {
+		return dynamicSlice != null;
+	}
+
+	public String getDynamicSlice() {
+		return dynamicSlice;
 	}
 
 	public boolean equals(Object obj) {
@@ -62,6 +79,10 @@ public class OperandImpl extends AbstractOperand {
 		/* Check PARTED_INDICES */
 		if (!Indices.equals(partedIndices, comparedOperandImpl.partedIndices)) return false;
 
+		if (isDynamicSlice() ^ comparedOperandImpl.isDynamicSlice()) return false;
+		if (isDynamicSlice()) {
+			if (!dynamicSlice.equals(comparedOperandImpl.dynamicSlice)) return false;
+		}
 		/* Check IsInverted */
 		return isInverted() == comparedOperandImpl.isInverted();
 	}
@@ -72,6 +93,7 @@ public class OperandImpl extends AbstractOperand {
 		if (isInverted()) sb.append("NOT ");
 		sb.append(name);
 		if (isParted()) sb.append(partedIndices);
+		if (isDynamicSlice()) sb.append("( ").append(dynamicSlice).append(" )");
 
 		return sb.toString();
 	}

@@ -82,10 +82,22 @@ public class ExpressionBuilder {
 		if (operator == null) {
 
 			/* Parse PARTED INDICES */
-			Indices partedIndices = buildIndices(line);
-			String pureOperand = extractPureOperand(line, partedIndices != null);
+			Indices partedIndices = null;
+			String dynamicSlice = null;
+			try {
+				partedIndices = buildIndices(line);
+			} catch (Exception e) {
+				dynamicSlice = extractIndicesLine(line);
+				if (dynamicSlice == null || !variableNames.contains(dynamicSlice)) {
+					throw e;
+				}
+			}
+			String pureOperand = extractPureOperand(line, partedIndices != null || dynamicSlice != null);
 
-			return replaceAliases(new OperandImpl(pureOperand, partedIndices, expressionContext.isInverted));
+			return replaceAliases(dynamicSlice == null ? 
+					new OperandImpl(pureOperand, partedIndices, expressionContext.isInverted) :
+					new OperandImpl(pureOperand, dynamicSlice, expressionContext.isInverted)
+			);
 		} else {
 			Expression expression = new Expression(operator, expressionContext.isInverted);
 			// Get subString-s of operands
@@ -95,6 +107,13 @@ public class ExpressionBuilder {
 			}
 			return expression;
 		}
+	}
+
+	private static String extractIndicesLine(String line) {
+		if (line.contains("(") && line.contains(")")) {
+			return line.substring(line.indexOf("(") + 1, line.lastIndexOf(")")).trim();
+		}
+		return null;
 	}
 
 	private AbstractOperand replaceAliases(OperandImpl operand) {

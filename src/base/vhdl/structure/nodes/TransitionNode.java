@@ -69,16 +69,24 @@ public class TransitionNode extends AbstractNode {
 	 */
 	public boolean isTransitionOf(AbstractVariable variable, boolean isNullATransition) {
 
-		if (!isNullATransition && isNull()) {
-			return false;
+		if (isNull()) {
+			return isNullATransition;
 		}
 
-		return isNull()
-				|| (getTargetOperand().getName().equals(variable.getPureName())
-				&& (!getTargetOperand().isParted() && variable.getClass() != PartedVariable.class
-				|| (variable.getClass() == PartedVariable.class
-				&& (!getTargetOperand().isParted()
-				|| getTargetOperand().getPartedIndices().contain(((PartedVariable) variable).getPartedIndices())))));
+		OperandImpl targetOperand = getTargetOperand();
+
+		if (targetOperand.getName().equals(variable.getPureName())) {
+			if (targetOperand.isDynamicSlice()) {
+				return true;
+			}
+			if (!targetOperand.isParted() && variable.getClass() != PartedVariable.class)
+				return true;
+			if (variable.getClass() == PartedVariable.class && (!targetOperand.isParted()
+					|| targetOperand.getPartedIndices().contain(((PartedVariable) variable).getPartedIndices())))
+				return true;
+		}
+
+		return false;
 	}
 
 	public boolean isIdenticalTo(AbstractNode comparedNode) {

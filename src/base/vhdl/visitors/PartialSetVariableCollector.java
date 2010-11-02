@@ -68,7 +68,7 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 	public void visitTransitionNode(TransitionNode transitionNode) throws Exception {
 		if (transitionNode.isNull()) return;
 		OperandImpl varOperand = transitionNode.getTargetOperand();
-		if (varOperand.isParted()) {
+		if (varOperand.isParted() || varOperand.isDynamicSlice()) {
 			/* Get the set of parted variables */
 			Set<OperandImpl> partedVarSet;
 			/* Check that variable is already mapped and map it otherwise */
@@ -109,6 +109,9 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 			/* create a new set of parted variable operands... */
 			HashSet<OperandImpl> newPartedVarSet = new HashSet<OperandImpl>();
 			Set<OperandImpl> oldPartedVarSet = partialSettingsMap.get(varName);
+			if (containsDynamicSlice(oldPartedVarSet)) {
+				continue; // will be split to bits anyway
+			}
 			/* and fill it with non-intersecting parted variable operands. */
 
 			/* Use 2 SortedSets: a separate one for START and END markers.
@@ -154,6 +157,15 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 			partialSettingsMap.put(varName, newPartedVarSet);
 		}
 
+	}
+
+	public static boolean containsDynamicSlice(Set<OperandImpl> partedVarSet) {
+		for (OperandImpl partedOperand : partedVarSet) {
+			if (partedOperand.isDynamicSlice()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean hasPartialAssignmentsIn(Process process) {

@@ -266,6 +266,10 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		/*#################################################
 		*       F I N A L I Z E    C O N T R O L  N O D E
 		* #################################################*/
+		insertControlNode(controlNode);
+	}
+
+	private void insertControlNode(Node controlNode) throws Exception {
 		finalizeControlNode(controlNode);
 		contextManager.fillCurrentContextWith(controlNode);
 	}
@@ -321,7 +325,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			/* branch <= not CCR(CBIT); =====> don't take partedIndices into account, they were already used during Function creation */
 			Indices partedIndices = dependentVariable instanceof FunctionVariable && ((FunctionVariable) dependentVariable).getOperator() == Operator.INV
 					? null : transitionNode.getValueOperandPartedIndices();
-			if (graphVariable instanceof PartedVariable && !transitionNode.isNull()) {
+			boolean isDynamicSlice = !transitionNode.isNull() && transitionNode.getTargetOperand().isDynamicSlice();
+			if (graphVariable instanceof PartedVariable && !transitionNode.isNull() && !isDynamicSlice) {
 				Indices graphPartedIndices = ((PartedVariable) graphVariable).getPartedIndices();
 				/* Adjust partedIndices, if only a part of the valueOperand (including its partedIndices) is used:
 				* in2(8) := '0';
@@ -352,10 +357,35 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			Node terminalNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).build();
 			/* Add VHDL lines the node's been created from */
 			terminalNode.setSource(transitionNode.getSource());
+			if (isDynamicSlice) {
+				insertDynamicNode(transitionNode, terminalNode);
+				return;
+			}
 			/* Add TerminalNode to Current Context and remove Current Context from stack, if the stack is NOT empty.
 			* If the stack is empty, initiate the root node */
 			contextManager.fillCurrentContextWith(terminalNode);
 		}
+	}
+
+	private void insertDynamicNode(TransitionNode transitionNode, Node terminalNode) throws Exception {
+		String dynamicSlice = transitionNode.getTargetOperand().getDynamicSlice();
+		AbstractVariable dynamicVariable = modelCollector.getVariable(dynamicSlice);
+		int conditionsCount = dynamicVariable.getType().getCardinality();
+		Node controlNode = new Node.Builder(dynamicVariable).createSuccessors(conditionsCount).
+				source(transitionNode.getSource()).build();
+		Indices partedIndices = ((PartedVariable) graphVariable).getPartedIndices();
+		if (partedIndices.length() != 1) {
+			throw new Exception("Dynamic node can be inserted for single bit graph only. Actual: " + graphVariable.getName());
+		}
+		int condition = partedIndices.getHighest();
+
+		contextManager.addContext(new Context(controlNode, Condition.createCondition(condition)));
+
+		contextManager.fillCurrentContextWith(terminalNode);
+
+		contextManager.removeContext();
+
+		insertControlNode(controlNode);
 	}
 
 	private boolean isDirectPartialAssignment(Indices partedGraph, Indices target) {
@@ -428,8 +458,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		/*#################################################
 		*       F I N A L I Z E    C O N T R O L  N O D E
 		* #################################################*/
-		finalizeControlNode(controlNode);
-		contextManager.fillCurrentContextWith(controlNode);
+		insertControlNode(controlNode);
 	}
 
 	public void visitWhenNode(WhenNode whenNode) throws Exception {
