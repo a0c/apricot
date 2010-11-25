@@ -1,8 +1,6 @@
 package base.vhdl.visitors;
 
-import base.vhdl.structure.Architecture;
-import base.vhdl.structure.Constant;
-import base.vhdl.structure.Entity;
+import base.vhdl.structure.*;
 import base.vhdl.structure.Process;
 import base.vhdl.structure.nodes.*;
 import ui.ConfigurationHandler;
@@ -21,17 +19,12 @@ public class BehDDGraphGenerator extends GraphGenerator {
 
 	public void visitProcess(base.vhdl.structure.Process process) throws Exception {
 
-		if (modelCollector.hasPartialAssignmentsIn(process)) {
-			/* Process partial settings, like "Parity(7) <= something;" */
-			processPartialSettings(modelCollector.getPartialAssignmentsFor(process), process.getRootNode());
-		} else {
-			/* Process process NAME */
-			String graphVarName = extractVariableName(process);
-			if (graphVarName == null)
-				throw new Exception("Could not extract GraphVariable name for the process with name \"" + process.getName() + "\"");
+		/* Process process NAME */
+		String graphVarName = extractVariableName(process);
+		if (graphVarName == null)
+			throw new Exception("Could not extract GraphVariable name for the process with name \"" + process.getName() + "\"");
 
-			couldProcessNextGraphVariable(modelCollector.getVariable(graphVarName), process.getRootNode());
-		}
+		couldProcessNextGraphVariable(modelCollector.getVariable(graphVarName), process.getRootNode());
 	}
 
 	static String extractVariableName(Process process) throws Exception {
@@ -52,7 +45,7 @@ public class BehDDGraphGenerator extends GraphGenerator {
 		doCheckChildrenOf(whenNode.getTransitions(), "(WHEN): " + java.util.Arrays.toString(whenNode.getConditionOperands()));
 	}
 
-	protected boolean isDelay(String variableName) {
+	protected boolean isDelay(OperandImpl operand) {
 		/* For Beh DD Trees no information is available regarding Delay flags, so set it active... */
 		return true;
 	}

@@ -17,6 +17,10 @@ public final class Type {
 	 * Used in different length-calculation methods and for final AGM printing to file.
 	 */
 	private Indices length;
+	/**
+	 * Type of array other than std_logic (composite type)
+	 */
+	private final Type arrayElementType;
 //    private final boolean isUpDirection;
 //    private final int offset;
 
@@ -27,7 +31,7 @@ public final class Type {
 	 * @param length physical length of variable/register. This defines the highestSB.
 	 */
 	public Type(Indices length) {
-		this(null, length);
+		this(null, length, null);
 	}
 
 	/**
@@ -35,8 +39,17 @@ public final class Type {
 	 * @param length	 physical length of variable/register. This defines the highestSB.
 	 */
 	public Type(Indices valueRange, Indices length) {
+		this(valueRange, length, null);
+	}
+
+	public Type(Indices length, Type arrayElementType) {
+		this(null, length, arrayElementType);
+	}
+
+	private Type(Indices valueRange, Indices length, Type arrayElementType) {
 		this.valueRange = valueRange;
 		this.length = length;
+		this.arrayElementType = arrayElementType;
 	}
 
 	public Indices getValueRange() {
@@ -57,6 +70,36 @@ public final class Type {
 
 	public boolean isEnum() {
 		return valueRange != null;
+	}
+
+	public boolean isArray() {
+		return arrayElementType != null;
+	}
+
+	public Indices resolveValueRange() {
+		if (isEnum()) {
+			return valueRange;
+		} else {
+			return length.deriveValueRange();
+		}
+	}
+
+	public int countPossibleValues(Indices range) {
+		return countPossibleValues(range, -1);
+	}
+
+	public int countPossibleValues(Indices range, int upperBound) {
+		int valuesCount;
+		if (range != null) {
+			valuesCount = range.deriveValueRange().length();
+		} else {
+			valuesCount = resolveValueRange().length();
+		}
+
+		if (upperBound == -1) {
+			return valuesCount;
+		}
+		return Math.min(valuesCount, upperBound);
 	}
 
 	public int getCardinality() {
@@ -90,6 +133,10 @@ public final class Type {
 		if (isEnum()) {
 			if (!valueRange.equals(that.valueRange)) return false;
 		}
+		if (isArray() ^ that.isArray()) return false;
+		if (isArray()) {
+			if (!arrayElementType.equals(that.arrayElementType)) return false;
+		}
 		/* All fields identical */
 		return true;
 	}
@@ -99,6 +146,9 @@ public final class Type {
 		result = HashCodeUtil.hash(result, length.hashCode());
 		if (isEnum()) {
 			result = HashCodeUtil.hash(result, valueRange.hashCode());
+		}
+		if (isArray()) {
+			result = HashCodeUtil.hash(result, arrayElementType.hashCode());
 		}
 		return result;
 	}
@@ -111,7 +161,17 @@ public final class Type {
 			sb.append(valueRange.toString());
 			sb.append(");");
 		}
+		if (isArray()) {
+			sb.append(" (SUBTYPE=").append(arrayElementType).append(");");
+		}
 		return sb.toString();
+	}
+
+	public Type getArrayElementType() {
+		if (!isArray()) {
+			throw new RuntimeException("Obtaining element type from non-array type: " + this);
+		}
+		return arrayElementType;
 	}
 
 	public Type derivePartedType(Indices partedIndices) {
@@ -120,6 +180,9 @@ public final class Type {
 		}
 		/* Derive the length of parted indices */
 		Indices length = partedIndices.deriveLength();
+		if (isArray()) {
+			return length.length() == 1 ? arrayElementType : new Type(length, arrayElementType);
+		}
 		/* Generate valueRange if needed */
 		Indices valueRange = null;
 		if (isEnum()) {

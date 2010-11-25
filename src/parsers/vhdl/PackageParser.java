@@ -2,6 +2,7 @@ package parsers.vhdl;
 
 import base.Indices;
 import base.Type;
+import base.hldd.structure.nodes.utils.Condition;
 import base.vhdl.structure.Package;
 import io.scan.VHDLScanner;
 import io.scan.VHDLToken;
@@ -9,6 +10,8 @@ import parsers.ExpressionBuilder;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /**
@@ -16,6 +19,7 @@ import java.util.regex.Pattern;
  */
 public class PackageParser {
 
+	private static final Pattern OTHERS_PATTERN = Pattern.compile("^(\\( )?OTHERS => .+( \\))?$");
 	private static final Pattern OTHERS_0_PATTERN = Pattern.compile("^(\\( )?OTHERS => '0'( \\))?$");
 	private static final Pattern OTHERS_1_PATTERN = Pattern.compile("^(\\( )?OTHERS => '1'( \\))?$");
 
@@ -198,18 +202,52 @@ public class PackageParser {
 		if (typeAndValue.startsWith("ARRAY ")) {
 			/* ARRAY ((PROCESSOR_WIDTH -1) DOWNTO -1) OF STD_LOGIC; */
 			/* todo: ARRAY ( NATURAL RANGE <> ) OF STD_LOGIC_VECTOR ( 31 DOWNTO 0 ) ; */
+			/*
+			* VHDL LRM: p46:
+			* — Example of unconstrained array declarations:
+			*    type SIGNED_FXPT is array (INTEGER range <>) of BIT;
+			*       -- A signed fixed-point array type
+			*    type SIGNED_FXPT_VECTOR is array (NATURAL range <>) of SIGNED_FXPT;
+			*       -- A vector of signed fixed-point elements
+			* — Example of partially constrained array declarations:
+			*    type SIGNED_FXPT_5x4 is array (1 to 5, 1 to 4) of SIGNED_FXPT;
+			*       -- A matrix of signed fixed-point elements
+			* — Examples of array object declarations:
+			*    signal DATA_LINE: DATA_IN;
+			*       --  Defines a data input line.
+			*    variable MY_MEMORY: MEMORY (0 to 2**n-1);
+			*       --  Defines a memory of 2n 32-bit words.
+			*    signal FXPT_VAL: SIGNED_FXPT (3 downto -4);
+			*       -- Defines an 8-bit fixed-point signal
+			*    signal VEC: SIGNED_FXPT_VECTOR (1 to 20)(9 downto 0);
+			*       -- Defines a vector of 20 10-bit fixed-point elements
+			*    variable SMATRIX: SIGNED_FXPT_5x4 (open)(3 downto -4);
+			*       -- Defines a 5x4 matrix of 8-bit fixed-point elements
+			* */
 			/* Check subtype */
 			int ofIndex = typeAndValue.lastIndexOf(" OF ");
-			String subType = typeAndValue.substring(ofIndex + 4).trim();
-			if (!(subType.equals("BIT") || subType.equals("STD_LOGIC")))
-				throw new UnsupportedConstructException("Unsupported type: \'" + typeAndValue + "\'\n" +
-						"Only BIT and STD_LOGIC are supported as array subtypes.", typeAndValue);
+			String subTypeString = typeAndValue.substring(ofIndex + 4).trim();
+			Type arrayElementType = null;
+			if (!(subTypeString.equals("BIT") || subTypeString.equals("STD_LOGIC"))) {
+				try {
+					/* Try parsing arrayElementType recursively */
+					arrayElementType = parseTypeAndValue(subTypeString, builder).type;
+
+				} catch (Exception e) {
+					throw new UnsupportedConstructException("Unsupported type: \'" + typeAndValue + "\'\n" +
+							"Only BIT and STD_LOGIC are supported as array subtypes.", typeAndValue);
+				}
+			}
 			/* Parse indices */
 			Indices indices = builder.buildIndices(
 					ExpressionBuilder.trimEnclosingBrackets(typeAndValue.substring(6, ofIndex)));
 			//todo: signed? what does the last -1 mean here: "(PROCESSOR_WIDTH -1) DOWNTO -1"
+			if (indices == null) {
+				throw new UnsupportedConstructException("Unsupported type: \'" + typeAndValue + "\'\n" +
+						"Unbounded arrays are not supported.", typeAndValue);
+			}
 
-			type = new Type(indices);
+			type = arrayElementType == null ? new Type(indices) : new Type(indices, arrayElementType);
 
 		} else if (typeAndValue.contains(" RANGE ")) {
 			/* INTEGER RANGE 32767 DOWNTO -32768 */
@@ -243,11 +281,11 @@ public class PackageParser {
 			throw new UnsupportedConstructException("Unsupported type: \'" + typeAndValue + "\'", typeAndValue);
 		}
 
-		valueAsString = replaceOthersValue(valueAsString, type.getLength());
+		Map<Condition, String> valuesAsString = replaceOthersValue(valueAsString, type, null);
 
-		BigInteger valueInt = valueAsString == null ? null : parseConstantValue(valueAsString);
+		BigInteger valueInt = valueAsString == null ? null : parseConstantValue(valuesAsString.get(Condition.FALSE));
 
-		return new TypeAndValueHolder(type, valueInt, valueAsString);
+		return new TypeAndValueHolder(type, valueInt, valuesAsString);
 	}
 
 	public static String extractTypeString(String typeString) {
@@ -257,19 +295,37 @@ public class PackageParser {
 		return typeString;
 	}
 
-	public static String replaceOthersValue(String valueAsString, Indices length) {
+	public static Map<Condition, String> replaceOthersValue(String valueAsString, Type type, Indices length) {
 
+		TreeMap<Condition, String> valuesAsString = new TreeMap<Condition, String>();
 		if (valueAsString == null) {
-			return null;
+			return valuesAsString; // empty values
 		}
 
+		if (length == null) {
+			length = type.getLength();
+		}
+
+		if (type.isArray() && length.length() > 1) {
+			if (isOthers(valueAsString)) {
+				valueAsString = ExpressionBuilder.trimEnclosingBrackets(valueAsString);
+				valueAsString = valueAsString.substring(valueAsString.indexOf("=>") + 2).trim();
+				String othersValue = replaceOthersValue(valueAsString, type.getArrayElementType(), null).get(Condition.FALSE);
+				for (int i = length.getLowest(); i < length.getHighest() + 1; i++) {
+					valuesAsString.put(Condition.createCondition(i), othersValue);
+				}
+				return valuesAsString;
+			}
+			throw new RuntimeException("Aggregates are not supported for arrays at the moment: " + valueAsString);
+		}
 		char bit;
 		if (OTHERS_0_PATTERN.matcher(valueAsString).matches()) {
 			bit = '0';
 		} else if (OTHERS_1_PATTERN.matcher(valueAsString).matches()) {
 			bit = '1';
 		} else {
-			return valueAsString;
+			valuesAsString.put(Condition.FALSE, valueAsString);
+			return valuesAsString;
 		}
 
 		/* Create a new String and fill it with 0 or 1 */
@@ -279,11 +335,12 @@ public class PackageParser {
 			sb.append(bit);
 		}
 		sb.append("\"");
-		return sb.toString();
+		valuesAsString.put(Condition.FALSE, sb.toString());
+		return valuesAsString;
 	}
 
 	public static boolean isOthers(String valueAsString) {
-		return OTHERS_0_PATTERN.matcher(valueAsString).matches() || OTHERS_1_PATTERN.matcher(valueAsString).matches();
+		return OTHERS_PATTERN.matcher(valueAsString).matches();
 	}
 
 	enum RadixEnum {

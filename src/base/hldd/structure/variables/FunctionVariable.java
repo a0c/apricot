@@ -1,11 +1,13 @@
 package base.hldd.structure.variables;
 
-import base.vhdl.structure.Operator;
-import base.hldd.structure.models.utils.PartedVariableHolder;
 import base.Indices;
 import base.Type;
+import base.hldd.structure.models.utils.PartedVariableHolder;
+import base.vhdl.structure.Operator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Class represents a FUNCTION VARIABLE as it is defined in AGM.<br>
@@ -142,6 +144,12 @@ public class FunctionVariable extends Variable {
 	}
 
 	protected Type adjustType(Type currentType, Type addedType, Indices addedPartedIndices) {
+		if (operator == Operator.EXP) {
+			if (operands.size() != 2) {
+				return null;
+			}
+			throw new RuntimeException("Don't know how to adjust type for EXPONENT function (while adding operand to function)");
+		}
 		/* Update highestSB */
 		Indices addedLength = addedType.getLength();
 		if (currentType == null) {
@@ -191,6 +199,7 @@ public class FunctionVariable extends Variable {
 	}
 
 	//todo: useless comparator, consider removing it. See the difference with and without it.
+
 	public static class FunctionsComparator implements Comparator<FunctionVariable> {
 
 		@Override

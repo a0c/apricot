@@ -109,7 +109,7 @@ public class VHDLToken {
 		IF_STATEMENT("^IF .* THEN$"),
 		ELSIF_STATEMENT("^ELSIF .* THEN$"),
 		ELSE("ELSE"),
-		TRANSITION("((^" + Sub.OPERAND.regexp + " ((:=)|(<=)).+? ;$)" +
+		TRANSITION("((^.+ ((:=)|(<=)).+? ;$)" +
 				"|(^NULL ;$))"),
 		CASE_STATEMENT("^CASE .* IS$"),
 		WHEN_STATEMENT("^WHEN .* =>$"),

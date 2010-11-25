@@ -1,4 +1,4 @@
-package base.hldd.structure.models.utils;
+package base.vhdl.structure.utils;
 
 import base.Indices;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import static org.junit.Assert.assertArrayEquals;
 /**
  * @author Anton Chepurov
  */
-public class PartialAssignmentManagerTest {
+public class SplittableOperandStorageTest {
 
 	@Test
 	public void correctUnsetIndicesExtracted() {
@@ -44,7 +44,7 @@ public class PartialAssignmentManagerTest {
 						new Indices[]{new Indices(3, 0)}),
 		};
 		for (DataHolder dataHolder : data) {
-			Collection<Indices> actualIndices = PartialAssignmentManager.extractUnsetIndices(dataHolder.setBits);
+			Collection<Indices> actualIndices = SplittableOperandStorage.extractUnsetIndices(dataHolder.setBits);
 			assertArrayEquals("The following set bits filled incorrect: " + java.util.Arrays.toString(dataHolder.setBits),
 					dataHolder.unsetIndices,
 					actualIndices.toArray(new Indices[actualIndices.size()]));
@@ -52,9 +52,11 @@ public class PartialAssignmentManagerTest {
 	}
 
 	/* Helper CLASSES */
+
 	private class DataHolder {
 		private final boolean[] setBits;
 		private final Indices[] unsetIndices;
+
 		public DataHolder(boolean[] setBits, Indices[] unsetIndices) {
 			this.setBits = setBits;
 			this.unsetIndices = unsetIndices;

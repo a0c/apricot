@@ -1,13 +1,12 @@
 package parsers;
 
 import base.vhdl.structure.*;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.HashSet;
-import java.math.BigInteger;
-
 import parsers.vhdl.PackageParser;
+
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * @author Anton Chepurov
@@ -82,6 +81,9 @@ public class OperandValueCalculator {
 				break;
 			case XOR: //todo
 				result = result.xor(rightValue); // leftValue ^ rightValue;
+				break;
+			case EXP:
+				result = result.pow(rightValue.intValue()); // leftValue ** rightValue;
 				break;
 			case SHIFT_LEFT:
 				result = result.shiftLeft(rightValue.intValue()); // leftValue * ( 10 * rightValue );

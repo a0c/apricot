@@ -3,8 +3,8 @@ package ui;
 
 import io.ConsoleWriter;
 
-import java.io.File;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -58,21 +58,23 @@ public class ConfigurationHandler {
 
 		// empty properties, in case propFile == null
 		ConfigurationHandler configurationHandler = new ConfigurationHandler(properties);
-		if (propFile != null) {
-			configurationHandler.verify(consoleWriter);
-		}
+		configurationHandler.verify(consoleWriter);
+
 		return configurationHandler;
 	}
 
 	private void verify(ConsoleWriter consoleWriter) {
 		if (getStateVarName() == null) {
-			consoleWriter.writeLn("### WARNING ###  STATE name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME));
+			consoleWriter.writeLn("### WARNING ###  STATE name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
+					". Further RTL HLDD generation will be impossible.");
 		}
 		if (getClockName() == null) {
-			consoleWriter.writeLn("### WARNING ###  CLOCK name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME));
+			consoleWriter.writeLn("### WARNING ###  CLOCK name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
+					". D-flags might not be set correctly. Cyclic dependencies between signal assignments may occur.");
 		}
 		if (getResetName() == null) {
-			consoleWriter.writeLn("### WARNING ###  RESET name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME));
+			consoleWriter.writeLn("### WARNING ###  RESET name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
+					". Un-resettable graphs may become resettable.");
 		}
 	}
 

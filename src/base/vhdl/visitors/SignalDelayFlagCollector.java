@@ -1,10 +1,11 @@
 package base.vhdl.visitors;
 
 import base.vhdl.structure.*;
+import base.vhdl.structure.nodes.CaseNode;
 import base.vhdl.structure.nodes.IfNode;
 import base.vhdl.structure.nodes.TransitionNode;
-import base.vhdl.structure.nodes.CaseNode;
 import base.vhdl.structure.nodes.WhenNode;
+import base.vhdl.structure.utils.OperandStorage;
 import ui.ConfigurationHandler;
 
 import java.util.Collection;
@@ -18,15 +19,18 @@ import java.util.HashSet;
  * @author Anton Chepurov
  */
 public class SignalDelayFlagCollector extends AbstractVisitor {
+
 	private boolean isInsideClock;
 	/**
-	 * Collection of names of {@link base.vhdl.structure.Signal}-s with activated D-flag
+	 * Collection of {@link base.vhdl.structure.OperandImpl}-s with activated D-flag
 	 */
-	private final Collection<String> dFlagNames = new HashSet<String>();
+	private final OperandStorage dFlagOperands = new OperandStorage();
 	/**
 	 * Collection of names of {@link base.vhdl.structure.Signal}-s from processed {@link base.vhdl.structure.Architecture}
 	 */
-	private final Collection<String> sigNames = new HashSet<String>();
+	private final Collection<String> pendingSignals = new HashSet<String>();
+
+	private Architecture currentArchitecture;
 
 	private final ConfigurationHandler config;
 
@@ -37,30 +41,30 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 		clockEventRemover = new ClockEventRemover(config);
 	}
 
-	public Collection<String> getDFlagNames() {
-		return dFlagNames;
+	public OperandStorage getDFlagOperands() {
+		return dFlagOperands;
 	}
 
 	public void visitEntity(Entity entity) throws Exception {
 		/* Collect OUTPUT ports as Signal names */
 		for (Port port : entity.getPorts()) {
 			if (port.isOutput()) {
-				sigNames.add(port.getName());
+				pendingSignals.add(port.getName());
 			}
 		}
 	}
 
 	public void visitArchitecture(Architecture architecture) throws Exception {
+		currentArchitecture = architecture;
 		/* Collect Signal names */
 		for (Signal signal : architecture.getSignals()) {
-			sigNames.add(signal.getName());
+			pendingSignals.add(signal.getName());
 		}
-
 	}
 
 	public void visitProcess(base.vhdl.structure.Process process) throws Exception {
 		/* If architecture declares no signals or all the signals are processed, skip processes */
-		if (sigNames.isEmpty()) return;
+		if (pendingSignals.isEmpty()) return;
 		/* Only check processes that have the Clocking signal in their sensitivity list */
 		if (!hasClockInSensitivityList(process.getSensitivityList())) return;
 		/* Traverse the tree */
@@ -70,13 +74,13 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 
 	public void visitIfNode(IfNode ifNode) throws Exception {
 		/* Exit when all Signals have been processed */
-		if (sigNames.isEmpty()) return;
+		if (pendingSignals.isEmpty()) return;
 
 		/* Record the state of being inside clock */
 		boolean wasInsideClock = isInsideClock;
 
 		/* Process CONDITION */
-		if (clockEventRemover.isClockingExpression(ifNode.getConditionExpression())) {
+		if (!isInsideClock && clockEventRemover.isClockingExpression(ifNode.getConditionExpression())) {
 			isInsideClock = true;
 		}
 
@@ -84,7 +88,7 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 		ifNode.getTruePart().traverse(this);
 
 		/* Exit when all Signals have been processed */
-		if (sigNames.isEmpty()) return;
+		if (pendingSignals.isEmpty()) return;
 
 		/* Restore the state of being inside clock */
 		isInsideClock = wasInsideClock;
@@ -98,26 +102,26 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 
 	public void visitTransitionNode(TransitionNode transitionNode) throws Exception {
 		/* Exit when all Signals have been processed */
-		if (sigNames.isEmpty()) return;
+		if (pendingSignals.isEmpty()) return;
 		if (isInsideClock) {
 			if (transitionNode.isNull()) return;
-			String operandName = transitionNode.getTargetOperand().getName();
-			if (sigNames.contains(operandName)) {
+			OperandImpl targetOperand = transitionNode.getTargetOperand();
+			if (pendingSignals.contains(targetOperand.getName())) {
 				/* Collect this operand */
-				dFlagNames.add(operandName);
+				dFlagOperands.store(targetOperand);
 				/* Remove this operand from varNames, to speed up the traversal */
-				sigNames.remove(operandName);
+				updatePendingSignals(targetOperand);
 			}
 		}
 	}
 
 	public void visitCaseNode(CaseNode caseNode) throws Exception {
 		/* Exit when all Signals have been processed */
-		if (sigNames.isEmpty()) return;
+		if (pendingSignals.isEmpty()) return;
 		for (WhenNode whenNode : caseNode.getConditions()) {
 			whenNode.traverse(this);
 			/* Exit when all Signals have been processed */
-			if (sigNames.isEmpty()) return;
+			if (pendingSignals.isEmpty()) return;
 		}
 	}
 
@@ -130,6 +134,18 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 			if (config.isClockName(signalName)) return true;
 		}
 		return false;
+	}
+
+	private void updatePendingSignals(OperandImpl dFlagOperand) {
+		String signalName = dFlagOperand.getName();
+		if (dFlagOperand.isWhole()) {
+			pendingSignals.remove(signalName);
+		} else {
+			/* check the whole range to be set */
+			if (dFlagOperands.isWholeRangeSet(signalName, currentArchitecture)) {
+				pendingSignals.remove(signalName);
+			}
+		}
 	}
 
 }

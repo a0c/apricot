@@ -1,22 +1,21 @@
 package base.vhdl.structure;
 
-import base.vhdl.visitors.Visitable;
 import base.vhdl.visitors.AbstractVisitor;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.io.File;
-
+import base.vhdl.visitors.Visitable;
 import io.scan.VHDLScanner;
 import parsers.vhdl.StructureBuilder;
 import parsers.vhdl.StructureParser;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @author Anton Chepurov
  */
-public class Entity implements Visitable {
+public class Entity extends ASTObject implements Visitable {
 
 	private String name;
 
@@ -41,6 +40,7 @@ public class Entity implements Visitable {
 	}
 
 	public Entity(String name) {
+		super(null);
 		this.name = name;
 		ports = new HashSet<Port>();
 		genericConstants = new HashSet<Constant>();
@@ -92,26 +92,26 @@ public class Entity implements Visitable {
 		architecture.traverse(visitor);
 	}
 
-	public Port resolvePort(String portName) {
+	private Port resolvePort(String name) {
 		//todo... change ports type to Map
 		for (Port port : ports) {
-			if (port.getName().equals(portName)) {
+			if (port.getName().equals(name)) {
 				return port;
 			}
 		}
 		return null;
 	}
 
-	public Constant resolveConstant(String constantName) {
+	private Constant resolveConstantInternal(String name) {
 		//todo... change constants type to Map
 		for (Constant constant : constants) {
-			if (constant.getName().equals(constantName)) {
+			if (constant.getName().equals(name)) {
 				return constant;
 			}
 		}
 		//todo... change generic constants type to Map
 		for (Constant constant : genericConstants) {
-			if (constant.getName().equals(constantName)) {
+			if (constant.getName().equals(name)) {
 				return constant;
 			}
 		}
@@ -120,5 +120,18 @@ public class Entity implements Visitable {
 
 	public ComponentDeclaration resolveComponentDeclaration(String compDeclName) {
 		return componentDeclarations.get(compDeclName);
+	}
+
+	@Override
+	public ASTObject doResolve(String name) {
+		Port port = resolvePort(name);
+		if (port != null) {
+			return port;
+		}
+		Constant constant = resolveConstantInternal(name);
+		if (constant != null) {
+			return constant;
+		}
+		return resolveComponentDeclaration(name);
 	}
 }

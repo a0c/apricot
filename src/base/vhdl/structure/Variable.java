@@ -5,13 +5,14 @@ import base.Type;
 /**
  * @author Anton Chepurov
  */
-public class Variable {
+public class Variable extends ASTObject {
 
 	private String name;
 
 	private Type type;
 
 	public Variable(String name, Type type) {
+		super(null);
 		this.name = name;
 		this.type = type;
 	}
@@ -26,6 +27,7 @@ public class Variable {
 		return name;
 	}
 
+	@Override
 	public Type getType() {
 		return type;
 	}

@@ -1,13 +1,11 @@
 package base.vhdl.visitors;
 
+import base.vhdl.processors.VariableSettingDetectorImpl;
 import base.vhdl.structure.*;
 import base.vhdl.structure.nodes.*;
-import base.vhdl.processors.VariableSettingDetectorImpl;
+import base.vhdl.structure.utils.OperandStorage;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Class traverses the tree and checks the usages of {@link Variable}-s.
@@ -25,7 +23,7 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 	/**
 	 * Collection of names of {@link base.vhdl.structure.Variable}-s with activated D-flag
 	 */
-	private final Collection<String> dFlagNames = new HashSet<String>();
+	private final OperandStorage dFlagOperands = new OperandStorage();
 	/**
 	 * Collection of names of {@link base.vhdl.structure.Variable}-s from processed {@link base.vhdl.structure.Process}
 	 */
@@ -33,42 +31,32 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 	/**
 	 * Map of sets to speedup setting checks. Used in {@link base.vhdl.processors.VariableSettingDetectorImpl}.
 	 */
-	private HashMap<String, HashSet<AbstractNode>> completelySettingNodesByVar;
+	private Map<String, Map<OperandImpl, Set<AbstractNode>>> settingNodesByVar;
 
-	/**
-	 * Currently processed entity
-	 */
-	private Entity entity;
-	/**
-	 * Currently processed architecture
-	 */
-	private Architecture architecture;
 	/**
 	 * Currently processed process
 	 */
 	private base.vhdl.structure.Process curProcess;
 
-	public Collection<String> getDFlagNames() {
-		return dFlagNames;
+	public OperandStorage getDFlagOperands() {
+		return dFlagOperands;
 	}
 
 	public void visitEntity(Entity entity) throws Exception {
-		this.entity = entity;
 	}
 
 	public void visitArchitecture(Architecture architecture) throws Exception {
-		this.architecture = architecture;
 	}
 
 	public void visitProcess(base.vhdl.structure.Process process) throws Exception {
 		/* Clear Variable names from the previous process */
 		varNames = new HashSet<String>();
-		completelySettingNodesByVar = new HashMap<String, HashSet<AbstractNode>>();
+		settingNodesByVar = new HashMap<String, Map<OperandImpl, Set<AbstractNode>>>();
 		/* Collect Variable names */
 		for (Variable variable : process.getVariables()) {
 			String varName = variable.getName();
 			varNames.add(varName);
-			completelySettingNodesByVar.put(varName, new HashSet<AbstractNode>());
+			settingNodesByVar.put(varName, new HashMap<OperandImpl, Set<AbstractNode>>());
 		}
 //        PartialSetVariableCollector collector = new PartialSetVariableCollector();
 //        process.traverse(collector);
@@ -91,7 +79,7 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 		if (varNames.isEmpty()) return;
 		/* Process CONDITION */
 		/* Extract operand names from condition expression and check them */
-		doCheckOperands(extractSetOfOperandNamesFrom(ifNode.getConditionExpression()), ifNode);
+		doCheckOperands(extractOperandsFrom(ifNode.getConditionExpression()), ifNode);
 
 		/* Process TRUE PART */
 		ifNode.getTruePart().traverse(this);
@@ -108,7 +96,7 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 		/* Exit when all Variables have been processed. */
 		if (varNames.isEmpty()) return;
 		/* Extract operand names from value transition and check them */
-		doCheckOperands(extractSetOfOperandNamesFrom(transitionNode.getValueOperand()), transitionNode);
+		doCheckOperands(extractOperandsFrom(transitionNode.getValueOperand()), transitionNode);
 	}
 
 	public void visitCaseNode(CaseNode caseNode) throws Exception {
@@ -120,7 +108,7 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 			throw new Exception("Expression conditions in CaseNode are not currently supported by "
 					+ VariableDelayFlagCollector.class.getSimpleName()
 					+ "\nCaseNode condition: " + conditionOperand.toString());
-		doCheckOperands(java.util.Collections.singleton(((OperandImpl) conditionOperand).getName()), caseNode);
+		doCheckOperands(Collections.singleton((OperandImpl) conditionOperand), caseNode);
 
 		/* Process CONDITIONS */
 		for (WhenNode whenNode : caseNode.getConditions()) {
@@ -140,63 +128,85 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 	 * the operands' D-flags are activated and the operands are removed from
 	 * varNames.
 	 *
-	 * @param operandNames names of the operands to check
-	 * @param operandNode  node where the specified operands originate from
+	 * @param operands	to be checked
+	 * @param operandNode node where the specified operands originate from
 	 * @throws Exception if
-	 * 					{@link #wasVariableSet(String, base.vhdl.structure.nodes.AbstractNode)} throws an Exception.
+	 *                   {@link #wasOperandSet(base.vhdl.structure.OperandImpl,base.vhdl.structure.nodes.AbstractNode)} throws an Exception.
 	 */
-	private void doCheckOperands(Collection<String> operandNames, AbstractNode operandNode) throws Exception {
+	private void doCheckOperands(Set<OperandImpl> operands, AbstractNode operandNode) throws Exception {
 		/* Check each operand to be set by this point. If operand hasn't
 		been set so far, activated Delay flag for it. */
-		for (String operandName : operandNames) {
-			if (!wasVariableSet(operandName, operandNode)) {
+		for (OperandImpl operand : operands) {
+			if (!wasOperandSet(operand, operandNode)) {
+				String varName = operand.getName();
 				/* Collect this operand */
-				dFlagNames.add(operandName);
+				dFlagOperands.store(varName, operand);
 				/* Remove this operand from varNames, to speed up the traversal */
-				varNames.remove(operandName);
+				if (dFlagOperands.isWholeRangeSet(varName, curProcess)) {
+					varNames.remove(varName);
+				}
 			}
 		}
 	}
 
 	/**
-	 * @param operandName name of the operand to check
+	 * @param operand	 operand to check
 	 * @param operandNode node that contains the specified operand
 	 * @return <code>true</code> if the specified operand is a {@link Variable}
-	 * 		   operand and it was set in the tree before this node, or if it is
-	 * 		   not a {@link Variable} operand. <code>false</code> if it is a
-	 * 		   {@link Variable} operand and it wasn't set.
+	 *         operand and it was set in the tree before this node, or if it is
+	 *         not a {@link Variable} operand. <code>false</code> if it is a
+	 *         {@link Variable} operand and it wasn't set.
 	 * @throws Exception if {@link base.vhdl.processors.VariableSettingDetectorImpl} throws an Exception
 	 */
-	private boolean wasVariableSet(String operandName, AbstractNode operandNode) throws Exception {
+	private boolean wasOperandSet(OperandImpl operand, AbstractNode operandNode) throws Exception {
 		/* Skip those operands that are not Variables */
-		if (!varNames.contains(operandName)) return true;
+		if (!varNames.contains(operand.getName())) return true;
 
 		VariableSettingDetectorImpl operandSetDetector
-				= new VariableSettingDetectorImpl(operandName, operandNode, entity, architecture, curProcess, completelySettingNodesByVar.get(operandName));
+				= new VariableSettingDetectorImpl(operand, operandNode, curProcess, obtainSettingNodes(operand));
 		operandSetDetector.detect();
 
 		return operandSetDetector.isOperandSet();
 	}
 
+	private Set<AbstractNode> obtainSettingNodes(OperandImpl operand) {
+
+		Map<OperandImpl, Set<AbstractNode>> settingNodesByOperand = settingNodesByVar.get(operand.getName());
+
+		if (settingNodesByOperand.containsKey(operand)) {
+			return settingNodesByOperand.get(operand);
+		}
+		/* Don't analyze slices. Too complex to gain any significant speed-up. */
+		Set<AbstractNode> settingNodes = new HashSet<AbstractNode>();
+
+		settingNodesByOperand.put(operand, settingNodes);
+
+		return settingNodes;
+	}
+
 	/**
 	 * @param abstractOperand where to extract operands from
-	 * @return Collection of operand names in an ascending order
+	 * @return Collection of operands in an ascending order
 	 */
-	static Collection<String> extractSetOfOperandNamesFrom(AbstractOperand abstractOperand) {
-		Collection<String> operandNamesSet = new TreeSet<String>();
+	static Set<OperandImpl> extractOperandsFrom(AbstractOperand abstractOperand) {
+		Set<OperandImpl> operands = new TreeSet<OperandImpl>(new Comparator<OperandImpl>() {
+			@Override
+			public int compare(OperandImpl o1, OperandImpl o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		}); //todo: why ordering?! Only for UnitTests?
 		if (abstractOperand instanceof OperandImpl) {
-			OperandImpl operand = (OperandImpl) abstractOperand;
-			operandNamesSet.add(operand.getName());
+			operands.add((OperandImpl) abstractOperand);
 		} else if (abstractOperand instanceof Expression) {
 			for (AbstractOperand absOperand : ((Expression) abstractOperand).getOperands()) {
-				operandNamesSet.addAll(extractSetOfOperandNamesFrom(absOperand));
+				operands.addAll(extractOperandsFrom(absOperand));
 			}
 		} else if (abstractOperand instanceof UserDefinedFunction) {
 			for (AbstractOperand absOperand : ((UserDefinedFunction) abstractOperand).getOperands()) {
-				operandNamesSet.addAll(extractSetOfOperandNamesFrom(absOperand));
+				operands.addAll(extractOperandsFrom(absOperand));
 			}
 		}
-		return operandNamesSet;
+		return operands;
 	}
 
 }

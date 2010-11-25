@@ -57,6 +57,10 @@ public class ComponentMerger {
 
 			PartedVariableHolder outerSignalHolder = resolveMappingFor(port, modelCollector);
 
+			if (outerSignalHolder == null) {
+				continue; // no signal is connected to this port
+			}
+
 			if (port.isOutput()) {
 
 				modelCollector.rebase(port, outerSignalHolder.getVariable());
@@ -76,9 +80,7 @@ public class ComponentMerger {
 		AbstractOperand outerOperand = component.findActualMappingFor(portName);
 
 		if (outerOperand == null) {
-			throw new ExtendedException("ComponentMerger: failed to link port " + portName +
-					"\nReason: port does not seem to be mapped",
-					ExtendedException.ERROR_TEXT);
+			return null;
 		}
 
 		AbstractVariable outerSignal;

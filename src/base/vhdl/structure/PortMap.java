@@ -54,6 +54,9 @@ public class PortMap {
 
 			AbstractOperand actual = findActualFor(port.getName());
 
+			if (actual == null) {
+				continue; /* no signal is connected to this port of the component */
+			}
 			if (actual.isParted() && actual instanceof OperandImpl) {
 
 				partedActuals.add(((OperandImpl) actual));
@@ -63,6 +66,17 @@ public class PortMap {
 
 		return partedActuals;
 
+	}
+
+	void resolvePositionalMap(List<Port> ports) {
+
+		for (int i = 0; i < portMapItems.size(); i++) {
+			PortMapItem oldPortMapItem = portMapItems.get(i);
+			if (oldPortMapItem.formal == null) {
+				OperandImpl resolvedFormal = new OperandImpl(ports.get(i).getName());
+				portMapItems.set(i, new PortMapItem(resolvedFormal, oldPortMapItem.actual));
+			}
+		}
 	}
 
 

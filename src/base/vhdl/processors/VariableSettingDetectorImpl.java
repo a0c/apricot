@@ -1,21 +1,24 @@
 package base.vhdl.processors;
 
-import base.vhdl.structure.nodes.*;
-import base.vhdl.structure.*;
-import base.Type;
 import base.Indices;
-
-import java.util.List;
-import java.util.HashSet;
-import java.math.BigInteger;
-
+import base.Type;
+import base.vhdl.structure.AbstractOperand;
+import base.vhdl.structure.Constant;
+import base.vhdl.structure.OperandImpl;
+import base.vhdl.structure.Process;
+import base.vhdl.structure.nodes.*;
 import parsers.vhdl.PackageParser;
+
+import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * For the Variable with the specified variable name, checks if this Variable
  * was set (initialized) in the tree before the specified starting node.
  * <p/>
- * <b>Implementational issues.</b><br>
+ * <b>Implementation issues.</b><br>
  * Search for the initialization of the specified variable is performed using
  * <i>backtrack</i>, starting from startingNode. To perform backtrack, dynamic
  * terminating node is used (at the beginning, terminating node is set to
@@ -31,32 +34,24 @@ import parsers.vhdl.PackageParser;
  */
 public class VariableSettingDetectorImpl extends AbstractProcessor {
 	private boolean isOperandSet = false;
-	private final String variableName;
+	private final OperandImpl operandToCheck;
 	private AbstractNode terminatingNode;
-	/* Currently processed Entity, Architecture, and Process */
-	private final Entity entity;
-	private final Architecture architecture;
-	private final base.vhdl.structure.Process process;
-	private final HashSet<AbstractNode> completelySettingNodes;
+	/* Currently processed Process */
+	private final Process process;
+	private final Set<AbstractNode> completelySettingNodes;
 
 	/**
-	 * @param variableName		   name of the Variable to check
-	 * @param startingNode		   node where to start from
-	 * @param entity				 currently processed entity
-	 * @param architecture		   currently processed architecture
-	 * @param process				currently processed process
-	 * @param completelySettingNodes set of nodes that set the specified variable completely.
-	 * 								 Used for speedup in case of costly-to-process nodes (CaseNodes and IfNodes).
+	 * @param operandToCheck to be checked
+	 * @param startingNode   node where to start from
+	 * @param process		currently processed process
+	 * @param settingNodes   set of nodes that set the specified variable completely.
 	 */
-	public VariableSettingDetectorImpl(String variableName, AbstractNode startingNode,
-									   Entity entity, Architecture architecture, base.vhdl.structure.Process process,
-									   HashSet<AbstractNode> completelySettingNodes) {
-		this.variableName = variableName;
+	public VariableSettingDetectorImpl(OperandImpl operandToCheck, AbstractNode startingNode, Process process,
+									   Set<AbstractNode> settingNodes) {
+		this.operandToCheck = operandToCheck;
 		this.terminatingNode = startingNode;
-		this.entity = entity;
-		this.architecture = architecture;
 		this.process = process;
-		this.completelySettingNodes = completelySettingNodes;
+		this.completelySettingNodes = settingNodes;
 	}
 
 	public boolean isOperandSet() {
@@ -105,8 +100,9 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 	}
 
 	/* Will never occur, since WhenNode backtracks 2 levels */
+
 	public void processCaseNode(CaseNode caseNode) {
-		throw new RuntimeException(getClass().getSimpleName() + ": CaseNode is processed. WhenNode should've backtracked 2 levels.");
+		throw new RuntimeException(getClass().getSimpleName() + ": CaseNode is processed. WhenNode should have backtracked 2 levels.");
 	}
 
 	public void processWhenNode(WhenNode whenNode) {
@@ -141,7 +137,8 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 //			if (operand.isParted())
 //				throw new RuntimeException(OperandSettingDetectorImpl.class.getSimpleName() + " doesn't currently support parted operands"); //todo: also see DelayFLagCollector
 
-			return operand.getName().equals(variableName);
+			return operand.contains(operandToCheck, process);
+
 		} else if (abstractNode instanceof CaseNode) {
 			/* Speed up with previous results */
 			if (completelySettingNodes.contains(abstractNode)) {
@@ -154,7 +151,7 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 			/* Resolve CaseType */
 			Type caseType = resolveType(caseNode.getVariableOperand());
 			/* Check that all conditions of CaseNode dependent variable are listed in WhenNodes */
-			Indices valueRange = caseType.isEnum() ? caseType.getValueRange() : caseType.getLength().deriveValueRange();
+			Indices valueRange = caseType.resolveValueRange();
 			if (!areAllValuesListed(valueRange, caseNode.getConditions()))
 				return false; //todo: this check will be incomplete, if subsequent setting CaseNodes are applied
 			/* Check all conditions to set the variable */
@@ -200,7 +197,7 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 		if (conditions.get(conditions.size() - 1).isOthers()) return true;
 		/* Unfortunately have to check all the values one by one. */
 		/* Init all unlisted values. */
-		HashSet<BigInteger> unlistedValues = new HashSet<BigInteger>(valueRange.length());
+		Set<BigInteger> unlistedValues = new HashSet<BigInteger>(valueRange.length());
 		for (int condition = valueRange.getLowest(); condition <= valueRange.getHighest(); condition++)
 			unlistedValues.add(BigInteger.valueOf(condition));
 		/* Iterate listed conditions and remove listed ones from the set of unlisted values */
@@ -211,7 +208,7 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 				BigInteger conditionValue = PackageParser.parseConstantValue(conditionAsString);
 				if (conditionValue == null) {
 					/* Try resolving named constant */
-					Constant constant = resolveConstant(conditionAsString);
+					Constant constant = process.resolveConstant(conditionAsString);
 					if (constant == null)
 						throw new RuntimeException(getClass().getSimpleName() + ": cannot resolve named constant: " + conditionAsString);
 					conditionValue = constant.getValue();
@@ -224,18 +221,6 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 		return unlistedValues.isEmpty();
 	}
 
-	private Constant resolveConstant(String constantName) {
-		Constant constant;
-		if ((constant = process.resolveConstant(constantName)) != null) {
-			return constant;
-		} else if ((constant = architecture.resolveConstant(constantName)) != null) {
-			return constant;
-		} else if ((constant = entity.resolveConstant(constantName)) != null) {
-			return constant;
-		}
-		return null;
-	}
-
 	private void doBacktrack(AbstractNode newTerminatingNode) {
 		terminatingNode = newTerminatingNode;
 	}
@@ -243,26 +228,13 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 	private Type resolveType(AbstractOperand abstractOperand) {
 		if (abstractOperand instanceof OperandImpl) {
 			OperandImpl operand = (OperandImpl) abstractOperand;
-			String operandName = operand.getName();
-			/* ... */
-			Indices partedIndices = operand.getPartedIndices();
-			Type operandType;
 
 			/* Resolve the variable/signal/port by name and get its type */
-			Variable variable;
-			Signal signal;
-			Port port;
-			if ((variable = process.resolveVariable(operandName)) != null) {
-				operandType = variable.getType();
-			} else if ((signal = architecture.resolveSignal(operandName)) != null) {
-				operandType = signal.getType();
-			} else if ((port = entity.resolvePort(operandName)) != null) {
-				operandType = port.getType();
-			} else throw new RuntimeException(getClass().getSimpleName() + ": cannot resolve operand: " + operand);
+			Type operandType = process.resolveType(operand.getName());
 			if (operandType == null)
 				throw new RuntimeException(getClass().getSimpleName() + ": empty type for operand " + operand);
 			/* Derive parted type */
-			return operandType.derivePartedType(partedIndices);
+			return operandType.derivePartedType(operand.getPartedIndices());
 
 		} else
 			throw new RuntimeException(getClass().getSimpleName() + ": cannot resolve type for " + abstractOperand.getClass().getSimpleName());

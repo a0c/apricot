@@ -1,8 +1,9 @@
 package parsers;
 
-import base.helpers.RegexpFactory;
-import base.vhdl.structure.*;
 import base.Indices;
+import base.helpers.RegexpFactory;
+import base.hldd.structure.nodes.utils.Condition;
+import base.vhdl.structure.*;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -21,6 +22,9 @@ public class ExpressionBuilder {
 	);
 	private static final Pattern CONV_INTEGER_CONV = Pattern.compile(
 			"^" + RegexpFactory.createStringRegexp("CONV_INTEGER") + " \\( .+ \\)$"
+	);
+	private static final Pattern TO_INTEGER_CONV = Pattern.compile(
+			"^" + RegexpFactory.createStringRegexp("TO_INTEGER") + " \\( .+ \\)$"
 	);
 	private static final Pattern USER_DEFINED_CONV = Pattern.compile(
 			"^[a-zA-Z][\\w]* \\( .+ \\)$"
@@ -43,6 +47,27 @@ public class ExpressionBuilder {
 	public ExpressionBuilder(OperandValueCalculator valueCalculator, Collection<String> variableNames) {
 		this.valueCalculator = valueCalculator;
 		this.variableNames = variableNames;
+	}
+
+	public AbstractOperand buildArrayExpression(Map<Condition, String> lines) throws Exception {
+
+		if (lines.isEmpty()) {
+			return null;
+		}
+
+		if (lines.size() == 1) {
+			return buildExpression(lines.get(Condition.FALSE));
+		}
+
+		Map<Condition, OperandImpl> arrayOperands = new TreeMap<Condition, OperandImpl>();
+		for (Map.Entry<Condition, String> entry : lines.entrySet()) {
+			String line = entry.getValue();
+			if (line != null) {
+				AbstractOperand operand = buildExpression(line);
+				arrayOperands.put(entry.getKey(), (OperandImpl) operand);
+			}
+		}
+		return new OperandImpl(arrayOperands);
 	}
 
 	public AbstractOperand buildExpression(String line) throws Exception {
@@ -83,20 +108,21 @@ public class ExpressionBuilder {
 
 			/* Parse PARTED INDICES */
 			Indices partedIndices = null;
-			String dynamicSlice = null;
+			AbstractOperand dynamicSlice = null;
 			try {
 				partedIndices = buildIndices(line);
 			} catch (Exception e) {
-				dynamicSlice = extractIndicesLine(line);
-				if (dynamicSlice == null || !variableNames.contains(dynamicSlice)) {
+				dynamicSlice = extractDynamicRange(line);
+				if (dynamicSlice == null || !(dynamicSlice instanceof OperandImpl) ||
+						!variableNames.contains(((OperandImpl) dynamicSlice).getName())) {
 					throw e;
 				}
 			}
 			String pureOperand = extractPureOperand(line, partedIndices != null || dynamicSlice != null);
 
-			return replaceAliases(dynamicSlice == null ? 
+			return replaceAliases(dynamicSlice == null ?
 					new OperandImpl(pureOperand, partedIndices, expressionContext.isInverted) :
-					new OperandImpl(pureOperand, dynamicSlice, expressionContext.isInverted)
+					new OperandImpl(pureOperand, (OperandImpl) dynamicSlice, expressionContext.isInverted)
 			);
 		} else {
 			Expression expression = new Expression(operator, expressionContext.isInverted);
@@ -109,9 +135,10 @@ public class ExpressionBuilder {
 		}
 	}
 
-	private static String extractIndicesLine(String line) {
+	private AbstractOperand extractDynamicRange(String line) throws Exception {
 		if (line.contains("(") && line.contains(")")) {
-			return line.substring(line.indexOf("(") + 1, line.lastIndexOf(")")).trim();
+			line = line.substring(line.indexOf("(") + 1, line.lastIndexOf(")")).trim();
+			return buildExpression(line);
 		}
 		return null;
 	}
@@ -142,7 +169,8 @@ public class ExpressionBuilder {
 		/* Check to match the conversion regexp-s */
 		return (STD_LOGIC_VECTOR_CONV.matcher(line).matches()
 				|| UNSIGNED_CONV.matcher(line).matches()
-				|| CONV_INTEGER_CONV.matcher(line).matches())
+				|| CONV_INTEGER_CONV.matcher(line).matches()
+				|| TO_INTEGER_CONV.matcher(line).matches())
 				&& getClosingIndex(line, line.indexOf("(")) == line.length() - 1;
 	}
 
@@ -240,7 +268,7 @@ public class ExpressionBuilder {
 	 * <p/>
 	 * <<< VOTO0 ='1' AND VOTO1 ='1' AND VOTO2 ='1' AND VOTO3 ='1' >>>
 	 *
-	 * @param operator to search for
+	 * @param operator	 to search for
 	 * @param validRegions where to look for operator
 	 * @return regions of valid operator (subString-s from validRegions that contain specified operator)
 	 */
@@ -276,7 +304,7 @@ public class ExpressionBuilder {
 	 * @param line where to extract the regions from
 	 * @return array of regions
 	 * @throws Exception if specified line is a malformed expression
-	 * 					 (closing bracket is missing)
+	 *                   (closing bracket is missing)
 	 */
 	Region[] getValidRegions(String line) throws Exception {
 		List<Region> validRegions = new LinkedList<Region>();
@@ -405,15 +433,15 @@ public class ExpressionBuilder {
 	 *
 	 * @param line			  where to search the starting/closing characters
 	 * @param startingCharIndex index of the starting character
-	 * 							the closing character has to be found for
+	 *                          the closing character has to be found for
 	 * @return index of the closing character, if it is found,
-	 * 		   or <code>-1</code> if the closing character has
-	 * 		   not been found (either is missing at all or the
-	 * 		   starting character is the last character in the
-	 * 		   line).
+	 *         or <code>-1</code> if the closing character has
+	 *         not been found (either is missing at all or the
+	 *         starting character is the last character in the
+	 *         line).
 	 * @throws Exception if the specified <code>startingCharIndex</code> is
-	 * 					 beyond the length of the string, or the starting character
-	 * 					 is not supported.
+	 *                   beyond the length of the string, or the starting character
+	 *                   is not supported.
 	 */
 	private static int getClosingIndex(String line, int startingCharIndex) throws Exception {
 		/* Check for the startingCharIndex to conform with the length of the line */
@@ -452,9 +480,9 @@ public class ExpressionBuilder {
 	/**
 	 * @param expressionLine	   expression line to calculate value for
 	 * @param expressionLineSource source line of the expression, used when
-	 * 							   throwing Exception
+	 *                             throwing Exception
 	 * @return numerical value of the specified expression if it can be
-	 * 		   calculated
+	 *         calculated
 	 * @throws Exception if the value of expression could not be calculated
 	 */
 	public int evaluateNumerically(String expressionLine, String expressionLineSource) throws Exception {

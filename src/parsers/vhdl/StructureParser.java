@@ -148,7 +148,7 @@ public class StructureParser {
 						/* Signal HIGHEST SIGNIFICANT BIT */
 						typeAndValue = PackageParser.parseTypeAndValue(value.substring(value.indexOf(":") + 1).trim(), builder);
 						/* Create new SIGNAL */
-						builder.buildSignal(name, typeAndValue.type, typeAndValue.valueAsString);
+						builder.buildSignal(name, typeAndValue.type, typeAndValue.valuesAsString);
 					}
 					break;
 				case ALIAS:
@@ -279,16 +279,23 @@ public class StructureParser {
 		String[] mappings = map.split(",");
 		List<Map.Entry<String, String>> mappingEntries = new ArrayList<Map.Entry<String, String>>(mappings.length);
 		for (String mapping : mappings) {
-			if (!mapping.contains("=>")) {
-				//todo POSITIONAL ASSOCIATION in port map
-				throw new ParseException("Implementation is missing for POSITIONAL ASSOCIATION in port/generic map "
-						+ Arrays.toString(mappings), 0);
-			}
+			/* todo: see comment below
+			* Instance: entity E
+			*    generic map (ROM(1 to 2) => (others => (others => '0')))
+			*    port map (A, Op2(3 to 4) => B(1 to 2), Op2(2) => B(3),
+			*              Result => C(3 downto 1));*/
 			String[] parts = mapping.split("=>", 2);
-			if (parts.length != 2) {
+			String formal, actual;
+			if (parts.length == 1) {
+				formal = null;
+				actual = parts[0].trim();
+			} else if (parts.length == 2) {
+				formal = parts[0].trim();
+				actual = parts[1].trim();
+			} else {
 				throw new ParseException("Invalid mapping: " + mapping, 0);
 			}
-			mappingEntries.add(new AbstractMap.SimpleImmutableEntry<String, String>(parts[0].trim(), parts[1].trim()));
+			mappingEntries.add(new AbstractMap.SimpleImmutableEntry<String, String>(formal, actual));
 		}
 		return mappingEntries;
 	}

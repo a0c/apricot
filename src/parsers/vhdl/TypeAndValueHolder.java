@@ -1,8 +1,10 @@
 package parsers.vhdl;
 
 import base.Type;
+import base.hldd.structure.nodes.utils.Condition;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 /**
  * @author Anton Chepurov
@@ -10,11 +12,11 @@ import java.math.BigInteger;
 class TypeAndValueHolder {
 	final Type type;
 	final BigInteger value;
-	final String valueAsString;
+	final Map<Condition, String> valuesAsString;
 
-	TypeAndValueHolder(Type type, BigInteger value, String valueAsString) {
+	TypeAndValueHolder(Type type, BigInteger value, Map<Condition, String> valuesAsString) {
 		this.type = type;
 		this.value = value;
-		this.valueAsString = valueAsString;
+		this.valuesAsString = valuesAsString;
 	}
 }

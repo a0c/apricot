@@ -3,6 +3,7 @@ package parsers.vhdl;
 import base.Indices;
 import base.SourceLocation;
 import base.Type;
+import base.hldd.structure.nodes.utils.Condition;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Package;
 import base.vhdl.structure.Process;
@@ -93,6 +94,7 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		}
 		PortMap portMap = buildMapping(portMapEntries);
 		ComponentDeclaration componentDeclaration = entity.resolveComponentDeclaration(componentUnitName);
+		componentDeclaration.resolvePositionalMap(portMap);
 		ComponentInstantiation compInst = new ComponentInstantiation(componentName, componentDeclaration, generics, portMap);
 
 		Object currentContext = contextStack.peek();
@@ -104,9 +106,10 @@ public class StructureBuilder extends AbstractPackageBuilder {
 	private PortMap buildMapping(List<Map.Entry<String, String>> mappingEntries) throws Exception {
 		PortMap map = new PortMap(mappingEntries.size());
 		for (Map.Entry<String, String> mappingEntry : mappingEntries) {
-			AbstractOperand formal = expressionBuilder.buildExpression(mappingEntry.getKey());
+			String formalString = mappingEntry.getKey();
+			AbstractOperand formal = formalString == null ? null : expressionBuilder.buildExpression(formalString);
 			AbstractOperand actual = expressionBuilder.buildExpression(mappingEntry.getValue());
-			if (!(formal instanceof OperandImpl)) {
+			if (formal != null && !(formal instanceof OperandImpl)) {
 				throw new Exception("Simple operand expected as a Formal in port/generic map " + mappingEntry);
 			}
 			map.addMapping((OperandImpl) formal, actual);
@@ -123,7 +126,7 @@ public class StructureBuilder extends AbstractPackageBuilder {
 
 	public void buildArchitecture(String name, String affiliation) {
 		if (entity != null) {
-			entity.setArchitecture(new Architecture(name, affiliation));
+			entity.setArchitecture(new Architecture(name, affiliation, entity));
 			contextStack.push(entity.getArchitecture());
 		}
 	}
@@ -166,7 +169,7 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		if (entity != null) {
 			Architecture architecture = entity.getArchitecture();
 			if (architecture != null) {
-				Process process = new Process(processName, sensitivityList);
+				Process process = new Process(processName, sensitivityList, architecture);
 				architecture.addProcess(process);
 				/* Add process to Context Stack */
 				contextStack.push(process);
@@ -183,14 +186,14 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		}
 	}
 
-	public void buildSignal(String signalName, Type type, String defaultValue) throws Exception {
+	public void buildSignal(String signalName, Type type, Map<Condition, String> defaultValues) throws Exception {
 		Object objectUnderConstruction = contextStack.peek();
 		if (objectUnderConstruction instanceof Architecture) {
 			Architecture architecture = (Architecture) objectUnderConstruction;
-			AbstractOperand defaultValueOperand = defaultValue == null ? null : expressionBuilder.buildExpression(defaultValue);
+			AbstractOperand defaultValueOperand = expressionBuilder.buildArrayExpression(defaultValues);
 			if (defaultValueOperand != null && !(defaultValueOperand instanceof OperandImpl)) {
 				throw new UnsupportedConstructException("Simple operand expected as signal's DEFAULT VALUE, actual: "
-						+ defaultValueOperand.getClass().getSimpleName(), defaultValue);
+						+ defaultValueOperand.getClass().getSimpleName(), defaultValues.toString());
 			}
 			architecture.addSignal(new Signal(signalName, type, (OperandImpl) defaultValueOperand));
 			variableNames.add(signalName);
@@ -285,8 +288,12 @@ public class StructureBuilder extends AbstractPackageBuilder {
 			transition = new Transition();
 		} else if (PackageParser.isOthers(variableValue)) {
 			/* ##### OTHERS #####*/
-			variableValue = PackageParser.replaceOthersValue(variableValue, getLengthFor(variableName));
-			transition = new Transition((OperandImpl) expressionBuilder.buildExpression(variableName), expressionBuilder.buildExpression(variableValue));
+			OperandImpl targetOperand = (OperandImpl) expressionBuilder.buildExpression(variableName);
+			Type type = getTypeFor(targetOperand.getName());
+			Indices partedIndices = targetOperand.isParted() ? targetOperand.getPartedIndices()
+					: targetOperand.isDynamicRange() ? Indices.BIT_INDICES : null;
+			variableValue = PackageParser.replaceOthersValue(variableValue, type, partedIndices).get(Condition.FALSE);
+			transition = new Transition(targetOperand, expressionBuilder.buildExpression(variableValue));
 		} else {
 			/* ##### NORMAL #####*/
 			transition = new Transition((OperandImpl) expressionBuilder.buildExpression(variableName), expressionBuilder.buildExpression(variableValue));
@@ -298,26 +305,21 @@ public class StructureBuilder extends AbstractPackageBuilder {
 		addNodeToCurrentContext(transitionNode);
 	}
 
-	private Indices getLengthFor(String variableName) {
-		//todo: consider implementing resolve(String) method in Entity, Architecture, Process etc...
-		/* Search in PORTS */
-		for (Port port : entity.getPorts()) {
-			if (port.getName().equals(variableName)) {
-				return port.getType().getLength();
-			}
+	private Type getTypeFor(String variableName) {
+
+		ASTObject variableContainer = findNearestVariableContainer();
+		if (variableContainer == null) {
+			return null;
 		}
-		/* Search in SIGNALS */
-		for (Signal signal : entity.getArchitecture().getSignals()) {
-			if (signal.getName().equals(variableName)) {
-				return signal.getType().getLength();
-			}
-		}
-		/* Search in VARIABLES */
-		for (Process process : entity.getArchitecture().getProcesses()) {
-			for (Variable variable : process.getVariables()) {
-				if (variable.getName().equals(variableName)) {
-					return variable.getType().getLength();
-				}
+
+		return variableContainer.resolveType(variableName);
+	}
+
+	private ASTObject findNearestVariableContainer() {
+		for (int i = contextStack.size() - 1; i >= 0; i--) {
+			Object context = contextStack.get(i);
+			if (context instanceof Process || context instanceof Architecture || context instanceof Entity) {
+				return (ASTObject) context;
 			}
 		}
 		return null;

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author Anton Chepurov
  */
-public class ComponentDeclaration {
+public class ComponentDeclaration extends ASTObject {
 
 	private final String name;
 
@@ -20,6 +20,7 @@ public class ComponentDeclaration {
 	private final Map<String, String> genericTypesByName;
 
 	public ComponentDeclaration(String name, File sourceFile) {
+		super(null);
 		this.name = name;
 		this.sourceFile = sourceFile;
 		ports = new LinkedList<Port>();
@@ -59,5 +60,9 @@ public class ComponentDeclaration {
 
 	public String getGenericTypeAsString(String genericName) {
 		return genericTypesByName.get(genericName);
+	}
+
+	public void resolvePositionalMap(PortMap portMap) {
+		portMap.resolvePositionalMap(ports);
 	}
 }

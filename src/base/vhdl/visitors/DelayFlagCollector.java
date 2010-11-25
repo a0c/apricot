@@ -2,14 +2,12 @@ package base.vhdl.visitors;
 
 import base.vhdl.structure.*;
 import base.vhdl.structure.Process;
+import base.vhdl.structure.nodes.CaseNode;
 import base.vhdl.structure.nodes.IfNode;
 import base.vhdl.structure.nodes.TransitionNode;
-import base.vhdl.structure.nodes.CaseNode;
 import base.vhdl.structure.nodes.WhenNode;
+import base.vhdl.structure.utils.OperandStorage;
 import ui.ConfigurationHandler;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * Class collects those {@link Variable}-s and {@link Signal}-s
@@ -25,15 +23,17 @@ import java.util.HashSet;
  * @author Anton Chepurov
  */
 public class DelayFlagCollector extends AbstractVisitor {
-	private final Collection<String> dFlagNames = new HashSet<String>();
+
+	private final OperandStorage dFlagOperands = new OperandStorage();
+
 	private final ConfigurationHandler config;
 
 	public DelayFlagCollector(ConfigurationHandler config) {
 		this.config = config;
 	}
 
-	public Collection<String> getDFlagNames() {
-		return dFlagNames;
+	public OperandStorage getDFlagOperands() {
+		return dFlagOperands;
 	}
 
 	public void visitEntity(Entity entity) throws Exception {
@@ -43,8 +43,8 @@ public class DelayFlagCollector extends AbstractVisitor {
 		/* Traverse the architecture with a new SignalDelayFlagCollector */
 		SignalDelayFlagCollector sigCollector = new SignalDelayFlagCollector(config);
 		entity.traverse(sigCollector);
-		/* Add collected Signal dFlagNames to the global dFlagNames collection */
-		dFlagNames.addAll(sigCollector.getDFlagNames());
+		/* Add collected Signal dFlagOperands to the global dFlagOperands collection */
+		dFlagOperands.storeAll(sigCollector.getDFlagOperands());
 
 		/* ##########################
 		##### Collect VARIABLES #####
@@ -52,8 +52,8 @@ public class DelayFlagCollector extends AbstractVisitor {
 		/* Traverse the process with a new VariableDelayFlagCollector */
 		VariableDelayFlagCollector varCollector = new VariableDelayFlagCollector();
 		entity.traverse(varCollector);
-		/* Add collected Variable dFlagNames to the global dFlagNames collection */
-		dFlagNames.addAll(varCollector.getDFlagNames());
+		/* Add collected Variable dFlagOperands to the global dFlagOperands collection */
+		dFlagOperands.storeAll(varCollector.getDFlagOperands());
 	}
 
 	public void visitArchitecture(Architecture architecture) throws Exception {

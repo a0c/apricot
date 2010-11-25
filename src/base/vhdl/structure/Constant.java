@@ -7,7 +7,7 @@ import java.math.BigInteger;
 /**
  * @author Anton Chepurov
  */
-public class Constant {
+public class Constant extends ASTObject {
 
 	private String name;
 
@@ -16,6 +16,7 @@ public class Constant {
 	private BigInteger value;
 
 	public Constant(String constantName, Type type, BigInteger value) {
+		super(null);
 		this.name = constantName;
 		this.type = type;
 		this.value = value;
@@ -31,6 +32,7 @@ public class Constant {
 		return value;
 	}
 
+	@Override
 	public Type getType() {
 		return type;
 	}

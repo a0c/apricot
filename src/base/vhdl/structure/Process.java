@@ -1,20 +1,20 @@
 package base.vhdl.structure;
 
 import base.vhdl.structure.nodes.CompositeNode;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Collection;
-
-import base.vhdl.visitors.Visitable;
 import base.vhdl.visitors.AbstractVisitor;
+import base.vhdl.visitors.Visitable;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Anton Chepurov
  */
-public class Process implements Visitable {
+public class Process extends ASTObject implements Visitable {
 
-	private String name;
+	private final String name;
+
 	private final Collection<String> sensitivityList;
 
 	private Set<Variable> variables = new HashSet<Variable>();
@@ -23,7 +23,8 @@ public class Process implements Visitable {
 
 	private CompositeNode rootNode;
 
-	public Process(String name, Collection<String> sensitivityList) {
+	public Process(String name, Collection<String> sensitivityList, Architecture parent) {
+		super(parent);
 		this.name = name;
 		this.sensitivityList = sensitivityList;
 	}
@@ -84,23 +85,32 @@ public class Process implements Visitable {
 		visitor.visitProcess(this);
 	}
 
-	public Variable resolveVariable(String variableName) {
+	private Variable resolveVariable(String name) {
 		//todo: for storing Variables, use Map instead of set
 		for (Variable variable : variables) {
-			if (variable.getName().equals(variableName)) {
+			if (variable.getName().equals(name)) {
 				return variable;
 			}
 		}
 		return null;
 	}
 
-	public Constant resolveConstant(String constantName) {
+	private Constant resolveConstantInternal(String name) {
 		//todo: for storing Constants, use Map instead of set
 		for (Constant constant : constants) {
-			if (constant.getName().equals(constantName)) {
+			if (constant.getName().equals(name)) {
 				return constant;
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public ASTObject doResolve(String name) {
+		Variable variable = resolveVariable(name);
+		if (variable != null) {
+			return variable;
+		}
+		return resolveConstantInternal(name);
 	}
 }

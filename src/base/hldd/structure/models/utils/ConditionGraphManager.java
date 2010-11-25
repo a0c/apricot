@@ -1,6 +1,7 @@
 package base.hldd.structure.models.utils;
 
 import base.HLDDException;
+import base.Indices;
 import base.SourceLocation;
 import base.Type;
 import base.hldd.structure.Flags;
@@ -69,10 +70,11 @@ public class ConditionGraphManager {
 
 		/* Root Node */
 		AbstractOperand caseOperand = caseNode.getVariableOperand();
+		Indices partedIndices = caseOperand.getPartedIndices();
 		AbstractVariable caseVariable = modelCollector.convertOperandToVariable(caseOperand, null, false);
-		int conditionValuesCount = modelCollector.getConditionValuesCount(caseVariable);
+		int conditionValuesCount = caseVariable.getType().countPossibleValues(partedIndices);
 		Node rootNode = new Node.Builder(caseVariable).createSuccessors(conditionValuesCount).
-				partedIndices(caseOperand.getPartedIndices()).source(caseNode.getSource()).build();
+				partedIndices(partedIndices).source(caseNode.getSource()).build();
 		/* Fill Root Node, and map branches (to condition values)*/
 		Map<Condition, Condition> conditionMapping = new HashMap<Condition, Condition>();
 		Set<ConstantVariable> terminalVariablesSet = new HashSet<ConstantVariable>();

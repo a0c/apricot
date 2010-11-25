@@ -1,10 +1,12 @@
 package base.hldd.structure.variables;
 
 import base.HLDDException;
-import base.Type;
 import base.Indices;
+import base.Type;
+import base.hldd.structure.nodes.utils.Condition;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 /**
  * Class represents a CONSTANT VARIABLE as it is defined in AGM.<br>
@@ -14,8 +16,9 @@ import java.math.BigInteger;
  */
 public class ConstantVariable extends Variable {
 
-	// ConstantVariable VALUE
 	private BigInteger value;
+
+	private final Map<Condition, ConstantVariable> arrayValues;
 
 	public ConstantVariable(String constantName, BigInteger value) {
 		this(constantName, value, deriveType(value));
@@ -25,13 +28,25 @@ public class ConstantVariable extends Variable {
 		super(constantName, type == null ? deriveType(value) : type);
 		this.value = value;
 		setConstant(true);
+		arrayValues = null;
+	}
+
+	public ConstantVariable(Map<Condition, ConstantVariable> arrayValues) {
+		this.arrayValues = arrayValues;
 	}
 
 	private static Type deriveType(BigInteger value) {
 		return new Type(Indices.deriveLengthForValues(value.intValue(), 0));
 	}
 
+	public boolean isArray() {
+		return arrayValues != null;
+	}
+
 	public String toString() {
+		if (isArray()) {
+			return "### ARRAY CONSTANT (" + arrayValues.size() + ") ###";
+		}
 		return super.toString() + "\tVAL = " + value;
 	}
 
@@ -63,6 +78,12 @@ public class ConstantVariable extends Variable {
 
 	public ConstantVariable subRange(Indices rangeToExtract) throws HLDDException {
 
+		if (isArray()) {
+			if (rangeToExtract.length() != 1) {
+				throw new RuntimeException("Only single bit range can be extracted from ARRAY ConstantVariable. Actual range: " + rangeToExtract);
+			}
+			return arrayValues.get(Condition.createCondition(rangeToExtract.getLowest()));
+		}
 		Indices length = getLength();
 
 		if (!length.contain(rangeToExtract)) {

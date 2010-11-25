@@ -109,7 +109,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
 					/* Generate Graphs (GraphVariables) and collect all variables */
 					consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-					graphCreatingVisitor = new BehGraphGenerator(config, settings, generics, delayCollector.getDFlagNames());
+					graphCreatingVisitor = new BehGraphGenerator(config, settings, generics, delayCollector.getDFlagOperands());
 					entity.traverse(graphCreatingVisitor);
 					modelCollector = graphCreatingVisitor.getModelCollector();
 					consoleWriter.done();

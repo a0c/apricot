@@ -1,7 +1,6 @@
 package base.vhdl.visitors;
 
-import base.HLDDException;
-import base.Indices;
+import base.*;
 import base.hldd.structure.Flags;
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.models.utils.*;
@@ -15,6 +14,7 @@ import base.vhdl.structure.*;
 import base.vhdl.structure.Process;
 import base.vhdl.structure.Variable;
 import base.vhdl.structure.nodes.*;
+import base.vhdl.structure.utils.OperandStorage;
 import parsers.vhdl.OperandLengthSetter;
 import ui.ConfigurationHandler;
 import ui.ConverterSettings;
@@ -163,33 +163,39 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		/* Adjust CONSTANT LENGTHS to the lengths of the variables that use these constants directly */
 		adjustConstantAndOperandLengths(architecture);
 
-		Set<ComponentInstantiation> components = architecture.getComponents();
-		/* Update partially assigned signals with components' output port mappings */
-		modelCollector.splitPartiallyAssignedSignals(components);
+		createDynamicRangeReadGraphs(architecture);
 
-		/* Collect partialSet variables */
-		modelCollector.collectPartialSettings(architecture);
-
+		List<base.vhdl.structure.nodes.CompositeNode> rootNodes = new LinkedList<base.vhdl.structure.nodes.CompositeNode>();
+		rootNodes.add(architecture.getTransitions());
+		for (Process process : architecture.getProcesses()) {
+			rootNodes.add(process.getRootNode());
+		}
+		processRangeAssignments(collectRangeAssignments(architecture), rootNodes);
 		/* Process process-external transitions of the Architecture */
-		processPartialSettings(modelCollector.getPartialAssignmentsFor(architecture), architecture.getTransitions());
 		for (AbstractNode archTransNode : architecture.getTransitions().getChildren()) {
 			couldProcessNextGraphVariable(null, archTransNode);
 		}
 
 		/* Process COMPONENTS */
-		for (ComponentInstantiation component : components) {
+		for (ComponentInstantiation component : architecture.getComponents()) {
 			loadComponent(component);
 		}
 	}
 
-	private void setDefaultValue(base.hldd.structure.variables.Variable signalVariable,
-								 OperandImpl defaultValueOperand, String signalName) throws Exception {
-		AbstractVariable defaultValue = modelCollector.convertOperandToVariable(defaultValueOperand, signalVariable.getLength(), true);
-		if (defaultValue != null && !(defaultValue instanceof ConstantVariable)) {
+	private void setDefaultValue(base.hldd.structure.variables.Variable signalVariable, OperandImpl defaultValueOperand, String signalName) throws Exception {
+
+		if (defaultValueOperand == null) {
+			return;
+		}
+
+		AbstractVariable defaultValue = modelCollector.convertOperandToVariable(defaultValueOperand, signalVariable.getType(), true);
+
+		if (!(defaultValue instanceof ConstantVariable)) {
 			throw new ExtendedException("Non-constant DEFAULT VALUE variable created for signal " + signalName +
-					"\nExpected: " + ConstantVariable.class.getSimpleName() + ". Actual: " + defaultValue.getClass().getSimpleName(),
+					"\nExpected: ConstantVariable. Actual: " + defaultValue.getClass().getSimpleName(),
 					ExtendedException.ERROR_TEXT);
 		}
+
 		signalVariable.setDefaultValue((ConstantVariable) defaultValue);
 	}
 
@@ -198,6 +204,40 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		BehModel model = ComponentLoader.loadModel(component, settings);
 
 		new ComponentMerger(component, model).mergeTo(modelCollector);
+	}
+
+	private void createDynamicRangeReadGraphs(Architecture architecture) throws Exception {
+
+		DynamicRangeReadsCollector dynamicRangeReadsCollector = new DynamicRangeReadsCollector();
+
+		architecture.traverse(dynamicRangeReadsCollector);
+
+		for (DynamicRangeReadsCollector.Read dynamicRead : dynamicRangeReadsCollector.getReads()) {
+
+			OperandImpl dynamicRangeRead = dynamicRead.operand;
+			SourceLocation source = dynamicRead.source;
+
+			AbstractVariable wholeVariable = modelCollector.getVariable(dynamicRangeRead.getName());
+			Type type = wholeVariable.getType().derivePartedType(Indices.BIT_INDICES);
+			String dynRangeReadName = OperandImpl.generateNameForDynamicRangeRead(dynamicRangeRead);
+			AbstractVariable baseVariable = new base.hldd.structure.variables.Variable(dynRangeReadName, type);
+
+			Node rootNode = createDynamicNode(dynamicRangeRead, source);
+			for (int i = 0; i < rootNode.getConditionValuesCount(); i++) {
+				Node successor = new Node.Builder(wholeVariable).partedIndices(new Indices(i, i)).build();
+				rootNode.setSuccessor(Condition.createCondition(i), successor);
+			}
+			modelCollector.createAndReplaceNewGraph(baseVariable, rootNode, false);
+		}
+	}
+
+	private OperandStorage collectRangeAssignments(Architecture architecture) throws Exception {
+
+		PartialSetVariableCollector rangeAssignmentsCollector = new PartialSetVariableCollector(modelCollector);
+
+		architecture.traverse(rangeAssignmentsCollector);
+
+		return rangeAssignmentsCollector.getRangeAssignments();
 	}
 
 	private void collectConstants(Collection<Constant> constants) throws Exception {
@@ -210,7 +250,6 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	/**
 	 * @param ifNode IfNode being visited
 	 * @throws Exception {@link base.hldd.structure.nodes.Node#isEmptyControlNode() cause1 }
-	 *                   {@link base.hldd.structure.models.utils.ModelManager#getConditionValuesCount(AbstractVariable)  cause 2 }
 	 */
 	public void visitIfNode(IfNode ifNode) throws Exception {
 
@@ -321,11 +360,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			/* Extract dependentVariable and partedIndices */
 			AbstractVariable dependentVariable = transitionNode.isNull()
 					? graphVariable // Retain value
-					: modelCollector.convertOperandToVariable(transitionNode.getValueOperand(), graphVariable.getLength(), true);
+					: modelCollector.convertOperandToVariable(transitionNode.getValueOperand(), graphVariable.getType(), true);
 			/* branch <= not CCR(CBIT); =====> don't take partedIndices into account, they were already used during Function creation */
 			Indices partedIndices = dependentVariable instanceof FunctionVariable && ((FunctionVariable) dependentVariable).getOperator() == Operator.INV
 					? null : transitionNode.getValueOperandPartedIndices();
-			boolean isDynamicSlice = !transitionNode.isNull() && transitionNode.getTargetOperand().isDynamicSlice();
+			boolean isDynamicSlice = !transitionNode.isNull() && transitionNode.getTargetOperand().isDynamicRange();
 			if (graphVariable instanceof PartedVariable && !transitionNode.isNull() && !isDynamicSlice) {
 				Indices graphPartedIndices = ((PartedVariable) graphVariable).getPartedIndices();
 				/* Adjust partedIndices, if only a part of the valueOperand (including its partedIndices) is used:
@@ -358,7 +397,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			/* Add VHDL lines the node's been created from */
 			terminalNode.setSource(transitionNode.getSource());
 			if (isDynamicSlice) {
-				insertDynamicNode(transitionNode, terminalNode);
+				insertDynamicNode(transitionNode.getTargetOperand(), terminalNode);
 				return;
 			}
 			/* Add TerminalNode to Current Context and remove Current Context from stack, if the stack is NOT empty.
@@ -367,12 +406,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		}
 	}
 
-	private void insertDynamicNode(TransitionNode transitionNode, Node terminalNode) throws Exception {
-		String dynamicSlice = transitionNode.getTargetOperand().getDynamicSlice();
-		AbstractVariable dynamicVariable = modelCollector.getVariable(dynamicSlice);
-		int conditionsCount = dynamicVariable.getType().getCardinality();
-		Node controlNode = new Node.Builder(dynamicVariable).createSuccessors(conditionsCount).
-				source(transitionNode.getSource()).build();
+	private void insertDynamicNode(OperandImpl targetOperand, Node terminalNode) throws Exception {
+		Node controlNode = createDynamicNode(targetOperand, terminalNode.getSource());
 		Indices partedIndices = ((PartedVariable) graphVariable).getPartedIndices();
 		if (partedIndices.length() != 1) {
 			throw new Exception("Dynamic node can be inserted for single bit graph only. Actual: " + graphVariable.getName());
@@ -386,6 +421,16 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		contextManager.removeContext();
 
 		insertControlNode(controlNode);
+	}
+
+	private Node createDynamicNode(OperandImpl dynamicSliceOperand, SourceLocation source) throws Exception {
+		int wholeLength = modelCollector.getVariable(dynamicSliceOperand.getName()).getLength().length();
+		OperandImpl dynamicSlice = dynamicSliceOperand.getDynamicRange();
+		AbstractVariable dynamicVariable = modelCollector.getVariable(dynamicSlice.getName());
+		Indices dynamicIndices = dynamicSlice.getPartedIndices();
+		int conditionsCount = dynamicVariable.getType().countPossibleValues(dynamicIndices, wholeLength);
+		return new Node.Builder(dynamicVariable).partedIndices(dynamicIndices).
+				createSuccessors(conditionsCount).source(source).build();
 	}
 
 	private boolean isDirectPartialAssignment(Indices partedGraph, Indices target) {
@@ -417,7 +462,20 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			}
 			return false; /* This transition variable has already been processed. */
 
-		} else return transitionNode.isTransitionOf(graphVariable, isNullATransition);
+		} else return isVariableSetIn(transitionNode, graphVariable, isNullATransition, modelCollector);
+	}
+
+	static boolean isVariableSetIn(TransitionNode transitionNode, AbstractVariable variable, boolean isNullATransition, TypeResolver typeResolver) {
+
+		if (transitionNode.isNull()) {
+			return isNullATransition;
+		}
+
+		OperandImpl targetOperand = transitionNode.getTargetOperand();
+
+		Indices variableRange = variable instanceof PartedVariable ? ((PartedVariable) variable).getPartedIndices() : null;
+		OperandImpl variableOperand = new OperandImpl(variable.getPureName(), variableRange, false);
+		return targetOperand.contains(variableOperand, typeResolver);
 	}
 
 	public void visitCaseNode(CaseNode caseNode) throws Exception {
@@ -435,9 +493,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		Indices partedIndices = variableOperand.getPartedIndices();
 		/* Count possible conditions of dependentVariable */
 		//todo: suspicious action: dependentVariable.isState() ? caseNode.getConditions().size(). May be "when => others", may be "when A | B | C =>" ... consider these...
-//		int conditionValuesCount = dependentVariable.isState() ? caseNode.getConditions().size() : modelCollector.getConditionValuesCount(dependentVariable);
-		int conditionValuesCount = variableOperand.isParted() ? partedIndices.deriveValueRange().length()
-				: modelCollector.getConditionValuesCount(dependentVariable);
+//		int conditionValuesCount = dependentVariable.isState() ? caseNode.getConditions().size() : modelCollector.countPossibleValues(dependentVariable);
+		int conditionValuesCount = dependentVariable.getType().countPossibleValues(partedIndices);
 		/* Create Control Node */
 		Node controlNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(conditionValuesCount).build();
 		/* Add VHDL lines the node's been created from */
@@ -534,7 +591,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			}
 		}
 		/* Create new GraphVariable and replace old one */
-		GraphVariable newGraphVariable = modelCollector.createAndReplaceNewGraph(graphVariable, graphVariableRootNode, isDelay(graphVariable.getName()));
+		GraphVariable newGraphVariable = modelCollector.createAndReplaceNewGraph(graphVariable, graphVariableRootNode,
+				isDelay(new OperandImpl(graphVariable.getName())));
 
 		/* Remove redundant resets */
 		graphVariableRootNode.traverse(new ObsoleteResetRemoverImpl(newGraphVariable));
@@ -546,40 +604,44 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		graphVariable = newGraphVariable;
 	}
 
-	protected abstract boolean isDelay(String variableName);
+	protected abstract boolean isDelay(OperandImpl operand);
 
-	protected void processPartialSettings(Map<String, Set<OperandImpl>> partialAssignments,
-										  base.vhdl.structure.nodes.CompositeNode rootNode) throws Exception {
+	protected void processRangeAssignments(OperandStorage rangeAssignments,
+										   Collection<base.vhdl.structure.nodes.CompositeNode> rootNodes) throws Exception {
 		/* For each partially assigned variable in process, traverse the tree once for each partial assigned variable */
-		for (Map.Entry<String, Set<OperandImpl>> varPartialAssignments : partialAssignments.entrySet()) {
-			String varName = varPartialAssignments.getKey();
-			Set<OperandImpl> partialSets = varPartialAssignments.getValue();
+		for (OperandStorage.Item item : rangeAssignments.getItems()) {
+			String varName = item.name;
+			Set<OperandImpl> rangeOperands = item.operands;
 			AbstractVariable wholeVariable = modelCollector.getVariable(varName); // base variable of partial setting variables
-			/* Check for missing CAT inputs and for intersections (throw Exception).*/
-			modelCollector.finalizeAndCheckForCompleteness(partialSets, wholeVariable.getLength(), varName);
 			/* For each partial setting variable, traverse the tree */
-			List<OperandImpl> partialSetList = new LinkedList<OperandImpl>();
-			for (OperandImpl partSetOperand : partialSets) {
+			for (OperandImpl rangeOperand : rangeOperands) {
 				/* Create new variable */ //todo: may be substitute with couldProcessNextGraphVariable(). Check ModelCollector.replace() to act equally to modelCollector.addVariable() met below:
-				setGraphVariable(new PartedVariable(partSetOperand.getName(), wholeVariable.getType(), partSetOperand.getPartedIndices()));
-				graphVariable.setDefaultValue(modelCollector.extractSubConstant(wholeVariable.getDefaultValue(), partSetOperand.getPartedIndices()));
+				setGraphVariable(modelCollector.getVariable(rangeOperand.toString()));
+				graphVariable.setDefaultValue(modelCollector.extractSubConstant(wholeVariable.getDefaultValue(), rangeOperand.getPartedIndices()));
 				graphVariableRootNode = null;
 				contextManager.clear();
-				rootNode.traverse(this);
+
+				for (base.vhdl.structure.nodes.CompositeNode rootNode : rootNodes) {
+					rootNode.traverse(this);
+					if (graphVariableRootNode != null) {
+						break;
+					}
+				}
 				if (graphVariableRootNode == null) {
 					graphVariableRootNode = getDefaultValueNode();
 					if (graphVariableRootNode == null) {
-						throw new Exception("Partial setting variable " + graphVariable + " is never set.");
+						/* will be set in component, hopefully */
+						continue;
 					}
 				}
-				GraphVariable newGraphVariable = new GraphVariable(graphVariable, graphVariableRootNode);
-				modelCollector.addVariable(partSetOperand.toString(), newGraphVariable);
+				modelCollector.createAndReplaceNewGraph(graphVariable, graphVariableRootNode, isDelay(rangeOperand));
 				//todo: Remove redundant resets?
-				partialSetList.add(partSetOperand);
-				processedGraphVars.add(partSetOperand.toString());
+				processedGraphVars.add(rangeOperand.toString());
 			}
 
-			modelCollector.concatenatePartialAssignments(wholeVariable, partialSetList, isDelay(varName));
+			if (wholeVariable.getType().isArray()) {
+				modelCollector.flattenVariableToBits(wholeVariable);
+			}
 
 			processedGraphVars.add(varName);
 		}

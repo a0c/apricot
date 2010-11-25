@@ -6,13 +6,14 @@ import java.util.List;
 /**
  * @author Anton Chepurov
  */
-public class ComponentInstantiation {
+public class ComponentInstantiation extends ASTObject {
 	private final String name;
 	private final ComponentDeclaration declaration;
 	private final PortMap portMap;
 	private final Collection<Constant> generics;
 
 	public ComponentInstantiation(String name, ComponentDeclaration declaration, Collection<Constant> generics, PortMap portMap) {
+		super(null);
 		this.name = name;
 		this.declaration = declaration;
 		this.generics = generics;

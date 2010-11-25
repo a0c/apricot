@@ -5,7 +5,7 @@ import base.Type;
 /**
  * @author Anton Chepurov
  */
-public class Signal {
+public class Signal extends ASTObject {
 
 	private final String name;
 
@@ -14,6 +14,7 @@ public class Signal {
 	private final OperandImpl defaultValue;
 
 	public Signal(String name, Type type, OperandImpl defaultValue) {
+		super(null);
 		this.name = name;
 		this.type = type;
 		this.defaultValue = defaultValue;
@@ -23,6 +24,7 @@ public class Signal {
 		return name;
 	}
 
+	@Override
 	public Type getType() {
 		return type;
 	}

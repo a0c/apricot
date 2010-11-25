@@ -34,6 +34,7 @@ public enum Operator {
 	AND(" AND ", false, true, 2), // todo: consider using 2 AND-S, OR-s (INV-s?): logical and algebraical. Benefit 1) remove 3rd parameter from constructor and method isLogical(). Benefit 2) simplify code that uses objects of Operator class. Or just remove 3rd parameter and check in ConditionGraphManager operator to be AND, OR or XOR in order for them to be logical.
 	OR(" OR ", false, true, 2),
 	MOD(" MOD ", false, false, 2),
+	EXP(" * * ", false, false, 2),
 	SHIFT_RIGHT(false, 2),
 	SHIFT_LEFT(false, 2),
 	INV(false, true, 1);
@@ -113,7 +114,7 @@ public enum Operator {
 	 * @param operatorToContain function to check for
 	 * @param lines			 array of Strings where to check for the {@code operatorToContain}
 	 * @return <code>true</code> if the lines contain the specified function.
-	 * 		   <code>false</code> otherwise.
+	 *         <code>false</code> otherwise.
 	 */
 	public static boolean containsOperator(Operator operatorToContain, String... lines) {
 		for (String line : lines) {
@@ -147,6 +148,8 @@ public enum Operator {
 			return ADDER;
 		} else if (containsOperator(SUBTR, validRegions) && !isMinusNumber(validRegions)) {
 			return SUBTR;
+		} else if (containsOperator(EXP, validRegions)) {
+			return EXP;
 		} else if (containsOperator(MULT, validRegions)) {
 			return MULT;
 		} else if (containsOperator(DIV, validRegions)) {
@@ -167,7 +170,7 @@ public enum Operator {
 	 *
 	 * @param validRegions regions to check
 	 * @return <code>true</code> if the specified validRegions declare a number with minus sign.
-	 * 		   <code>false</code> otherwise.
+	 *         <code>false</code> otherwise.
 	 */
 	static boolean isMinusNumber(String... validRegions) {
 		return validRegions.length == 1 && MINUS_NUMBER_PATTERN.matcher(validRegions[0]).matches();
@@ -186,16 +189,33 @@ public enum Operator {
 
 		if (isCondition) {
 			return Indices.BIT_INDICES;
-		} else if (this == CAT) {
-			/* Accumulative HSB of all the operands */
-			int currentLength = currentIndices == null ? 0 : currentIndices.length();
-			int newOperandLength = newOperandIndices.length();
+		}
+		switch (this) {
+			case EQ:
+			case NEQ:
+			case LE:
+			case U_LE:
+			case GE:
+			case U_GE:
+			case LT:
+			case U_LT:
+			case GT:
+			case U_GT:
+				throw new RuntimeException("Adjusting length for condition operator; should've returned BIT_INDICES by this place");
+			case CAT:
+				/* Accumulative HSB of all the operands */
+				int currentLength = currentIndices == null ? 0 : currentIndices.length();
+				int newOperandLength = newOperandIndices.length();
 
-			return new Indices(currentLength + newOperandLength - 1, 0);
-		} else {
-
-			if (this == ADDER || this == DIV || this == MULT || this == AND || this == OR || this == XOR
-					|| this == SUBTR || this == MOD) {
+				return new Indices(currentLength + newOperandLength - 1, 0);
+			case ADDER:
+			case MULT:
+			case DIV:
+			case XOR:
+			case SUBTR:
+			case AND:
+			case OR:
+			case MOD:
 				/* HSB of the longest operand */
 				if (currentIndices == null) {
 					return newOperandIndices;
@@ -204,16 +224,16 @@ public enum Operator {
 					int newHsb = newOperandIndices.highestSB();
 					return currentHsb > newHsb ? currentIndices : newOperandIndices;
 				}
-
-			} else if (this == SHIFT_LEFT || this == SHIFT_RIGHT) {
+			case EXP:
+				break;
+			case SHIFT_RIGHT:
+			case SHIFT_LEFT:
 				/* HSB of the operand being shifted */
 				return currentIndices == null ? newOperandIndices : currentIndices;
-			} else {
-				/* INV */
+			case INV:
 				return newOperandIndices;
-			}
 		}
-
+		throw new RuntimeException("Don't know how to adjust length for " + this + " operator");
 	}
 
 

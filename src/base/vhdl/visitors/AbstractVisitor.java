@@ -13,6 +13,7 @@ import base.vhdl.structure.nodes.WhenNode;
  */
 public abstract class AbstractVisitor {
 
+	//todo: make all methods non-abstract, but throw Exceptions from them. This way Impl classes will not be obliged to override methods with empty bodies, when the methods are not actually needed 
 	public abstract void visitEntity(Entity entity) throws Exception;
 
 	public abstract void visitArchitecture(Architecture architecture) throws Exception;

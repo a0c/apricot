@@ -1,13 +1,11 @@
 package base.vhdl.structure.nodes;
 
-import base.vhdl.visitors.AbstractVisitor;
-import base.vhdl.structure.Transition;
+import base.Indices;
+import base.vhdl.processors.AbstractProcessor;
 import base.vhdl.structure.AbstractOperand;
 import base.vhdl.structure.OperandImpl;
-import base.vhdl.processors.AbstractProcessor;
-import base.hldd.structure.variables.AbstractVariable;
-import base.hldd.structure.variables.PartedVariable;
-import base.Indices;
+import base.vhdl.structure.Transition;
+import base.vhdl.visitors.AbstractVisitor;
 
 /**
  * @author Anton Chepurov
@@ -34,8 +32,8 @@ public class TransitionNode extends AbstractNode {
 
 	/**
 	 * @return <code>null</code> if it is a <code>Null-transition</code>
-	 * 		   or if valueOperand is not parted. Parted indices, if the
-	 * 		   valueOperand is parted.
+	 *         or if valueOperand is not parted. Parted indices, if the
+	 *         valueOperand is parted.
 	 */
 	public Indices getValueOperandPartedIndices() {
 		return isNull() ? null : getValueOperand().getPartedIndices();
@@ -49,49 +47,8 @@ public class TransitionNode extends AbstractNode {
 		processor.processTransitionNode(this);
 	}
 
-	/**
-	 * TransitionNode is transition of the specified variable if:
-	 * <br>- Node is <code>Null-transition</code> node (can only occur in Beh
-	 * DD trees).
-	 * <br>  (<b>NB!</b> For the rest of the cases node is supposed to be a
-	 * non-<code>Null-transition</code>)
-	 * <br>- Node's variableOperand has the same name as Variable and one of
-	 * the following holds:
-	 * <br>- - none of them is parted;
-	 * <br>- - Variable is parted and node's variableOperand is either not
-	 * parted or has parted indices that contain the parted indices of
-	 * the Variable;
-	 *
-	 * @param variable		  checked variable
-	 * @param isNullATransition whether to treat null-transition as a transition of the specified variable
-	 * @return <code>true</code> if this Transition Node sets the specified
-	 * 		   variable. <code>false</code> otherwise.
-	 */
-	public boolean isTransitionOf(AbstractVariable variable, boolean isNullATransition) {
-
-		if (isNull()) {
-			return isNullATransition;
-		}
-
-		OperandImpl targetOperand = getTargetOperand();
-
-		if (targetOperand.getName().equals(variable.getPureName())) {
-			if (targetOperand.isDynamicSlice()) {
-				return true;
-			}
-			if (!targetOperand.isParted() && variable.getClass() != PartedVariable.class)
-				return true;
-			if (variable.getClass() == PartedVariable.class && (!targetOperand.isParted()
-					|| targetOperand.getPartedIndices().contain(((PartedVariable) variable).getPartedIndices())))
-				return true;
-		}
-
-		return false;
-	}
-
 	public boolean isIdenticalTo(AbstractNode comparedNode) {
 		return comparedNode instanceof TransitionNode && transition.isIdenticalTo(((TransitionNode) comparedNode).transition);
-
 	}
 
 	public String toString() {

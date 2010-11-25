@@ -1,27 +1,26 @@
 package base.hldd.structure.models.utils;
 
 import base.HLDDException;
+import base.Indices;
+import base.Type;
+import base.TypeResolver;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
-import base.hldd.structure.variables.Variable;
 import base.hldd.visitors.DependentVariableReplacer;
 import base.vhdl.structure.*;
-import base.Indices;
-import base.Type;
-
-import java.util.*;
-import java.math.BigInteger;
-
-import base.vhdl.structure.Process;
 import parsers.vhdl.PackageParser;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * @author Anton Chepurov
  */
-public class ModelManager {
+public class ModelManager implements TypeResolver {
+
 	private VariableManager variableManager;
-	private PartialAssignmentManager partialAssignmentManager;
+
 	private ConstantVariable constant0;
 	private ConstantVariable constant1;
 
@@ -43,14 +42,14 @@ public class ModelManager {
 
 	public ConstantVariable getConstant0() throws Exception {
 		if (constant0 == null) {
-			constant0 = (ConstantVariable) convertOperandToVariable(new OperandImpl("0"), Indices.BIT_INDICES, false);
+			constant0 = (ConstantVariable) convertOperandToVariable(new OperandImpl("0"), Type.BIT_TYPE, false);
 		}
 		return constant0;
 	}
 
 	public ConstantVariable getConstant1() throws Exception {
 		if (constant1 == null) {
-			constant1 = (ConstantVariable) convertOperandToVariable(new OperandImpl("1"), Indices.BIT_INDICES, false);
+			constant1 = (ConstantVariable) convertOperandToVariable(new OperandImpl("1"), Type.BIT_TYPE, false);
 		}
 		return constant1;
 	}
@@ -84,7 +83,12 @@ public class ModelManager {
 
 	private void replaceInModel(AbstractVariable variableToReplace, PartedVariableHolder replacingVarHolder) {
 
-		AbstractVariable replacingVariable = replacingVarHolder.getVariable();
+		boolean flattenToBits = (replacingVarHolder == null);
+		if (flattenToBits) {
+			checkBitVariablesAvailability(variableToReplace);
+		}
+
+		AbstractVariable replacingVariable = flattenToBits ? null : replacingVarHolder.getVariable();
 		/* Replace old variable with new one in Functions and GraphVariables */
 		for (AbstractVariable absVariable : variableManager.getVariables()) {
 
@@ -92,10 +96,16 @@ public class ModelManager {
 				FunctionVariable functionVariable = (FunctionVariable) absVariable;
 				for (PartedVariableHolder operand : functionVariable.getOperands()) {
 					if (operand.getVariable() == variableToReplace) {
-						operand.setVariable(replacingVariable);
-						if (replacingVarHolder.isParted()) {
-							//todo: Indices.absoluteFor()...
-							operand.setPartedIndices(replacingVarHolder.getPartedIndices());
+						if (flattenToBits) {
+							replacingVariable = generateBitRangeVariable(variableToReplace, operand.getPartedIndices());
+							operand.setVariable(replacingVariable);
+							operand.setPartedIndices(null);
+						} else {
+							operand.setVariable(replacingVariable);
+							if (replacingVarHolder.isParted()) {
+								//todo: Indices.absoluteFor()...
+								operand.setPartedIndices(replacingVarHolder.getPartedIndices());
+							}
 						}
 					}
 				}
@@ -103,13 +113,44 @@ public class ModelManager {
 			} else if (absVariable instanceof GraphVariable) {
 				GraphVariable graphVariable = (GraphVariable) absVariable;
 				try {
-					graphVariable.traverse(new DependentVariableReplacer(variableToReplace, replacingVarHolder));
+					graphVariable.traverse(flattenToBits ?
+							new DependentVariableReplacer.FlattenerToBits(variableToReplace, this) :
+							new DependentVariableReplacer(variableToReplace, replacingVarHolder)
+					);
 				} catch (Exception e) {
 					throw new RuntimeException("Error while traversing GraphVariable with DependentVariableReplacer: "
 							+ e.getMessage(), e); /* should never happen */
 				}
 			}
 		}
+	}
+
+	private void checkBitVariablesAvailability(AbstractVariable variableToReplace) {
+		for (int i = 0; i < variableToReplace.getLength().getHighest(); i++) {
+			String bitVariableName = generateBitVariableName(variableToReplace, new Indices(i, i));
+			AbstractVariable bitVariable = getVariable(bitVariableName);
+			if (bitVariable == null) {
+				throw new RuntimeException("Cannot flatten variable " + variableToReplace.getName() +
+						" to bits. BIT SLICE variable " + bitVariableName + " is not found.");
+			}
+		}
+	}
+
+	public AbstractVariable generateBitRangeVariable(AbstractVariable wholeVariable, Indices partedIndices) {
+		return getVariable(generateBitVariableName(wholeVariable, partedIndices));
+	}
+
+	private String generateBitVariableName(AbstractVariable wholeVariable, Indices partedIndices) {
+
+		if (partedIndices == null) {
+			throw new RuntimeException("Cannot flatten variable " + wholeVariable.getName() +
+					" to bits. WHOLE variable is in use.");
+		}
+		if (partedIndices.length() != 1) {
+			throw new RuntimeException("Cannot flatten variable " + wholeVariable.getName() +
+					" to bits. NON-BIT SLICE of the variable is in use: " + partedIndices);
+		}
+		return new OperandImpl(wholeVariable.getName(), partedIndices, false).toString();
 	}
 
 	public PartedVariableHolder convertConditionalStmt(Expression conditionalStmt, boolean flattenCondition) throws Exception {
@@ -219,7 +260,7 @@ public class ModelManager {
 	 *                     Depending on this, <i>inversion</i> in expression is either ignored (in case
 	 *                     of conditions), or treated as a Function (in case of transition).
 	 * @return FunctionVariable which represents the specified operand
-	 * @throws Exception cause {@link #convertOperandToVariable(AbstractOperand, Indices, boolean) cause }
+	 * @throws Exception cause {@link #convertOperandToVariable(AbstractOperand, Type, boolean) cause }
 	 */
 	private FunctionVariable createFunction(AbstractOperand funcOperand, boolean isTransition) throws Exception {
 		FunctionVariable functionVariable;
@@ -358,7 +399,7 @@ public class ModelManager {
 	 * comparison operators: GT / U_GT, LT / U_LT, GE / U_GE, LE / U_LE.
 	 *
 	 * @param functionVariable variable to tune
-	 * @throws Exception {@link #convertOperandToVariable(AbstractOperand, Indices, boolean)}.
+	 * @throws Exception {@link #convertOperandToVariable(AbstractOperand, Type, boolean)}.
 	 */
 	private void tuneFunctionVariable(FunctionVariable functionVariable) throws Exception {
 		/* Replace DIVISION and MULTIPLICATION by power of 2 with SHIFTS */
@@ -438,11 +479,13 @@ public class ModelManager {
 		return variableManager.getConstantByValue(subConstant.getValue(), subConstant.getLength());
 	}
 
-	public void concatenatePartialAssignments(AbstractVariable wholeVariable, List<OperandImpl> partialAssignments, boolean delay) throws Exception {
-		/* Create CAT function */
+	public void concatenateRangeAssignments(String wholeVariableName, List<OperandImpl> partialAssignments) throws Exception {
+
 		FunctionVariable catFunction = createCatFunction(partialAssignments);
-		/* Make base variable tree contain 1 Terminal Node only: the CAT node */
-		createAndReplaceNewGraph(wholeVariable, new Node.Builder(catFunction).build(), delay); // isDelay(varName) was at first "true".
+
+		AbstractVariable wholeVariable = getVariable(wholeVariableName);
+
+		createAndReplaceNewGraph(wholeVariable, new Node.Builder(catFunction).build(), false); // isDelay(varName) was at first "true".
 	}
 
 	/**
@@ -472,31 +515,24 @@ public class ModelManager {
 		return (FunctionVariable) convertOperandToVariable(catExpression, null, true);
 	}
 
-	private PartialAssignmentManager getPartialAssignmentManager() {
-		if (partialAssignmentManager == null) {
-			partialAssignmentManager = new PartialAssignmentManager(this);
+	public void flattenVariableToBits(AbstractVariable wholeVariable) {
+
+		replaceInModel(wholeVariable, null);
+
+		removeVariable(wholeVariable);
+	}
+
+	@Override
+	public Type resolveType(String objectName) {
+		AbstractVariable abstractVariable = getVariable(objectName);
+		if (abstractVariable != null) {
+			return abstractVariable.getType();
 		}
-		return partialAssignmentManager;
-	}
-
-	public void collectPartialSettings(Architecture architecture) throws Exception {
-		getPartialAssignmentManager().collectPartialSettings(architecture);
-	}
-
-	public boolean hasPartialAssignmentsIn(Process process) {
-		return getPartialAssignmentManager().hasPartialAssignmentsIn(process);
-	}
-
-	public Map<String, Set<OperandImpl>> getPartialAssignmentsFor(Object astObject) {
-		return getPartialAssignmentManager().getPartialAssignmentsFor(astObject);
-	}
-
-	public void finalizeAndCheckForCompleteness(Set<OperandImpl> partialSets, Indices wholeLength, String varName) throws Exception {
-		PartialAssignmentManager.finalizeAndCheckForCompleteness(partialSets, wholeLength, varName);
-	}
-
-	public void splitPartiallyAssignedSignals(Set<ComponentInstantiation> components) throws Exception {
-		getPartialAssignmentManager().splitPartiallyAssignedSignals(components);
+		ConstantVariable constantVariable = getConstant(objectName);
+		if (constantVariable != null) {
+			return constantVariable.getType();
+		}
+		return null;
 	}
 
 	private class OperandImplComparator implements Comparator<OperandImpl> {
@@ -605,39 +641,6 @@ public class ModelManager {
 		return variableToFind;
 	}
 
-	/**
-	 * @param variable variable for which to calculate the number of conditions
-	 * @return number of possible values of the variable
-	 * @throws Exception if number of conditions is being calculated for a variable that doesn't belong
-	 *                   neither to FunctionVariable nor to Variable class
-	 */
-	public int getConditionValuesCount(AbstractVariable variable) throws Exception {
-		int order;
-		if (variable.getClass() == FunctionVariable.class) {
-			order = 1;
-		} else if (variable.getClass() == Variable.class || variable.getClass() == GraphVariable.class) {
-			Type varType = variable.getType();
-			if (varType.isEnum()) {
-				return varType.getCardinality();
-			} else {
-				return varType.getLength().deriveValueRange().getHighest() + 1;
-//                return varType.getLength().length();
-			}
-//            order = variable.getLength().length()  /*variable.getHighestSB() + 1*/ ;
-			//todo: Indices.deriveValueRange() may be helpfull here
-		} else if (variable instanceof PartedVariable) { // todo: comment this part and add "variable instanceof PartedVariable" to previous
-			variable.getLength().length();
-			PartedVariable partedVariable = (PartedVariable) variable;
-			order = partedVariable.getPartedIndices().length();
-		} else throw new Exception("Number of conditions can be calculated " +
-				"for " + FunctionVariable.class.getSimpleName() + ", " +
-				Variable.class.getSimpleName() + " and " +
-				GraphVariable.class.getSimpleName() + " only:" +
-				"\nRequested variable: \n" + variable.toString());
-
-		return (int) Math.pow(2, order);
-	}
-
 	public int getBooleanValueFromOperand(AbstractOperand abstractOperand) {
 		return adjustBooleanCondition(1, abstractOperand.isInverted());
 	}
@@ -656,28 +659,46 @@ public class ModelManager {
 	 * Otherwise searches for it amongst internal variables.
 	 *
 	 * @param operand	  base operand to extract variable from
-	 * @param targetLength desired length of the variable or <code>null<code> if doesn't matter.
+	 * @param targetType   desired length of the variable or <code>null<code> if doesn't matter.
 	 *                     <b>NB!</b> This currently matters for {@link ConstantVariable}-s only.
 	 * @param isTransition {@link #createFunction(base.vhdl.structure.AbstractOperand, boolean)}
 	 * @return a ConstantVariable, FunctionVariable or Variable based on the <code>operand</code>
 	 * @throws Exception if the <code>operand</code> contains an undeclared variable
 	 */
-	public AbstractVariable convertOperandToVariable(AbstractOperand operand, Indices targetLength, boolean isTransition) throws Exception {
+	public AbstractVariable convertOperandToVariable(AbstractOperand operand, Type targetType, boolean isTransition) throws Exception {
 
 		if (operand instanceof Expression || operand instanceof OperandImpl && operand.isInverted()) {
 
 			return createFunction(operand, isTransition);
 
 		} else if (operand instanceof OperandImpl) {
-			String variableName = ((OperandImpl) operand).getName();
+			OperandImpl operandImpl = (OperandImpl) operand;
+			if (operandImpl.isArray()) {
+				Type elType = targetType.getArrayElementType();
+				Map<Condition, ConstantVariable> arrayValues = new TreeMap<Condition, ConstantVariable>();
+				for (OperandImpl.Element element : operandImpl.getElements()) {
+
+					AbstractVariable elVar = convertOperandToVariable(element.operand, elType, isTransition);
+					if (!(elVar instanceof ConstantVariable)) {
+						throw new Exception("Non-constant array element found: " + elVar.getClass().getSimpleName());
+					}
+					arrayValues.put(element.index, (ConstantVariable) elVar);
+				}
+				return new ConstantVariable(arrayValues);
+			}
+			String variableName = operandImpl.getName();
 			BigInteger constantValue = PackageParser.parseConstantValue(variableName);
 			if (constantValue != null) {
 				/* Get CONSTANT by VALUE*/
 				//todo: Jaan: different constants for different contexts
+				Indices targetLength = targetType != null ? targetType.getLength() : null;
 				return variableManager.getConstantByValue(constantValue,
 						operand.getLength() != null ? operand.getLength() : targetLength);
 
 			} else {
+				if (operandImpl.isDynamicRange()) {
+					variableName = OperandImpl.generateNameForDynamicRangeRead(operandImpl);
+				}
 				/* Get VARIABLE by NAME */
 				AbstractVariable variable = variableManager.getVariableByName(variableName);
 				if (variable != null) return variable;

@@ -1,15 +1,17 @@
 package base.vhdl.structure;
 
-import base.vhdl.visitors.Visitable;
-import base.vhdl.visitors.AbstractVisitor;
 import base.vhdl.structure.nodes.CompositeNode;
+import base.vhdl.visitors.AbstractVisitor;
+import base.vhdl.visitors.Visitable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author Anton Chepurov
  */
-public class Architecture implements Visitable {
+public class Architecture extends ASTObject implements Visitable {
 	private final String name;
 	private final String affiliation;
 
@@ -23,7 +25,8 @@ public class Architecture implements Visitable {
 
 	private Set<ComponentInstantiation> components = new HashSet<ComponentInstantiation>();
 
-	public Architecture(String name, String affiliation) {
+	public Architecture(String name, String affiliation, Entity parent) {
+		super(parent);
 		this.name = name;
 		this.affiliation = affiliation;
 	}
@@ -88,18 +91,18 @@ public class Architecture implements Visitable {
 		}
 	}
 
-	public Signal resolveSignal(String signalName) {
+	private Signal resolveSignal(String name) {
 		for (Signal signal : signals) {
-			if (signal.getName().equals(signalName)) {
+			if (signal.getName().equals(name)) {
 				return signal;
 			}
 		}
 		return null;
 	}
 
-	public Constant resolveConstant(String constantName) {
+	private Constant resolveConstantInternal(String name) {
 		for (Constant constant : constants) {
-			if (constant.getName().equals(constantName)) {
+			if (constant.getName().equals(name)) {
 				return constant;
 			}
 		}
@@ -108,5 +111,27 @@ public class Architecture implements Visitable {
 
 	public void addComponent(ComponentInstantiation componentInst) {
 		components.add(componentInst);
+	}
+
+	public ComponentInstantiation resolveComponentInstantiation(String compInstName) {
+		for (ComponentInstantiation component : components) {
+			if (component.getName().equals(compInstName)) {
+				return component;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public ASTObject doResolve(String name) {
+		Signal signal = resolveSignal(name);
+		if (signal != null) {
+			return signal;
+		}
+		Constant constant = resolveConstantInternal(name);
+		if (constant != null) {
+			return constant;
+		}
+		return resolveComponentInstantiation(name);
 	}
 }

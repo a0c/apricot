@@ -5,7 +5,7 @@ import base.Type;
 /**
  * @author Anton Chepurov
  */
-public class Port {
+public class Port extends ASTObject {
 
 	private String name;
 
@@ -14,6 +14,7 @@ public class Port {
 	private Type type;
 
 	public Port(String name, boolean isInput, Type type) {
+		super(null);
 		this.name = name;
 		this.isInput = isInput;
 		this.type = type;
@@ -33,6 +34,7 @@ public class Port {
 		return !isInput;
 	}
 
+	@Override
 	public Type getType() {
 		return type;
 	}
