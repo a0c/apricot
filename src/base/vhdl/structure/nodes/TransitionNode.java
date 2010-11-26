@@ -32,11 +32,11 @@ public class TransitionNode extends AbstractNode {
 
 	/**
 	 * @return <code>null</code> if it is a <code>Null-transition</code>
-	 *         or if valueOperand is not parted. Parted indices, if the
-	 *         valueOperand is parted.
+	 *         or if valueOperand is not a range. Range, if the
+	 *         valueOperand is a range operand.
 	 */
-	public Indices getValueOperandPartedIndices() {
-		return isNull() ? null : getValueOperand().getPartedIndices();
+	public Indices getValueOperandRange() {
+		return isNull() ? null : getValueOperand().getRange();
 	}
 
 	public void traverse(AbstractVisitor visitor) throws Exception {

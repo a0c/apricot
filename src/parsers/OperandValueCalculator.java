@@ -17,10 +17,10 @@ public class OperandValueCalculator {
 
 	public ValueHolder calculateValueFor(AbstractOperand operand) throws Exception {
 
-		/* Discard PARTED operands */
-		if (operand.isParted())
+		/* Discard RANGE operands */
+		if (operand.isRange())
 			throw new Exception(OperandValueCalculator.class.getSimpleName() +
-					" is calculating value for Operand with parted indices. " +
+					" is calculating value for Operand with range. " +
 					"This functionality is not currently supported.");
 
 		if (operand instanceof OperandImpl) {

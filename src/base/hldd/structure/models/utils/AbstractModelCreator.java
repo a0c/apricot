@@ -118,7 +118,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 
 					FunctionVariable functionVariable = (FunctionVariable) variable;
 
-					for (PartedVariableHolder
+					for (RangeVariableHolder
 							operandHolder : functionVariable.getOperands()) {
 						if (operandHolder.getVariable() == constant) {
 							isUsed = true;
@@ -354,28 +354,28 @@ public abstract class AbstractModelCreator implements ModelCreator {
 		private void addNonDelayGraph(AbstractVariable dependentVariable, Set<GraphVariable> depVarSet) {
 			/* Skip value retaining nodes (case when variable depends on itself) */
 			if (currentlyProcessedVar == dependentVariable) return;
-			/* Skip usages of base whole variables in parted variables */
-			if (isUsageOfBaseVariableInParted(dependentVariable)) return;
+			/* Skip usages of base whole variables in range variables */
+			if (isUsageOfBaseVariableInRange(dependentVariable)) return;
 			/* Check for GraphVariables and if failed --- for FunctionVariables */
 			if (dependentVariable instanceof GraphVariable && !dependentVariable.isDelay()) {
 				depVarSet.add((GraphVariable) dependentVariable);
 			} else if (dependentVariable instanceof FunctionVariable) {
-				for (PartedVariableHolder operandHolder : ((FunctionVariable) dependentVariable).getOperands()) {
+				for (RangeVariableHolder operandHolder : ((FunctionVariable) dependentVariable).getOperands()) {
 					/* Check Operands */
 					addNonDelayGraph(operandHolder.getVariable(), depVarSet);
 				}
 			}
 		}
 
-		private boolean isUsageOfBaseVariableInParted(AbstractVariable dependentVariable) {
+		private boolean isUsageOfBaseVariableInRange(AbstractVariable dependentVariable) {
 			if (!(dependentVariable instanceof GraphVariable)) { // Base variable is expected to be a GraphVariable with a CAT-function as the only node
 				return false;
 			}
 			GraphVariable depVar = (GraphVariable) dependentVariable;
 
 			return currentlyProcessedVar.getPureName().equals(depVar.getPureName())
-					&& currentlyProcessedVar.getBaseVariable() instanceof PartedVariable
-					&& !(depVar.getBaseVariable() instanceof PartedVariable);
+					&& currentlyProcessedVar.getBaseVariable() instanceof RangeVariable
+					&& !(depVar.getBaseVariable() instanceof RangeVariable);
 		}
 
 	}

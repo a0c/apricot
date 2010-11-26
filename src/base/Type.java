@@ -174,12 +174,12 @@ public final class Type {
 		return arrayElementType;
 	}
 
-	public Type derivePartedType(Indices partedIndices) {
-		if (partedIndices == null) {
+	public Type deriveRangeType(Indices range) {
+		if (range == null) {
 			return this;
 		}
-		/* Derive the length of parted indices */
-		Indices length = partedIndices.deriveLength();
+		/* Derive the length of the range */
+		Indices length = range.deriveLength();
 		if (isArray()) {
 			return length.length() == 1 ? arrayElementType : new Type(length, arrayElementType);
 		}

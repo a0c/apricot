@@ -42,7 +42,7 @@ public class DefaultGraphVariableCreator implements GraphVariableCreator {
 					Collector.NodeData nodeDatum = nodeData[i];
 					Object depVarObject = collector.getVarObject(nodeDatum.depVarIndex);
 					TreeMap<Condition, Integer> successors = nodeDatum.successors;
-					Indices depVarPartedIndices = nodeDatum.depVarPartedIndices;
+					Indices depVarRange = nodeDatum.depVarRange;
 					AbstractVariable dependentVariable;
 					if (depVarObject instanceof AbstractVariable) {
 						dependentVariable = (AbstractVariable) depVarObject;
@@ -51,8 +51,8 @@ public class DefaultGraphVariableCreator implements GraphVariableCreator {
 					} else throw new Exception("Error while creating nodes for GraphVariable:" +
 							"\nDependent variable for a node is neither an AbstractVariable nor a GraphVariableData");
 					/* Create and hash node */
-					Node newNode = successors == null ? new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).build()
-							: new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).createSuccessors(Condition.countValues(successors.keySet())).build();
+					Node newNode = successors == null ? new Node.Builder(dependentVariable).range(depVarRange).build()
+							: new Node.Builder(dependentVariable).range(depVarRange).createSuccessors(Condition.countValues(successors.keySet())).build();
 					nodeByIndex.put(i, newNode);
 					/* Index node manually */
 					newNode.setRelativeIndex(i);

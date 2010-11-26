@@ -39,16 +39,16 @@ public class TemporalNodeTest {
 		assertArrayEquals(windowPlaceholders, ((TemporalNode) node).getWindowPlaceholders());
 
 		// Check correctness of super-class methods
-		Indices partedIndices = new Indices(9, 2);
+		Indices range = new Indices(9, 2);
 		SourceLocation source = new SourceLocation(new File("Buba.aqa"), Collections.singleton(1991));
 		node = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags()))
 				.createSuccessors(2)
-				.partedIndices(partedIndices)
+				.range(range)
 				.source(source).build();
 		assertTrue(node instanceof TemporalNode);
 		assertTrue(node.isControlNode());
-		assertNotNull(node.getPartedIndices());
-		assertEquals(partedIndices, node.getPartedIndices());
+		assertNotNull(node.getRange());
+		assertEquals(range, node.getRange());
 		assertNotNull(node.getSource());
 		assertEquals(source, node.getSource());
 		assertEquals("Buba.aqa 1991", node.getSource().toString());
@@ -56,7 +56,7 @@ public class TemporalNodeTest {
 		// Check class of the chained builder
 		Node.Builder builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).createSuccessors(2);
 		assertTrue(builder instanceof TemporalNode.Builder);
-		builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).partedIndices(partedIndices);
+		builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).range(range);
 		assertTrue(builder instanceof TemporalNode.Builder);
 		builder = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags())).source(source);
 		assertTrue(builder instanceof TemporalNode.Builder);

@@ -39,16 +39,16 @@ public class SplittableOperandStorage extends OperandStorage {
 			int lowerBound = getLowest(oldRanges);
 			int upperBound = getHighest(oldRanges);
 			/* Fill SortedSets */
-			for (OperandImpl sliceOperand : oldRanges) {
-				Indices slice = sliceOperand.getPartedIndices();
+			for (OperandImpl rangeOperand : oldRanges) {
+				Indices range = rangeOperand.getRange();
 				/* Starting index */
-				int start = slice.getLowest();
+				int start = range.getLowest();
 				startsSet.add(start);
 				if (start - 1 >= lowerBound) {
 					endsSet.add(start - 1);
 				}
 				/* Ending index */
-				int end = slice.getHighest();
+				int end = range.getHighest();
 				endsSet.add(end);
 				if (end + 1 <= upperBound) {
 					startsSet.add(end + 1);
@@ -66,7 +66,7 @@ public class SplittableOperandStorage extends OperandStorage {
 
 			fillMissingRanges(newRanges, varName, typeResolver);
 
-			/* Replace the variable set in partialSettingsMap with the new one */
+			/* Replace operand set with the new one */
 			operandsByName.put(varName, newRanges);
 		}
 
@@ -84,7 +84,7 @@ public class SplittableOperandStorage extends OperandStorage {
 
 			Type type = typeResolver.resolveType(operand.getDynamicRange().getName());
 
-			int length = type.countPossibleValues(operand.getPartedIndices(), wholeLength);
+			int length = type.countPossibleValues(operand.getRange(), wholeLength);
 
 			operands.remove(operand);
 			for (int index = 0; index < length; index++) {
@@ -96,7 +96,7 @@ public class SplittableOperandStorage extends OperandStorage {
 	private static int getLowest(Set<OperandImpl> operands) {
 		int min = Integer.MAX_VALUE;
 		for (OperandImpl operand : operands) {
-			int lowest = operand.getPartedIndices().getLowest();
+			int lowest = operand.getRange().getLowest();
 			if (lowest < min) {
 				min = lowest;
 			}
@@ -111,7 +111,7 @@ public class SplittableOperandStorage extends OperandStorage {
 	private static int getHighest(Set<OperandImpl> operands) {
 		int max = -1;
 		for (OperandImpl operand : operands) {
-			int highest = operand.getPartedIndices().getHighest();
+			int highest = operand.getRange().getHighest();
 			if (highest > max) {
 				max = highest;
 			}
@@ -130,9 +130,9 @@ public class SplittableOperandStorage extends OperandStorage {
 		boolean[] bits = new boolean[wholeLength];
 		/* Check intersections: if any, inform about them */
 		for (OperandImpl operand : operands) {
-			if (!operand.isParted())
+			if (!operand.isRange())
 				throw new RuntimeException("Range assignment operand doesn't contain range: " + operand);
-			Indices range = operand.getPartedIndices();
+			Indices range = operand.getRange();
 			for (int index = range.getLowest(); index <= range.getHighest(); index++) {
 				/* If this bit has already been set, inform about intersection */
 				if (bits[index]) throw new RuntimeException("Intersection of range assignment operands:" +
@@ -140,7 +140,7 @@ public class SplittableOperandStorage extends OperandStorage {
 				bits[index] = true;
 			}
 		}
-		/* Check missing partial setting variables: if any, fill the set with missing variables */
+		/* Check missing range assignment variables: if any, fill the set with missing variables */
 		Collection<Indices> unsetIndicesCollect = extractUnsetIndices(bits);
 		for (Indices unsetIndices : unsetIndicesCollect) { //todo: It may occur, that the whole variable is unset. Consider this.
 			operands.add(new OperandImpl(varName, unsetIndices, false));

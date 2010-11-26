@@ -290,9 +290,9 @@ public class StructureBuilder extends AbstractPackageBuilder {
 			/* ##### OTHERS #####*/
 			OperandImpl targetOperand = (OperandImpl) expressionBuilder.buildExpression(variableName);
 			Type type = getTypeFor(targetOperand.getName());
-			Indices partedIndices = targetOperand.isParted() ? targetOperand.getPartedIndices()
+			Indices range = targetOperand.isRange() ? targetOperand.getRange()
 					: targetOperand.isDynamicRange() ? Indices.BIT_INDICES : null;
-			variableValue = PackageParser.replaceOthersValue(variableValue, type, partedIndices).get(Condition.FALSE);
+			variableValue = PackageParser.replaceOthersValue(variableValue, type, range).get(Condition.FALSE);
 			transition = new Transition(targetOperand, expressionBuilder.buildExpression(variableValue));
 		} else {
 			/* ##### NORMAL #####*/

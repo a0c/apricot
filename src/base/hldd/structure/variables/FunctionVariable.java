@@ -2,7 +2,7 @@ package base.hldd.structure.variables;
 
 import base.Indices;
 import base.Type;
-import base.hldd.structure.models.utils.PartedVariableHolder;
+import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.vhdl.structure.Operator;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class FunctionVariable extends Variable {
 	/**
 	 * Operands
 	 */
-	protected List<PartedVariableHolder> operands;
+	protected List<RangeVariableHolder> operands;
 	/**
 	 * Index of function (denotes order)
 	 */
@@ -53,7 +53,7 @@ public class FunctionVariable extends Variable {
 	public FunctionVariable(Operator operator, int nameIdx) {
 		this(nameIdx);
 		this.operator = operator;
-		operands = new ArrayList<PartedVariableHolder>(INITIAL_OPERAND_COUNT);
+		operands = new ArrayList<RangeVariableHolder>(INITIAL_OPERAND_COUNT);
 	}
 
 	protected FunctionVariable(int nameIdx) {
@@ -79,10 +79,10 @@ public class FunctionVariable extends Variable {
 		StringBuilder sb = new StringBuilder();
 		int i = 1;
 		String delim = operands.size() > 2 ? " " : "\t";
-		for (PartedVariableHolder operand : operands) {
+		for (RangeVariableHolder operand : operands) {
 			sb.append("A").append(i++).append("<= ");
-			String indicesAsString = operand.isParted()
-					? operand.getPartedIndices().toStringAngular(false)
+			String indicesAsString = operand.isRange()
+					? operand.getRange().toStringAngular(false)
 					: operand.getVariable().lengthToString();
 			sb.append(operand.getVariable().getIndex()).append(indicesAsString);
 			sb.append(",").append(delim);
@@ -128,22 +128,22 @@ public class FunctionVariable extends Variable {
 
 	/**
 	 * @param operandVariable operand to add
-	 * @param partedIndices   parted indices of the operand to add
+	 * @param range range of the operand to add
 	 * @throws Exception if the operand being added exceeds the limit of the operator operands limit
 	 */
-	public void addOperand(AbstractVariable operandVariable, Indices partedIndices) throws Exception {
+	public void addOperand(AbstractVariable operandVariable, Indices range) throws Exception {
 		if (!isValidAddition()) throw new Exception(FAILED_ADD_OPERAND_TEXT + " to Function." +
 				"\nOperator " + operator + " supports only " + operator.getNumberOfOperands() + " operand(s).");
-		operands.add(new PartedVariableHolder(operandVariable, partedIndices));
+		operands.add(new RangeVariableHolder(operandVariable, range));
 		/* Update highestSB */
-		type = adjustType(type, operandVariable.getType(), partedIndices);
+		type = adjustType(type, operandVariable.getType(), range);
 	}
 
 	protected boolean isValidAddition() {
 		return operands.size() < operator.getNumberOfOperands();
 	}
 
-	protected Type adjustType(Type currentType, Type addedType, Indices addedPartedIndices) {
+	protected Type adjustType(Type currentType, Type addedType, Indices addedRange) {
 		if (operator == Operator.EXP) {
 			if (operands.size() != 2) {
 				return null;
@@ -153,10 +153,10 @@ public class FunctionVariable extends Variable {
 		/* Update highestSB */
 		Indices addedLength = addedType.getLength();
 		if (currentType == null) {
-			Indices adjustedLength = operator.adjustLength(null, addedLength, addedPartedIndices);
+			Indices adjustedLength = operator.adjustLength(null, addedLength, addedRange);
 			currentType = new Type(adjustedLength);
 		} else {
-			Indices adjustedLength = operator.adjustLength(currentType.getLength(), addedLength, addedPartedIndices);
+			Indices adjustedLength = operator.adjustLength(currentType.getLength(), addedLength, addedRange);
 			currentType.setLength(adjustedLength);
 		}
 		return currentType;
@@ -168,7 +168,7 @@ public class FunctionVariable extends Variable {
 		return operator;
 	}
 
-	public List<PartedVariableHolder> getOperands() {
+	public List<RangeVariableHolder> getOperands() {
 		return operands;
 	}
 
@@ -184,7 +184,7 @@ public class FunctionVariable extends Variable {
 		this.operator = operator;
 	}
 
-	public void setOperand(int index, PartedVariableHolder operandHolder) {
+	public void setOperand(int index, RangeVariableHolder operandHolder) {
 		operands.set(index, operandHolder);
 	}
 

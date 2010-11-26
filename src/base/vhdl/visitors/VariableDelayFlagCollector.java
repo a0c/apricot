@@ -1,6 +1,6 @@
 package base.vhdl.visitors;
 
-import base.vhdl.processors.VariableSettingDetectorImpl;
+import base.vhdl.processors.OperandAssignmentDetectorImpl;
 import base.vhdl.structure.*;
 import base.vhdl.structure.nodes.*;
 import base.vhdl.structure.utils.OperandStorage;
@@ -29,7 +29,7 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 	 */
 	private Collection<String> varNames;
 	/**
-	 * Map of sets to speedup setting checks. Used in {@link base.vhdl.processors.VariableSettingDetectorImpl}.
+	 * Map of sets to speedup setting checks. Used in {@link base.vhdl.processors.OperandAssignmentDetectorImpl}.
 	 */
 	private Map<String, Map<OperandImpl, Set<AbstractNode>>> settingNodesByVar;
 
@@ -58,11 +58,11 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 			varNames.add(varName);
 			settingNodesByVar.put(varName, new HashMap<OperandImpl, Set<AbstractNode>>());
 		}
-//        PartialSetVariableCollector collector = new PartialSetVariableCollector();
+//        RangeAssignmentCollector collector = new RangeAssignmentCollector();
 //        process.traverse(collector);
-//        Map<String, Set<OperandImpl>> partialSettingsMap = collector.getPartialSettingsMap();
-//        if (!partialSettingsMap.isEmpty()) {
-//            partialSettingsMapByProcess.put(process, partialSettingsMap);
+//        Map<String, Set<OperandImpl>> rangeAssignmentsMap = collector.getRangeAssignmentsMap();
+//        if (!rangeAssignmentsMap.isEmpty()) {
+//            rangeAssignmentsMapByProcess.put(process, rangeAssignmentsMap);
 //        }
 
 
@@ -156,17 +156,17 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 	 *         operand and it was set in the tree before this node, or if it is
 	 *         not a {@link Variable} operand. <code>false</code> if it is a
 	 *         {@link Variable} operand and it wasn't set.
-	 * @throws Exception if {@link base.vhdl.processors.VariableSettingDetectorImpl} throws an Exception
+	 * @throws Exception if {@link base.vhdl.processors.OperandAssignmentDetectorImpl} throws an Exception
 	 */
 	private boolean wasOperandSet(OperandImpl operand, AbstractNode operandNode) throws Exception {
 		/* Skip those operands that are not Variables */
 		if (!varNames.contains(operand.getName())) return true;
 
-		VariableSettingDetectorImpl operandSetDetector
-				= new VariableSettingDetectorImpl(operand, operandNode, curProcess, obtainSettingNodes(operand));
-		operandSetDetector.detect();
+		OperandAssignmentDetectorImpl assignmentDetector
+				= new OperandAssignmentDetectorImpl(operand, operandNode, curProcess, obtainSettingNodes(operand));
+		assignmentDetector.detect();
 
-		return operandSetDetector.isOperandSet();
+		return assignmentDetector.isOperandSet();
 	}
 
 	private Set<AbstractNode> obtainSettingNodes(OperandImpl operand) {
@@ -176,7 +176,7 @@ public class VariableDelayFlagCollector extends AbstractVisitor {
 		if (settingNodesByOperand.containsKey(operand)) {
 			return settingNodesByOperand.get(operand);
 		}
-		/* Don't analyze slices. Too complex to gain any significant speed-up. */
+		/* Don't analyze ranges. Too complex to gain any significant speed-up. */
 		Set<AbstractNode> settingNodes = new HashSet<AbstractNode>();
 
 		settingNodesByOperand.put(operand, settingNodes);

@@ -36,21 +36,21 @@ public class ExtraConditionGraphManager {
 
 			Expression expression = ((IfNode) node).getConditionExpression();
 
-			PartedVariableHolder conditionVarHolder = modelCollector.convertConditionalStmt(expression, false);
-			LinkedList<PartedVariableHolder> boolOperandsList = new BooleanOperandsCollector(conditionVarHolder).collect();
+			RangeVariableHolder conditionVarHolder = modelCollector.convertConditionalStmt(expression, false);
+			LinkedList<RangeVariableHolder> boolOperandsList = new BooleanOperandsCollector(conditionVarHolder).collect();
 
 			String baseName = ConditionGraphManager.createName(node);
 			ConstantVariable constant0 = modelCollector.getConstant0();
 			ConstantVariable constant1 = modelCollector.getConstant1();
-			for (PartedVariableHolder boolOperand : boolOperandsList) {
+			for (RangeVariableHolder boolOperand : boolOperandsList) {
 
 				AbstractVariable operandVar = boolOperand.getVariable();
-				Indices partedIndices = boolOperand.getPartedIndices();
+				Indices range = boolOperand.getRange();
 				boolean isInverted = boolOperand.isInverted();
 
-				String name = baseName + "__" + operandVar.getName() + Indices.toString(partedIndices);
+				String name = baseName + "__" + operandVar.getName() + Indices.toString(range);
 
-				Node controlNode = new Node.Builder(operandVar).partedIndices(partedIndices).createSuccessors(2).build();
+				Node controlNode = new Node.Builder(operandVar).range(range).createSuccessors(2).build();
 
 				controlNode.setSuccessor(Condition.TRUE, new Node.Builder(isInverted ? constant0 : constant1).build());
 				controlNode.setSuccessor(Condition.FALSE, new Node.Builder(isInverted ? constant1 : constant0).build());

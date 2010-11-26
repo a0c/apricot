@@ -5,7 +5,7 @@ import static base.hldd.structure.models.utils.ModelManager.adjustBooleanConditi
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.models.utils.VariableManager;
-import base.hldd.structure.models.utils.PartedVariableHolder;
+import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.TemporalNode;
 import base.hldd.structure.Flags;
@@ -102,7 +102,7 @@ public class ModelManager {
 		if (dependentVariable instanceof FunctionVariable) {
 			/* For FunctionVariable, add all its operands and the FunctionVariable itself */
 			FunctionVariable functionVariable = (FunctionVariable) dependentVariable;
-			for (PartedVariableHolder operandHolder : functionVariable.getOperands()) {
+			for (RangeVariableHolder operandHolder : functionVariable.getOperands()) {
 				addVariables(operandHolder.getVariable());
 			}
 			variableManager.addVariable(dependentVariable);
@@ -120,9 +120,9 @@ public class ModelManager {
 
 			/* Create new CONTROL NODE (Checking is removed here, only 2 values are left) */
 			AbstractOperand booleanOperand = ((OperandImpl) replacingExpression).getBaseOperand();
-			PartedVariableHolder depVarHolder = hlddModelManager.extractBooleanDependentVariable(booleanOperand, true); //todo: false?
+			RangeVariableHolder depVarHolder = hlddModelManager.extractBooleanDependentVariable(booleanOperand, true); //todo: false?
 			TemporalNode replacingControlNode = new TemporalNode.Builder(depVarHolder.getVariable())
-					.partedIndices(depVarHolder.getPartedIndices())
+					.range(depVarHolder.getRange())
 					.createSuccessors(2)
 					.window(contextManager.getCurrentWindow()).build();
 
@@ -191,7 +191,7 @@ public class ModelManager {
 				/* Add the window via creation of a TemporalNode on the basis of the rootNode */
 				int conditionsCount = rootNode.getConditionsCount();
 				TemporalNode temporalRootNode = new TemporalNode.Builder(rootNode.getDependentVariable())
-						.partedIndices(rootNode.getPartedIndices())
+						.range(rootNode.getRange())
 						.createSuccessors(rootNode.getConditionValuesCount())
 						.window(parentWindow).build();
 				for (int idx = 0; idx < conditionsCount; idx++) {

@@ -43,7 +43,7 @@ public class PPGLibraryGraphVariableCreator implements GraphVariableCreator {
 				Collector.NodeData nodeDatum = nodeData[i];
 				Object depVarObject = collector.getVarObject(nodeDatum.depVarIndex);
 				TreeMap<Condition, Integer> successors = nodeDatum.successors;
-				Indices depVarPartedIndices = nodeDatum.depVarPartedIndices;
+				Indices depVarRange = nodeDatum.depVarRange;
 				String[] windowPlaceholders = nodeDatum.windowPlaceholders;
 				AbstractVariable dependentVariable;
 				if (depVarObject instanceof AbstractVariable) {
@@ -56,12 +56,12 @@ public class PPGLibraryGraphVariableCreator implements GraphVariableCreator {
 				Node newNode;
 				if (windowPlaceholders != null) {
 					if (successors != null) {
-						newNode = new TemporalNode.Builder(dependentVariable).partedIndices(depVarPartedIndices).createSuccessors(Condition.countValues(successors.keySet())).windowPlaceholders(windowPlaceholders).build();
+						newNode = new TemporalNode.Builder(dependentVariable).range(depVarRange).createSuccessors(Condition.countValues(successors.keySet())).windowPlaceholders(windowPlaceholders).build();
 					} else throw new Exception("Error while creating nodes for GraphVariable in PPG Library:" +
 							"\nWindow is assigned to Terminal node! Notion of window is applicable to Control nodes (Boolean expressions or PSL Property) only");
 				} else {
-					newNode = successors == null ? new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).build()
-							: new Node.Builder(dependentVariable).partedIndices(depVarPartedIndices).createSuccessors(Condition.countValues(successors.keySet())).build();
+					newNode = successors == null ? new Node.Builder(dependentVariable).range(depVarRange).build()
+							: new Node.Builder(dependentVariable).range(depVarRange).createSuccessors(Condition.countValues(successors.keySet())).build();
 				}
 				nodeByIndex.put(i, newNode);
 				/* Index node manually */

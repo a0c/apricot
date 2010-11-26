@@ -15,7 +15,7 @@ import java.util.List;
  * Algorithm:<br>
  * <b>1)</b> If the operand is a <b>leaf operand</b> ({@link OperandImpl} or {@link UserDefinedFunction}), then its
  * <i>VHDL typing</i> is analyzed:<br>
- * *  - <u>partedIndices</u> are taken into account;<br>
+ * *  - <u>range</u> are taken into account;<br>
  * *  - <u>VHDL constants</u> are parsed depending on <u>radix</u> (HEX, BOOLEAN and DECIMAL). If VHDL
  * constant typing defines a fixed length, then it is used.<br>
  * *  - length for {@link UserDefinedFunction} is extracted from the <u>package file</u> where the function
@@ -74,7 +74,7 @@ public class OperandLengthSetter {
 					Indices length = null;
 					for (AbstractOperand childOperand : operands) {
 						length = operator.adjustLength(length,
-								childOperand.getLength(), childOperand.getPartedIndices());
+								childOperand.getLength(), childOperand.getRange());
 					}
 					/* Store */
 					operand.setLength(length);
@@ -133,10 +133,10 @@ public class OperandLengthSetter {
 						}
 					}
 					/* ### DIRECT length ###:
-					* Map operand, if its length is set (either by partedIndices or by own length) */
+					* Map operand, if its length is set (either by range or by own length) */
 					Indices length = null;
-					if (operand.isParted())
-						length = operand.getPartedIndices().deriveLength(); // length is derived: Some_operand<2:2> ==> the length is being set (0:0), not the real indices (2:2).
+					if (operand.isRange())
+						length = operand.getRange().deriveLength(); // length is derived: Some_operand<2:2> ==> the length is being set (0:0), not the real indices (2:2).
 					if (length == null) length = variable.getLength();
 					/* Map */
 					if (length != null) {
@@ -151,10 +151,10 @@ public class OperandLengthSetter {
 				} else {
 					/* Operand declares constant. */
 					/* ### DIRECT length ###:
-					* Map operand, if its desired length is set (either by partedIndices or by own length, i.e. by VHDL typing) */
+					* Map operand, if its desired length is set (either by range or by own length, i.e. by VHDL typing) */
 					Indices length = null;
-					if (operand.isParted())
-						length = operand.getPartedIndices().deriveLength(); // length is derived: Some_operand<2:2> ==> the length is being set (0:0), not the real indices (2:2).
+					if (operand.isRange())
+						length = operand.getRange().deriveLength(); // length is derived: Some_operand<2:2> ==> the length is being set (0:0), not the real indices (2:2).
 					if (length == null) length = valAndLenHolder.getDesiredLength();
 					if (length != null) {
 						operand.setLength(length);

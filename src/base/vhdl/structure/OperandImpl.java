@@ -19,14 +19,13 @@ public class OperandImpl extends AbstractOperand {
 
 	private OperandImpl dynamicRange;
 	/* todo: for multidimensional array replace dynamicRange with List<OperandImpl> ranges;
-	* todo: first partedIndices will reside in partedIndices field of slices.get(0); parent partedIndices will be null;
-	* todo: isParted() will become {return !slices.isEmpty()}.
+	* todo: first range will reside in range field of ranges.get(0); parent range will be null;
+	* todo: isRange() will become {return !ranges.isEmpty()}.
 	* todo: This is for values single values. Consider aggregations as well: 
 	* todo: - There Map<Condition, OperandImpl> may be required
 	* todo: - OTHERS may be inserted to Condition as a generic field. */
 
-	//todo: rename partedIndices to slice; isParted() => isSlice()
-	private Indices partedIndices;
+	private Indices range;
 
 	private Map<Condition, OperandImpl> arrayOperands;
 
@@ -35,10 +34,10 @@ public class OperandImpl extends AbstractOperand {
 		this.name = name;
 	}
 
-	public OperandImpl(String name, Indices partedIndices, boolean isInverted) {
+	public OperandImpl(String name, Indices range, boolean isInverted) {
 		super(isInverted);
 		this.name = name;
-		this.partedIndices = partedIndices;
+		this.range = range;
 	}
 
 	public OperandImpl(String name, OperandImpl dynamicRange, boolean isInverted) {
@@ -60,20 +59,20 @@ public class OperandImpl extends AbstractOperand {
 		return name;
 	}
 
-	public Indices getPartedIndices() {
-		return partedIndices;
+	public Indices getRange() {
+		return range;
 	}
 
 	public boolean isArray() {
 		return arrayOperands != null;
 	}
 
-	public boolean isParted() {
-		return partedIndices != null;
+	public boolean isRange() {
+		return range != null;
 	}
 
 	public boolean isWhole() {
-		return !isParted() && !isDynamicRange();
+		return !isRange() && !isDynamicRange();
 	}
 
 	public boolean isDynamicRange() {
@@ -94,7 +93,7 @@ public class OperandImpl extends AbstractOperand {
 	public int hashCode() {
 		int result = HashCodeUtil.SEED;
 		result = HashCodeUtil.hash(result, name);
-		result = HashCodeUtil.hash(result, partedIndices);
+		result = HashCodeUtil.hash(result, range);
 		result = HashCodeUtil.hash(result, dynamicRange);
 		result = HashCodeUtil.hash(result, arrayOperands);
 		return result;
@@ -107,8 +106,8 @@ public class OperandImpl extends AbstractOperand {
 		/* Check OPERANDS */
 		if (!name.equals(comparedOperandImpl.getName())) return false;
 
-		/* Check PARTED_INDICES */
-		if (!Indices.equals(partedIndices, comparedOperandImpl.partedIndices)) return false;
+		/* Check RANGE */
+		if (!Indices.equals(range, comparedOperandImpl.range)) return false;
 
 		if (isDynamicRange() ^ comparedOperandImpl.isDynamicRange()) return false;
 		if (isDynamicRange()) {
@@ -131,7 +130,7 @@ public class OperandImpl extends AbstractOperand {
 
 		if (isInverted()) sb.append("NOT ");
 		sb.append(name);
-		if (isParted()) sb.append(partedIndices);
+		if (isRange()) sb.append(range);
 		if (isDynamicRange()) sb.append("( ").append(dynamicRange).append(" )");
 
 		return sb.toString();
@@ -155,15 +154,15 @@ public class OperandImpl extends AbstractOperand {
 
 	public Indices resolveRange(TypeResolver typeResolver) {
 
-		if (isParted()) {
-			return partedIndices;
+		if (isRange()) {
+			return range;
 		}
 
 		if (isDynamicRange()) {
-			if (dynamicRange.isParted()) {
-				return dynamicRange.getPartedIndices().deriveValueRange();
+			if (dynamicRange.isRange()) {
+				return dynamicRange.getRange().deriveValueRange();
 			} else {
-				//todo: may overflow out of this type slice;
+				//todo: may overflow out of this type's range;
 				Type dynamicRangeType = typeResolver.resolveType(dynamicRange.getName());
 				return dynamicRangeType.resolveValueRange();
 			}

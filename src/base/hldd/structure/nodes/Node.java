@@ -5,7 +5,6 @@ import base.SourceLocation;
 import base.hldd.structure.nodes.utils.Successors;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.AbstractVariable;
-import base.hldd.structure.variables.PartedVariable;
 import base.hldd.structure.nodes.utils.Utility;
 import base.hldd.visitors.Visitable;
 import base.hldd.visitors.HLDDVisitor;
@@ -29,9 +28,9 @@ public class Node implements Visitable, Cloneable {
 	private Successors successors;
 
 	/**
-	 * Parted indices of {@link #dependentVariable}. <p> todo: consider using a ready {@link PartedVariable} as {@link #dependentVariable} and removing this field (partedIndices) at all
+	 * Range of {@link #dependentVariable}. <p> todo: consider using a ready {@link base.hldd.structure.variables.RangeVariable} as {@link #dependentVariable} and removing this field (range) at all
 	 */
-	private Indices partedIndices;
+	private Indices range;
 	/**
 	 * Line numbers in VHDL file this Node was created from
 	 */
@@ -63,7 +62,7 @@ public class Node implements Visitable, Cloneable {
 	protected Node(Builder builder) {
 		dependentVariable = builder.dependentVariable;
 		successors = builder.successors;
-		partedIndices = builder.partedIndices;
+		range = builder.range;
 		source = builder.source;
 	}
 
@@ -83,9 +82,9 @@ public class Node implements Visitable, Cloneable {
 		sb.append(dependentVariable.getIndex());
 		sb.append("\t\"");
 		sb.append(depVarName());
-		sb.append(indicesToString(partedIndices, true));
+		sb.append(indicesToString(range, true));
 		sb.append("\"\t");
-		sb.append(partedIndices == null ? dependentVariable.lengthToString() : indicesToString(partedIndices, false));
+		sb.append(range == null ? dependentVariable.lengthToString() : indicesToString(range, false));
 
 		return sb.toString();
 	}
@@ -96,8 +95,8 @@ public class Node implements Visitable, Cloneable {
 
 	/**
 	 * TemporalNode adds a Range window to the name, e.g. "p1@[1..END-4]".<br>
-	 * PartedVariable adds indices "(8 DOWNTO 3)", but via its
-	 * {@link base.hldd.structure.variables.PartedVariable#getName()} method.
+	 * RangeVariable adds range "(8 DOWNTO 3)", but via its
+	 * {@link base.hldd.structure.variables.RangeVariable#getName()} method.
 	 *
 	 * @return name of the variable (must be overriden for different formatting)
 	 */
@@ -133,8 +132,8 @@ public class Node implements Visitable, Cloneable {
 			if (!successors.isIdenticalTo(comparedNode.successors)) return false;
 		}
 
-		/* Compare PARTED INDICES */
-		if (!Indices.equals(partedIndices, comparedNode.partedIndices)) return false;
+		/* Compare RANGE */
+		if (!Indices.equals(range, comparedNode.range)) return false;
 
 		/* All tests passed. */
 		return true;
@@ -146,9 +145,9 @@ public class Node implements Visitable, Cloneable {
 
 	public Node clone() {
 		if (isTerminalNode()) {
-			return new Builder(dependentVariable).partedIndices(partedIndices).source(source).build();
+			return new Builder(dependentVariable).range(range).source(source).build();
 		} else {
-			Node clonedNode = new Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(successors.getConditionValuesCount()).source(source).build();
+			Node clonedNode = new Builder(dependentVariable).range(range).createSuccessors(successors.getConditionValuesCount()).source(source).build();
 			clonedNode.successors.cloneFrom(successors);
 			return clonedNode;
 		}
@@ -208,8 +207,8 @@ public class Node implements Visitable, Cloneable {
 		return successors.asCollection();
 	}
 
-	public Indices getPartedIndices() {
-		return partedIndices;
+	public Indices getRange() {
+		return range;
 	}
 
 	public SourceLocation getSource() {
@@ -232,8 +231,8 @@ public class Node implements Visitable, Cloneable {
 		this.dependentVariable = dependentVariable;
 	}
 
-	public void setPartedIndices(Indices partedIndices) {
-		this.partedIndices = partedIndices;
+	public void setRange(Indices range) {
+		this.range = range;
 	}
 
 	public void setSource(SourceLocation source) {
@@ -378,7 +377,7 @@ public class Node implements Visitable, Cloneable {
 		private final AbstractVariable dependentVariable;
 		// Optional parameters -- initialized to default values
 		private Successors successors = null;
-		private Indices partedIndices = null;
+		private Indices range = null;
 		private SourceLocation source = null;
 
 		public Builder(AbstractVariable dependentVariable) {
@@ -394,8 +393,8 @@ public class Node implements Visitable, Cloneable {
 			return this;
 		}
 
-		public Builder partedIndices(Indices partedIndices) {
-			this.partedIndices = partedIndices;
+		public Builder range(Indices range) {
+			this.range = range;
 			return this;
 		}
 

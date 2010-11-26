@@ -165,7 +165,7 @@ public class ExpressionBuilderTest {
 
 		ExpressionBuilder builder = new ExpressionBuilder(calculator, Collections.<String>emptySet());
 		for (int i = 0; i < SOURCE_INDICES.length; i++) {
-			Indices indices = builder.buildIndices(SOURCE_INDICES[i]);
+			Indices indices = builder.buildRange(SOURCE_INDICES[i]);
 			assertEquals("Incorrect indices built from \"" + SOURCE_INDICES[i] + "\"",
 					DESTINATION_INDICES[i], indices);
 		}

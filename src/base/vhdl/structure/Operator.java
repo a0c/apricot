@@ -177,10 +177,10 @@ public enum Operator {
 	}
 
 
-	public Indices adjustLength(Indices currentLength, Indices addedLength, Indices addedPartedIndices) {
+	public Indices adjustLength(Indices currentLength, Indices addedLength, Indices addedRange) {
 		/* Length is derived for the following case:
 		* Some_operand<2:2> ==> the length is being adjusted (0:0), not the real indices (2:2).*/
-		Indices newOperandLength = addedPartedIndices != null ? addedPartedIndices.deriveLength() : addedLength;
+		Indices newOperandLength = addedRange != null ? addedRange.deriveLength() : addedLength;
 		/* Adjust range */
 		return adjustLength(currentLength, newOperandLength);
 	}

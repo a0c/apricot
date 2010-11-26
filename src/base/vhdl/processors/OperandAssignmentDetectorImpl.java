@@ -32,7 +32,7 @@ import java.util.Set;
  *
  * @author Anton Chepurov
  */
-public class VariableSettingDetectorImpl extends AbstractProcessor {
+public class OperandAssignmentDetectorImpl extends AbstractProcessor {
 	private boolean isOperandSet = false;
 	private final OperandImpl operandToCheck;
 	private AbstractNode terminatingNode;
@@ -46,7 +46,7 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 	 * @param process		currently processed process
 	 * @param settingNodes   set of nodes that set the specified variable completely.
 	 */
-	public VariableSettingDetectorImpl(OperandImpl operandToCheck, AbstractNode startingNode, Process process,
+	public OperandAssignmentDetectorImpl(OperandImpl operandToCheck, AbstractNode startingNode, Process process,
 									   Set<AbstractNode> settingNodes) {
 		this.operandToCheck = operandToCheck;
 		this.terminatingNode = startingNode;
@@ -127,15 +127,15 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 		/* For control nodes => check to be set in every branch, otherwise not set. */
 		if (abstractNode instanceof TransitionNode) {
 			/* TransitionNode defines the variable completely (if it defines the specified variable at all).
-			* Parted settings are still in ToDo list. Also Consider using PartialSetVariableCollector in VariableDelayFlagCollector.visitProcess() ==> commented code.
-			* Todo: PartialSetVariableCollector itself doesn't have to be used in OperandSettingDetectorImpl. Here only check that required part of the variable was previously set. */
+//			* Range assignments are still in ToDo list. (Is it???) Also Consider using RangeAssignmentCollector in VariableDelayFlagCollector.visitProcess() ==> commented code.
+			* Todo: RangeAssignmentCollector itself doesn't have to be used in OperandSettingDetectorImpl. Here only check that required range of the variable was previously set. */
 			TransitionNode transitionNode = (TransitionNode) abstractNode;
 			if (transitionNode.isNull()) return false;
 
 			OperandImpl operand = transitionNode.getTargetOperand();
 			// todo: commented for Elsevier paper... (hc11 CPU)
-//			if (operand.isParted())
-//				throw new RuntimeException(OperandSettingDetectorImpl.class.getSimpleName() + " doesn't currently support parted operands"); //todo: also see DelayFLagCollector
+//			if (operand.isRange())
+//				throw new RuntimeException(OperandSettingDetectorImpl.class.getSimpleName() + " doesn't currently support range operands"); //todo: also see DelayFLagCollector
 
 			return operand.contains(operandToCheck, process);
 
@@ -233,8 +233,8 @@ public class VariableSettingDetectorImpl extends AbstractProcessor {
 			Type operandType = process.resolveType(operand.getName());
 			if (operandType == null)
 				throw new RuntimeException(getClass().getSimpleName() + ": empty type for operand " + operand);
-			/* Derive parted type */
-			return operandType.derivePartedType(operand.getPartedIndices());
+			/* Derive range type */
+			return operandType.deriveRangeType(operand.getRange());
 
 		} else
 			throw new RuntimeException(getClass().getSimpleName() + ": cannot resolve type for " + abstractOperand.getClass().getSimpleName());

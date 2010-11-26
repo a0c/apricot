@@ -50,13 +50,13 @@ public class ConditionGraphManager {
 		return (GraphVariable) modelCollector.getIdenticalVariable(graphVariable);
 	}
 
-	public PartedVariableHolder convertConditionToBooleanGraph(AbstractNode conditionNode) throws Exception {
+	public RangeVariableHolder convertConditionToBooleanGraph(AbstractNode conditionNode) throws Exception {
 
 		if (conditionNode instanceof IfNode) {
 
 			GraphVariable graphVariable = convertConditionToGraph(conditionNode);
 
-			return new PartedVariableHolder(graphVariable, null, 1);
+			return new RangeVariableHolder(graphVariable, null, 1);
 
 		} else {
 			throw new HLDDException("Converting " + conditionNode.getClass().getSimpleName() + " into Boolean Condition Graph." +
@@ -70,11 +70,11 @@ public class ConditionGraphManager {
 
 		/* Root Node */
 		AbstractOperand caseOperand = caseNode.getVariableOperand();
-		Indices partedIndices = caseOperand.getPartedIndices();
+		Indices range = caseOperand.getRange();
 		AbstractVariable caseVariable = modelCollector.convertOperandToVariable(caseOperand, null, false);
-		int conditionValuesCount = caseVariable.getType().countPossibleValues(partedIndices);
+		int conditionValuesCount = caseVariable.getType().countPossibleValues(range);
 		Node rootNode = new Node.Builder(caseVariable).createSuccessors(conditionValuesCount).
-				partedIndices(partedIndices).source(caseNode.getSource()).build();
+				range(range).source(caseNode.getSource()).build();
 		/* Fill Root Node, and map branches (to condition values)*/
 		Map<Condition, Condition> conditionMapping = new HashMap<Condition, Condition>();
 		Set<ConstantVariable> terminalVariablesSet = new HashSet<ConstantVariable>();
@@ -126,7 +126,7 @@ public class ConditionGraphManager {
 
 	private GraphVariable ifToGraph(IfNode ifNode) throws Exception {
 
-		PartedVariableHolder conditionVarHolder = modelCollector.convertConditionalStmt(ifNode.getConditionExpression(), false);
+		RangeVariableHolder conditionVarHolder = modelCollector.convertConditionalStmt(ifNode.getConditionExpression(), false);
 
 		Node rootNode = new FullTreeCreator(conditionVarHolder, ifNode).create();
 
@@ -184,11 +184,11 @@ public class ConditionGraphManager {
 	}
 
 	private class FullTreeCreator {
-		private PartedVariableHolder sourceCondition;
+		private RangeVariableHolder sourceCondition;
 		private SourceLocation source;
 		private Interpreter interpreter;
 
-		public FullTreeCreator(PartedVariableHolder sourceCondition, IfNode ifNode) throws Exception {
+		public FullTreeCreator(RangeVariableHolder sourceCondition, IfNode ifNode) throws Exception {
 			this.sourceCondition = sourceCondition;
 			this.source = ifNode.getSource();
 			this.interpreter = new Interpreter(this.sourceCondition, modelCollector.getConstant0(), modelCollector.getConstant1(), source.toString());
@@ -196,20 +196,20 @@ public class ConditionGraphManager {
 
 		public Node create() throws Exception {
 
-			LinkedList<PartedVariableHolder> boolOperandsList = new BooleanOperandsCollector(sourceCondition).collect();
+			LinkedList<RangeVariableHolder> boolOperandsList = new BooleanOperandsCollector(sourceCondition).collect();
 
 //			new UnusedFunctionsRemover(sourceCondition, boolOperandsList).remove();
 
 			return createFrom(boolOperandsList, null);
 		}
 
-		private Node createFrom(LinkedList<PartedVariableHolder> boolOperandsList, Node terminalNode) throws HLDDException {
+		private Node createFrom(LinkedList<RangeVariableHolder> boolOperandsList, Node terminalNode) throws HLDDException {
 
 			if (!boolOperandsList.isEmpty()) {
 
-				PartedVariableHolder thisVarHolder = boolOperandsList.removeFirst(); // TAKE
+				RangeVariableHolder thisVarHolder = boolOperandsList.removeFirst(); // TAKE
 
-				Node thisNode = new Node.Builder(thisVarHolder.getVariable()).partedIndices(thisVarHolder.getPartedIndices()).
+				Node thisNode = new Node.Builder(thisVarHolder.getVariable()).range(thisVarHolder.getRange()).
 						source(source).createSuccessors(2).build();
 
 				/* TRUE branch */
@@ -239,25 +239,25 @@ public class ConditionGraphManager {
 	}
 
 	private class Interpreter {
-		private final PartedVariableHolder evaluatedCondition;
+		private final RangeVariableHolder evaluatedCondition;
 		private final ConstantVariable constant0;
 		private final ConstantVariable constant1;
 		private final String sourceAsString;
 
-		private final HashMap<PartedVariableHolder, Boolean> valueByVariable = new HashMap<PartedVariableHolder, Boolean>();
+		private final HashMap<RangeVariableHolder, Boolean> valueByVariable = new HashMap<RangeVariableHolder, Boolean>();
 
-		public Interpreter(PartedVariableHolder evaluatedCondition, ConstantVariable constant0, ConstantVariable constant1, String sourceAsString) {
+		public Interpreter(RangeVariableHolder evaluatedCondition, ConstantVariable constant0, ConstantVariable constant1, String sourceAsString) {
 			this.evaluatedCondition = evaluatedCondition;
 			this.constant0 = constant0;
 			this.constant1 = constant1;
 			this.sourceAsString = sourceAsString;
 		}
 
-		public void assign(PartedVariableHolder variable, boolean value) {
+		public void assign(RangeVariableHolder variable, boolean value) {
 			valueByVariable.put(variable, value);
 		}
 
-		public void free(PartedVariableHolder variable) {
+		public void free(RangeVariableHolder variable) {
 			valueByVariable.remove(variable);
 		}
 
@@ -278,7 +278,7 @@ public class ConditionGraphManager {
 		}
 
 		@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
-		private boolean evaluate(PartedVariableHolder variable) throws HLDDException, EvaluationImpossibleException {
+		private boolean evaluate(RangeVariableHolder variable) throws HLDDException, EvaluationImpossibleException {
 
 			Boolean result = null;
 			boolean isInversed = variable.getTrueValue() == 0; //todo: store TrueValue as boolean.
@@ -295,11 +295,11 @@ public class ConditionGraphManager {
 
 					FunctionVariable functionVariable = (FunctionVariable) abstractVariable;
 					Operator operator = functionVariable.getOperator();
-					List<PartedVariableHolder> operands = functionVariable.getOperands();
+					List<RangeVariableHolder> operands = functionVariable.getOperands();
 
 					switch (operator) {
 						case OR:
-							for (PartedVariableHolder operand : operands) {
+							for (RangeVariableHolder operand : operands) {
 								if (result == null) {
 									result = evaluate(operand);
 								} else {
@@ -308,7 +308,7 @@ public class ConditionGraphManager {
 							}
 							break;
 						case AND:
-							for (PartedVariableHolder operand : operands) {
+							for (RangeVariableHolder operand : operands) {
 								if (result == null) {
 									result = evaluate(operand);
 								} else {
@@ -317,7 +317,7 @@ public class ConditionGraphManager {
 							}
 							break;
 						case XOR:
-							for (PartedVariableHolder operand : operands) {
+							for (RangeVariableHolder operand : operands) {
 								if (result == null) {
 									result = evaluate(operand);
 								} else {
@@ -357,10 +357,10 @@ public class ConditionGraphManager {
 
 /*
 	private class UnusedFunctionsRemover {
-		private final PartedVariableHolder sourceCondition;
-		private final LinkedList<PartedVariableHolder> boolOperandsList;
+		private final RangeVariableHolder sourceCondition;
+		private final LinkedList<RangeVariableHolder> boolOperandsList;
 
-		public UnusedFunctionsRemover(PartedVariableHolder sourceCondition, LinkedList<PartedVariableHolder> boolOperandsList) {
+		public UnusedFunctionsRemover(RangeVariableHolder sourceCondition, LinkedList<RangeVariableHolder> boolOperandsList) {
 			this.sourceCondition = sourceCondition;
 			this.boolOperandsList = boolOperandsList;
 		}
@@ -369,18 +369,18 @@ public class ConditionGraphManager {
 			remove(sourceCondition);
 		}
 
-		private void remove(PartedVariableHolder partedVariableHolder) {
+		private void remove(RangeVariableHolder rangeVariableHolder) {
 
-			AbstractVariable variable = partedVariableHolder.getVariable();
+			AbstractVariable variable = rangeVariableHolder.getVariable();
 
 			if (variable instanceof FunctionVariable) {
 
-				if (!boolOperandsList.contains(partedVariableHolder)) {
+				if (!boolOperandsList.contains(rangeVariableHolder)) {
 					modelCollector.removeVariable(variable);
 				}
 				
 				FunctionVariable functionVariable = (FunctionVariable) variable;
-				for (PartedVariableHolder operand : functionVariable.getOperands()) {
+				for (RangeVariableHolder operand : functionVariable.getOperands()) {
 					remove(operand);
 				}
 			}

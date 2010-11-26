@@ -66,10 +66,10 @@ public class ModelManager implements TypeResolver {
 		/* ReAdd updated old variable to hash */
 		addVariable(variableToRebase);
 
-		replaceInModel(newBaseVariable, new PartedVariableHolder(variableToRebase, null));
+		replaceInModel(newBaseVariable, new RangeVariableHolder(variableToRebase, null));
 	}
 
-	public void replaceWithIndices(AbstractVariable variableToReplace, PartedVariableHolder replacingVarHolder) {
+	public void replaceWithIndices(AbstractVariable variableToReplace, RangeVariableHolder replacingVarHolder) {
 		AbstractVariable replacingVariable = replacingVarHolder.getVariable();
 
 		/* Remove old variable from hash */
@@ -81,7 +81,7 @@ public class ModelManager implements TypeResolver {
 		replaceInModel(variableToReplace, replacingVarHolder);
 	}
 
-	private void replaceInModel(AbstractVariable variableToReplace, PartedVariableHolder replacingVarHolder) {
+	private void replaceInModel(AbstractVariable variableToReplace, RangeVariableHolder replacingVarHolder) {
 
 		boolean flattenToBits = (replacingVarHolder == null);
 		if (flattenToBits) {
@@ -94,17 +94,17 @@ public class ModelManager implements TypeResolver {
 
 			if (absVariable instanceof FunctionVariable) {
 				FunctionVariable functionVariable = (FunctionVariable) absVariable;
-				for (PartedVariableHolder operand : functionVariable.getOperands()) {
+				for (RangeVariableHolder operand : functionVariable.getOperands()) {
 					if (operand.getVariable() == variableToReplace) {
 						if (flattenToBits) {
-							replacingVariable = generateBitRangeVariable(variableToReplace, operand.getPartedIndices());
+							replacingVariable = generateBitRangeVariable(variableToReplace, operand.getRange());
 							operand.setVariable(replacingVariable);
-							operand.setPartedIndices(null);
+							operand.setRange(null);
 						} else {
 							operand.setVariable(replacingVariable);
-							if (replacingVarHolder.isParted()) {
+							if (replacingVarHolder.isRange()) {
 								//todo: Indices.absoluteFor()...
-								operand.setPartedIndices(replacingVarHolder.getPartedIndices());
+								operand.setRange(replacingVarHolder.getRange());
 							}
 						}
 					}
@@ -131,29 +131,29 @@ public class ModelManager implements TypeResolver {
 			AbstractVariable bitVariable = getVariable(bitVariableName);
 			if (bitVariable == null) {
 				throw new RuntimeException("Cannot flatten variable " + variableToReplace.getName() +
-						" to bits. BIT SLICE variable " + bitVariableName + " is not found.");
+						" to bits. BIT RANGE variable " + bitVariableName + " is not found.");
 			}
 		}
 	}
 
-	public AbstractVariable generateBitRangeVariable(AbstractVariable wholeVariable, Indices partedIndices) {
-		return getVariable(generateBitVariableName(wholeVariable, partedIndices));
+	public AbstractVariable generateBitRangeVariable(AbstractVariable wholeVariable, Indices range) {
+		return getVariable(generateBitVariableName(wholeVariable, range));
 	}
 
-	private String generateBitVariableName(AbstractVariable wholeVariable, Indices partedIndices) {
+	private String generateBitVariableName(AbstractVariable wholeVariable, Indices range) {
 
-		if (partedIndices == null) {
+		if (range == null) {
 			throw new RuntimeException("Cannot flatten variable " + wholeVariable.getName() +
 					" to bits. WHOLE variable is in use.");
 		}
-		if (partedIndices.length() != 1) {
+		if (range.length() != 1) {
 			throw new RuntimeException("Cannot flatten variable " + wholeVariable.getName() +
-					" to bits. NON-BIT SLICE of the variable is in use: " + partedIndices);
+					" to bits. NON-BIT range of the variable is in use: " + range);
 		}
-		return new OperandImpl(wholeVariable.getName(), partedIndices, false).toString();
+		return new OperandImpl(wholeVariable.getName(), range, false).toString();
 	}
 
-	public PartedVariableHolder convertConditionalStmt(Expression conditionalStmt, boolean flattenCondition) throws Exception {
+	public RangeVariableHolder convertConditionalStmt(Expression conditionalStmt, boolean flattenCondition) throws Exception {
 		boolean inverted = conditionalStmt.isInverted();
 
 		/* Create FUNCTION */
@@ -161,7 +161,7 @@ public class ModelManager implements TypeResolver {
 		if (flattenCondition) {
 			functionVariable = createCompositeFunction(conditionalStmt);
 			if (functionVariable != null) {
-				return new PartedVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
+				return new RangeVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
 			}
 		}
 
@@ -179,23 +179,23 @@ public class ModelManager implements TypeResolver {
 	 * @return holder of a variable, its indices and its true value
 	 * @throws HLDDException if CompositeFunctionVariable is specified as a parameter
 	 */
-	private PartedVariableHolder detectTrueValueAndSimplify(FunctionVariable functionVariable, boolean inverted) throws HLDDException {
+	private RangeVariableHolder detectTrueValueAndSimplify(FunctionVariable functionVariable, boolean inverted) throws HLDDException {
 
 		if (functionVariable instanceof CompositeFunctionVariable) {
 			throw new HLDDException("ModelManager: detectTrueValueAndSimplify(): FunctionVariable is expected as a parameter. Received: CompositeFunctionVariable.");
 		}
-		PartedVariableHolder originalFunction = new PartedVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
+		RangeVariableHolder originalFunction = new RangeVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
 
 		Operator operator = functionVariable.getOperator();
-		List<PartedVariableHolder> operands = functionVariable.getOperands();
+		List<RangeVariableHolder> operands = functionVariable.getOperands();
 
 		boolean isNEQ = operator == Operator.NEQ;
 		if (operator == Operator.EQ || isNEQ) {
 			ConstantVariable constantOperand;
-			PartedVariableHolder variableOperand;
+			RangeVariableHolder variableOperand;
 
-			PartedVariableHolder leftOp = operands.get(0);
-			PartedVariableHolder rightOp = operands.get(1);
+			RangeVariableHolder leftOp = operands.get(0);
+			RangeVariableHolder rightOp = operands.get(1);
 			if (rightOp.getVariable() instanceof ConstantVariable) {
 				constantOperand = (ConstantVariable) rightOp.getVariable();
 				variableOperand = leftOp;
@@ -214,20 +214,20 @@ public class ModelManager implements TypeResolver {
 			removeVariable(functionVariable);
 
 			int initialCondition = constantOperand.getValue().intValue();
-			return new PartedVariableHolder(variableOperand.getVariable(),
-					variableOperand.getPartedIndices(), adjustBooleanCondition(initialCondition, inverted ^ isNEQ));
+			return new RangeVariableHolder(variableOperand.getVariable(),
+					variableOperand.getRange(), adjustBooleanCondition(initialCondition, inverted ^ isNEQ));
 		} else {
 			return originalFunction;
 		}
 
 	}
 
-	public PartedVariableHolder extractBooleanDependentVariable(AbstractOperand abstractOperand, boolean useComposites) throws Exception {
+	public RangeVariableHolder extractBooleanDependentVariable(AbstractOperand abstractOperand, boolean useComposites) throws Exception {
 		if (abstractOperand instanceof Expression) {
 			return convertConditionalStmt((Expression) abstractOperand, useComposites);
 		} else if (abstractOperand instanceof OperandImpl) {
 			OperandImpl operand = (OperandImpl) abstractOperand;
-			return new PartedVariableHolder(getVariable(operand.getName()), operand.getPartedIndices(), getBooleanValueFromOperand(operand));
+			return new RangeVariableHolder(getVariable(operand.getName()), operand.getRange(), getBooleanValueFromOperand(operand));
 		}
 		throw new Exception("Dependent variable is being extracted from : " + abstractOperand +
 				"\nCurrently extraction of Dependent Variables is only supported for " +
@@ -240,7 +240,7 @@ public class ModelManager implements TypeResolver {
 		}
 
 		Operator compositeOperator = condition.getOperator();
-		List<PartedVariableHolder> compositeElements = new LinkedList<PartedVariableHolder>();
+		List<RangeVariableHolder> compositeElements = new LinkedList<RangeVariableHolder>();
 
 		for (AbstractOperand operand : condition.getOperands()) {
 			/* All operands of a CompositeCondition are Expressions, not OperandImpls */
@@ -250,7 +250,7 @@ public class ModelManager implements TypeResolver {
 			}
 		}
 
-		return new CompositeFunctionVariable(compositeOperator, compositeElements.toArray(new PartedVariableHolder[compositeElements.size()]));
+		return new CompositeFunctionVariable(compositeOperator, compositeElements.toArray(new RangeVariableHolder[compositeElements.size()]));
 	}
 
 	/**
@@ -274,7 +274,7 @@ public class ModelManager implements TypeResolver {
 
 		} else if (funcOperand instanceof Expression) {
 			Expression expression = (Expression) funcOperand;
-			List<PartedVariableHolder> partiallySetVarList;
+			List<RangeVariableHolder> rangeAssignmentVarList;
 			if (expression.isInverted() && isTransition) {
 				/* Create NOT function on the base of underlying function */
 				/* NOT (REG1 AND REG2) --- in condition NOT should be ignored
@@ -284,48 +284,48 @@ public class ModelManager implements TypeResolver {
 								 * */
 				functionVariable = createInversionFunction(expression, isTransition);
 
-			} else if (!(partiallySetVarList = getPartiallySetVariablesFor(expression)).isEmpty()) {
+			} else if (!(rangeAssignmentVarList = getRangeAssignmentVariablesFor(expression)).isEmpty()) {
 				functionVariable = doCreateFinalFunction(Operator.CAT,
-						partiallySetVarList.toArray(new PartedVariableHolder[partiallySetVarList.size()]));
+						rangeAssignmentVarList.toArray(new RangeVariableHolder[rangeAssignmentVarList.size()]));
 			} else {
 				/* Create and collect operands */
-				PartedVariableHolder[] operandsHolders = new PartedVariableHolder[expression.getOperands().size()];
+				RangeVariableHolder[] operandsHolders = new RangeVariableHolder[expression.getOperands().size()];
 				if (isTransition) {
 					/* Transition */
 					int i = 0;
 					for (AbstractOperand operand : expression.getOperands()) {
-						operandsHolders[i++] = new PartedVariableHolder(convertOperandToVariable(operand, null,
+						operandsHolders[i++] = new RangeVariableHolder(convertOperandToVariable(operand, null,
 								isTransition),
-								operand.getPartedIndices());
+								operand.getRange());
 					}
 
 				} else {
 					/* CONDITION */
 					int i = 0;
 					AbstractVariable operandVariable;
-					Indices operandPartedIndices;
+					Indices operandRange;
 					for (AbstractOperand operand : expression.getOperands()) {
-						operandPartedIndices = operand.getPartedIndices();
+						operandRange = operand.getRange();
 						if (operand instanceof Expression) {
 							/* Treat operand as condition and extract dependent variable from it */
-							PartedVariableHolder depVariableHolder = convertConditionalStmt((Expression) operand, false);
+							RangeVariableHolder depVariableHolder = convertConditionalStmt((Expression) operand, false);
 							operandVariable = getIdenticalVariable(depVariableHolder.getVariable());
-							operandPartedIndices = depVariableHolder.getPartedIndices();
+							operandRange = depVariableHolder.getRange();
 							/* If extracted dependent variable is OperandImpl or an inverted Expression,
-														 * then take into account its value (e.g. cs_read='0' -> "cs_read" with true_value = 0).
-														 * In Functions, if some operand is inversed or with true_value = 0, then all we can do
-														 * is to substitute this operand with its INV function. */
+							* then take into account its value (e.g. cs_read='0' -> "cs_read" with true_value = 0).
+							* In Functions, if some operand is inversed or with true_value = 0, then all we can do
+							* is to substitute this operand with its INV function. */
 							if (depVariableHolder.getTrueValue() != 1) {
 								/* Create INV function */
 								operandVariable = getIdenticalVariable(
-										doCreateFinalInversionFunction(operandVariable, operandPartedIndices));
+										doCreateFinalInversionFunction(operandVariable, operandRange));
 							}
 						} else if (operand instanceof OperandImpl) {
 							operandVariable = convertOperandToVariable(operand, null, false);
 						} else throw new Exception("Unexpected situation while creating function: " +
 								"operand is neither " + Expression.class.getSimpleName() +
 								" nor " + OperandImpl.class.getSimpleName());
-						operandsHolders[i++] = new PartedVariableHolder(operandVariable, operandPartedIndices);
+						operandsHolders[i++] = new RangeVariableHolder(operandVariable, operandRange);
 					}
 
 				}
@@ -345,12 +345,12 @@ public class ModelManager implements TypeResolver {
 		return (FunctionVariable) getIdenticalVariable(functionVariable);
 	}
 
-	private FunctionVariable doCreateFinalInversionFunction(AbstractVariable operandVariable, Indices operandPartedIndices) {
+	private FunctionVariable doCreateFinalInversionFunction(AbstractVariable operandVariable, Indices operandRange) {
 		/* Create Function */
 		FunctionVariable invFunctionVariable = new FunctionVariable(Operator.INV, generateFunctionNameIdx(Operator.INV));
 		/* Add a single operand */
 		try {
-			invFunctionVariable.addOperand(operandVariable, operandPartedIndices);
+			invFunctionVariable.addOperand(operandVariable, operandRange);
 		} catch (Exception e) {
 			throw new RuntimeException("Unexpected exception: " +
 					"Cannot add a single operand (" + operandVariable + ") to " + Operator.INV + " Function");
@@ -358,13 +358,13 @@ public class ModelManager implements TypeResolver {
 		return invFunctionVariable;
 	}
 
-	private FunctionVariable doCreateFinalFunction(Operator operator, PartedVariableHolder... operandVariables) throws Exception {
+	private FunctionVariable doCreateFinalFunction(Operator operator, RangeVariableHolder... operandVariables) throws Exception {
 		/* Create new Function Variable */
 		FunctionVariable functionVariable = new FunctionVariable(operator, generateFunctionNameIdx(operator));
 		/* Add operand variables one by one to the new Function Variable */
-		for (PartedVariableHolder operandVarHolder : operandVariables) {
+		for (RangeVariableHolder operandVarHolder : operandVariables) {
 			try {
-				functionVariable.addOperand(operandVarHolder.getVariable(), operandVarHolder.getPartedIndices());
+				functionVariable.addOperand(operandVarHolder.getVariable(), operandVarHolder.getRange());
 			} catch (Exception e) {
 				if (!e.getMessage().startsWith(FunctionVariable.FAILED_ADD_OPERAND_TEXT))
 					throw e;
@@ -381,7 +381,7 @@ public class ModelManager implements TypeResolver {
 				/* Make the previously created function an operand of the new one */
 				newFunction.addOperand(functionVariable, null);
 				/* Make the operand that failed to be added an operand of the new function */
-				newFunction.addOperand(operandVarHolder.getVariable(), operandVarHolder.getPartedIndices());
+				newFunction.addOperand(operandVarHolder.getVariable(), operandVarHolder.getRange());
 				/* Change the link of functionVariable to the new one */
 				functionVariable = newFunction;
 			}
@@ -404,7 +404,7 @@ public class ModelManager implements TypeResolver {
 	private void tuneFunctionVariable(FunctionVariable functionVariable) throws Exception {
 		/* Replace DIVISION and MULTIPLICATION by power of 2 with SHIFTS */
 		Operator operator = functionVariable.getOperator();
-		List<PartedVariableHolder> operandHolders = functionVariable.getOperands();
+		List<RangeVariableHolder> operandHolders = functionVariable.getOperands();
 		ValueAndIndexHolder powerOf2Constant;
 		//todo: temporarily comment this for Toha (was if (false && ...))
 		if (/*false && */(operator == Operator.MULT || operator == Operator.DIV)
@@ -415,11 +415,11 @@ public class ModelManager implements TypeResolver {
 			/* Create SHIFT step operand */
 			AbstractVariable shiftStepOpeVariable = variableManager.getConstantByValue(powerOf2Constant.value);
 			/* Get the operand being shifted. Here assume that MULT and DIV have 2 operands only. */
-			PartedVariableHolder shiftedOperandHolder = operandHolders.get(invertBit(powerOf2Constant.index));
+			RangeVariableHolder shiftedOperandHolder = operandHolders.get(invertBit(powerOf2Constant.index));
 			/* Set the shiftedOperand as left operand */
 			functionVariable.setOperand(0, shiftedOperandHolder);
 			/* Set the shiftStepOpeVariable as right operand */
-			functionVariable.setOperand(1, new PartedVariableHolder(shiftStepOpeVariable, null));
+			functionVariable.setOperand(1, new RangeVariableHolder(shiftStepOpeVariable, null));
 		}
 
 		/* Decide between SIGNED and UNSIGNED modifications of comparison operators */
@@ -445,14 +445,14 @@ public class ModelManager implements TypeResolver {
 	/**
 	 * Searches amongst the specified operands list for the first met
 	 * {@link ConstantVariable} that's value is a power of 2.
-	 * todo: Note that partedIndices are not taken into account here
+	 * todo: Note that range is not taken into account here
 	 *
-	 * @param operandHolders list of Parted Variable Holders to search in
+	 * @param operandHolders list of Range Variable Holders to search in
 	 * @return value of the first met {@link ConstantVariable} that's
 	 *         value is a power of 2, or <code>null</code> if no such a
 	 *         {@link ConstantVariable} is fount in the specified list.
 	 */
-	private ValueAndIndexHolder findPowerOf2Constant(List<PartedVariableHolder> operandHolders) {
+	private ValueAndIndexHolder findPowerOf2Constant(List<RangeVariableHolder> operandHolders) {
 		for (int i = 0; i < operandHolders.size(); i++) {
 			AbstractVariable variable = operandHolders.get(i).getVariable();
 			if (variable instanceof ConstantVariable) {
@@ -479,9 +479,9 @@ public class ModelManager implements TypeResolver {
 		return variableManager.getConstantByValue(subConstant.getValue(), subConstant.getLength());
 	}
 
-	public void concatenateRangeAssignments(String wholeVariableName, List<OperandImpl> partialAssignments) throws Exception {
+	public void concatenateRangeAssignments(String wholeVariableName, List<OperandImpl> rangeAssignments) throws Exception {
 
-		FunctionVariable catFunction = createCatFunction(partialAssignments);
+		FunctionVariable catFunction = createCatFunction(rangeAssignments);
 
 		AbstractVariable wholeVariable = getVariable(wholeVariableName);
 
@@ -498,18 +498,18 @@ public class ModelManager implements TypeResolver {
 	public GraphVariable createAndReplaceNewGraph(AbstractVariable oldGraphVariable, Node graphVarRootNode, boolean isDelay) {
 		GraphVariable newGraphVariable = new GraphVariable(oldGraphVariable, graphVarRootNode);
 		newGraphVariable.setDelay(isDelay);
-		replaceWithIndices(oldGraphVariable, new PartedVariableHolder(newGraphVariable, null));
+		replaceWithIndices(oldGraphVariable, new RangeVariableHolder(newGraphVariable, null));
 		return newGraphVariable;
 	}
 
-	private FunctionVariable createCatFunction(List<OperandImpl> partialSetList) throws Exception {
+	private FunctionVariable createCatFunction(List<OperandImpl> rangeAssignmentList) throws Exception {
 		/* Sort by index */
-		Collections.sort(partialSetList, new OperandImplComparator());
+		Collections.sort(rangeAssignmentList, new OperandImplComparator());
 		/* Create CAT Expression */
 		Expression catExpression = new Expression(Operator.CAT, false);
 		/* Add all inputs to the expression */
-		for (OperandImpl partialSet : partialSetList) {
-			catExpression.addOperand(partialSet);
+		for (OperandImpl rangeAssignment : rangeAssignmentList) {
+			catExpression.addOperand(rangeAssignment);
 		}
 		/* Add the Expression to ModelCollector */
 		return (FunctionVariable) convertOperandToVariable(catExpression, null, true);
@@ -538,7 +538,7 @@ public class ModelManager implements TypeResolver {
 	private class OperandImplComparator implements Comparator<OperandImpl> {
 		public int compare(OperandImpl o1, OperandImpl o2) {
 			/* NB! Larger indices should be catted earlier, so swap the compared indices */
-			return o2.getPartedIndices().compareTo(o1.getPartedIndices());
+			return o2.getRange().compareTo(o1.getRange());
 		}
 	}
 
@@ -559,7 +559,7 @@ public class ModelManager implements TypeResolver {
 		/* Create Function */
 		FunctionVariable invFunctionVariable
 				= doCreateFinalInversionFunction(convertOperandToVariable(operand, null, isTransition),
-				operand.getPartedIndices());
+				operand.getRange());
 		/* Restore initial inverted state */
 		operand.setInverted(true);
 		return invFunctionVariable;
@@ -571,36 +571,36 @@ public class ModelManager implements TypeResolver {
 	 * instances of {@link base.hldd.structure.variables.GraphVariable} for
 	 * what it is guaranteed that all the
 	 * {@link base.hldd.structure.variables.GraphVariable#baseVariable}-s
-	 * are instances of {@link base.hldd.structure.variables.PartedVariable}.
+	 * are instances of {@link base.hldd.structure.variables.RangeVariable}.
 	 *
-	 * @param expression where to extract PartedVariables from
+	 * @param expression where to extract RangeVariables from
 	 * @return a <code>non-empty</code> list of
-	 *         {@link base.hldd.structure.models.utils.PartedVariableHolder}-s, if the
+	 *         {@link RangeVariableHolder}-s, if the
 	 *         specified expression is CAT with all its operands being
 	 *         instances of
-	 *         {@link base.hldd.structure.variables.PartedVariable} (all in all
-	 *         --- a Complete Partially Set Variable). Otherwise an empty list
+	 *         {@link base.hldd.structure.variables.RangeVariable} (all in all
+	 *         --- a Complete Variable with range assignments). Otherwise an empty list
 	 *         is returned.
 	 */
-	private List<PartedVariableHolder> getPartiallySetVariablesFor(Expression expression) {
-		LinkedList<PartedVariableHolder> returnList = new LinkedList<PartedVariableHolder>();
-		LinkedList<PartedVariableHolder> emptyList = new LinkedList<PartedVariableHolder>();
+	private List<RangeVariableHolder> getRangeAssignmentVariablesFor(Expression expression) {
+		LinkedList<RangeVariableHolder> returnList = new LinkedList<RangeVariableHolder>();
+		LinkedList<RangeVariableHolder> emptyList = new LinkedList<RangeVariableHolder>();
 		if (expression.getOperator() != Operator.CAT) return emptyList;
-		/* Check all operands to be PartedVariables */
+		/* Check all operands to be RangeVariables */
 		for (AbstractOperand operand : expression.getOperands()) {
 			if (!(operand instanceof OperandImpl)) return emptyList;
 			OperandImpl operandImpl = (OperandImpl) operand;
-			if (!operandImpl.isParted()) return emptyList;
-			/* Compose name of PartedVariable */
-			Indices partedIndices = operandImpl.getPartedIndices();
-			String varName = operandImpl.getName() + partedIndices;
-			/* Obtain the PartedVariable (all parted GraphVariables have been set by this point) */
+			if (!operandImpl.isRange()) return emptyList;
+			/* Compose name of RangeVariable */
+			Indices range = operandImpl.getRange();
+			String varName = operandImpl.getName() + range;
+			/* Obtain the RangeVariable (all range GraphVariables have been set by this point) */
 			AbstractVariable operandVariable = getVariable(varName);
-			if (operandVariable != null && (operandVariable instanceof PartedVariable ||
+			if (operandVariable != null && (operandVariable instanceof RangeVariable ||
 					(operandVariable instanceof GraphVariable
-							&& ((GraphVariable) operandVariable).getBaseVariable() instanceof PartedVariable))) {
-				/* Provide NULL indices here, since they are already included in the base variable as PartedVariable. */
-				returnList.add(new PartedVariableHolder(operandVariable, null));
+							&& ((GraphVariable) operandVariable).getBaseVariable() instanceof RangeVariable))) {
+				/* Provide NULL indices here, since they are already included in the base variable as RangeVariable. */
+				returnList.add(new RangeVariableHolder(operandVariable, null));
 			} else {
 				return emptyList;
 			}
@@ -719,7 +719,7 @@ public class ModelManager implements TypeResolver {
 							udFunctionOperands.size(), operand.getLength());
 			// Create and add operands to UD Function Variable
 			for (AbstractOperand udFunctionOperand : udFunctionOperands) {
-				udFunctionVariable.addOperand(convertOperandToVariable(udFunctionOperand, null, true), udFunctionOperand.getPartedIndices());
+				udFunctionVariable.addOperand(convertOperandToVariable(udFunctionOperand, null, true), udFunctionOperand.getRange());
 			}
 			// Search for identical and add variable to collector if needed
 			return getIdenticalVariable(udFunctionVariable);
@@ -788,9 +788,9 @@ public class ModelManager implements TypeResolver {
 
 	public class CompositeFunctionVariable extends FunctionVariable {
 		private Operator compositeOperator;
-		private PartedVariableHolder[] functionVariables;
+		private RangeVariableHolder[] functionVariables;
 
-		public CompositeFunctionVariable(Operator compositeOperator, PartedVariableHolder... functionVariables) {
+		public CompositeFunctionVariable(Operator compositeOperator, RangeVariableHolder... functionVariables) {
 			this.compositeOperator = compositeOperator;
 			this.functionVariables = functionVariables;
 		}
@@ -799,7 +799,7 @@ public class ModelManager implements TypeResolver {
 			return compositeOperator;
 		}
 
-		public PartedVariableHolder[] getFunctionVariables() {
+		public RangeVariableHolder[] getFunctionVariables() {
 			return functionVariables;
 		}
 

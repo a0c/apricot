@@ -3,7 +3,7 @@ package base.hldd.structure.nodes;
 import base.HLDDException;
 import base.SourceLocation;
 import base.hldd.structure.models.utils.ModelManager.CompositeFunctionVariable;
-import base.hldd.structure.models.utils.PartedVariableHolder;
+import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.AbstractVariable;
 import base.vhdl.structure.Operator;
@@ -39,14 +39,14 @@ public class CompositeNode extends Node {
 		Node rootNode = null;
 		Node previousNode = null;
 		Operator compositeOperator = compositeFunctionVar.getCompositeOperator();
-		for (PartedVariableHolder funcVarHolder : compositeFunctionVar.getFunctionVariables()) {
+		for (RangeVariableHolder funcVarHolder : compositeFunctionVar.getFunctionVariables()) {
 			AbstractVariable funcVar = funcVarHolder.getVariable();
-			Indices partedIndices = funcVarHolder.getPartedIndices();
+			Indices range = funcVarHolder.getRange();
 			int trueValue = funcVarHolder.getTrueValue();
 			/* Create newControlNode */
 			Node controlNode = funcVar instanceof CompositeFunctionVariable
 					? getNode((CompositeFunctionVariable) funcVar)
-					: new Builder(funcVar).partedIndices(partedIndices).createSuccessors(2).build(); /* Condition Function has 2 values/successors only */
+					: new Builder(funcVar).range(range).createSuccessors(2).build(); /* Condition Function has 2 values/successors only */
 			controlNode.setSuccessor(Condition.TRUE, null); // init all conditions (TRUE and FALSE), so that in setSuccessor(Condition, Node)
 			controlNode.setSuccessor(Condition.FALSE, null);// we could simply iterate conditions, w/o fine-tuning (getSuccessorInternal()).
 			trueValuesByNodes.put(controlNode, Condition.createCondition(trueValue));/* Actually, can check, if doesn't contain... */ //todo: make funcVarHolder.getTrueValue() return Condition instead of int

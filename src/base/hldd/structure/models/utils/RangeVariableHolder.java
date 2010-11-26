@@ -5,33 +5,33 @@ import base.hldd.structure.variables.AbstractVariable;
 import base.Indices;
 
 /**
- * Class is used to pass both a variable and its parted indices to and fro.
+ * Class is used to pass both a variable and its range to and fro.
  *
  * @author Anton Chepurov
  */
-public class PartedVariableHolder {
+public class RangeVariableHolder {
 	public static final int NO_TRUE_VALUE = Integer.MIN_VALUE;
 
 	private AbstractVariable variable;
-	private Indices partedIndices;
+	private Indices range;
 	private final int trueValue;
 
-	public PartedVariableHolder(AbstractVariable variable, Indices partedIndices, int trueValue) {
+	public RangeVariableHolder(AbstractVariable variable, Indices range, int trueValue) {
 		this.variable = variable;
-		this.partedIndices = partedIndices;
+		this.range = range;
 		this.trueValue = trueValue;
 	}
 
-	public PartedVariableHolder(AbstractVariable variable, Indices partedIndices) {
-		this(variable, partedIndices, NO_TRUE_VALUE); //todo: instead of NO_TRUE_VALUE extend PartedVariableHolder class ...
+	public RangeVariableHolder(AbstractVariable variable, Indices range) {
+		this(variable, range, NO_TRUE_VALUE); //todo: instead of NO_TRUE_VALUE extend RangeVariableHolder class ...
 	}
 
 	public AbstractVariable getVariable() {
 		return variable;
 	}
 
-	public Indices getPartedIndices() {
-		return partedIndices;
+	public Indices getRange() {
+		return range;
 	}
 
 	public int getTrueValue() {
@@ -42,34 +42,34 @@ public class PartedVariableHolder {
 		return trueValue == 0;
 	}
 
-	public boolean isParted() {
-		return partedIndices != null;
+	public boolean isRange() {
+		return range != null;
 	}
 
-	public boolean isIdenticalTo(PartedVariableHolder comparedHolder) {
+	public boolean isIdenticalTo(RangeVariableHolder comparedHolder) {
 		/* Compare Variables */
 		if (!variable.isIdenticalTo(comparedHolder.variable)) return false;
-		/* Compare Parted Indices */
-		return Indices.equals(partedIndices, comparedHolder.partedIndices);
+		/* Compare Ranges */
+		return Indices.equals(range, comparedHolder.range);
 	}
 
 	public void setVariable(AbstractVariable variable) {
 		this.variable = variable;
 	}
 
-	public void setPartedIndices(Indices partedIndices) {
-		this.partedIndices = partedIndices;
+	public void setRange(Indices range) {
+		this.range = range;
 	}
 
 	public String toString() {
-		return variable + Indices.toString(partedIndices);
+		return variable + Indices.toString(range);
 	}
 
 	@Override
 	public int hashCode() {
 		int result = HashCodeUtil.SEED;
 		result = HashCodeUtil.hash(result, variable);
-		result = HashCodeUtil.hash(result, partedIndices);
+		result = HashCodeUtil.hash(result, range);
 		result = HashCodeUtil.hash(result, trueValue);
 		return result;
 	}
@@ -78,14 +78,14 @@ public class PartedVariableHolder {
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null || obj.getClass() != this.getClass()) return false;
-		PartedVariableHolder thatHolder = (PartedVariableHolder) obj;
+		RangeVariableHolder thatHolder = (RangeVariableHolder) obj;
 
 		if (variable != thatHolder.variable) return false;
 
-		if (partedIndices == null ^ thatHolder.partedIndices == null) return false;
+		if (range == null ^ thatHolder.range == null) return false;
 
 		//noinspection SimplifiableIfStatement
-		if (partedIndices != null && !partedIndices.equals(thatHolder.partedIndices)) {
+		if (range != null && !range.equals(thatHolder.range)) {
 			return false;
 		}
 

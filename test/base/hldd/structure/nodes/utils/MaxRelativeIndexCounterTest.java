@@ -39,12 +39,12 @@ public class MaxRelativeIndexCounterTest {
 			uniqueNode = new Node.Builder(createVariable("U1", 1, new Flags())).createSuccessors(2).build();
 
 			Node nodeU2 = new Node.Builder(createVariable("U2", 1, new Flags())).createSuccessors(2).build();
-			Node nodeU3 = new Node.Builder(createVariable("U3", 1, new Flags())).partedIndices(NULL_ARRAY).build();
+			Node nodeU3 = new Node.Builder(createVariable("U3", 1, new Flags())).range(NULL_ARRAY).build();
 			uniqueNode.setSuccessor(Condition.FALSE, nodeU2);
 			uniqueNode.setSuccessor(Condition.TRUE, nodeU3);
 
-			Node nodeU4 = new Node.Builder(createVariable("U4", 1, new Flags())).partedIndices(NULL_ARRAY).build();
-			Node nodeU5 = new Node.Builder(createVariable("U5", 1, new Flags())).partedIndices(NULL_ARRAY).build();
+			Node nodeU4 = new Node.Builder(createVariable("U4", 1, new Flags())).range(NULL_ARRAY).build();
+			Node nodeU5 = new Node.Builder(createVariable("U5", 1, new Flags())).range(NULL_ARRAY).build();
 			nodeU2.setSuccessor(Condition.FALSE, nodeU4);
 			nodeU2.setSuccessor(Condition.TRUE, nodeU5);
 
@@ -63,11 +63,11 @@ public class MaxRelativeIndexCounterTest {
 			duplicateNode = new Node.Builder(createVariable("D1", 2, new Flags())).createSuccessors(2).build();
 
 			Node nodeD2 = new Node.Builder(createVariable("D2", 2, new Flags())).createSuccessors(2).build();
-			Node nodeD3 = new Node.Builder(createVariable("D3", 2, new Flags())).partedIndices(NULL_ARRAY).build();
+			Node nodeD3 = new Node.Builder(createVariable("D3", 2, new Flags())).range(NULL_ARRAY).build();
 			duplicateNode.setSuccessor(Condition.FALSE, nodeD2);
 			duplicateNode.setSuccessor(Condition.TRUE, nodeD3);
 
-			Node nodeD4 = new Node.Builder(createVariable("D4", 2, new Flags())).partedIndices(NULL_ARRAY).build();
+			Node nodeD4 = new Node.Builder(createVariable("D4", 2, new Flags())).range(NULL_ARRAY).build();
 			nodeD2.setSuccessor(Condition.FALSE, nodeD3);
 			nodeD2.setSuccessor(Condition.TRUE, nodeD4);
 
@@ -83,7 +83,7 @@ public class MaxRelativeIndexCounterTest {
 			/* CYCLIC + DUPLICATE*/
 			cyclicNode = new Node.Builder(createVariable("C1", 3, new Flags())).createSuccessors(2).build();
 			Node nodeC2 = new Node.Builder(createVariable("C2", 2, new Flags())).createSuccessors(2).build();
-			Node nodeC3 = new Node.Builder(createVariable("C3", 2, new Flags())).partedIndices(NULL_ARRAY).build();
+			Node nodeC3 = new Node.Builder(createVariable("C3", 2, new Flags())).range(NULL_ARRAY).build();
 			cyclicNode.setSuccessor(Condition.FALSE, nodeC2);
 			cyclicNode.setSuccessor(Condition.TRUE, nodeC3);
 

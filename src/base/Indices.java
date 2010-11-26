@@ -36,6 +36,7 @@ public final class Indices implements Comparable<Indices> {
 	}
 
 	// todo: maybe should be renamed to getCardinality();
+
 	public int length() {
 		return highest - lowest + 1;
 	}
@@ -45,57 +46,57 @@ public final class Indices implements Comparable<Indices> {
 	}
 
 	/**
-	 * When applied to {@link base.hldd.structure.variables.PartedVariable}-s (see method
+	 * When applied to {@link base.hldd.structure.variables.RangeVariable}-s (see method
 	 * {@link base.vhdl.visitors.GraphGenerator#visitTransitionNode(base.vhdl.structure.nodes.TransitionNode)}),
 	 * the following situation holds:<br>
-	 * <i>This object</i> is the Indices of {@link base.hldd.structure.variables.PartedVariable} and so it's never null.
+	 * <i>This object</i> is the range of {@link base.hldd.structure.variables.RangeVariable} and so it's never null.
 	 * <br>
 	 * Different situations:<br>
-	 * 1) <code>valueIndices</code> may be missing or not.<br>
-	 * 2) <code>targetIndices</code> may be missing or not.
+	 * 1) <code>valueRange</code> may be missing or not.<br>
+	 * 2) <code>targetRange</code> may be missing or not.
 	 * <p/>
 	 * See the different situations in corresponding JUnit test.
 	 *
-	 * @param valueIndices  where to extract absolute indices from (indices of
-	 * 						<b>valueOperand</b> of {@link base.vhdl.structure.nodes.TransitionNode})
-	 * @param targetIndices indices of <b>targetOperand</b> of {@link base.vhdl.structure.nodes.TransitionNode}.
-	 * 						<b>NB!</b> Note that method checks curTransitionIndices to contain the Indices this
-	 * 						method is called on and throws an Exception if they don't.
-	 * @return corresponding absolute indices of these Indices ( the ones method is invoked on ),
-	 * 		   extracted from targetIndices.
+	 * @param valueRange  where to extract absolute range from (range of
+	 *                    <b>valueOperand</b> of {@link base.vhdl.structure.nodes.TransitionNode})
+	 * @param targetRange range of <b>targetOperand</b> of {@link base.vhdl.structure.nodes.TransitionNode}.
+	 *                    <b>NB!</b> Note that method checks targetRange to contain the range this
+	 *                    method is called on and throws an Exception if it doesn't.
+	 * @return corresponding absolute range of this range (the one method is invoked on),
+	 *         extracted from targetRange.
 	 */
-	public Indices absoluteFor(Indices targetIndices, Indices valueIndices) {
-		/* Calculations require both targetIndices and valueIndices,
-		* so the missing indices must be derived. */
+	public Indices absoluteFor(Indices targetRange, Indices valueRange) {
+		/* Calculations require both targetRange and valueRange,
+		* so the missing range must be derived. */
 
-		if (targetIndices == null && valueIndices == null) {
-			/* If both indices are missing, it means that targetOperand and valueOperand
+		if (targetRange == null && valueRange == null) {
+			/* If both ranges are missing, it means that targetOperand and valueOperand
 			* have the same length, and all derivations will be truncated at the end anyway.
-			* So simply return the parted indices themselves. */
+			* So simply return the range itself. */
 			return this;
 		} else {
-			/* If parted indices are the same as target indices,
-			* it means that this is a direct assignment, where valueIndices should be preserved (incl. null). */
-			if (this.equals(targetIndices)) {
-				return valueIndices;
+			/* If range is the same as target range,
+			* it means that this is a direct assignment, where valueRange should be preserved (incl. null). */
+			if (this.equals(targetRange)) {
+				return valueRange;
 			}
-			/* Here at least one of the indices is not null. */
-			/* Derive the missing indices from the present one: */
-			targetIndices = targetIndices == null ? deriveLength(valueIndices) : targetIndices;
-			valueIndices = valueIndices == null ? deriveLength(targetIndices) : valueIndices;
+			/* Here at least one of the ranges is not null. */
+			/* Derive the missing range from the present one: */
+			targetRange = targetRange == null ? deriveLength(valueRange) : targetRange;
+			valueRange = valueRange == null ? deriveLength(targetRange) : valueRange;
 
-			/* Here both targetIndices and valueIndices are available. */
-			/* Check targetIndices to contain these indices: */
-			if (!targetIndices.contain(this)) throw new RuntimeException("Unexpected bug while obtaining absolute " +
-					"indices:\ntargetIndices don't contain indices of PartedVariable." +
-					"\nProbable source of error: incorrect splitting of PartedVariables into non-interlapping regions");
+			/* Here both targetRange and valueRange are available. */
+			/* Check targetRange to contain this range: */
+			if (!targetRange.contain(this)) throw new RuntimeException("Unexpected bug while obtaining absolute " +
+					"range:\ntargetRange doesn't contain indices of RangeVariable." +
+					"\nProbable source of error: incorrect splitting of RangeVariables into non-overlapping regions");
 			/* Calculate difference: */
 			Indices difference = new Indices(
-					targetIndices.highest - this.highest,
-					this.lowest - targetIndices.lowest);
+					targetRange.highest - this.highest,
+					this.lowest - targetRange.lowest);
 			return new Indices(
-					valueIndices.highest - difference.highest,
-					valueIndices.lowest + difference.lowest);
+					valueRange.highest - difference.highest,
+					valueRange.lowest + difference.lowest);
 		}
 	}
 
@@ -164,8 +165,8 @@ public final class Indices implements Comparable<Indices> {
 
 	/**
 	 * @param mergeIndices whether to merge single bit indices (<5:5>) into one bit (<5>).
-	 * 					   <br><code>true</code> is currently used only in variable names of Nodes
-	 * 					   (V = 133	"CRC_STAT_WEN_1<< 1 >"	<< 1:1>).
+	 *                     <br><code>true</code> is currently used only in variable names of Nodes
+	 *                     (V = 133	"CRC_STAT_WEN_1<< 1 >"	<< 1:1>).
 	 * @return indices in angular brackets, e.g. <br><code><<8:0><br>< 2 ></code>
 	 */
 	public String toStringAngular(boolean mergeIndices) {

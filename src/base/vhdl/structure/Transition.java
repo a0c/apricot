@@ -5,7 +5,7 @@ package base.vhdl.structure;
  */
 public class Transition {
 
-	//todo: when introducing partedIndices for target field, update the following:
+	//todo: when introducing range for target field, update the following:
 	//todo: ConstantLengthAdjuster --> visitTransitionNode --> new OperandImpl(absGraphVariableName)
 	private OperandImpl targetOperand;
 	private AbstractOperand valueOperand;

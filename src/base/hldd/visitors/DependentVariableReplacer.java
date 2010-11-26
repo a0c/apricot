@@ -1,7 +1,7 @@
 package base.hldd.visitors;
 
 import base.hldd.structure.models.utils.ModelManager;
-import base.hldd.structure.models.utils.PartedVariableHolder;
+import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.GraphVariable;
@@ -11,9 +11,9 @@ import base.hldd.structure.variables.GraphVariable;
  */
 public class DependentVariableReplacer implements HLDDVisitor {
 	protected final AbstractVariable variableToReplace;
-	private final PartedVariableHolder replacingVarHolder;
+	private final RangeVariableHolder replacingVarHolder;
 
-	public DependentVariableReplacer(AbstractVariable variableToReplace, PartedVariableHolder replacingVarHolder) {
+	public DependentVariableReplacer(AbstractVariable variableToReplace, RangeVariableHolder replacingVarHolder) {
 		this.variableToReplace = variableToReplace;
 		this.replacingVarHolder = replacingVarHolder;
 	}
@@ -32,9 +32,9 @@ public class DependentVariableReplacer implements HLDDVisitor {
 
 	protected void replaceNode(Node node) {
 		node.setDependentVariable(replacingVarHolder.getVariable());
-		if (replacingVarHolder.isParted()) {
+		if (replacingVarHolder.isRange()) {
 			//todo: Indices.absoluteFor()...
-			node.setPartedIndices(replacingVarHolder.getPartedIndices());
+			node.setRange(replacingVarHolder.getRange());
 		}
 	}
 
@@ -53,8 +53,8 @@ public class DependentVariableReplacer implements HLDDVisitor {
 
 		@Override
 		protected void replaceNode(Node node) {
-			node.setDependentVariable(modelManager.generateBitRangeVariable(variableToReplace, node.getPartedIndices()));
-			node.setPartedIndices(null);
+			node.setDependentVariable(modelManager.generateBitRangeVariable(variableToReplace, node.getRange()));
+			node.setRange(null);
 		}
 	}
 }

@@ -79,7 +79,7 @@ public class StructureBuilder {
 							continue FULL_SCAN_OF_VARIABLES; //todo: Place for possible optimization: if dependency is analyzed, then right ordering will allow not to skip unknown inputs... However, optimization overhead may be larger than current skipping.
 						}
 
-						functionVariable.addOperand(inputVariable, functionData.inputPartedIndices[inputIndex]);
+						functionVariable.addOperand(inputVariable, functionData.inputRanges[inputIndex]);
 					}
 
 					/* Set index to Function Variable and add variable to collector */
@@ -150,20 +150,20 @@ public class StructureBuilder {
 		collector.addVariable(newConstantVariable);
 	}
 
-	public void buildFunction(int index, int nameIdx, String functionType, int[] inputIndices, Indices[] inputPartedIndices, Indices length) {
+	public void buildFunction(int index, int nameIdx, String functionType, int[] inputIndices, Indices[] inputRanges, Indices length) {
 		varCount--;
 		funcCount--;
 		/* Collect FunctionData */
-		collector.addFunctionData(functionType, nameIdx, index, inputIndices, inputPartedIndices, length);
+		collector.addFunctionData(functionType, nameIdx, index, inputIndices, inputRanges, length);
 	}
 
-	public void buildGraph(int index, Flags flags, String name, Indices partedIndices, Indices length, int graphLength, int graphIndex) {
+	public void buildGraph(int index, Flags flags, String name, Indices range, Indices length, int graphLength, int graphIndex) {
 		varCount--;
 		graphCount--;
 		/* Create base variable for GraphVariable */
-		Variable baseVariable = partedIndices == null
+		Variable baseVariable = range == null
 				? new Variable(name, new Type(length), flags)
-				: new PartedVariable(name, new Type(length), partedIndices, flags);
+				: new RangeVariable(name, new Type(length), range, flags);
 		baseVariable.forceSetIndex(index);
 		if (baseVariable.isOutput()) outpCount--;
 		GraphVariable newGraphVariable = new GraphVariable(baseVariable, null);
@@ -171,11 +171,11 @@ public class StructureBuilder {
 		collector.addGraphVariableData(newGraphVariable, graphLength, graphIndex);
 	}
 
-	public void buildNode(int relativeNodeIndex, int depVarIndex, Indices depVarPartedIndices,
+	public void buildNode(int relativeNodeIndex, int depVarIndex, Indices depVarRange,
 						  TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
 		nodeCount--;
 		/* Collect NodeData */
-		collector.addNodeData(relativeNodeIndex, depVarIndex, depVarPartedIndices, successors, windowPlaceholders);
+		collector.addNodeData(relativeNodeIndex, depVarIndex, depVarRange, successors, windowPlaceholders);
 	}
 
 	public void buildVariable(int index, Flags flags, String name, Indices length) throws Exception {

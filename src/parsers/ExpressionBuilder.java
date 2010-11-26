@@ -106,23 +106,23 @@ public class ExpressionBuilder {
 
 		if (operator == null) {
 
-			/* Parse PARTED INDICES */
-			Indices partedIndices = null;
-			AbstractOperand dynamicSlice = null;
+			/* Parse RANGE */
+			Indices range = null;
+			AbstractOperand dynamicRange = null;
 			try {
-				partedIndices = buildIndices(line);
+				range = buildRange(line);
 			} catch (Exception e) {
-				dynamicSlice = extractDynamicRange(line);
-				if (dynamicSlice == null || !(dynamicSlice instanceof OperandImpl) ||
-						!variableNames.contains(((OperandImpl) dynamicSlice).getName())) {
+				dynamicRange = extractDynamicRange(line);
+				if (dynamicRange == null || !(dynamicRange instanceof OperandImpl) ||
+						!variableNames.contains(((OperandImpl) dynamicRange).getName())) {
 					throw e;
 				}
 			}
-			String pureOperand = extractPureOperand(line, partedIndices != null || dynamicSlice != null);
+			String pureOperand = extractPureOperand(line, range != null || dynamicRange != null);
 
-			return replaceAliases(dynamicSlice == null ?
-					new OperandImpl(pureOperand, partedIndices, expressionContext.isInverted) :
-					new OperandImpl(pureOperand, (OperandImpl) dynamicSlice, expressionContext.isInverted)
+			return replaceAliases(dynamicRange == null ?
+					new OperandImpl(pureOperand, range, expressionContext.isInverted) :
+					new OperandImpl(pureOperand, (OperandImpl) dynamicRange, expressionContext.isInverted)
 			);
 		} else {
 			Expression expression = new Expression(operator, expressionContext.isInverted);
@@ -149,14 +149,14 @@ public class ExpressionBuilder {
 			return operand;
 		}
 
-		if (operand.isParted()) {
-			//todo: sliced ALIAS, see VHDL2008_comments.pdf => p.105
-			throw new RuntimeException("Implement me: SLICED ALIAS. todo: merge indices");
+		if (operand.isRange()) {
+			//todo: range ALIAS, see VHDL2008_comments.pdf => p.105
+			throw new RuntimeException("Implement me: RANGE ALIAS. todo: merge indices");
 		}
 
 		OperandImpl actualOperand = aliasByName.get(operand.getName()).getActual();
 
-		return new OperandImpl(actualOperand.getName(), actualOperand.getPartedIndices(), operand.isInverted());
+		return new OperandImpl(actualOperand.getName(), actualOperand.getRange(), operand.isInverted());
 	}
 
 	private boolean isUserDefinedFunction(String line) throws Exception {
@@ -174,8 +174,8 @@ public class ExpressionBuilder {
 				&& getClosingIndex(line, line.indexOf("(")) == line.length() - 1;
 	}
 
-	private static String extractPureOperand(String line, boolean hasPartedIndices) {
-		return hasPartedIndices ? line.substring(0, line.indexOf("(")).trim() : line;
+	private static String extractPureOperand(String line, boolean hasRange) {
+		return hasRange ? line.substring(0, line.indexOf("(")).trim() : line;
 	}
 
 	/**
@@ -188,18 +188,18 @@ public class ExpressionBuilder {
 	 *             <br> 32767 DOWNTO -32768 *
 	 *             <br> 0 TO 3  *
 	 *             <br> (Processor_width -1) downto -1 *
-	 * @return parted indices if present or  <code>null</code> if indices are not present
+	 * @return range if present or  <code>null</code> if range is not present
 	 * @throws Exception if {@link #evaluateNumerically(String, String)}
 	 */
-	public Indices buildIndices(String line) throws Exception {
+	public Indices buildRange(String line) throws Exception {
 		if (BIT_RANGE_PATTERN.matcher(line).matches()) {
 			/* d_in ( 8 downto 1 ) */
 			/* d_in ( 1 to 8 ) */
-			IndicesDeclaration indicesDeclaration =
+			RangeDeclaration rangeDeclaration =
 					parseIndicesDeclaration(line.substring(line.indexOf("(") + 1, line.indexOf(")")).trim());
-			int lowestIndex = evaluateNumerically(indicesDeclaration.lowestIndex, line);
-			int highestIndex = evaluateNumerically(indicesDeclaration.highestIndex, line);
-			return new Indices(highestIndex, lowestIndex, indicesDeclaration.isDescending);
+			int lowestIndex = evaluateNumerically(rangeDeclaration.lowestIndex, line);
+			int highestIndex = evaluateNumerically(rangeDeclaration.highestIndex, line);
+			return new Indices(highestIndex, lowestIndex, rangeDeclaration.isDescending);
 
 		} else if (SINGLE_BIT_PATTERN.matcher(line).matches()) {
 			/* d_in ( 0 ) */
@@ -210,26 +210,26 @@ public class ExpressionBuilder {
 			/* 32767 DOWNTO -32768 */
 			/* 0 TO 3  */
 			/* (Processor_width -1) downto -1 */
-			IndicesDeclaration indicesDeclaration = parseIndicesDeclaration(line);
-			int lowestIndex = evaluateNumerically(indicesDeclaration.lowestIndex, line);
-			int highestIndex = evaluateNumerically(indicesDeclaration.highestIndex, line);
-			return new Indices(highestIndex, lowestIndex, indicesDeclaration.isDescending);
+			RangeDeclaration rangeDeclaration = parseIndicesDeclaration(line);
+			int lowestIndex = evaluateNumerically(rangeDeclaration.lowestIndex, line);
+			int highestIndex = evaluateNumerically(rangeDeclaration.highestIndex, line);
+			return new Indices(highestIndex, lowestIndex, rangeDeclaration.isDescending);
 
 		} else return null;
 	}
 
-	private static IndicesDeclaration parseIndicesDeclaration(String rangeAsString) {
+	private static RangeDeclaration parseIndicesDeclaration(String rangeAsString) {
 		/* 32767 DOWNTO -32768 */
 		/* 0 TO 3 */
 		String[] indicesAsString;
 		if (rangeAsString.contains(" DOWNTO ")) {
 			// DESCENDING order
 			indicesAsString = rangeAsString.split(" DOWNTO ");
-			return new IndicesDeclaration(indicesAsString[1], indicesAsString[0], true);
+			return new RangeDeclaration(indicesAsString[1], indicesAsString[0], true);
 		} else {
 			//ASCENDING order
 			indicesAsString = rangeAsString.split(" TO ");
-			return new IndicesDeclaration(indicesAsString[0], indicesAsString[1], false);
+			return new RangeDeclaration(indicesAsString[0], indicesAsString[1], false);
 		}
 	}
 
@@ -497,7 +497,7 @@ public class ExpressionBuilder {
 	public Expression unfoldBoolean(OperandImpl operand) throws Exception {
 		Expression expression = new Expression(Operator.EQ, false);
 
-		expression.addOperand(new OperandImpl(operand.getName(), operand.getPartedIndices(), false));
+		expression.addOperand(new OperandImpl(operand.getName(), operand.getRange(), false));
 		expression.addOperand(operand.isInverted() ? buildExpression("\'0\'") : buildExpression("\'1\'"));
 
 		return expression;

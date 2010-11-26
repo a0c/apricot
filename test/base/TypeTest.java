@@ -50,22 +50,22 @@ public class TypeTest {
 	}
 
 	@Test
-	public void derivePartedType() {
+	public void deriveRangeType() {
 		Type type = new Type(new Indices(7, 0));
-		assertEquals(new Type(new Indices(2, 0)), type.derivePartedType(new Indices(7, 5)));
-		assertEquals(new Type(new Indices(0, 0)), type.derivePartedType(new Indices(7, 7)));
-		assertEquals(new Type(new Indices(0, 0)), type.derivePartedType(new Indices(0, 0)));
-		assertEquals(new Type(new Indices(2, 0)), type.derivePartedType(new Indices(2, 0)));
-		assertEquals(new Type(new Indices(1, 0)), type.derivePartedType(new Indices(4, 3)));
-		assertEquals(type, type.derivePartedType(null));
-		assertEquals(new Type(new Indices(7, 0)), type.derivePartedType(null));
+		assertEquals(new Type(new Indices(2, 0)), type.deriveRangeType(new Indices(7, 5)));
+		assertEquals(new Type(new Indices(0, 0)), type.deriveRangeType(new Indices(7, 7)));
+		assertEquals(new Type(new Indices(0, 0)), type.deriveRangeType(new Indices(0, 0)));
+		assertEquals(new Type(new Indices(2, 0)), type.deriveRangeType(new Indices(2, 0)));
+		assertEquals(new Type(new Indices(1, 0)), type.deriveRangeType(new Indices(4, 3)));
+		assertEquals(type, type.deriveRangeType(null));
+		assertEquals(new Type(new Indices(7, 0)), type.deriveRangeType(null));
 		type = Type.createFromValues(255, 0);
-		assertEquals(new Type(new Indices(7, 0), new Indices(2, 0)), type.derivePartedType(new Indices(7, 5)));
-		assertEquals(new Type(new Indices(1, 0), new Indices(0, 0)), type.derivePartedType(new Indices(7, 7)));
-		assertEquals(new Type(new Indices(1, 0), new Indices(0, 0)), type.derivePartedType(new Indices(0, 0)));
-		assertEquals(new Type(new Indices(7, 0), new Indices(2, 0)), type.derivePartedType(new Indices(2, 0)));
-		assertEquals(new Type(new Indices(3, 0), new Indices(1, 0)), type.derivePartedType(new Indices(4, 3)));
-		assertEquals(type, type.derivePartedType(null));
-		assertEquals(Type.createFromValues(255, 0), type.derivePartedType(null));
+		assertEquals(new Type(new Indices(7, 0), new Indices(2, 0)), type.deriveRangeType(new Indices(7, 5)));
+		assertEquals(new Type(new Indices(1, 0), new Indices(0, 0)), type.deriveRangeType(new Indices(7, 7)));
+		assertEquals(new Type(new Indices(1, 0), new Indices(0, 0)), type.deriveRangeType(new Indices(0, 0)));
+		assertEquals(new Type(new Indices(7, 0), new Indices(2, 0)), type.deriveRangeType(new Indices(2, 0)));
+		assertEquals(new Type(new Indices(3, 0), new Indices(1, 0)), type.deriveRangeType(new Indices(4, 3)));
+		assertEquals(type, type.deriveRangeType(null));
+		assertEquals(Type.createFromValues(255, 0), type.deriveRangeType(null));
 	}
 }

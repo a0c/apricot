@@ -55,7 +55,7 @@ public class ComponentMerger {
 
 		for (AbstractVariable port : ports) {
 
-			PartedVariableHolder outerSignalHolder = resolveMappingFor(port, modelCollector);
+			RangeVariableHolder outerSignalHolder = resolveMappingFor(port, modelCollector);
 
 			if (outerSignalHolder == null) {
 				continue; // no signal is connected to this port
@@ -73,7 +73,7 @@ public class ComponentMerger {
 		}
 	}
 
-	private PartedVariableHolder resolveMappingFor(AbstractVariable port, ModelManager modelCollector) throws ExtendedException {
+	private RangeVariableHolder resolveMappingFor(AbstractVariable port, ModelManager modelCollector) throws ExtendedException {
 
 		String portName = port.getName();
 
@@ -109,7 +109,7 @@ public class ComponentMerger {
 					ExtendedException.ERROR_TEXT);
 		}
 
-		return new PartedVariableHolder(outerSignal, outerOperand.getPartedIndices());
+		return new RangeVariableHolder(outerSignal, outerOperand.getRange());
 	}
 
 }

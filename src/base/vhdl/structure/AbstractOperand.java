@@ -53,7 +53,7 @@ public abstract class AbstractOperand {
 	 * 		   {@link Expression} and {@link UserDefinedFunction} utilize
 	 * 		   the default behaviour.
 	 */
-	public Indices getPartedIndices() {
+	public Indices getRange() {
 		return null;
 	}
 
@@ -63,7 +63,7 @@ public abstract class AbstractOperand {
 	 * 		   {@link Expression} and {@link UserDefinedFunction} utilize
 	 * 		   the default behaviour.
 	 */
-	public boolean isParted() {
+	public boolean isRange() {
 		return false;
 	}
 

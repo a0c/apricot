@@ -44,7 +44,7 @@ public abstract class AbstractPackageBuilder implements PackageBuilder {
 	}
 
 	public Indices buildIndices(String rangeAsString) throws Exception {
-		return expressionBuilder.buildIndices(rangeAsString);
+		return expressionBuilder.buildRange(rangeAsString);
 	}
 
 }

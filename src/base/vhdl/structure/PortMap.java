@@ -46,9 +46,9 @@ public class PortMap {
 		}
 	}
 
-	public List<OperandImpl> filterPartedActualsFrom(List<Port> ports) {
+	public List<OperandImpl> filterRangeActualsFrom(List<Port> ports) {
 
-		LinkedList<OperandImpl> partedActuals = new LinkedList<OperandImpl>();
+		LinkedList<OperandImpl> rangeActuals = new LinkedList<OperandImpl>();
 
 		for (Port port : ports) {
 
@@ -57,14 +57,14 @@ public class PortMap {
 			if (actual == null) {
 				continue; /* no signal is connected to this port of the component */
 			}
-			if (actual.isParted() && actual instanceof OperandImpl) {
+			if (actual.isRange() && actual instanceof OperandImpl) {
 
-				partedActuals.add(((OperandImpl) actual));
+				rangeActuals.add((OperandImpl) actual);
 			}
 
 		}
 
-		return partedActuals;
+		return rangeActuals;
 
 	}
 

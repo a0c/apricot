@@ -218,13 +218,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			SourceLocation source = dynamicRead.source;
 
 			AbstractVariable wholeVariable = modelCollector.getVariable(dynamicRangeRead.getName());
-			Type type = wholeVariable.getType().derivePartedType(Indices.BIT_INDICES);
+			Type type = wholeVariable.getType().deriveRangeType(Indices.BIT_INDICES);
 			String dynRangeReadName = OperandImpl.generateNameForDynamicRangeRead(dynamicRangeRead);
 			AbstractVariable baseVariable = new base.hldd.structure.variables.Variable(dynRangeReadName, type);
 
 			Node rootNode = createDynamicNode(dynamicRangeRead, source);
 			for (int i = 0; i < rootNode.getConditionValuesCount(); i++) {
-				Node successor = new Node.Builder(wholeVariable).partedIndices(new Indices(i, i)).build();
+				Node successor = new Node.Builder(wholeVariable).range(new Indices(i, i)).build();
 				rootNode.setSuccessor(Condition.createCondition(i), successor);
 			}
 			modelCollector.createAndReplaceNewGraph(baseVariable, rootNode, false);
@@ -233,11 +233,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	private OperandStorage collectRangeAssignments(Architecture architecture) throws Exception {
 
-		PartialSetVariableCollector rangeAssignmentsCollector = new PartialSetVariableCollector(modelCollector);
+		RangeAssignmentCollector rangeAssignmentCollector = new RangeAssignmentCollector(modelCollector);
 
-		architecture.traverse(rangeAssignmentsCollector);
+		architecture.traverse(rangeAssignmentCollector);
 
-		return rangeAssignmentsCollector.getRangeAssignments();
+		return rangeAssignmentCollector.getRangeAssignments();
 	}
 
 	private void collectConstants(Collection<Constant> constants) throws Exception {
@@ -258,20 +258,20 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		* #################################################*/
 		Expression expression = ifNode.getConditionExpression();
 		/* Extract dependentVariable */
-		PartedVariableHolder depVariableHolder = doCreateGraphsForCS
+		RangeVariableHolder depVariableHolder = doCreateGraphsForCS
 				? conditionGraphManager.convertConditionToBooleanGraph(ifNode)
 				: modelCollector.convertConditionalStmt(expression, doFlattenConditions);
 		if (doCreateSubGraphs) {
 			extraConditionGraphManager.generateExtraGraph(ifNode);
 		}
 		AbstractVariable dependentVariable = depVariableHolder.getVariable();
-		Indices partedIndices = depVariableHolder.getPartedIndices();
+		Indices range = depVariableHolder.getRange();
 		int conditionValueInt = depVariableHolder.getTrueValue();
 
 		/* Create ControlNode */
 		Node controlNode = dependentVariable instanceof CompositeFunctionVariable
 				? new CompositeNode((CompositeFunctionVariable) dependentVariable)
-				: new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(2).build();
+				: new Node.Builder(dependentVariable).range(range).createSuccessors(2).build();
 		/* Add VHDL lines the node's been created from */
 		controlNode.setSource(ifNode.getSource());
 
@@ -331,7 +331,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	/**
 	 * Behavioural DD tree cannot set multiple variables in one process tree.
-	 * Though, it still can have multiple nodes (partial setting variables).
+	 * Though, it still can have multiple nodes (range assignment variables).
 	 *
 	 * @param ifNode true part of which to be checked
 	 * @throws Exception if check fails
@@ -340,7 +340,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	/**
 	 * Behavioural DD tree cannot set multiple variables in one process tree.
-	 * Though, it still can have multiple nodes (partial setting variables).
+	 * Though, it still can have multiple nodes (range assignment variables).
 	 *
 	 * @param ifNode false part of which to be checked
 	 * @throws Exception if check fails
@@ -357,46 +357,46 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		if (isGraphVariableSetIn(transitionNode)) {
 			/* ######### Create TERMINAL NODE ############*/
 
-			/* Extract dependentVariable and partedIndices */
+			/* Extract dependentVariable and range */
 			AbstractVariable dependentVariable = transitionNode.isNull()
 					? graphVariable // Retain value
 					: modelCollector.convertOperandToVariable(transitionNode.getValueOperand(), graphVariable.getType(), true);
-			/* branch <= not CCR(CBIT); =====> don't take partedIndices into account, they were already used during Function creation */
-			Indices partedIndices = dependentVariable instanceof FunctionVariable && ((FunctionVariable) dependentVariable).getOperator() == Operator.INV
-					? null : transitionNode.getValueOperandPartedIndices();
-			boolean isDynamicSlice = !transitionNode.isNull() && transitionNode.getTargetOperand().isDynamicRange();
-			if (graphVariable instanceof PartedVariable && !transitionNode.isNull() && !isDynamicSlice) {
-				Indices graphPartedIndices = ((PartedVariable) graphVariable).getPartedIndices();
-				/* Adjust partedIndices, if only a part of the valueOperand (including its partedIndices) is used:
+			/* branch <= not CCR(CBIT); =====> don't take range into account, they were already used during Function creation */
+			Indices range = dependentVariable instanceof FunctionVariable && ((FunctionVariable) dependentVariable).getOperator() == Operator.INV
+					? null : transitionNode.getValueOperandRange();
+			boolean isDynamicRange = !transitionNode.isNull() && transitionNode.getTargetOperand().isDynamicRange();
+			if (graphVariable instanceof RangeVariable && !transitionNode.isNull() && !isDynamicRange) {
+				Indices graphRange = ((RangeVariable) graphVariable).getRange();
+				/* Adjust range, if only a part of the valueOperand (including its range) is used:
 				* in2(8) := '0';
-				* in2 := "000000001";			// graphVariable is parted, e.g. in(3)
-				* in2 := d_in;					// graphVariable is parted, e.g. in(3)
-				* in2 := d_in3(9 downto 2) ;	// graphVariable is parted, e.g. in(3)
+				* in2 := "000000001";			// graphVariable is a range, e.g. in(3)
+				* in2 := d_in;					// graphVariable is a range, e.g. in(3)
+				* in2 := d_in3(9 downto 2) ;	// graphVariable is a range, e.g. in(3)
 				* in2(3) := d_in3(5) ;
 				* in2(3 downto 0) := d_in3(5 downto 2) ;
 				* */
-				if (isDirectPartialAssignment(graphPartedIndices, transitionNode.getTargetOperand().getPartedIndices())) {
+				if (isDirectRangeAssignment(graphRange, transitionNode.getTargetOperand().getRange())) {
 					// in2(8) := '0';
 					// in2(3 downto 0) := d_in3(5 downto 2) ;  // graphVariable is "in2(3 downto 0)"
 					// Actually, absoluteFor() below covers this also, however constant 's extractSubConstant() does not.
 				} else {
 					if (dependentVariable instanceof ConstantVariable) {
 						/* v_out <= "0000"; // and looking for 'v_out(1)' */
-						dependentVariable = modelCollector.extractSubConstant((ConstantVariable) dependentVariable, graphPartedIndices);
-						partedIndices = null;
+						dependentVariable = modelCollector.extractSubConstant((ConstantVariable) dependentVariable, graphRange);
+						range = null;
 					} else {
-						/* Subtract indices (get Absolute indices out of relative) */
-						partedIndices = graphPartedIndices.absoluteFor(
-								transitionNode.getTargetOperand().getPartedIndices(),
-								partedIndices);
+						/* Subtract ranges (get Absolute range out of relative) */
+						range = graphRange.absoluteFor(
+								transitionNode.getTargetOperand().getRange(),
+								range);
 					}
 				}
 			}
 			/* Create TerminalNode */
-			Node terminalNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).build();
+			Node terminalNode = new Node.Builder(dependentVariable).range(range).build();
 			/* Add VHDL lines the node's been created from */
 			terminalNode.setSource(transitionNode.getSource());
-			if (isDynamicSlice) {
+			if (isDynamicRange) {
 				insertDynamicNode(transitionNode.getTargetOperand(), terminalNode);
 				return;
 			}
@@ -408,11 +408,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	private void insertDynamicNode(OperandImpl targetOperand, Node terminalNode) throws Exception {
 		Node controlNode = createDynamicNode(targetOperand, terminalNode.getSource());
-		Indices partedIndices = ((PartedVariable) graphVariable).getPartedIndices();
-		if (partedIndices.length() != 1) {
+		Indices range = ((RangeVariable) graphVariable).getRange();
+		if (range.length() != 1) {
 			throw new Exception("Dynamic node can be inserted for single bit graph only. Actual: " + graphVariable.getName());
 		}
-		int condition = partedIndices.getHighest();
+		int condition = range.getHighest();
 
 		contextManager.addContext(new Context(controlNode, Condition.createCondition(condition)));
 
@@ -423,18 +423,18 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		insertControlNode(controlNode);
 	}
 
-	private Node createDynamicNode(OperandImpl dynamicSliceOperand, SourceLocation source) throws Exception {
-		int wholeLength = modelCollector.getVariable(dynamicSliceOperand.getName()).getLength().length();
-		OperandImpl dynamicSlice = dynamicSliceOperand.getDynamicRange();
-		AbstractVariable dynamicVariable = modelCollector.getVariable(dynamicSlice.getName());
-		Indices dynamicIndices = dynamicSlice.getPartedIndices();
-		int conditionsCount = dynamicVariable.getType().countPossibleValues(dynamicIndices, wholeLength);
-		return new Node.Builder(dynamicVariable).partedIndices(dynamicIndices).
+	private Node createDynamicNode(OperandImpl dynamicRangeOperand, SourceLocation source) throws Exception {
+		int wholeLength = modelCollector.getVariable(dynamicRangeOperand.getName()).getLength().length();
+		OperandImpl dynamicRange = dynamicRangeOperand.getDynamicRange();
+		AbstractVariable dynamicVariable = modelCollector.getVariable(dynamicRange.getName());
+		Indices dynRange = dynamicRange.getRange();
+		int conditionsCount = dynamicVariable.getType().countPossibleValues(dynRange, wholeLength);
+		return new Node.Builder(dynamicVariable).range(dynRange).
 				createSuccessors(conditionsCount).source(source).build();
 	}
 
-	private boolean isDirectPartialAssignment(Indices partedGraph, Indices target) {
-		return partedGraph.equals(target);
+	private boolean isDirectRangeAssignment(Indices graphRange, Indices target) {
+		return graphRange.equals(target);
 	}
 
 	private boolean isGraphVariableSetIn(TransitionNode transitionNode) throws Exception {
@@ -447,7 +447,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			if (!processedGraphVars.contains(transitionVarName)) {
 				setGraphVariable(modelCollector.getVariable(transitionVarName));
 				if (graphVariable == null) {
-					return false;//todo: commented for DEMO. (Informs that the initial variable of partedSetting variables is not found or the like... In any way, has something to do with partedSetting variables)
+					return false;//todo: commented for DEMO. (Informs that the initial variable of range assignment variables is not found or the like... In any way, has something to do with range assignment variables)
 //                    Exception exception = new Exception("GraphVariable to process could not be set:" +
 //                            "\nModel collector does not contain the requested variable: " + transitionVarName +
 //                            "\nVariable " + transitionVarName + " is not declared.");
@@ -473,7 +473,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 		OperandImpl targetOperand = transitionNode.getTargetOperand();
 
-		Indices variableRange = variable instanceof PartedVariable ? ((PartedVariable) variable).getPartedIndices() : null;
+		Indices variableRange = variable instanceof RangeVariable ? ((RangeVariable) variable).getRange() : null;
 		OperandImpl variableOperand = new OperandImpl(variable.getPureName(), variableRange, false);
 		return targetOperand.contains(variableOperand, typeResolver);
 	}
@@ -490,13 +490,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		if (doCreateSubGraphs) {
 			extraConditionGraphManager.generateExtraGraph(caseNode);
 		}
-		Indices partedIndices = variableOperand.getPartedIndices();
+		Indices range = variableOperand.getRange();
 		/* Count possible conditions of dependentVariable */
 		//todo: suspicious action: dependentVariable.isState() ? caseNode.getConditions().size(). May be "when => others", may be "when A | B | C =>" ... consider these...
 //		int conditionValuesCount = dependentVariable.isState() ? caseNode.getConditions().size() : modelCollector.countPossibleValues(dependentVariable);
-		int conditionValuesCount = dependentVariable.getType().countPossibleValues(partedIndices);
+		int conditionValuesCount = dependentVariable.getType().countPossibleValues(range);
 		/* Create Control Node */
-		Node controlNode = new Node.Builder(dependentVariable).partedIndices(partedIndices).createSuccessors(conditionValuesCount).build();
+		Node controlNode = new Node.Builder(dependentVariable).range(range).createSuccessors(conditionValuesCount).build();
 		/* Add VHDL lines the node's been created from */
 		controlNode.setSource(caseNode.getSource()); //todo: inline with the creation process above...
 
@@ -555,7 +555,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	/**
 	 * Behavioural DD tree cannot set multiple variables in one process tree.
-	 * Though, it still can have multiple nodes (partial setting variables).
+	 * Though, it still can have multiple nodes (range assignment variables).
 	 *
 	 * @param whenNode transitions of which to be checked
 	 * @throws Exception if check fails
@@ -608,16 +608,16 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	protected void processRangeAssignments(OperandStorage rangeAssignments,
 										   Collection<base.vhdl.structure.nodes.CompositeNode> rootNodes) throws Exception {
-		/* For each partially assigned variable in process, traverse the tree once for each partial assigned variable */
+		/* For each variable that has range assignments in process, traverse the tree once for each range assignment variable */
 		for (OperandStorage.Item item : rangeAssignments.getItems()) {
 			String varName = item.name;
 			Set<OperandImpl> rangeOperands = item.operands;
-			AbstractVariable wholeVariable = modelCollector.getVariable(varName); // base variable of partial setting variables
-			/* For each partial setting variable, traverse the tree */
+			AbstractVariable wholeVariable = modelCollector.getVariable(varName); // base variable of range assignment variables
+			/* For each range assignment variable, traverse the tree */
 			for (OperandImpl rangeOperand : rangeOperands) {
 				/* Create new variable */ //todo: may be substitute with couldProcessNextGraphVariable(). Check ModelCollector.replace() to act equally to modelCollector.addVariable() met below:
 				setGraphVariable(modelCollector.getVariable(rangeOperand.toString()));
-				graphVariable.setDefaultValue(modelCollector.extractSubConstant(wholeVariable.getDefaultValue(), rangeOperand.getPartedIndices()));
+				graphVariable.setDefaultValue(modelCollector.extractSubConstant(wholeVariable.getDefaultValue(), rangeOperand.getRange()));
 				graphVariableRootNode = null;
 				contextManager.clear();
 
@@ -968,7 +968,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 				}
 
 				/* Adjust Constant Length */
-				Indices length = leftOperand.isParted() ? leftOperand.getPartedIndices() : leftVariable.getLength();
+				Indices length = leftOperand.isRange() ? leftOperand.getRange() : leftVariable.getLength();
 				constantVariable.setLength(length);
 			}
 		}

@@ -1,7 +1,7 @@
 package base.hldd.visitors;
 
 import base.HLDDException;
-import base.hldd.structure.models.utils.PartedVariableHolder;
+import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.FunctionVariable;
@@ -35,7 +35,7 @@ public class UsedFunctionsCollectorImpl implements HLDDVisitor {
 
 			usedFunctions.add(funVar);
 
-			for (PartedVariableHolder operand : funVar.getOperands()) {
+			for (RangeVariableHolder operand : funVar.getOperands()) {
 				addAndRecur(operand.getVariable());
 			}
 		}

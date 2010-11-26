@@ -36,7 +36,7 @@ public class IndicesTest {
 
 	@Test
 	public void deriveLength() {
-		/* used with Parted Indices */
+		/* used with ranges */
 		assertEquals(new Indices(0, 0), Indices.BIT_INDICES.deriveLength());
 		assertEquals(new Indices(1, 0), new Indices(1, 0).deriveLength());
 		assertEquals(new Indices(7, 0), new Indices(7, 0).deriveLength());
@@ -171,7 +171,7 @@ public class IndicesTest {
 
 		/* The following situation:
 		* "DATA_HELD(33 DOWNTO 5) <= DATAIN;" DATA_HELD(24 DOWNTO 0) ===> ...
-		* is not possible due to doDisintersectPartialSettings() method of PartialSetVariableCollector.
+		* is not possible due to splitOverlaps() method of SplittableOperandStorage.
 		* This method would split the above mentioned operand into 2:
 		* DATA_HELD(24 DOWNTO 5) and DATA_HELD(4 DOWNTO 0),
 		* and the latter wouldn't match the check isGraphVariableSetIn() in GraphGenerator. */

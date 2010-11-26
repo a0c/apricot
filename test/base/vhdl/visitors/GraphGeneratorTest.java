@@ -4,7 +4,7 @@ import base.Indices;
 import base.Type;
 import base.TypeResolver;
 import base.hldd.structure.Flags;
-import base.hldd.structure.variables.PartedVariable;
+import base.hldd.structure.variables.RangeVariable;
 import base.hldd.structure.variables.Variable;
 import base.vhdl.structure.OperandImpl;
 import base.vhdl.structure.Transition;
@@ -79,10 +79,10 @@ public class GraphGeneratorTest {
 		/* Build variable to compare with */
 		Variable comparedVariable = new Variable("V_OUT", new Type(new Indices(3, 0)), new Flags());
 		Variable differentVariable = new Variable("BALOON", new Type(new Indices(3, 0)), new Flags());
-		PartedVariable comparedVariable2 = new PartedVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(2, 2));
-		PartedVariable comparedVariable3 = new PartedVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(7, 0));
-		PartedVariable comparedVariable4 = new PartedVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(6, 0));
-		PartedVariable comparedVariable5 = new PartedVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(7, 1));
+		RangeVariable comparedVariable2 = new RangeVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(2, 2));
+		RangeVariable comparedVariable3 = new RangeVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(7, 0));
+		RangeVariable comparedVariable4 = new RangeVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(6, 0));
+		RangeVariable comparedVariable5 = new RangeVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(7, 1));
 		/* Build and test Transition Nodes */
 		TransitionNode transNodeNull = buildTransitionNode(null);
 		TransitionNode transNodeFull = buildTransitionNode("V_OUT");
@@ -103,14 +103,14 @@ public class GraphGeneratorTest {
 
 		/* Compared with "DIFFERENT_VARIABLE" */
 		assertFalse(recognizedMessage(differentVariable, transNodePart2), GraphGenerator.isVariableSetIn(transNodePart2, differentVariable, true, typeResolver));
-		/* Same name, non of them is parted */
+		/* Same name, non of them is range */
 		when(typeResolver.resolveType("V_OUT")).thenReturn(new Type(new Indices(3, 0)));
 		assertTrue(notRecognizedMessage(comparedVariable, transNodeFull), GraphGenerator.isVariableSetIn(transNodeFull, comparedVariable, true, typeResolver));
-		/* Same name, var is parted, node is not */
+		/* Same name, var is range, node is not */
 		when(typeResolver.resolveType("V_OUT")).thenReturn(new Type(new Indices(7, 0)));
 		assertTrue(notRecognizedMessage(comparedVariable2, transNodeFull), GraphGenerator.isVariableSetIn(transNodeFull, comparedVariable2, true, typeResolver));
 		assertTrue(notRecognizedMessage(comparedVariable3, transNodeFull), GraphGenerator.isVariableSetIn(transNodeFull, comparedVariable3, true, typeResolver));
-		/* Same name, var is parted, node is too */
+		/* Same name, var is range, node is too */
 		assertTrue(notRecognizedMessage(comparedVariable2, transNodePart1), GraphGenerator.isVariableSetIn(transNodePart1, comparedVariable2, true, typeResolver));
 		assertTrue(notRecognizedMessage(comparedVariable2, transNodePart2), GraphGenerator.isVariableSetIn(transNodePart1, comparedVariable2, true, typeResolver));
 		assertTrue(notRecognizedMessage(comparedVariable4, transNodePart2), GraphGenerator.isVariableSetIn(transNodePart2, comparedVariable4, true, typeResolver));

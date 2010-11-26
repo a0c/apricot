@@ -1,6 +1,6 @@
 package base.hldd.structure.variables;
 
-import base.hldd.structure.models.utils.PartedVariableHolder;
+import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.Indices;
 import base.Type;
 
@@ -31,11 +31,11 @@ public class UserDefinedFunctionVariable extends FunctionVariable {
 		super(nameIdx);
 		this.userDefinedOperator = userDefinedOperator;
 		this.expectedOperandsSize = expectedOperandsSize;
-		this.operands = new ArrayList<PartedVariableHolder>(expectedOperandsSize);
+		this.operands = new ArrayList<RangeVariableHolder>(expectedOperandsSize);
 		this.type = new Type(length);
 	}
 
-	protected Type adjustType(Type currentType, Type addedType, Indices addedPartedIndices) {
+	protected Type adjustType(Type currentType, Type addedType, Indices addedRange) {
 		/* Don't update type. It is finally set in constructor.
 		*  Return current type. */
 		return type;

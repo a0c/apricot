@@ -2,7 +2,7 @@ package base.vhdl.visitors;
 
 import base.Type;
 import base.hldd.structure.models.utils.ModelManager;
-import base.hldd.structure.variables.PartedVariable;
+import base.hldd.structure.variables.RangeVariable;
 import base.vhdl.structure.*;
 import base.vhdl.structure.Process;
 import base.vhdl.structure.nodes.CaseNode;
@@ -18,13 +18,13 @@ import java.util.Set;
 /**
  * @author Anton Chepurov
  */
-public class PartialSetVariableCollector extends AbstractVisitor {
+public class RangeAssignmentCollector extends AbstractVisitor {
 
 	private final SplittableOperandStorage rangeAssignments = new SplittableOperandStorage();
 
 	private final ModelManager modelManager;
 
-	public PartialSetVariableCollector(ModelManager modelManager) {
+	public RangeAssignmentCollector(ModelManager modelManager) {
 		this.modelManager = modelManager;
 	}
 
@@ -36,7 +36,7 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 		architecture.getTransitions().traverse(this);
 
 		for (ComponentInstantiation component : architecture.getComponents()) {
-			for (OperandImpl rangeOutputActual : component.findPartedOutputActuals()) {
+			for (OperandImpl rangeOutputActual : component.findRangeOutputActuals()) {
 				rangeAssignments.store(rangeOutputActual);
 			}
 		}
@@ -56,7 +56,7 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 	public void visitTransitionNode(TransitionNode transitionNode) throws Exception {
 		if (transitionNode.isNull()) return;
 		OperandImpl varOperand = transitionNode.getTargetOperand();
-		if (varOperand.isParted() || varOperand.isDynamicRange()) {
+		if (varOperand.isRange() || varOperand.isDynamicRange()) {
 			rangeAssignments.store(varOperand);
 		}
 	}
@@ -92,7 +92,7 @@ public class PartialSetVariableCollector extends AbstractVisitor {
 
 			for (OperandImpl rangeAssignment : rangeAssignments) {
 
-				PartedVariable rangeVariable = new PartedVariable(varName, varType, rangeAssignment.getPartedIndices());
+				RangeVariable rangeVariable = new RangeVariable(varName, varType, rangeAssignment.getRange());
 
 				modelManager.addVariable(rangeVariable);
 

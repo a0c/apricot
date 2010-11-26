@@ -57,9 +57,9 @@ public class ComponentInstantiation extends ASTObject {
 		}
 	}
 
-	public List<OperandImpl> findPartedOutputActuals() {
+	public List<OperandImpl> findRangeOutputActuals() {
 
-		return portMap.filterPartedActualsFrom(declaration.getOutputPorts());
+		return portMap.filterRangeActualsFrom(declaration.getOutputPorts());
 	}
 
 }

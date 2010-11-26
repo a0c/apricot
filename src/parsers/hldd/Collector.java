@@ -54,8 +54,8 @@ public class Collector {
 		indexVarHash.put(newVariable.getIndex(), newVariable);
 	}
 
-	void addFunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Indices[] inputPartedIndices, Indices length) {
-		indexVarHash.put(index, new FunctionData(functionType, nameIdx, index, inputIndices, inputPartedIndices, length));
+	void addFunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Indices[] inputRanges, Indices length) {
+		indexVarHash.put(index, new FunctionData(functionType, nameIdx, index, inputIndices, inputRanges, length));
 	}
 
 	void addGraphVariableData(GraphVariable newGraphVariable, int graphLength, int graphIndex) {
@@ -65,9 +65,9 @@ public class Collector {
 		currentNodes = new NodeData[graphLength];
 	}
 
-	void addNodeData(int relativeNodeIndex, int depVarIndex, Indices depVarPartedIndices, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
+	void addNodeData(int relativeNodeIndex, int depVarIndex, Indices depVarRange, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
 		currentGraphLength--;
-		currentNodes[relativeNodeIndex] = new NodeData(depVarIndex, depVarPartedIndices, successors, windowPlaceholders);
+		currentNodes[relativeNodeIndex] = new NodeData(depVarIndex, depVarRange, successors, windowPlaceholders);
 		if (currentGraphLength == 0) {
 			indexVarHash.put(currentGraphVariable.getIndex(), new GraphVariableData(currentGraphVariable, currentGraphIndex, currentNodes));
 		}
@@ -107,15 +107,15 @@ public class Collector {
 		final int nameIdx;
 		final int index;
 		final int[] inputIndices;
-		Indices[] inputPartedIndices;
+		Indices[] inputRanges;
 		final Indices length;
 
-		public FunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Indices[] inputPartedIndices, Indices length) {
+		public FunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Indices[] inputRanges, Indices length) {
 			this.functionType = functionType;
 			this.nameIdx = nameIdx;
 			this.index = index;
 			this.inputIndices = inputIndices;
-			this.inputPartedIndices = inputPartedIndices;
+			this.inputRanges = inputRanges;
 			this.length = length;
 		}
 	}
@@ -134,13 +134,13 @@ public class Collector {
 
 	public class NodeData {
 		public final int depVarIndex;
-		public Indices depVarPartedIndices;
+		public Indices depVarRange;
 		public final TreeMap<Condition, Integer> successors;
 		public final String[] windowPlaceholders;
 
-		public NodeData(int depVarIndex, Indices depVarPartedIndices, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
+		public NodeData(int depVarIndex, Indices depVarRange, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
 			this.depVarIndex = depVarIndex;
-			this.depVarPartedIndices = depVarPartedIndices;
+			this.depVarRange = depVarRange;
 			this.successors = successors;
 			this.windowPlaceholders = windowPlaceholders;
 		}

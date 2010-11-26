@@ -48,7 +48,7 @@ public class FsmGraphCreator implements HLDDVisitor {
 			} else {
 				/* Create a new Control Node (Node) */
 				int conditionsCount = node.getConditionsCount();
-				Node newControlNode = new Node.Builder(absDepVariable).partedIndices(node.getPartedIndices()).createSuccessors(node.getConditionValuesCount()).build();
+				Node newControlNode = new Node.Builder(absDepVariable).range(node.getRange()).createSuccessors(node.getConditionValuesCount()).build();
 				for (int idx = 0; idx < conditionsCount; idx++) {
 					Condition condition = node.getCondition(idx);
 					Node successor = node.getSuccessor(condition);
@@ -229,7 +229,7 @@ public class FsmGraphCreator implements HLDDVisitor {
 		private void addControlNode(Node graphControlNode, Node fsmNode) throws Exception {
 			/* Create new Control Node */
 			Node newControlNode = new Node.Builder(graphControlNode.getDependentVariable())
-					.partedIndices(graphControlNode.getPartedIndices())
+					.range(graphControlNode.getRange())
 					.createSuccessors(graphControlNode.getConditionValuesCount()).build();
 
 			FsmGraphCreator.FSMGraphMerger.FsmContext.Context currentContext = fsmContext.getCurrentContext();

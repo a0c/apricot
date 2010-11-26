@@ -10,24 +10,24 @@ import java.util.LinkedList;
  * @author Anton Chepurov
  */
 class BooleanOperandsCollector {
-	private PartedVariableHolder rootVarHolder;
-	private LinkedList<PartedVariableHolder> list = new LinkedList<PartedVariableHolder>();
+	private RangeVariableHolder rootVarHolder;
+	private LinkedList<RangeVariableHolder> list = new LinkedList<RangeVariableHolder>();
 
-	public BooleanOperandsCollector(PartedVariableHolder partedVariableHolder) {
-		rootVarHolder = partedVariableHolder;
+	public BooleanOperandsCollector(RangeVariableHolder rangeVariableHolder) {
+		rootVarHolder = rangeVariableHolder;
 	}
 
-	public LinkedList<PartedVariableHolder> collect() throws HLDDException {
+	public LinkedList<RangeVariableHolder> collect() throws HLDDException {
 
 		collect(rootVarHolder);
 
 		return list;
 	}
 
-	private void collect(PartedVariableHolder partedVariableHolder) throws HLDDException {
+	private void collect(RangeVariableHolder rangeVariableHolder) throws HLDDException {
 
-		AbstractVariable abstractVariable = partedVariableHolder.getVariable();
-		int length = partedVariableHolder.isParted() ? partedVariableHolder.getPartedIndices().length()
+		AbstractVariable abstractVariable = rangeVariableHolder.getVariable();
+		int length = rangeVariableHolder.isRange() ? rangeVariableHolder.getRange().length()
 				: abstractVariable.getLength().length();
 
 		if (abstractVariable.getClass() == Variable.class || abstractVariable instanceof GraphVariable) {
@@ -36,7 +36,7 @@ class BooleanOperandsCollector {
 				return;
 			}
 
-			addToList(partedVariableHolder);
+			addToList(rangeVariableHolder);
 
 		} else if (abstractVariable instanceof FunctionVariable) {
 
@@ -45,11 +45,11 @@ class BooleanOperandsCollector {
 			Operator operator = functionVariable.getOperator();
 
 			if (operator.isLogical(length)) { // go inside logical functions only. Note: conditions like fly='1' are represented by Variables, not FunctionVariables
-				for (PartedVariableHolder operand : functionVariable.getOperands()) {
+				for (RangeVariableHolder operand : functionVariable.getOperands()) {
 					collect(operand);
 				}
 			} else {
-				addToList(partedVariableHolder);
+				addToList(rangeVariableHolder);
 			}
 
 
@@ -59,9 +59,9 @@ class BooleanOperandsCollector {
 		}
 	}
 
-	private void addToList(PartedVariableHolder partedVariableHolder) {
-		if (!list.contains(partedVariableHolder)) {
-			list.add(partedVariableHolder);
+	private void addToList(RangeVariableHolder rangeVariableHolder) {
+		if (!list.contains(rangeVariableHolder)) {
+			list.add(rangeVariableHolder);
 		}
 	}
 }

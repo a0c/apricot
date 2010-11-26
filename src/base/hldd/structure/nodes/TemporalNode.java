@@ -63,8 +63,8 @@ public class TemporalNode extends Node {
 		/**
 		 * Override superclass method and return this builder (not the one of the superclass)
 		 */
-		public Builder partedIndices(Indices partedIndices) {
-			super.partedIndices(partedIndices);
+		public Builder range(Indices range) {
+			super.range(range);
 			return this;
 		}
 
