@@ -1,15 +1,12 @@
 package parsers.vhdl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-import base.vhdl.structure.*;
+import base.Range;
+import base.Type;
+import base.vhdl.structure.Entity;
 import base.vhdl.structure.Process;
 import base.vhdl.structure.nodes.AbstractNode;
 import base.vhdl.structure.nodes.TransitionNode;
-import base.Type;
-import base.Indices;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -18,9 +15,11 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Anton Chepurov
@@ -64,7 +63,7 @@ public class StructureBuilderTest {
 		int portHighestSB = 7;
 		StructureBuilder builder = new StructureBuilder();
 		builder.buildEntity("EntityName");
-		builder.buildPort(portName, false, new Type(new Indices(portHighestSB, 0)));
+		builder.buildPort(portName, false, new Type(new Range(portHighestSB, 0)));
 		builder.buildArchitecture("ArchitectureName", "ArchitectureAffiliation");
 		builder.buildProcess("ProcessName", new LinkedList<String>());
 		builder.buildTransition(portName, transitionValue, null);

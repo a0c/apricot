@@ -67,7 +67,7 @@ public class ComponentMerger {
 
 			} else {
 
-				modelCollector.replaceWithIndices(port, outerSignalHolder);
+				modelCollector.replaceWithRange(port, outerSignalHolder);
 
 			}
 		}

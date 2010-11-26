@@ -1,6 +1,6 @@
 package base.vhdl.processors;
 
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.vhdl.structure.AbstractOperand;
 import base.vhdl.structure.Constant;
@@ -151,7 +151,7 @@ public class OperandAssignmentDetectorImpl extends AbstractProcessor {
 			/* Resolve CaseType */
 			Type caseType = resolveType(caseNode.getVariableOperand());
 			/* Check that all conditions of CaseNode dependent variable are listed in WhenNodes */
-			Indices valueRange = caseType.resolveValueRange();
+			Range valueRange = caseType.resolveValueRange();
 			if (!areAllValuesListed(valueRange, caseNode.getConditions()))
 				return false; //todo: this check will be incomplete, if subsequent setting CaseNodes are applied
 			/* Check all conditions to set the variable */
@@ -191,7 +191,7 @@ public class OperandAssignmentDetectorImpl extends AbstractProcessor {
 		throw new RuntimeException(getClass().getSimpleName() + ": cannot detect variable setting in following node: " + abstractNode);
 	}
 
-	private boolean areAllValuesListed(Indices valueRange, List<WhenNode> conditions) {
+	private boolean areAllValuesListed(Range valueRange, List<WhenNode> conditions) {
 		/* All values are definitely listed, if When-Node with Others exist.
 		* So check the last condition */
 		if (conditions.get(conditions.size() - 1).isOthers()) return true;

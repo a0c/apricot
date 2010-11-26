@@ -1,23 +1,23 @@
 package base;
 
 /**
- * Immutable class representing indices (i.e. ranges).
- *
  * @author Anton Chepurov
  */
-public final class Indices implements Comparable<Indices> {
-	static final String INTERSECTION_TEXT = "Cannot compare intersecting indices: ";
-	public static final Indices BIT_INDICES = new Indices(0, 0);
+public final class Range implements Comparable<Range> {
+
+	static final String INTERSECTION_TEXT = "Cannot compare intersecting ranges: ";
+	
+	public static final Range BIT_RANGE = new Range(0, 0);
 
 	private final int highest;
 	private final int lowest;
 	private final boolean isDescending; //todo: take this field into account in all the methods!
 
-	public Indices(int highest, int lowest) {
+	public Range(int highest, int lowest) {
 		this(highest, lowest, true);
 	}
 
-	public Indices(int highest, int lowest, boolean isDescending) {
+	public Range(int highest, int lowest, boolean isDescending) {
 		this.highest = highest;
 		this.lowest = lowest;
 		this.isDescending = isDescending;
@@ -65,7 +65,7 @@ public final class Indices implements Comparable<Indices> {
 	 * @return corresponding absolute range of this range (the one method is invoked on),
 	 *         extracted from targetRange.
 	 */
-	public Indices absoluteFor(Indices targetRange, Indices valueRange) {
+	public Range absoluteFor(Range targetRange, Range valueRange) {
 		/* Calculations require both targetRange and valueRange,
 		* so the missing range must be derived. */
 
@@ -87,31 +87,31 @@ public final class Indices implements Comparable<Indices> {
 
 			/* Here both targetRange and valueRange are available. */
 			/* Check targetRange to contain this range: */
-			if (!targetRange.contain(this)) throw new RuntimeException("Unexpected bug while obtaining absolute " +
-					"range:\ntargetRange doesn't contain indices of RangeVariable." +
+			if (!targetRange.contains(this)) throw new RuntimeException("Unexpected bug while obtaining absolute " +
+					"range:\ntargetRange doesn't contain range of RangeVariable." +
 					"\nProbable source of error: incorrect splitting of RangeVariables into non-overlapping regions");
 			/* Calculate difference: */
-			Indices difference = new Indices(
+			Range difference = new Range(
 					targetRange.highest - this.highest,
 					this.lowest - targetRange.lowest);
-			return new Indices(
+			return new Range(
 					valueRange.highest - difference.highest,
 					valueRange.lowest + difference.lowest);
 		}
 	}
 
-	private Indices deriveLength(Indices availableIndices) {
-		return new Indices(availableIndices.highestSB(), 0);
+	private Range deriveLength(Range availableRange) {
+		return new Range(availableRange.highestSB(), 0);
 	}
 
-	public Indices deriveLength() {
+	public Range deriveLength() {
 		return deriveLength(this);
 	}
 
-	public Indices deriveValueRange() {
-		/* Compute maximum value these indices can store (alternatively, maximum index this indices can address) */
+	public Range deriveValueRange() {
+		/* Compute maximum value this range can store (alternatively, maximum index this range can address) */
 		int maxValue = (int) Math.pow(2, length());
-		return new Indices(maxValue - 1, 0);
+		return new Range(maxValue - 1, 0);
 	}
 
 	/**
@@ -121,22 +121,23 @@ public final class Indices implements Comparable<Indices> {
 	 * @param smallestValue lowest value to be stored in the register
 	 * @return length of the register required to store whichever of the possible values of the variable
 	 */
-	public static Indices deriveLengthForValues(int largestValue, int smallestValue) {
+	public static Range deriveLengthForValues(int largestValue, int smallestValue) {
 		/* By default use the largest value.
 		* Extend the largest value with negative range part if the range has one. */
 		int extension = smallestValue < 0 ? smallestValue : 0;
-		return new Indices(Integer.toBinaryString(largestValue - extension).length() - 1, 0);
+		return new Range(Integer.toBinaryString(largestValue - extension).length() - 1, 0);
 	}
 
 	@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
-	public boolean contain(Indices indices) {
-		return indices != null && lowest <= indices.lowest && highest >= indices.highest;
+	public boolean contains(Range range) {
+		return range != null && lowest <= range.lowest && highest >= range.highest;
 	}
 
 	public int hashCode() {
 		int result = HashCodeUtil.SEED;
 		result = HashCodeUtil.hash(result, highest);
 		result = HashCodeUtil.hash(result, lowest);
+		result = HashCodeUtil.hash(result, isDescending);
 		return result;
 	}
 
@@ -144,39 +145,39 @@ public final class Indices implements Comparable<Indices> {
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if ((obj == null) || (obj.getClass() != this.getClass())) return false;
-		Indices that = (Indices) obj;
+		Range that = (Range) obj;
 		return highest == that.highest && lowest == that.lowest;
 	}
 
-	public static boolean equals(Indices indices1, Indices indices2) {
+	public static boolean equals(Range firstRange, Range secondRange) {
 		/* Check NULLs */
-		if ((indices1 == null) ^ (indices2 == null)) return false;
+		if ((firstRange == null) ^ (secondRange == null)) return false;
 		/* Here both either are nulls or non-nulls */
-		if (indices1 != null) {
-			if (!indices1.equals(indices2)) return false;
+		if (firstRange != null) {
+			if (!firstRange.equals(secondRange)) return false;
 		}
 		/* All checks passed */
 		return true;
 	}
 
-	public static String toString(Indices indices) {
-		return indices == null ? "" : indices.toString();
+	public static String toString(Range range) {
+		return range == null ? "" : range.toString();
 	}
 
 	/**
-	 * @param mergeIndices whether to merge single bit indices (<5:5>) into one bit (<5>).
+	 * @param merge whether to merge single bit range (<5:5>) into one bit (<5>).
 	 *                     <br><code>true</code> is currently used only in variable names of Nodes
 	 *                     (V = 133	"CRC_STAT_WEN_1<< 1 >"	<< 1:1>).
-	 * @return indices in angular brackets, e.g. <br><code><<8:0><br>< 2 ></code>
+	 * @return range in angular brackets, e.g. <br><code><<8:0><br>< 2 ></code>
 	 */
-	public String toStringAngular(boolean mergeIndices) {
-		return mergeIndices && highest == lowest ?
+	public String toStringAngular(boolean merge) {
+		return merge && highest == lowest ?
 				"<" + highest + ">" :
 				"<" + highest + ":" + lowest + ">";
 	}
 
 	/**
-	 * @return indices in round brackets, e.g. <br><code>(8 DOWNTO 0)<br>( 2 )</code>
+	 * @return range in round brackets, e.g. <br><code>(8 DOWNTO 0)<br>( 2 )</code>
 	 */
 	public String toString() {
 		return highest == lowest ?
@@ -184,7 +185,7 @@ public final class Indices implements Comparable<Indices> {
 				"(" + highest + " DOWNTO " + lowest + ")";
 	}
 
-	public int compareTo(Indices o) {
+	public int compareTo(Range o) {
 		/* Check to be equal, before intersection is detected */
 		if (equals(o)) return 0;
 		/* Check for intersections: they cannot be compared */
@@ -194,12 +195,13 @@ public final class Indices implements Comparable<Indices> {
 	}
 
 	@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
-	private boolean intersectsWith(Indices o) {
-		/* Check the o to be inside this Indices. */
-		return contains(o.highest) || contains(o.lowest);
+	private boolean intersectsWith(Range o) {
+		/* Check the o to be inside this Range. */
+		return intersects(o.highest) || intersects(o.lowest);
 	}
 
-	private boolean contains(int index) {
+	@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
+	private boolean intersects(int index) {
 		return index >= lowest && index <= highest;
 	}
 

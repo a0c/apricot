@@ -1,6 +1,6 @@
 package parsers.vhdl;
 
-import base.Indices;
+import base.Range;
 
 import java.math.BigInteger;
 
@@ -15,13 +15,13 @@ public class ConstantValueAndLengthHolder {
 	/**
 	 * Derived length of the constant (<code>null</code> if not specified)
 	 */
-	private final Indices desiredLength;
+	private final Range desiredLength;
 
 	/**
 	 * @param value		 {@link #value}
 	 * @param desiredLength {@link #desiredLength}
 	 */
-	public ConstantValueAndLengthHolder(BigInteger value, Indices desiredLength) {
+	public ConstantValueAndLengthHolder(BigInteger value, Range desiredLength) {
 		this.value = value;
 		this.desiredLength = desiredLength;
 	}
@@ -36,7 +36,7 @@ public class ConstantValueAndLengthHolder {
 	/**
 	 * @return {@link #desiredLength}.
 	 */
-	public Indices getDesiredLength() {
+	public Range getDesiredLength() {
 		return desiredLength;
 	}
 }

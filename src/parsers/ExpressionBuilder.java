@@ -1,6 +1,6 @@
 package parsers;
 
-import base.Indices;
+import base.Range;
 import base.helpers.RegexpFactory;
 import base.hldd.structure.nodes.utils.Condition;
 import base.vhdl.structure.*;
@@ -107,7 +107,7 @@ public class ExpressionBuilder {
 		if (operator == null) {
 
 			/* Parse RANGE */
-			Indices range = null;
+			Range range = null;
 			AbstractOperand dynamicRange = null;
 			try {
 				range = buildRange(line);
@@ -151,7 +151,7 @@ public class ExpressionBuilder {
 
 		if (operand.isRange()) {
 			//todo: range ALIAS, see VHDL2008_comments.pdf => p.105
-			throw new RuntimeException("Implement me: RANGE ALIAS. todo: merge indices");
+			throw new RuntimeException("Implement me: RANGE ALIAS. todo: merge ranges");
 		}
 
 		OperandImpl actualOperand = aliasByName.get(operand.getName()).getActual();
@@ -191,34 +191,34 @@ public class ExpressionBuilder {
 	 * @return range if present or  <code>null</code> if range is not present
 	 * @throws Exception if {@link #evaluateNumerically(String, String)}
 	 */
-	public Indices buildRange(String line) throws Exception {
+	public Range buildRange(String line) throws Exception {
 		if (BIT_RANGE_PATTERN.matcher(line).matches()) {
 			/* d_in ( 8 downto 1 ) */
 			/* d_in ( 1 to 8 ) */
 			RangeDeclaration rangeDeclaration =
-					parseIndicesDeclaration(line.substring(line.indexOf("(") + 1, line.indexOf(")")).trim());
+					parseRangeDeclaration(line.substring(line.indexOf("(") + 1, line.indexOf(")")).trim());
 			int lowestIndex = evaluateNumerically(rangeDeclaration.lowestIndex, line);
 			int highestIndex = evaluateNumerically(rangeDeclaration.highestIndex, line);
-			return new Indices(highestIndex, lowestIndex, rangeDeclaration.isDescending);
+			return new Range(highestIndex, lowestIndex, rangeDeclaration.isDescending);
 
 		} else if (SINGLE_BIT_PATTERN.matcher(line).matches()) {
 			/* d_in ( 0 ) */
 			int index = evaluateNumerically(line.substring(line.indexOf("(") + 1, line.indexOf(")")).trim(), line);
-			return new Indices(index, index);
+			return new Range(index, index);
 
 		} else if (PURE_BIT_RANGE_PATTERN.matcher(line).matches()) {
 			/* 32767 DOWNTO -32768 */
 			/* 0 TO 3  */
 			/* (Processor_width -1) downto -1 */
-			RangeDeclaration rangeDeclaration = parseIndicesDeclaration(line);
+			RangeDeclaration rangeDeclaration = parseRangeDeclaration(line);
 			int lowestIndex = evaluateNumerically(rangeDeclaration.lowestIndex, line);
 			int highestIndex = evaluateNumerically(rangeDeclaration.highestIndex, line);
-			return new Indices(highestIndex, lowestIndex, rangeDeclaration.isDescending);
+			return new Range(highestIndex, lowestIndex, rangeDeclaration.isDescending);
 
 		} else return null;
 	}
 
-	private static RangeDeclaration parseIndicesDeclaration(String rangeAsString) {
+	private static RangeDeclaration parseRangeDeclaration(String rangeAsString) {
 		/* 32767 DOWNTO -32768 */
 		/* 0 TO 3 */
 		String[] indicesAsString;

@@ -1,6 +1,6 @@
 package base.vhdl.structure.utils;
 
-import base.Indices;
+import base.Range;
 import base.TypeResolver;
 import base.vhdl.structure.OperandImpl;
 
@@ -42,12 +42,12 @@ public class OperandStorage {
 
 	public boolean isWholeRangeSet(String variableName, TypeResolver typeResolver) {
 
-		Indices wholeRange = typeResolver.resolveType(variableName).getLength();
+		Range wholeRange = typeResolver.resolveType(variableName).getLength();
 
 		return isRangeSet(wholeRange, variableName, typeResolver);
 	}
 
-	private boolean isRangeSet(Indices range, String variableName, TypeResolver typeResolver) {
+	private boolean isRangeSet(Range range, String variableName, TypeResolver typeResolver) {
 		Set<Integer> bitsToBeSet = new HashSet<Integer>(range.length());
 		for (int bit = range.getLowest(); bit <= range.getHighest(); bit++) {
 			bitsToBeSet.add(bit);
@@ -56,7 +56,7 @@ public class OperandStorage {
 			if (operand.isWhole()) {
 				return true;
 			} else {
-				Indices opRange = operand.resolveRange(typeResolver);
+				Range opRange = operand.resolveRange(typeResolver);
 				for (int i = opRange.getLowest(); i <= opRange.getHighest(); i++) {
 					bitsToBeSet.remove(i);
 				}
@@ -67,7 +67,7 @@ public class OperandStorage {
 
 	public boolean contains(OperandImpl operand, TypeResolver typeResolver) {
 
-		Indices range = operand.resolveRange(typeResolver);
+		Range range = operand.resolveRange(typeResolver);
 
 		return isRangeSet(range, operand.getName(), typeResolver);
 	}

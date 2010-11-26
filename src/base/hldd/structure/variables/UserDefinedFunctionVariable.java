@@ -1,7 +1,7 @@
 package base.hldd.structure.variables;
 
+import base.Range;
 import base.hldd.structure.models.utils.RangeVariableHolder;
-import base.Indices;
 import base.Type;
 
 import java.util.ArrayList;
@@ -26,8 +26,7 @@ public class UserDefinedFunctionVariable extends FunctionVariable {
 	 *                             can be accessed quickly by their index.
 	 * @param length			   length to create a type from
 	 */
-	public UserDefinedFunctionVariable(String userDefinedOperator, int nameIdx,
-									   int expectedOperandsSize, Indices length) {
+	public UserDefinedFunctionVariable(String userDefinedOperator, int nameIdx, int expectedOperandsSize, Range length) {
 		super(nameIdx);
 		this.userDefinedOperator = userDefinedOperator;
 		this.expectedOperandsSize = expectedOperandsSize;
@@ -35,7 +34,7 @@ public class UserDefinedFunctionVariable extends FunctionVariable {
 		this.type = new Type(length);
 	}
 
-	protected Type adjustType(Type currentType, Type addedType, Indices addedRange) {
+	protected Type adjustType(Type currentType, Type addedType, Range addedRange) {
 		/* Don't update type. It is finally set in constructor.
 		*  Return current type. */
 		return type;

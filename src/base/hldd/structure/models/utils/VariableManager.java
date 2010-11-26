@@ -1,6 +1,6 @@
 package base.hldd.structure.models.utils;
 
-import base.Indices;
+import base.Range;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.ConstantVariable;
 import base.hldd.structure.variables.FunctionVariable;
@@ -142,7 +142,7 @@ public class VariableManager {
 	 * @param targetLength requested length or <code>null</code> if doesn't matter
 	 * @return an instance of ConstantVariable with the value of <code>constValueToFind</code>
 	 */
-	public ConstantVariable getConstantByValue(BigInteger value, Indices targetLength) {
+	public ConstantVariable getConstantByValue(BigInteger value, Range targetLength) {
 
 		// Prefer constants with meaningful names (look for direct constant)
 		ConstantVariable constWithSmartName = ConstantVariable.createNamedConstant(value, null, targetLength);

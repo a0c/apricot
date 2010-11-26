@@ -218,13 +218,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			SourceLocation source = dynamicRead.source;
 
 			AbstractVariable wholeVariable = modelCollector.getVariable(dynamicRangeRead.getName());
-			Type type = wholeVariable.getType().deriveRangeType(Indices.BIT_INDICES);
+			Type type = wholeVariable.getType().deriveRangeType(Range.BIT_RANGE);
 			String dynRangeReadName = OperandImpl.generateNameForDynamicRangeRead(dynamicRangeRead);
 			AbstractVariable baseVariable = new base.hldd.structure.variables.Variable(dynRangeReadName, type);
 
 			Node rootNode = createDynamicNode(dynamicRangeRead, source);
 			for (int i = 0; i < rootNode.getConditionValuesCount(); i++) {
-				Node successor = new Node.Builder(wholeVariable).range(new Indices(i, i)).build();
+				Node successor = new Node.Builder(wholeVariable).range(new Range(i, i)).build();
 				rootNode.setSuccessor(Condition.createCondition(i), successor);
 			}
 			modelCollector.createAndReplaceNewGraph(baseVariable, rootNode, false);
@@ -265,7 +265,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			extraConditionGraphManager.generateExtraGraph(ifNode);
 		}
 		AbstractVariable dependentVariable = depVariableHolder.getVariable();
-		Indices range = depVariableHolder.getRange();
+		Range range = depVariableHolder.getRange();
 		int conditionValueInt = depVariableHolder.getTrueValue();
 
 		/* Create ControlNode */
@@ -362,11 +362,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
 					? graphVariable // Retain value
 					: modelCollector.convertOperandToVariable(transitionNode.getValueOperand(), graphVariable.getType(), true);
 			/* branch <= not CCR(CBIT); =====> don't take range into account, they were already used during Function creation */
-			Indices range = dependentVariable instanceof FunctionVariable && ((FunctionVariable) dependentVariable).getOperator() == Operator.INV
+			Range range = dependentVariable instanceof FunctionVariable && ((FunctionVariable) dependentVariable).getOperator() == Operator.INV
 					? null : transitionNode.getValueOperandRange();
 			boolean isDynamicRange = !transitionNode.isNull() && transitionNode.getTargetOperand().isDynamicRange();
 			if (graphVariable instanceof RangeVariable && !transitionNode.isNull() && !isDynamicRange) {
-				Indices graphRange = ((RangeVariable) graphVariable).getRange();
+				Range graphRange = ((RangeVariable) graphVariable).getRange();
 				/* Adjust range, if only a part of the valueOperand (including its range) is used:
 				* in2(8) := '0';
 				* in2 := "000000001";			// graphVariable is a range, e.g. in(3)
@@ -408,7 +408,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	private void insertDynamicNode(OperandImpl targetOperand, Node terminalNode) throws Exception {
 		Node controlNode = createDynamicNode(targetOperand, terminalNode.getSource());
-		Indices range = ((RangeVariable) graphVariable).getRange();
+		Range range = ((RangeVariable) graphVariable).getRange();
 		if (range.length() != 1) {
 			throw new Exception("Dynamic node can be inserted for single bit graph only. Actual: " + graphVariable.getName());
 		}
@@ -427,14 +427,14 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		int wholeLength = modelCollector.getVariable(dynamicRangeOperand.getName()).getLength().length();
 		OperandImpl dynamicRange = dynamicRangeOperand.getDynamicRange();
 		AbstractVariable dynamicVariable = modelCollector.getVariable(dynamicRange.getName());
-		Indices dynRange = dynamicRange.getRange();
+		Range dynRange = dynamicRange.getRange();
 		int conditionsCount = dynamicVariable.getType().countPossibleValues(dynRange, wholeLength);
 		return new Node.Builder(dynamicVariable).range(dynRange).
 				createSuccessors(conditionsCount).source(source).build();
 	}
 
-	private boolean isDirectRangeAssignment(Indices graphRange, Indices target) {
-		return graphRange.equals(target);
+	private boolean isDirectRangeAssignment(Range graphRange, Range targetRange) {
+		return graphRange.equals(targetRange);
 	}
 
 	private boolean isGraphVariableSetIn(TransitionNode transitionNode) throws Exception {
@@ -473,7 +473,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 		OperandImpl targetOperand = transitionNode.getTargetOperand();
 
-		Indices variableRange = variable instanceof RangeVariable ? ((RangeVariable) variable).getRange() : null;
+		Range variableRange = variable instanceof RangeVariable ? ((RangeVariable) variable).getRange() : null;
 		OperandImpl variableOperand = new OperandImpl(variable.getPureName(), variableRange, false);
 		return targetOperand.contains(variableOperand, typeResolver);
 	}
@@ -490,7 +490,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		if (doCreateSubGraphs) {
 			extraConditionGraphManager.generateExtraGraph(caseNode);
 		}
-		Indices range = variableOperand.getRange();
+		Range range = variableOperand.getRange();
 		/* Count possible conditions of dependentVariable */
 		//todo: suspicious action: dependentVariable.isState() ? caseNode.getConditions().size(). May be "when => others", may be "when A | B | C =>" ... consider these...
 //		int conditionValuesCount = dependentVariable.isState() ? caseNode.getConditions().size() : modelCollector.countPossibleValues(dependentVariable);
@@ -968,7 +968,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 				}
 
 				/* Adjust Constant Length */
-				Indices length = leftOperand.isRange() ? leftOperand.getRange() : leftVariable.getLength();
+				Range length = leftOperand.isRange() ? leftOperand.getRange() : leftVariable.getLength();
 				constantVariable.setLength(length);
 			}
 		}

@@ -1,6 +1,7 @@
 package base.hldd.structure.nodes;
 
 import base.HLDDException;
+import base.Range;
 import base.SourceLocation;
 import base.hldd.structure.nodes.utils.Successors;
 import base.hldd.structure.nodes.utils.Condition;
@@ -8,7 +9,6 @@ import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.nodes.utils.Utility;
 import base.hldd.visitors.Visitable;
 import base.hldd.visitors.HLDDVisitor;
-import base.Indices;
 
 import java.util.Collection;
 
@@ -30,7 +30,7 @@ public class Node implements Visitable, Cloneable {
 	/**
 	 * Range of {@link #dependentVariable}. <p> todo: consider using a ready {@link base.hldd.structure.variables.RangeVariable} as {@link #dependentVariable} and removing this field (range) at all
 	 */
-	private Indices range;
+	private Range range;
 	/**
 	 * Line numbers in VHDL file this Node was created from
 	 */
@@ -82,15 +82,15 @@ public class Node implements Visitable, Cloneable {
 		sb.append(dependentVariable.getIndex());
 		sb.append("\t\"");
 		sb.append(depVarName());
-		sb.append(indicesToString(range, true));
+		sb.append(rangeToString(range, true));
 		sb.append("\"\t");
-		sb.append(range == null ? dependentVariable.lengthToString() : indicesToString(range, false));
+		sb.append(range == null ? dependentVariable.lengthToString() : rangeToString(range, false));
 
 		return sb.toString();
 	}
 
-	private String indicesToString(Indices indices, boolean mergeIndices) {
-		return indices == null ? "" : indices.toStringAngular(mergeIndices);
+	private String rangeToString(Range range, boolean merge) {
+		return range == null ? "" : range.toStringAngular(merge);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class Node implements Visitable, Cloneable {
 		}
 
 		/* Compare RANGE */
-		if (!Indices.equals(range, comparedNode.range)) return false;
+		if (!Range.equals(range, comparedNode.range)) return false;
 
 		/* All tests passed. */
 		return true;
@@ -207,7 +207,7 @@ public class Node implements Visitable, Cloneable {
 		return successors.asCollection();
 	}
 
-	public Indices getRange() {
+	public Range getRange() {
 		return range;
 	}
 
@@ -231,7 +231,7 @@ public class Node implements Visitable, Cloneable {
 		this.dependentVariable = dependentVariable;
 	}
 
-	public void setRange(Indices range) {
+	public void setRange(Range range) {
 		this.range = range;
 	}
 
@@ -377,7 +377,7 @@ public class Node implements Visitable, Cloneable {
 		private final AbstractVariable dependentVariable;
 		// Optional parameters -- initialized to default values
 		private Successors successors = null;
-		private Indices range = null;
+		private Range range = null;
 		private SourceLocation source = null;
 
 		public Builder(AbstractVariable dependentVariable) {
@@ -393,7 +393,7 @@ public class Node implements Visitable, Cloneable {
 			return this;
 		}
 
-		public Builder range(Indices range) {
+		public Builder range(Range range) {
 			this.range = range;
 			return this;
 		}

@@ -1,6 +1,6 @@
 package base.hldd.structure.models.utils;
 
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.hldd.structure.Flags;
 import base.hldd.structure.nodes.Node;
@@ -45,10 +45,10 @@ public class ExtraConditionGraphManager {
 			for (RangeVariableHolder boolOperand : boolOperandsList) {
 
 				AbstractVariable operandVar = boolOperand.getVariable();
-				Indices range = boolOperand.getRange();
+				Range range = boolOperand.getRange();
 				boolean isInverted = boolOperand.isInverted();
 
-				String name = baseName + "__" + operandVar.getName() + Indices.toString(range);
+				String name = baseName + "__" + operandVar.getName() + Range.toString(range);
 
 				Node controlNode = new Node.Builder(operandVar).range(range).createSuccessors(2).build();
 

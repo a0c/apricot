@@ -1,12 +1,12 @@
 package parsers.hldd;
 
+import base.Range;
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
 import base.hldd.structure.variables.utils.GraphVariableCreator;
 import base.hldd.structure.Flags;
 import base.vhdl.structure.Operator;
-import base.Indices;
 import base.Type;
 
 import java.math.BigInteger;
@@ -139,7 +139,7 @@ public class StructureBuilder {
 		collector.setGraphOffset(collector.getFuncOffset() + funcCount);
 	}
 
-	public void buildConstant(int index, String name, Indices length, BigInteger constValue) throws Exception {
+	public void buildConstant(int index, String name, Range length, BigInteger constValue) throws Exception {
 		varCount--;
 		constCount--;
 		/* Create new Constant */
@@ -150,14 +150,14 @@ public class StructureBuilder {
 		collector.addVariable(newConstantVariable);
 	}
 
-	public void buildFunction(int index, int nameIdx, String functionType, int[] inputIndices, Indices[] inputRanges, Indices length) {
+	public void buildFunction(int index, int nameIdx, String functionType, int[] inputIndices, Range[] inputRanges, Range length) {
 		varCount--;
 		funcCount--;
 		/* Collect FunctionData */
 		collector.addFunctionData(functionType, nameIdx, index, inputIndices, inputRanges, length);
 	}
 
-	public void buildGraph(int index, Flags flags, String name, Indices range, Indices length, int graphLength, int graphIndex) {
+	public void buildGraph(int index, Flags flags, String name, Range range, Range length, int graphLength, int graphIndex) {
 		varCount--;
 		graphCount--;
 		/* Create base variable for GraphVariable */
@@ -171,14 +171,14 @@ public class StructureBuilder {
 		collector.addGraphVariableData(newGraphVariable, graphLength, graphIndex);
 	}
 
-	public void buildNode(int relativeNodeIndex, int depVarIndex, Indices depVarRange,
+	public void buildNode(int relativeNodeIndex, int depVarIndex, Range depVarRange,
 						  TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
 		nodeCount--;
 		/* Collect NodeData */
 		collector.addNodeData(relativeNodeIndex, depVarIndex, depVarRange, successors, windowPlaceholders);
 	}
 
-	public void buildVariable(int index, Flags flags, String name, Indices length) throws Exception {
+	public void buildVariable(int index, Flags flags, String name, Range length) throws Exception {
 		varCount--;
 		/* Create new Variable */
 		Variable newVariable = new Variable(name, new Type(length), flags);

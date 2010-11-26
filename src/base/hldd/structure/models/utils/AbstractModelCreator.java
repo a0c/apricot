@@ -35,8 +35,8 @@ public abstract class AbstractModelCreator implements ModelCreator {
 		/* Perform INDEXATION */ //todo: ModelIndexator -> modelIndexator.indexate(constants, variables);
 		performIndexation();
 
-		/* Hash indices and variables */
-		hashIndices();
+		/* Collect variables */
+		collectVariables();
 
 		/* Create MODEL */
 		doCreateModel();
@@ -79,8 +79,8 @@ public abstract class AbstractModelCreator implements ModelCreator {
 
 	protected abstract void doIndexGraphs(int varIndex, int graphIndex, int nodeIndex);
 
-	private void hashIndices() {
-		LOGGER.entering(LOGGER.getName(), "hashIndices(3/4)");
+	private void collectVariables() {
+		LOGGER.entering(LOGGER.getName(), "collectVariables(3/4)");
 
 		for (ConstantVariable constant : constants) {
 			if (constant.getIndex() == -1) {
@@ -101,7 +101,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 			variablesCollection.add(variable);
 		}
 
-		LOGGER.exiting(LOGGER.getName(), "hashIndices(3/4)");
+		LOGGER.exiting(LOGGER.getName(), "collectVariables(3/4)");
 	}
 
 	protected abstract void doCreateModel();

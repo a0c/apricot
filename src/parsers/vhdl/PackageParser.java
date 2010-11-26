@@ -1,6 +1,6 @@
 package parsers.vhdl;
 
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.hldd.structure.nodes.utils.Condition;
 import base.vhdl.structure.Package;
@@ -238,21 +238,21 @@ public class PackageParser {
 							"Only BIT and STD_LOGIC are supported as array subtypes.", typeAndValue);
 				}
 			}
-			/* Parse indices */
-			Indices indices = builder.buildIndices(
+			/* Parse range */
+			Range range = builder.buildRange(
 					ExpressionBuilder.trimEnclosingBrackets(typeAndValue.substring(6, ofIndex)));
 			//todo: signed? what does the last -1 mean here: "(PROCESSOR_WIDTH -1) DOWNTO -1"
-			if (indices == null) {
+			if (range == null) {
 				throw new UnsupportedConstructException("Unsupported type: \'" + typeAndValue + "\'\n" +
 						"Unbounded arrays are not supported.", typeAndValue);
 			}
 
-			type = arrayElementType == null ? new Type(indices) : new Type(indices, arrayElementType);
+			type = arrayElementType == null ? new Type(range) : new Type(range, arrayElementType);
 
 		} else if (typeAndValue.contains(" RANGE ")) {
 			/* INTEGER RANGE 32767 DOWNTO -32768 */
 			/* INTEGER RANGE 0 TO 3 */
-			Indices valueRange = builder.buildIndices(typeAndValue.substring(typeAndValue.indexOf(" RANGE ") + 7));
+			Range valueRange = builder.buildRange(typeAndValue.substring(typeAndValue.indexOf(" RANGE ") + 7));
 
 			type = Type.createFromValues(valueRange);/*todo: , valueRange.isDescending() ? */   // todo: <== isDescending() for #length#
 
@@ -260,9 +260,9 @@ public class PackageParser {
 				&& ExpressionBuilder.BIT_RANGE_PATTERN.matcher(typeAndValue).matches()) {
 			/* BIT_VECTOR ( 8 DOWNTO 0) */
 			/* {IN} STD_LOGIC_VECTOR(MOD_EN_BITS-3 DOWNTO 0) */
-			Indices indices = builder.buildIndices(typeAndValue);
+			Range range = builder.buildRange(typeAndValue);
 
-			type = new Type(indices);
+			type = new Type(range);
 
 		} else if (builder.containsType(typeAndValue)) {
 			type = builder.getType(typeAndValue);
@@ -295,7 +295,7 @@ public class PackageParser {
 		return typeString;
 	}
 
-	public static Map<Condition, String> replaceOthersValue(String valueAsString, Type type, Indices length) {
+	public static Map<Condition, String> replaceOthersValue(String valueAsString, Type type, Range length) {
 
 		TreeMap<Condition, String> valuesAsString = new TreeMap<Condition, String>();
 		if (valueAsString == null) {
@@ -428,18 +428,18 @@ public class PackageParser {
 			return DEC_PATTERN.matcher(valueAsString).matches();
 		}
 
-		private Indices lengthFor(String valueAsString) {
+		private Range lengthFor(String valueAsString) {
 			switch (this) {
 				case BOOLEAN:
-					return Indices.BIT_INDICES;
+					return Range.BIT_RANGE;
 				case BINARY:
-					return new Indices(valueAsString.length() - 1, 0);
+					return new Range(valueAsString.length() - 1, 0);
 				case DECIMAL:
 				case ARBITRARY:
 					return null;
 				default:
 					/* HEXADECIMAL */
-					return new Indices(4 * valueAsString.length() - 1, 0);
+					return new Range(4 * valueAsString.length() - 1, 0);
 			}
 		}
 	}

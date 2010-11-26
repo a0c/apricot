@@ -1,5 +1,6 @@
 package parsers.vhdl;
 
+import base.Range;
 import base.Type;
 import org.junit.Test;
 
@@ -62,7 +63,7 @@ public class PackageParserTest {
 			assertEquals("Incorrect parsed value for " + parsingConstant.valueAsString + ":",
 					parsingConstant.valueInt, holder.getValue());
 			int length = holder.getDesiredLength() != null ? holder.getDesiredLength().length()
-					: base.Indices.deriveLengthForValues(holder.getValue().intValue(), 0).length();
+					: Range.deriveLengthForValues(holder.getValue().intValue(), 0).length();
 			assertEquals("Incorrect parsed length for " + parsingConstant.valueAsString + ":",
 					parsingConstant.length, length);
 		}

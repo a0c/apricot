@@ -1,8 +1,8 @@
 package base.hldd.structure.models.utils;
 
 import base.HashCodeUtil;
+import base.Range;
 import base.hldd.structure.variables.AbstractVariable;
-import base.Indices;
 
 /**
  * Class is used to pass both a variable and its range to and fro.
@@ -13,16 +13,16 @@ public class RangeVariableHolder {
 	public static final int NO_TRUE_VALUE = Integer.MIN_VALUE;
 
 	private AbstractVariable variable;
-	private Indices range;
+	private Range range;
 	private final int trueValue;
 
-	public RangeVariableHolder(AbstractVariable variable, Indices range, int trueValue) {
+	public RangeVariableHolder(AbstractVariable variable, Range range, int trueValue) {
 		this.variable = variable;
 		this.range = range;
 		this.trueValue = trueValue;
 	}
 
-	public RangeVariableHolder(AbstractVariable variable, Indices range) {
+	public RangeVariableHolder(AbstractVariable variable, Range range) {
 		this(variable, range, NO_TRUE_VALUE); //todo: instead of NO_TRUE_VALUE extend RangeVariableHolder class ...
 	}
 
@@ -30,7 +30,7 @@ public class RangeVariableHolder {
 		return variable;
 	}
 
-	public Indices getRange() {
+	public Range getRange() {
 		return range;
 	}
 
@@ -50,19 +50,19 @@ public class RangeVariableHolder {
 		/* Compare Variables */
 		if (!variable.isIdenticalTo(comparedHolder.variable)) return false;
 		/* Compare Ranges */
-		return Indices.equals(range, comparedHolder.range);
+		return Range.equals(range, comparedHolder.range);
 	}
 
 	public void setVariable(AbstractVariable variable) {
 		this.variable = variable;
 	}
 
-	public void setRange(Indices range) {
+	public void setRange(Range range) {
 		this.range = range;
 	}
 
 	public String toString() {
-		return variable + Indices.toString(range);
+		return variable + Range.toString(range);
 	}
 
 	@Override

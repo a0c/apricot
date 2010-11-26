@@ -1,6 +1,6 @@
 package base.vhdl.structure;
 
-import base.Indices;
+import base.Range;
 
 import java.util.regex.Pattern;
 
@@ -177,18 +177,18 @@ public enum Operator {
 	}
 
 
-	public Indices adjustLength(Indices currentLength, Indices addedLength, Indices addedRange) {
+	public Range adjustLength(Range currentLength, Range addedLength, Range addedRange) {
 		/* Length is derived for the following case:
-		* Some_operand<2:2> ==> the length is being adjusted (0:0), not the real indices (2:2).*/
-		Indices newOperandLength = addedRange != null ? addedRange.deriveLength() : addedLength;
+		* Some_operand<2:2> ==> the length is being adjusted (0:0), not the real range (2:2).*/
+		Range newOperandLength = addedRange != null ? addedRange.deriveLength() : addedLength;
 		/* Adjust range */
 		return adjustLength(currentLength, newOperandLength);
 	}
 
-	public Indices adjustLength(Indices currentIndices, Indices newOperandIndices) {
+	public Range adjustLength(Range currentRange, Range newOperandRange) {
 
 		if (isCondition) {
-			return Indices.BIT_INDICES;
+			return Range.BIT_RANGE;
 		}
 		switch (this) {
 			case EQ:
@@ -201,13 +201,13 @@ public enum Operator {
 			case U_LT:
 			case GT:
 			case U_GT:
-				throw new RuntimeException("Adjusting length for condition operator; should've returned BIT_INDICES by this place");
+				throw new RuntimeException("Adjusting length for condition operator; should've returned BIT_RANGE by this place");
 			case CAT:
 				/* Accumulative HSB of all the operands */
-				int currentLength = currentIndices == null ? 0 : currentIndices.length();
-				int newOperandLength = newOperandIndices.length();
+				int currentLength = currentRange == null ? 0 : currentRange.length();
+				int newOperandLength = newOperandRange.length();
 
-				return new Indices(currentLength + newOperandLength - 1, 0);
+				return new Range(currentLength + newOperandLength - 1, 0);
 			case ADDER:
 			case MULT:
 			case DIV:
@@ -217,21 +217,21 @@ public enum Operator {
 			case OR:
 			case MOD:
 				/* HSB of the longest operand */
-				if (currentIndices == null) {
-					return newOperandIndices;
+				if (currentRange == null) {
+					return newOperandRange;
 				} else {
-					int currentHsb = currentIndices.highestSB();
-					int newHsb = newOperandIndices.highestSB();
-					return currentHsb > newHsb ? currentIndices : newOperandIndices;
+					int currentHsb = currentRange.highestSB();
+					int newHsb = newOperandRange.highestSB();
+					return currentHsb > newHsb ? currentRange : newOperandRange;
 				}
 			case EXP:
 				break;
 			case SHIFT_RIGHT:
 			case SHIFT_LEFT:
 				/* HSB of the operand being shifted */
-				return currentIndices == null ? newOperandIndices : currentIndices;
+				return currentRange == null ? newOperandRange : currentRange;
 			case INV:
-				return newOperandIndices;
+				return newOperandRange;
 		}
 		throw new RuntimeException("Don't know how to adjust length for " + this + " operator");
 	}

@@ -1,10 +1,9 @@
 package parsers.hldd;
 
+import base.Range;
 import base.hldd.structure.nodes.utils.Condition;
 import io.scan.HLDDScanner;
-import base.psl.structure.Range;
 import base.hldd.structure.Flags;
-import base.Indices;
 
 import java.math.BigInteger;
 import java.util.TreeMap;
@@ -49,10 +48,10 @@ public class StructureParser {
 				/* Extract NAME and RANGE */
 				NameAndRange holder = parseNameAndRange(token.substring(token.indexOf("\"") + 1, token.lastIndexOf("\"")).trim());
 				String name = holder.name;
-				Indices range = holder.range;
+				Range range = holder.range;
 				/* Extract HIGHEST SIGNIFICANT BIT and build LENGTH */
 				int highestSB = Integer.parseInt(token.substring(token.indexOf("<") + 1, token.lastIndexOf(":")).trim());
-				Indices length = new Indices(highestSB, 0);
+				Range length = new Range(highestSB, 0);
 				/* Analyze FLAGS */
 				if (flags.isConstant()) {
 					/* CONSTANT */
@@ -72,7 +71,7 @@ public class StructureParser {
 					/* Extract INPUTS */
 					String[] inputDeclarations = token.substring(token.indexOf("(") + 1, token.indexOf(")")).trim().split(",");
 					int[] inputIndices = new int[inputDeclarations.length];
-					Indices[] inputRanges = new Indices[inputDeclarations.length];
+					Range[] inputRanges = new Range[inputDeclarations.length];
 					for (int i = 0; i < inputDeclarations.length; i++) {
 						String inputDeclaration = inputDeclarations[i].trim();
 						/* Extract input INDEX and RANGE, if any */
@@ -106,7 +105,7 @@ public class StructureParser {
 						/* Extract DEPENDENT VARIABLE INDEX */
 						int depVarIndex = Integer.parseInt(token.substring(token.lastIndexOf("=") + 1, token.indexOf("\"")).trim());
 						/* Extract RANGE if any */
-						Indices depVarRange = parseRange(token.substring(token.indexOf("\"") + 1, token.lastIndexOf("\"")).trim());
+						Range depVarRange = parseRange(token.substring(token.indexOf("\"") + 1, token.lastIndexOf("\"")).trim());
 						/* Extract SUCCESSORS */
 						String successorsDecl = token.substring(token.indexOf("(", token.indexOf(")")) + 1, token.indexOf(")", token.indexOf(")") + 1)).trim();
 						TreeMap<Condition, Integer> successors = null;
@@ -121,8 +120,8 @@ public class StructureParser {
 						}
 						/* Extract WINDOW */
 						String[] windowPlaceholders = null;
-						if (Range.isRangeDeclaration(token)) {
-							windowPlaceholders = Range.parseRangeDeclaration(token);
+						if (base.psl.structure.Range.isRangeDeclaration(token)) {
+							windowPlaceholders = base.psl.structure.Range.parseRangeDeclaration(token);
 						}
 						builder.buildNode(relativeNodeIndex, depVarIndex, depVarRange, successors, windowPlaceholders);
 					}
@@ -132,14 +131,14 @@ public class StructureParser {
 		}
 	}
 
-	private Indices parseRange(String line) throws Exception {
+	private Range parseRange(String line) throws Exception {
 
 		return BracketType.ANGULAR.parse(line).range; /* allowed to be null */
 	}
 
-	private NameAndRange parseNameAndRange(String nameAndIndices) throws Exception {
+	private NameAndRange parseNameAndRange(String nameAndRange) throws Exception {
 
-		return BracketType.ROUND.parse(nameAndIndices);
+		return BracketType.ROUND.parse(nameAndRange);
 	}
 
 	private enum BracketType {
@@ -155,41 +154,41 @@ public class StructureParser {
 			this.delim = delim;
 		}
 
-		public boolean isPresentIn(String nameAndIndices) {
-			return nameAndIndices.contains(open) && nameAndIndices.contains(close);
+		public boolean isPresentIn(String nameAndRange) {
+			return nameAndRange.contains(open) && nameAndRange.contains(close);
 		}
 
-		public NameAndRange parse(String nameAndIndices) throws Exception {
-			if (isPresentIn(nameAndIndices)) {
-				int openIndex = nameAndIndices.lastIndexOf(open);
-				int closeIndex = nameAndIndices.lastIndexOf(close);
-				String name = nameAndIndices.substring(0, openIndex);
-				String line = nameAndIndices.substring(openIndex + 1, closeIndex);
-				Indices range;
+		public NameAndRange parse(String nameAndRange) throws Exception {
+			if (isPresentIn(nameAndRange)) {
+				int openIndex = nameAndRange.lastIndexOf(open);
+				int closeIndex = nameAndRange.lastIndexOf(close);
+				String name = nameAndRange.substring(0, openIndex);
+				String line = nameAndRange.substring(openIndex + 1, closeIndex);
+				Range range;
 
 				if (line.contains(delim)) {
 					try {
 						int highestIndex = Integer.parseInt(line.substring(0, line.indexOf(delim)).trim());
 						int lowestIndex = Integer.parseInt(line.substring(line.indexOf(delim) + delim.length()).trim());
-						range = new Indices(highestIndex, lowestIndex);
+						range = new Range(highestIndex, lowestIndex);
 					} catch (NumberFormatException e) {
-						throw new Exception("Could not parse the following indices to Integer: " + line);
+						throw new Exception("Could not parse Integers in the following range: " + line);
 					}
 
 				} else {
 					try {
 						int theOnlyIndex;
 						theOnlyIndex = Integer.parseInt(line.trim());
-						range = new Indices(theOnlyIndex, theOnlyIndex);
+						range = new Range(theOnlyIndex, theOnlyIndex);
 					} catch (NumberFormatException e) {
-						throw new Exception("Could not parse the following indices to Integer: " + line);
+						throw new Exception("Could not parse Integers in the following range: " + line);
 					}
 				}
 
 				return new NameAndRange(name, range);
 
 			} else {
-				return new NameAndRange(nameAndIndices, null);
+				return new NameAndRange(nameAndRange, null);
 			}
 		}
 
@@ -197,9 +196,9 @@ public class StructureParser {
 
 	static class NameAndRange {
 		String name;
-		Indices range;
+		Range range;
 
-		NameAndRange(String name, Indices range) {
+		NameAndRange(String name, Range range) {
 			this.name = name;
 			this.range = range;
 		}

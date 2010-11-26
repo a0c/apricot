@@ -1,6 +1,6 @@
 package base.hldd.structure.variables;
 
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.vhdl.structure.Operator;
@@ -42,10 +42,10 @@ public class FunctionVariable extends Variable {
 	 * General purpose constructor. Only receives <code>operator</code> and
 	 * <code>nameIdx</code> as parameters.
 	 * <p/>
-	 * Operands are filled using {@link #addOperand(AbstractVariable, Indices)}
+	 * Operands are filled using {@link #addOperand(AbstractVariable, Range)}
 	 * method. Each <code>operator</code> knows the number of supported
 	 * operands. So an Exception is thrown if this number gets exceeded when
-	 * calling {@link #addOperand(AbstractVariable, Indices)}.
+	 * calling {@link #addOperand(AbstractVariable, Range)}.
 	 *
 	 * @param operator operator (from the set of supported ones)
 	 * @param nameIdx  name index of the variable
@@ -81,10 +81,10 @@ public class FunctionVariable extends Variable {
 		String delim = operands.size() > 2 ? " " : "\t";
 		for (RangeVariableHolder operand : operands) {
 			sb.append("A").append(i++).append("<= ");
-			String indicesAsString = operand.isRange()
+			String rangeAsString = operand.isRange()
 					? operand.getRange().toStringAngular(false)
 					: operand.getVariable().lengthToString();
-			sb.append(operand.getVariable().getIndex()).append(indicesAsString);
+			sb.append(operand.getVariable().getIndex()).append(rangeAsString);
 			sb.append(",").append(delim);
 		}
 		sb.delete(sb.lastIndexOf(","), sb.length());
@@ -131,7 +131,7 @@ public class FunctionVariable extends Variable {
 	 * @param range range of the operand to add
 	 * @throws Exception if the operand being added exceeds the limit of the operator operands limit
 	 */
-	public void addOperand(AbstractVariable operandVariable, Indices range) throws Exception {
+	public void addOperand(AbstractVariable operandVariable, Range range) throws Exception {
 		if (!isValidAddition()) throw new Exception(FAILED_ADD_OPERAND_TEXT + " to Function." +
 				"\nOperator " + operator + " supports only " + operator.getNumberOfOperands() + " operand(s).");
 		operands.add(new RangeVariableHolder(operandVariable, range));
@@ -143,7 +143,7 @@ public class FunctionVariable extends Variable {
 		return operands.size() < operator.getNumberOfOperands();
 	}
 
-	protected Type adjustType(Type currentType, Type addedType, Indices addedRange) {
+	protected Type adjustType(Type currentType, Type addedType, Range addedRange) {
 		if (operator == Operator.EXP) {
 			if (operands.size() != 2) {
 				return null;
@@ -151,12 +151,12 @@ public class FunctionVariable extends Variable {
 			throw new RuntimeException("Don't know how to adjust type for EXPONENT function (while adding operand to function)");
 		}
 		/* Update highestSB */
-		Indices addedLength = addedType.getLength();
+		Range addedLength = addedType.getLength();
 		if (currentType == null) {
-			Indices adjustedLength = operator.adjustLength(null, addedLength, addedRange);
+			Range adjustedLength = operator.adjustLength(null, addedLength, addedRange);
 			currentType = new Type(adjustedLength);
 		} else {
-			Indices adjustedLength = operator.adjustLength(currentType.getLength(), addedLength, addedRange);
+			Range adjustedLength = operator.adjustLength(currentType.getLength(), addedLength, addedRange);
 			currentType.setLength(adjustedLength);
 		}
 		return currentType;

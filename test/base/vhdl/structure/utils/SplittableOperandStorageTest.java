@@ -1,6 +1,6 @@
 package base.vhdl.structure.utils;
 
-import base.Indices;
+import base.Range;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -13,41 +13,41 @@ import static org.junit.Assert.assertArrayEquals;
 public class SplittableOperandStorageTest {
 
 	@Test
-	public void correctUnsetIndicesExtracted() {
+	public void correctUnsetRangesExtracted() {
 		DataHolder[] data = new DataHolder[]{
 				new DataHolder(
 						new boolean[5],
-						new Indices[]{new Indices(4, 0)}),
+						new Range[]{new Range(4, 0)}),
 				new DataHolder(
 						new boolean[]{true, false, false, false, false},
-						new Indices[]{new Indices(4, 1)}),
+						new Range[]{new Range(4, 1)}),
 				new DataHolder(
 						new boolean[]{true, true, true, false, false},
-						new Indices[]{new Indices(4, 3)}),
+						new Range[]{new Range(4, 3)}),
 				new DataHolder(
 						new boolean[]{true, true, true, true, true},
-						new Indices[]{}),
+						new Range[]{}),
 				new DataHolder(
 						new boolean[]{true, false, true, false, false},
-						new Indices[]{new Indices(1, 1), new Indices(4, 3)}),
+						new Range[]{new Range(1, 1), new Range(4, 3)}),
 				new DataHolder(
 						new boolean[]{true, false, true, true, true},
-						new Indices[]{new Indices(1, 1)}),
+						new Range[]{new Range(1, 1)}),
 				new DataHolder(
 						new boolean[]{true, false, true, false, true},
-						new Indices[]{new Indices(1, 1), new Indices(3, 3)}),
+						new Range[]{new Range(1, 1), new Range(3, 3)}),
 				new DataHolder(
 						new boolean[]{false, false, true, true, false},
-						new Indices[]{new Indices(1, 0), new Indices(4, 4)}),
+						new Range[]{new Range(1, 0), new Range(4, 4)}),
 				new DataHolder(
 						new boolean[]{false, false, false, false, true},
-						new Indices[]{new Indices(3, 0)}),
+						new Range[]{new Range(3, 0)}),
 		};
 		for (DataHolder dataHolder : data) {
-			Collection<Indices> actualIndices = SplittableOperandStorage.extractUnsetIndices(dataHolder.setBits);
+			Collection<Range> actualRanges = SplittableOperandStorage.extractUnsetRanges(dataHolder.setBits);
 			assertArrayEquals("The following set bits filled incorrect: " + java.util.Arrays.toString(dataHolder.setBits),
-					dataHolder.unsetIndices,
-					actualIndices.toArray(new Indices[actualIndices.size()]));
+					dataHolder.unsetRanges,
+					actualRanges.toArray(new Range[actualRanges.size()]));
 		}
 	}
 
@@ -55,11 +55,11 @@ public class SplittableOperandStorageTest {
 
 	private class DataHolder {
 		private final boolean[] setBits;
-		private final Indices[] unsetIndices;
+		private final Range[] unsetRanges;
 
-		public DataHolder(boolean[] setBits, Indices[] unsetIndices) {
+		public DataHolder(boolean[] setBits, Range[] unsetRanges) {
 			this.setBits = setBits;
-			this.unsetIndices = unsetIndices;
+			this.unsetRanges = unsetRanges;
 		}
 	}
 

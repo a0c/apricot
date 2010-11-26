@@ -1,12 +1,12 @@
 package parsers;
 
+import base.Range;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 import static junit.framework.Assert.assertEquals;
 
 import base.vhdl.structure.*;
-import base.Indices;
 
 import java.util.List;
 import java.util.Collections;
@@ -58,7 +58,7 @@ public class ExpressionBuilderTest {
 			"CLK'EVENT AND CLK='1'"
 	};
 
-	private static final String[] SOURCE_INDICES = {
+	private static final String[] SOURCE_RANGES = {
 			"NoIndices",
 			"SingleIndex ( 92093 )",
 			"DoubleIndex ( 123 DOWNTO 2 )",
@@ -75,21 +75,21 @@ public class ExpressionBuilderTest {
 			"(PROCESSOR_WIDTH -1) DOWNTO -1" //assume that Processor_width = 19
 	};
 
-	private static final Indices[] DESTINATION_INDICES = {
+	private static final Range[] DESTINATION_RANGES = {
 			null,
-			new Indices(92093, 92093),
-			new Indices(123, 2),
-			new Indices(7, 5),
-			new Indices(127, -128),
+			new Range(92093, 92093),
+			new Range(123, 2),
+			new Range(7, 5),
+			new Range(127, -128),
 
-			new Indices(8, 1),
-			new Indices(8, 1, false),
+			new Range(8, 1),
+			new Range(8, 1, false),
 
-			new Indices(0, 0),
+			new Range(0, 0),
 
-			new Indices(32767, -32768),
-			new Indices(3, 0, false),
-			new Indices(18, -1),
+			new Range(32767, -32768),
+			new Range(3, 0, false),
+			new Range(18, -1),
 	};
 
 	@Test
@@ -157,17 +157,17 @@ public class ExpressionBuilderTest {
 	}
 
 	@Test
-	public void correctIndicesBuilt() throws Exception {
+	public void correctRangesBuilt() throws Exception {
 		OperandValueCalculator calculator = new OperandValueCalculator();
 		calculator.addConstant(new Constant("CONSTANT", null, BigInteger.valueOf(130)));
 		calculator.addConstant(new Constant("ANOTHER_GENERIC", null, BigInteger.valueOf(3)));
 		calculator.addConstant(new Constant("PROCESSOR_WIDTH", null, BigInteger.valueOf(19)));
 
 		ExpressionBuilder builder = new ExpressionBuilder(calculator, Collections.<String>emptySet());
-		for (int i = 0; i < SOURCE_INDICES.length; i++) {
-			Indices indices = builder.buildRange(SOURCE_INDICES[i]);
-			assertEquals("Incorrect indices built from \"" + SOURCE_INDICES[i] + "\"",
-					DESTINATION_INDICES[i], indices);
+		for (int i = 0; i < SOURCE_RANGES.length; i++) {
+			Range range = builder.buildRange(SOURCE_RANGES[i]);
+			assertEquals("Incorrect range built from \"" + SOURCE_RANGES[i] + "\"",
+					DESTINATION_RANGES[i], range);
 		}
 	}
 

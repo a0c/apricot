@@ -1,7 +1,7 @@
 package base.hldd.structure.variables;
 
 import base.hldd.structure.Flags;
-import base.Indices;
+import base.Range;
 import base.Type;
 
 /**
@@ -142,13 +142,13 @@ public class Variable extends AbstractVariable {
 		return type.isSigned();
 	}
 
-	public Indices getLength() {
+	public Range getLength() {
 		if (type == null)
 			throw new RuntimeException("Trying to ask for getLength() on FSM variable (it does not have type) or other variable without type");
 		return type.getLength();
 	}
 
-	public void setLength(Indices length) {
+	public void setLength(Range length) {
 		if (type == null) {
 			if (isFSM()) {
 				throw new RuntimeException("Trying to set length to FSM variable (it does not have length and does not have type)");

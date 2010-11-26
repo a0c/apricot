@@ -1,12 +1,12 @@
 package base.hldd.structure.variables.utils;
 
+import base.Range;
 import base.hldd.structure.nodes.utils.Condition;
 import parsers.hldd.Collector;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.TemporalNode;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.Graph;
-import base.Indices;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,7 @@ public class PPGLibraryGraphVariableCreator implements GraphVariableCreator {
 				Collector.NodeData nodeDatum = nodeData[i];
 				Object depVarObject = collector.getVarObject(nodeDatum.depVarIndex);
 				TreeMap<Condition, Integer> successors = nodeDatum.successors;
-				Indices depVarRange = nodeDatum.depVarRange;
+				Range depVarRange = nodeDatum.depVarRange;
 				String[] windowPlaceholders = nodeDatum.windowPlaceholders;
 				AbstractVariable dependentVariable;
 				if (depVarObject instanceof AbstractVariable) {

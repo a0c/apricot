@@ -7,7 +7,7 @@ import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.AbstractVariable;
 import base.vhdl.structure.Operator;
-import base.Indices;
+import base.Range;
 
 import java.util.Collection;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class CompositeNode extends Node {
 		Operator compositeOperator = compositeFunctionVar.getCompositeOperator();
 		for (RangeVariableHolder funcVarHolder : compositeFunctionVar.getFunctionVariables()) {
 			AbstractVariable funcVar = funcVarHolder.getVariable();
-			Indices range = funcVarHolder.getRange();
+			Range range = funcVarHolder.getRange();
 			int trueValue = funcVarHolder.getTrueValue();
 			/* Create newControlNode */
 			Node controlNode = funcVar instanceof CompositeFunctionVariable

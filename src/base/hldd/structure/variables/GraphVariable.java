@@ -1,10 +1,10 @@
 package base.hldd.structure.variables;
 
+import base.Range;
 import base.hldd.structure.Graph;
 import base.hldd.structure.nodes.Node;
 import base.hldd.visitors.Visitable;
 import base.hldd.visitors.HLDDVisitor;
-import base.Indices;
 import base.Type;
 
 /**
@@ -119,7 +119,7 @@ public class GraphVariable extends AbstractVariable implements Visitable {
 		return baseVariable.isInput();
 	}
 
-	public Indices getLength() {
+	public Range getLength() {
 		return baseVariable.getLength();
 	}
 

@@ -15,7 +15,7 @@ import base.hldd.structure.nodes.Node;
 import base.hldd.structure.Graph;
 import base.hldd.structure.Flags;
 import base.Type;
-import base.Indices;
+import base.Range;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -260,7 +260,7 @@ public class Beh2RtlTransformer {
 				/* Create MUX_ADDR */
 				if (terminalNodesCount > 1) {
 					newVariable = new Variable(graphVariable.getName() + ControlPartManager.SUFFIX_MUX_ADDR,
-							new Type(new Indices(termNodeCollector.getMuxAddrLength(graphVariable) - 1, 0)), new Flags().setCout(true));
+							new Type(new Range(termNodeCollector.getMuxAddrLength(graphVariable) - 1, 0)), new Flags().setCout(true));
 					modelCollector.addVariable(newVariable);
 					controlPartManager.addControlPartVariable(newVariable);
 				}

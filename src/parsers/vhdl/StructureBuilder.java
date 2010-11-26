@@ -1,6 +1,6 @@
 package parsers.vhdl;
 
-import base.Indices;
+import base.Range;
 import base.SourceLocation;
 import base.Type;
 import base.hldd.structure.nodes.utils.Condition;
@@ -290,8 +290,8 @@ public class StructureBuilder extends AbstractPackageBuilder {
 			/* ##### OTHERS #####*/
 			OperandImpl targetOperand = (OperandImpl) expressionBuilder.buildExpression(variableName);
 			Type type = getTypeFor(targetOperand.getName());
-			Indices range = targetOperand.isRange() ? targetOperand.getRange()
-					: targetOperand.isDynamicRange() ? Indices.BIT_INDICES : null;
+			Range range = targetOperand.isRange() ? targetOperand.getRange()
+					: targetOperand.isDynamicRange() ? Range.BIT_RANGE : null;
 			variableValue = PackageParser.replaceOthersValue(variableValue, type, range).get(Condition.FALSE);
 			transition = new Transition(targetOperand, expressionBuilder.buildExpression(variableValue));
 		} else {

@@ -1,7 +1,7 @@
 package base.hldd.structure.variables;
 
 import base.HLDDException;
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.hldd.structure.nodes.utils.Condition;
 
@@ -36,7 +36,7 @@ public class ConstantVariable extends Variable {
 	}
 
 	private static Type deriveType(BigInteger value) {
-		return new Type(Indices.deriveLengthForValues(value.intValue(), 0));
+		return new Type(Range.deriveLengthForValues(value.intValue(), 0));
 	}
 
 	public boolean isArray() {
@@ -50,9 +50,9 @@ public class ConstantVariable extends Variable {
 		return super.toString() + "\tVAL = " + value;
 	}
 
-	public static ConstantVariable createNamedConstant(BigInteger value, String name, Indices forcedLength) {
+	public static ConstantVariable createNamedConstant(BigInteger value, String name, Range forcedLength) {
 
-		int length = forcedLength != null ? forcedLength.length() : Indices.deriveLengthForValues(value.intValue(), 0).length();
+		int length = forcedLength != null ? forcedLength.length() : Range.deriveLengthForValues(value.intValue(), 0).length();
 
 		name = (name == null) ? "CONST_" + value + "_BW" + length : name;
 
@@ -76,7 +76,7 @@ public class ConstantVariable extends Variable {
 
 	/* Setters and Getters END */
 
-	public ConstantVariable subRange(Indices rangeToExtract) throws HLDDException {
+	public ConstantVariable subRange(Range rangeToExtract) throws HLDDException {
 
 		if (isArray()) {
 			if (rangeToExtract.length() != 1) {
@@ -84,9 +84,9 @@ public class ConstantVariable extends Variable {
 			}
 			return arrayValues.get(Condition.createCondition(rangeToExtract.getLowest()));
 		}
-		Indices length = getLength();
+		Range length = getLength();
 
-		if (!length.contain(rangeToExtract)) {
+		if (!length.contains(rangeToExtract)) {
 			throw new HLDDException("ConstantVariable: subRange(): rangeToExtract is out of bounds: " + rangeToExtract + " out of " + length);
 		}
 

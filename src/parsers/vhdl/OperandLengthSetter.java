@@ -1,10 +1,10 @@
 package parsers.vhdl;
 
+import base.Range;
 import base.vhdl.structure.*;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.ConstantVariable;
 import base.hldd.structure.models.utils.ModelManager;
-import base.Indices;
 import base.helpers.ExceptionSolver;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
  * *  - length for {@link UserDefinedFunction} is extracted from the <u>package file</u> where the function
  * is defined.<br><br>
  * <b>2)</b> If the operand is an <b>{@link Expression}</b>, then:<br>
- * *  - its length is calculated using {@link Operator#adjustLength(Indices, Indices, Indices)};<br>
+ * *  - its length is calculated using {@link Operator#adjustLength(Range , Range , Range)};<br>
  * *  - its <u>operator</u> is analyzed for imposing constraints to the lengths of Expression operands. This
  * is used for those constants, that don't have their length fixed in VHDL typing.
  * <p/>
@@ -71,7 +71,7 @@ public class OperandLengthSetter {
 				* calculate and store fixed length for the Expression itself. */
 				if (areAllChildrenFixed(operands)) {
 					/* Calculate */
-					Indices length = null;
+					Range length = null;
 					for (AbstractOperand childOperand : operands) {
 						length = operator.adjustLength(length,
 								childOperand.getLength(), childOperand.getRange());
@@ -98,22 +98,22 @@ public class OperandLengthSetter {
 					if (variable == null) {
 						if (variableName.equalsIgnoreCase("C_ADDR_OFFS_CRC_CFG")) {
 							ConstantVariable constantVariable = new ConstantVariable(variableName, new java.math.BigInteger("0"));
-							constantVariable.setLength(new Indices(1, 0));
+							constantVariable.setLength(new Range(1, 0));
 							modelCollector.addVariable(constantVariable);
 							variable = constantVariable;
 						} else if (variableName.equalsIgnoreCase("C_ADDR_OFFS_CRC_INP")) {
 							ConstantVariable constantVariable = new ConstantVariable(variableName, new java.math.BigInteger("1"));
-							constantVariable.setLength(new Indices(1, 0));
+							constantVariable.setLength(new Range(1, 0));
 							modelCollector.addVariable(constantVariable);
 							variable = constantVariable;
 						} else if (variableName.equalsIgnoreCase("C_ADDR_OFFS_CRC_CSTAT")) {
 							ConstantVariable constantVariable = new ConstantVariable(variableName, new java.math.BigInteger("2"));
-							constantVariable.setLength(new Indices(1, 0));
+							constantVariable.setLength(new Range(1, 0));
 							modelCollector.addVariable(constantVariable);
 							variable = constantVariable;
 						} else if (variableName.equalsIgnoreCase("C_ADDR_OFFS_CRC_OUTP")) {
 							ConstantVariable constantVariable = new ConstantVariable(variableName, new java.math.BigInteger("3"));
-							constantVariable.setLength(new Indices(1, 0));
+							constantVariable.setLength(new Range(1, 0));
 							modelCollector.addVariable(constantVariable);
 							variable = constantVariable;
 						} else {
@@ -134,9 +134,9 @@ public class OperandLengthSetter {
 					}
 					/* ### DIRECT length ###:
 					* Map operand, if its length is set (either by range or by own length) */
-					Indices length = null;
+					Range length = null;
 					if (operand.isRange())
-						length = operand.getRange().deriveLength(); // length is derived: Some_operand<2:2> ==> the length is being set (0:0), not the real indices (2:2).
+						length = operand.getRange().deriveLength(); // length is derived: Some_operand<2:2> ==> the length is being set (0:0), not the real range (2:2).
 					if (length == null) length = variable.getLength();
 					/* Map */
 					if (length != null) {
@@ -152,9 +152,9 @@ public class OperandLengthSetter {
 					/* Operand declares constant. */
 					/* ### DIRECT length ###:
 					* Map operand, if its desired length is set (either by range or by own length, i.e. by VHDL typing) */
-					Indices length = null;
+					Range length = null;
 					if (operand.isRange())
-						length = operand.getRange().deriveLength(); // length is derived: Some_operand<2:2> ==> the length is being set (0:0), not the real indices (2:2).
+						length = operand.getRange().deriveLength(); // length is derived: Some_operand<2:2> ==> the length is being set (0:0), not the real range (2:2).
 					if (length == null) length = valAndLenHolder.getDesiredLength();
 					if (length != null) {
 						operand.setLength(length);
@@ -171,7 +171,7 @@ public class OperandLengthSetter {
 							operand.setLength(getLengthImposedBy(parentOperand));
 						} else if (parentOperand != null && parentOperand instanceof Expression
 								&& isNonImposingOperator(((Expression) parentOperand).getOperator())) {
-							length = Indices.deriveLengthForValues(valAndLenHolder.getValue().intValue(), 0);
+							length = Range.deriveLengthForValues(valAndLenHolder.getValue().intValue(), 0);
 							operand.setLength(length);
 						}
 					}
@@ -179,7 +179,7 @@ public class OperandLengthSetter {
 			} else if (operand instanceof UserDefinedFunction) {
 				//todo: take from package file
 				if (((UserDefinedFunction) operand).getUserDefinedFunction().startsWith("F_")) {
-					operand.setLength(new Indices(31, 0));
+					operand.setLength(new Range(31, 0));
 				} else {
 					//todo: commented for DEMO
 					Exception exception = new Exception("Could not calculate length for User Defined Function: " +
@@ -187,7 +187,7 @@ public class OperandLengthSetter {
 							"\nDo implement extracting length from package file!!!");
 					Object solution = ExceptionSolver.getInstance().findSolution(exception.getMessage(), ExceptionSolver.SolutionOptions.VALUE);
 					if (solution.getClass() == ConstantValueAndLengthHolder.class) {
-						Indices length = new Indices(((ConstantValueAndLengthHolder) solution).getValue().intValue(), 0);
+						Range length = new Range(((ConstantValueAndLengthHolder) solution).getValue().intValue(), 0);
 						operand.setLength(length);
 					} else throw exception;
 				}
@@ -238,7 +238,7 @@ public class OperandLengthSetter {
 	 * @param operand to get the length for
 	 * @return fixed length for the operand or <code>null</code> if length is not set
 	 */
-	public Indices getFixedLengthFor(AbstractOperand operand) {
+	public Range getFixedLengthFor(AbstractOperand operand) {
 		return operand.getLength();
 	}
 
@@ -246,7 +246,7 @@ public class OperandLengthSetter {
 		return operand.getLength() != null;
 	}
 
-	private Indices getLengthImposedBy(AbstractOperand parentOperand) {
+	private Range getLengthImposedBy(AbstractOperand parentOperand) {
 		return isLengthImposedBy(parentOperand) ? parentOperand.getLength() : null;
 	}
 

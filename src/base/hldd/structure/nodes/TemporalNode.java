@@ -2,8 +2,7 @@ package base.hldd.structure.nodes;
 
 import base.SourceLocation;
 import base.hldd.structure.variables.AbstractVariable;
-import base.psl.structure.Range;
-import base.Indices;
+import base.Range;
 
 /**
  * Node with a notion of <i>temporal window</i>.
@@ -14,7 +13,7 @@ import base.Indices;
  * @author Anton Chepurov
  */
 public class TemporalNode extends Node {
-	private Range window;
+	private base.psl.structure.Range window;
 	private String[] windowPlaceholders;
 
 	/**
@@ -40,7 +39,7 @@ public class TemporalNode extends Node {
 
 	public static class Builder extends Node.Builder {
 		// Optional parameters -- initialized to default values
-		private Range window = null;
+		private base.psl.structure.Range window = null;
 		private String[] windowPlaceholders = null;
 
 		public Builder(AbstractVariable dependentVariable) {
@@ -63,7 +62,7 @@ public class TemporalNode extends Node {
 		/**
 		 * Override superclass method and return this builder (not the one of the superclass)
 		 */
-		public Builder range(Indices range) {
+		public Builder range(Range range) {
 			super.range(range);
 			return this;
 		}
@@ -76,7 +75,7 @@ public class TemporalNode extends Node {
 			return this;
 		}
 
-		public Builder window(Range window) {
+		public Builder window(base.psl.structure.Range window) {
 			this.window = window;
 			return this;
 		}

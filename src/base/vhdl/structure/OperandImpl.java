@@ -1,7 +1,7 @@
 package base.vhdl.structure;
 
 import base.HashCodeUtil;
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.TypeResolver;
 import base.hldd.structure.nodes.utils.Condition;
@@ -25,7 +25,7 @@ public class OperandImpl extends AbstractOperand {
 	* todo: - There Map<Condition, OperandImpl> may be required
 	* todo: - OTHERS may be inserted to Condition as a generic field. */
 
-	private Indices range;
+	private Range range;
 
 	private Map<Condition, OperandImpl> arrayOperands;
 
@@ -34,7 +34,7 @@ public class OperandImpl extends AbstractOperand {
 		this.name = name;
 	}
 
-	public OperandImpl(String name, Indices range, boolean isInverted) {
+	public OperandImpl(String name, Range range, boolean isInverted) {
 		super(isInverted);
 		this.name = name;
 		this.range = range;
@@ -59,7 +59,7 @@ public class OperandImpl extends AbstractOperand {
 		return name;
 	}
 
-	public Indices getRange() {
+	public Range getRange() {
 		return range;
 	}
 
@@ -107,7 +107,7 @@ public class OperandImpl extends AbstractOperand {
 		if (!name.equals(comparedOperandImpl.getName())) return false;
 
 		/* Check RANGE */
-		if (!Indices.equals(range, comparedOperandImpl.range)) return false;
+		if (!Range.equals(range, comparedOperandImpl.range)) return false;
 
 		if (isDynamicRange() ^ comparedOperandImpl.isDynamicRange()) return false;
 		if (isDynamicRange()) {
@@ -146,13 +146,13 @@ public class OperandImpl extends AbstractOperand {
 
 		if (!name.equals(thatOperand.name)) return false;
 
-		Indices thisRange = resolveRange(typeResolver);
-		Indices thatRange = thatOperand.resolveRange(typeResolver);
+		Range thisRange = resolveRange(typeResolver);
+		Range thatRange = thatOperand.resolveRange(typeResolver);
 
-		return thisRange.contain(thatRange);
+		return thisRange.contains(thatRange);
 	}
 
-	public Indices resolveRange(TypeResolver typeResolver) {
+	public Range resolveRange(TypeResolver typeResolver) {
 
 		if (isRange()) {
 			return range;

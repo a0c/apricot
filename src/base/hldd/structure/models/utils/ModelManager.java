@@ -1,7 +1,7 @@
 package base.hldd.structure.models.utils;
 
 import base.HLDDException;
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.TypeResolver;
 import base.hldd.structure.nodes.Node;
@@ -69,7 +69,7 @@ public class ModelManager implements TypeResolver {
 		replaceInModel(newBaseVariable, new RangeVariableHolder(variableToRebase, null));
 	}
 
-	public void replaceWithIndices(AbstractVariable variableToReplace, RangeVariableHolder replacingVarHolder) {
+	public void replaceWithRange(AbstractVariable variableToReplace, RangeVariableHolder replacingVarHolder) {
 		AbstractVariable replacingVariable = replacingVarHolder.getVariable();
 
 		/* Remove old variable from hash */
@@ -103,7 +103,7 @@ public class ModelManager implements TypeResolver {
 						} else {
 							operand.setVariable(replacingVariable);
 							if (replacingVarHolder.isRange()) {
-								//todo: Indices.absoluteFor()...
+								//todo: Range.absoluteFor()...
 								operand.setRange(replacingVarHolder.getRange());
 							}
 						}
@@ -127,7 +127,7 @@ public class ModelManager implements TypeResolver {
 
 	private void checkBitVariablesAvailability(AbstractVariable variableToReplace) {
 		for (int i = 0; i < variableToReplace.getLength().getHighest(); i++) {
-			String bitVariableName = generateBitVariableName(variableToReplace, new Indices(i, i));
+			String bitVariableName = generateBitVariableName(variableToReplace, new Range(i, i));
 			AbstractVariable bitVariable = getVariable(bitVariableName);
 			if (bitVariable == null) {
 				throw new RuntimeException("Cannot flatten variable " + variableToReplace.getName() +
@@ -136,11 +136,11 @@ public class ModelManager implements TypeResolver {
 		}
 	}
 
-	public AbstractVariable generateBitRangeVariable(AbstractVariable wholeVariable, Indices range) {
+	public AbstractVariable generateBitRangeVariable(AbstractVariable wholeVariable, Range range) {
 		return getVariable(generateBitVariableName(wholeVariable, range));
 	}
 
-	private String generateBitVariableName(AbstractVariable wholeVariable, Indices range) {
+	private String generateBitVariableName(AbstractVariable wholeVariable, Range range) {
 
 		if (range == null) {
 			throw new RuntimeException("Cannot flatten variable " + wholeVariable.getName() +
@@ -176,7 +176,7 @@ public class ModelManager implements TypeResolver {
 	 *
 	 * @param functionVariable functions whose true value is to be detected
 	 * @param inverted		 is the source {@link base.vhdl.structure.Expression} is inverted
-	 * @return holder of a variable, its indices and its true value
+	 * @return holder of a variable, its range and its true value
 	 * @throws HLDDException if CompositeFunctionVariable is specified as a parameter
 	 */
 	private RangeVariableHolder detectTrueValueAndSimplify(FunctionVariable functionVariable, boolean inverted) throws HLDDException {
@@ -303,7 +303,7 @@ public class ModelManager implements TypeResolver {
 					/* CONDITION */
 					int i = 0;
 					AbstractVariable operandVariable;
-					Indices operandRange;
+					Range operandRange;
 					for (AbstractOperand operand : expression.getOperands()) {
 						operandRange = operand.getRange();
 						if (operand instanceof Expression) {
@@ -345,7 +345,7 @@ public class ModelManager implements TypeResolver {
 		return (FunctionVariable) getIdenticalVariable(functionVariable);
 	}
 
-	private FunctionVariable doCreateFinalInversionFunction(AbstractVariable operandVariable, Indices operandRange) {
+	private FunctionVariable doCreateFinalInversionFunction(AbstractVariable operandVariable, Range operandRange) {
 		/* Create Function */
 		FunctionVariable invFunctionVariable = new FunctionVariable(Operator.INV, generateFunctionNameIdx(Operator.INV));
 		/* Add a single operand */
@@ -465,7 +465,7 @@ public class ModelManager implements TypeResolver {
 		return null;
 	}
 
-	public ConstantVariable extractSubConstant(ConstantVariable baseConstant, Indices rangeToExtract) throws HLDDException {
+	public ConstantVariable extractSubConstant(ConstantVariable baseConstant, Range rangeToExtract) throws HLDDException {
 
 		if (baseConstant == null) {
 			return null;
@@ -498,7 +498,7 @@ public class ModelManager implements TypeResolver {
 	public GraphVariable createAndReplaceNewGraph(AbstractVariable oldGraphVariable, Node graphVarRootNode, boolean isDelay) {
 		GraphVariable newGraphVariable = new GraphVariable(oldGraphVariable, graphVarRootNode);
 		newGraphVariable.setDelay(isDelay);
-		replaceWithIndices(oldGraphVariable, new RangeVariableHolder(newGraphVariable, null));
+		replaceWithRange(oldGraphVariable, new RangeVariableHolder(newGraphVariable, null));
 		return newGraphVariable;
 	}
 
@@ -537,7 +537,7 @@ public class ModelManager implements TypeResolver {
 
 	private class OperandImplComparator implements Comparator<OperandImpl> {
 		public int compare(OperandImpl o1, OperandImpl o2) {
-			/* NB! Larger indices should be catted earlier, so swap the compared indices */
+			/* NB! Larger ranges should be catted earlier, so swap the compared ranges */
 			return o2.getRange().compareTo(o1.getRange());
 		}
 	}
@@ -592,14 +592,14 @@ public class ModelManager implements TypeResolver {
 			OperandImpl operandImpl = (OperandImpl) operand;
 			if (!operandImpl.isRange()) return emptyList;
 			/* Compose name of RangeVariable */
-			Indices range = operandImpl.getRange();
+			Range range = operandImpl.getRange();
 			String varName = operandImpl.getName() + range;
 			/* Obtain the RangeVariable (all range GraphVariables have been set by this point) */
 			AbstractVariable operandVariable = getVariable(varName);
 			if (operandVariable != null && (operandVariable instanceof RangeVariable ||
 					(operandVariable instanceof GraphVariable
 							&& ((GraphVariable) operandVariable).getBaseVariable() instanceof RangeVariable))) {
-				/* Provide NULL indices here, since they are already included in the base variable as RangeVariable. */
+				/* Provide NULL range here, since it is already included in the base variable as RangeVariable. */
 				returnList.add(new RangeVariableHolder(operandVariable, null));
 			} else {
 				return emptyList;
@@ -691,7 +691,7 @@ public class ModelManager implements TypeResolver {
 			if (constantValue != null) {
 				/* Get CONSTANT by VALUE*/
 				//todo: Jaan: different constants for different contexts
-				Indices targetLength = targetType != null ? targetType.getLength() : null;
+				Range targetLength = targetType != null ? targetType.getLength() : null;
 				return variableManager.getConstantByValue(constantValue,
 						operand.getLength() != null ? operand.getLength() : targetLength);
 

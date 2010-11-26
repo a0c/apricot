@@ -70,8 +70,8 @@ public class TGMModelCreatorImpl implements ModelCreator {
 				/* Init new context */
 				modelManager.initNewPPGContext(startExpressionImpl.getWindow(), expressionOperator.getWindowPlaceholders());
 				/* Process nodes in reverse order,
-								*  so that when Control Nodes are reached all Terminal Nodes are already hashed
-								*  (so are all control node successors as well) */
+				*  so that when Control Nodes are reached all Terminal Nodes are already hashed
+				*  (so are all control node successors as well) */
 				Node[] propertyGraphNodes = expressionOperator.getPropertyGraph().getGraph().getRootNode().toArray(null);
 				for (int index = propertyGraphNodes.length - 1; index >= 0; index--) {
 					Node node = propertyGraphNodes[index];
@@ -79,8 +79,8 @@ public class TGMModelCreatorImpl implements ModelCreator {
 					if (node.isTerminalNode()) {
 
 						/* Hash property OUTPUT PORTS (TERMINAL NODES):
-												 * 1) in MODEL COLLECTOR (final model)
-												 * 2) in relative_to_absolute_indices hash */
+						* 1) in MODEL COLLECTOR (final model)
+						* 2) in relative_to_absolute_indices hash */
 						Node clonedNode = node.clone();
 						modelManager.addNode(index, clonedNode);
 

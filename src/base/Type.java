@@ -5,18 +5,18 @@ package base;
  */
 public final class Type {
 
-	public static final Type BIT_TYPE = new Type(Indices.BIT_INDICES);
+	public static final Type BIT_TYPE = new Type(Range.BIT_RANGE);
 	public static final Type BOOLEAN_TYPE = createFromValues(1, 0);
 
 	/**
 	 * Range of possible values in case of enum-s; <code>null</code> if not enum.
 	 */
-	private final Indices valueRange;
+	private final Range valueRange;
 	/**
 	 * Physical length of variable.
 	 * Used in different length-calculation methods and for final AGM printing to file.
 	 */
-	private Indices length;
+	private Range length;
 	/**
 	 * Type of array other than std_logic (composite type)
 	 */
@@ -30,7 +30,7 @@ public final class Type {
 	 *
 	 * @param length physical length of variable/register. This defines the highestSB.
 	 */
-	public Type(Indices length) {
+	public Type(Range length) {
 		this(null, length, null);
 	}
 
@@ -38,29 +38,29 @@ public final class Type {
 	 * @param valueRange range of possible values in case of enum-s; <code>null</code> if not enum.
 	 * @param length	 physical length of variable/register. This defines the highestSB.
 	 */
-	public Type(Indices valueRange, Indices length) {
+	public Type(Range valueRange, Range length) {
 		this(valueRange, length, null);
 	}
 
-	public Type(Indices length, Type arrayElementType) {
+	public Type(Range length, Type arrayElementType) {
 		this(null, length, arrayElementType);
 	}
 
-	private Type(Indices valueRange, Indices length, Type arrayElementType) {
+	private Type(Range valueRange, Range length, Type arrayElementType) {
 		this.valueRange = valueRange;
 		this.length = length;
 		this.arrayElementType = arrayElementType;
 	}
 
-	public Indices getValueRange() {
+	public Range getValueRange() {
 		return valueRange;
 	}
 
-	public Indices getLength() {
+	public Range getLength() {
 		return length;
 	}
 
-	public void setLength(Indices length) {
+	public void setLength(Range length) {
 		this.length = length;
 	}
 
@@ -76,7 +76,7 @@ public final class Type {
 		return arrayElementType != null;
 	}
 
-	public Indices resolveValueRange() {
+	public Range resolveValueRange() {
 		if (isEnum()) {
 			return valueRange;
 		} else {
@@ -84,11 +84,11 @@ public final class Type {
 		}
 	}
 
-	public int countPossibleValues(Indices range) {
+	public int countPossibleValues(Range range) {
 		return countPossibleValues(range, -1);
 	}
 
-	public int countPossibleValues(Indices range, int upperBound) {
+	public int countPossibleValues(Range range, int upperBound) {
 		int valuesCount;
 		if (range != null) {
 			valuesCount = range.deriveValueRange().length();
@@ -174,17 +174,17 @@ public final class Type {
 		return arrayElementType;
 	}
 
-	public Type deriveRangeType(Indices range) {
+	public Type deriveRangeType(Range range) {
 		if (range == null) {
 			return this;
 		}
 		/* Derive the length of the range */
-		Indices length = range.deriveLength();
+		Range length = range.deriveLength();
 		if (isArray()) {
 			return length.length() == 1 ? arrayElementType : new Type(length, arrayElementType);
 		}
 		/* Generate valueRange if needed */
-		Indices valueRange = null;
+		Range valueRange = null;
 		if (isEnum()) {
 			valueRange = length.deriveValueRange();
 		}
@@ -193,14 +193,14 @@ public final class Type {
 
 	}
 
-	public static Type createFromValues(Indices valueRange) {
+	public static Type createFromValues(Range valueRange) {
 		/* Calculate the LENGTH of the register to store the max. possible value of the variable */
-		Indices length = Indices.deriveLengthForValues(valueRange.getHighest(), valueRange.getLowest());
+		Range length = Range.deriveLengthForValues(valueRange.getHighest(), valueRange.getLowest());
 
 		return new Type(valueRange, length); /*todo: , valueRange.isDescending() ? */   // todo: <== isDescending() for #length#     <=== see in VHDLStructureParser.parseType()
 	}
 
 	public static Type createFromValues(int largestValue, int smallestValue) {
-		return createFromValues(new Indices(largestValue, smallestValue));
+		return createFromValues(new Range(largestValue, smallestValue));
 	}
 }

@@ -1,6 +1,6 @@
 package base.vhdl.structure.nodes;
 
-import base.Indices;
+import base.Range;
 import base.vhdl.processors.AbstractProcessor;
 import base.vhdl.structure.AbstractOperand;
 import base.vhdl.structure.OperandImpl;
@@ -35,7 +35,7 @@ public class TransitionNode extends AbstractNode {
 	 *         or if valueOperand is not a range. Range, if the
 	 *         valueOperand is a range operand.
 	 */
-	public Indices getValueOperandRange() {
+	public Range getValueOperandRange() {
 		return isNull() ? null : getValueOperand().getRange();
 	}
 

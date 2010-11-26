@@ -1,7 +1,7 @@
 package parsers.vhdl;
 
+import base.Range;
 import base.Type;
-import base.Indices;
 import base.vhdl.structure.Constant;
 
 import java.util.Map;
@@ -43,7 +43,7 @@ public abstract class AbstractPackageBuilder implements PackageBuilder {
 		return typeByName.get(typeName);
 	}
 
-	public Indices buildIndices(String rangeAsString) throws Exception {
+	public Range buildRange(String rangeAsString) throws Exception {
 		return expressionBuilder.buildRange(rangeAsString);
 	}
 

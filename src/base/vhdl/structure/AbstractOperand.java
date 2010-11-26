@@ -1,6 +1,6 @@
 package base.vhdl.structure;
 
-import base.Indices;
+import base.Range;
 
 /**
  * Class represents an <tt>Abstract Operand</tt> for being extended by <tt>leaf
@@ -25,7 +25,7 @@ public abstract class AbstractOperand {
 	 * Length of the operand. Not <code>null</code>, if fixed. <code>null</code> if not fixed yet.
 	 * <br> Used only for calculation of the lengths of Constant Variables.
 	 */
-	private Indices length;
+	private Range length;
 
 	public AbstractOperand(boolean isInverted) {
 		this.isInverted = isInverted;
@@ -39,11 +39,11 @@ public abstract class AbstractOperand {
 		isInverted = inverted;
 	}
 
-	public Indices getLength() {
+	public Range getLength() {
 		return length;
 	}
 
-	public void setLength(Indices length) {
+	public void setLength(Range length) {
 		this.length = length;
 	}
 
@@ -53,7 +53,7 @@ public abstract class AbstractOperand {
 	 * 		   {@link Expression} and {@link UserDefinedFunction} utilize
 	 * 		   the default behaviour.
 	 */
-	public Indices getRange() {
+	public Range getRange() {
 		return null;
 	}
 

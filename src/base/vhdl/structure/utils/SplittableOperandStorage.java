@@ -1,6 +1,6 @@
 package base.vhdl.structure.utils;
 
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.TypeResolver;
 import base.vhdl.structure.OperandImpl;
@@ -40,7 +40,7 @@ public class SplittableOperandStorage extends OperandStorage {
 			int upperBound = getHighest(oldRanges);
 			/* Fill SortedSets */
 			for (OperandImpl rangeOperand : oldRanges) {
-				Indices range = rangeOperand.getRange();
+				Range range = rangeOperand.getRange();
 				/* Starting index */
 				int start = range.getLowest();
 				startsSet.add(start);
@@ -61,7 +61,7 @@ public class SplittableOperandStorage extends OperandStorage {
 			ArrayList<Integer> startsArray = new ArrayList<Integer>(startsSet);
 			ArrayList<Integer> endsArray = new ArrayList<Integer>(endsSet);
 			for (int i = 0; i < startsArray.size(); i++) {
-				newRanges.add(new OperandImpl(varName, new Indices(endsArray.get(i), startsArray.get(i)), false));
+				newRanges.add(new OperandImpl(varName, new Range(endsArray.get(i), startsArray.get(i)), false));
 			}
 
 			fillMissingRanges(newRanges, varName, typeResolver);
@@ -88,7 +88,7 @@ public class SplittableOperandStorage extends OperandStorage {
 
 			operands.remove(operand);
 			for (int index = 0; index < length; index++) {
-				operands.add(new OperandImpl(varName, new Indices(index, index), false));
+				operands.add(new OperandImpl(varName, new Range(index, index), false));
 			}
 		}
 	}
@@ -132,7 +132,7 @@ public class SplittableOperandStorage extends OperandStorage {
 		for (OperandImpl operand : operands) {
 			if (!operand.isRange())
 				throw new RuntimeException("Range assignment operand doesn't contain range: " + operand);
-			Indices range = operand.getRange();
+			Range range = operand.getRange();
 			for (int index = range.getLowest(); index <= range.getHighest(); index++) {
 				/* If this bit has already been set, inform about intersection */
 				if (bits[index]) throw new RuntimeException("Intersection of range assignment operands:" +
@@ -141,14 +141,14 @@ public class SplittableOperandStorage extends OperandStorage {
 			}
 		}
 		/* Check missing range assignment variables: if any, fill the set with missing variables */
-		Collection<Indices> unsetIndicesCollect = extractUnsetIndices(bits);
-		for (Indices unsetIndices : unsetIndicesCollect) { //todo: It may occur, that the whole variable is unset. Consider this.
-			operands.add(new OperandImpl(varName, unsetIndices, false));
+		Collection<Range> unsetRanges = extractUnsetRanges(bits);
+		for (Range unsetRange : unsetRanges) { //todo: It may occur, that the whole variable is unset. Consider this.
+			operands.add(new OperandImpl(varName, unsetRange, false));
 		}
 	}
 
-	static Collection<Indices> extractUnsetIndices(boolean[] setBits) {
-		List<Indices> indicesList = new LinkedList<Indices>();
+	static Collection<Range> extractUnsetRanges(boolean[] setBits) {
+		List<Range> rangeList = new LinkedList<Range>();
 		int lowest = -1, highest = -1;
 		for (int i = 0; i < setBits.length; i++) {
 			if (!setBits[i]) {
@@ -158,15 +158,15 @@ public class SplittableOperandStorage extends OperandStorage {
 				highest = i;
 			} else {
 				if (lowest != -1) {
-					indicesList.add(new Indices(highest, lowest));
+					rangeList.add(new Range(highest, lowest));
 					lowest = -1;
 					highest = -1;
 				}
 			}
 		}
 		if (lowest != -1) {
-			indicesList.add(new Indices(highest, lowest));
+			rangeList.add(new Range(highest, lowest));
 		}
-		return indicesList;
+		return rangeList;
 	}
 }

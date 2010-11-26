@@ -33,7 +33,7 @@ public class DependentVariableReplacer implements HLDDVisitor {
 	protected void replaceNode(Node node) {
 		node.setDependentVariable(replacingVarHolder.getVariable());
 		if (replacingVarHolder.isRange()) {
-			//todo: Indices.absoluteFor()...
+			//todo: Range.absoluteFor()...
 			node.setRange(replacingVarHolder.getRange());
 		}
 	}

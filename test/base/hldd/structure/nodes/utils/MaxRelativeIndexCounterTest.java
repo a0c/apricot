@@ -1,21 +1,20 @@
 package base.hldd.structure.nodes.utils;
 
+import base.Range;
+import base.Type;
+import base.hldd.structure.Flags;
+import base.hldd.structure.nodes.Node;
+import base.hldd.structure.variables.Variable;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-
-import base.hldd.structure.nodes.Node;
-import base.hldd.structure.variables.Variable;
-import base.hldd.structure.Flags;
-import base.Indices;
-import base.Type;
 
 /**
  * @author Anton Chepurov
  */
 public class MaxRelativeIndexCounterTest {
 
-	private static final Indices NULL_ARRAY = null;
+	private static final Range NULL_ARRAY = null;
 
 //	0 0:(n___)(0=>1 1=>2)V=0"BOP"<1:0>
 //	1 1:(n___)(0=>3 1=>4)V=1"TOP"<1:0>
@@ -104,7 +103,7 @@ public class MaxRelativeIndexCounterTest {
 	}
 
 	private static Variable createVariable(String varName, int highestSB, Flags flags) {
-		return new Variable(varName, new Type(new Indices(highestSB, 0)), flags);
+		return new Variable(varName, new Type(new Range(highestSB, 0)), flags);
 	}
 
 

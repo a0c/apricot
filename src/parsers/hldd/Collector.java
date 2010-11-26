@@ -1,10 +1,10 @@
 package parsers.hldd;
 
+import base.Range;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.GraphVariable;
 import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.variables.FunctionVariable;
-import base.Indices;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +54,7 @@ public class Collector {
 		indexVarHash.put(newVariable.getIndex(), newVariable);
 	}
 
-	void addFunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Indices[] inputRanges, Indices length) {
+	void addFunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Range[] inputRanges, Range length) {
 		indexVarHash.put(index, new FunctionData(functionType, nameIdx, index, inputIndices, inputRanges, length));
 	}
 
@@ -65,7 +65,7 @@ public class Collector {
 		currentNodes = new NodeData[graphLength];
 	}
 
-	void addNodeData(int relativeNodeIndex, int depVarIndex, Indices depVarRange, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
+	void addNodeData(int relativeNodeIndex, int depVarIndex, Range depVarRange, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
 		currentGraphLength--;
 		currentNodes[relativeNodeIndex] = new NodeData(depVarIndex, depVarRange, successors, windowPlaceholders);
 		if (currentGraphLength == 0) {
@@ -107,10 +107,10 @@ public class Collector {
 		final int nameIdx;
 		final int index;
 		final int[] inputIndices;
-		Indices[] inputRanges;
-		final Indices length;
+		Range[] inputRanges;
+		final Range length;
 
-		public FunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Indices[] inputRanges, Indices length) {
+		public FunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Range[] inputRanges, Range length) {
 			this.functionType = functionType;
 			this.nameIdx = nameIdx;
 			this.index = index;
@@ -134,11 +134,11 @@ public class Collector {
 
 	public class NodeData {
 		public final int depVarIndex;
-		public Indices depVarRange;
+		public Range depVarRange;
 		public final TreeMap<Condition, Integer> successors;
 		public final String[] windowPlaceholders;
 
-		public NodeData(int depVarIndex, Indices depVarRange, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
+		public NodeData(int depVarIndex, Range depVarRange, TreeMap<Condition, Integer> successors, String[] windowPlaceholders) {
 			this.depVarIndex = depVarIndex;
 			this.depVarRange = depVarRange;
 			this.successors = successors;

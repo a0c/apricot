@@ -1,21 +1,20 @@
 package parsers.psl;
 
-import static base.hldd.structure.models.utils.ModelManager.adjustBooleanCondition;
-
-import base.hldd.structure.nodes.utils.Condition;
-import base.hldd.structure.variables.*;
-import base.hldd.structure.models.utils.VariableManager;
+import base.Type;
+import base.hldd.structure.Flags;
 import base.hldd.structure.models.utils.RangeVariableHolder;
+import base.hldd.structure.models.utils.VariableManager;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.TemporalNode;
-import base.hldd.structure.Flags;
+import base.hldd.structure.nodes.utils.Condition;
+import base.hldd.structure.variables.*;
 import base.psl.structure.*;
 import base.vhdl.structure.AbstractOperand;
-import base.Type;
-import base.Indices;
 
 import java.util.*;
 import java.util.logging.Logger;
+
+import static base.hldd.structure.models.utils.ModelManager.adjustBooleanCondition;
 
 /**
  * @author Anton Chepurov
@@ -53,7 +52,7 @@ public class ModelManager {
 
 	public void finalizePropertyGraph() throws Exception {
 		LOGGER.info("Creating property GRAPHs...");
-		Variable baseVariable = new Variable(currentPropertyName + contextManager.globalWindowToString(), new Type(new Indices(1, 0)), new Flags().setOutput(true));
+		Variable baseVariable = new Variable(currentPropertyName + contextManager.globalWindowToString(), new Type(new base.Range(1, 0)), new Flags().setOutput(true));
 		variableManager.addVariable(new GraphVariable(baseVariable, contextManager.getCurrentContext().getNode(0)));
 	}
 
@@ -78,7 +77,7 @@ public class ModelManager {
 	 * If the dependent variable is a {@link FunctionVariable}, then all its operands are added recursively as well.
 	 *
 	 * @param relativeIndex relative index of the node being added
-	 * @param node node to be added
+	 * @param node		  node to be added
 	 */
 	public void addNode(int relativeIndex, Node node) {
 		AbstractVariable dependentVariable = node.getDependentVariable();

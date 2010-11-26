@@ -1,6 +1,6 @@
 package base.vhdl.visitors;
 
-import base.Indices;
+import base.Range;
 import base.Type;
 import base.TypeResolver;
 import base.hldd.structure.Flags;
@@ -77,12 +77,12 @@ public class GraphGeneratorTest {
 	@Test
 	public void correctIsVariableSetIn() throws Exception {
 		/* Build variable to compare with */
-		Variable comparedVariable = new Variable("V_OUT", new Type(new Indices(3, 0)), new Flags());
-		Variable differentVariable = new Variable("BALOON", new Type(new Indices(3, 0)), new Flags());
-		RangeVariable comparedVariable2 = new RangeVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(2, 2));
-		RangeVariable comparedVariable3 = new RangeVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(7, 0));
-		RangeVariable comparedVariable4 = new RangeVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(6, 0));
-		RangeVariable comparedVariable5 = new RangeVariable("V_OUT", new Type(new Indices(7, 0)), new Indices(7, 1));
+		Variable comparedVariable = new Variable("V_OUT", new Type(new Range(3, 0)), new Flags());
+		Variable differentVariable = new Variable("BALOON", new Type(new Range(3, 0)), new Flags());
+		RangeVariable comparedVariable2 = new RangeVariable("V_OUT", new Type(new Range(7, 0)), new Range(2, 2));
+		RangeVariable comparedVariable3 = new RangeVariable("V_OUT", new Type(new Range(7, 0)), new Range(7, 0));
+		RangeVariable comparedVariable4 = new RangeVariable("V_OUT", new Type(new Range(7, 0)), new Range(6, 0));
+		RangeVariable comparedVariable5 = new RangeVariable("V_OUT", new Type(new Range(7, 0)), new Range(7, 1));
 		/* Build and test Transition Nodes */
 		TransitionNode transNodeNull = buildTransitionNode(null);
 		TransitionNode transNodeFull = buildTransitionNode("V_OUT");
@@ -104,10 +104,10 @@ public class GraphGeneratorTest {
 		/* Compared with "DIFFERENT_VARIABLE" */
 		assertFalse(recognizedMessage(differentVariable, transNodePart2), GraphGenerator.isVariableSetIn(transNodePart2, differentVariable, true, typeResolver));
 		/* Same name, non of them is range */
-		when(typeResolver.resolveType("V_OUT")).thenReturn(new Type(new Indices(3, 0)));
+		when(typeResolver.resolveType("V_OUT")).thenReturn(new Type(new Range(3, 0)));
 		assertTrue(notRecognizedMessage(comparedVariable, transNodeFull), GraphGenerator.isVariableSetIn(transNodeFull, comparedVariable, true, typeResolver));
 		/* Same name, var is range, node is not */
-		when(typeResolver.resolveType("V_OUT")).thenReturn(new Type(new Indices(7, 0)));
+		when(typeResolver.resolveType("V_OUT")).thenReturn(new Type(new Range(7, 0)));
 		assertTrue(notRecognizedMessage(comparedVariable2, transNodeFull), GraphGenerator.isVariableSetIn(transNodeFull, comparedVariable2, true, typeResolver));
 		assertTrue(notRecognizedMessage(comparedVariable3, transNodeFull), GraphGenerator.isVariableSetIn(transNodeFull, comparedVariable3, true, typeResolver));
 		/* Same name, var is range, node is too */

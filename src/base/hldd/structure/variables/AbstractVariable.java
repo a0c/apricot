@@ -2,7 +2,7 @@ package base.hldd.structure.variables;
 
 import base.HierarchyLocation;
 import base.Type;
-import base.Indices;
+import base.Range;
 
 /**
  * @author Anton Chepurov
@@ -29,7 +29,7 @@ public abstract class AbstractVariable implements Comparable<AbstractVariable> {
 
 	public abstract Type getType();
 
-	public abstract Indices getLength();
+	public abstract Range getLength();
 
 	public abstract boolean isState();
 

@@ -7,8 +7,7 @@ import static org.junit.Assert.*;
 
 import base.hldd.structure.variables.Variable;
 import base.hldd.structure.Flags;
-import base.psl.structure.Range;
-import base.Indices;
+import base.Range;
 import base.Type;
 
 import java.io.File;
@@ -27,7 +26,7 @@ public class TemporalNodeTest {
 		assertTrue(node instanceof TemporalNode);
 		// Window
 		node = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags()))
-				.window(new Range(new int[]{0, 7}, Range.TemporalModifier.ALWAYS.getSuffix())).build();
+				.window(new base.psl.structure.Range(new int[]{0, 7}, base.psl.structure.Range.TemporalModifier.ALWAYS.getSuffix())).build();
 		assertTrue(node instanceof TemporalNode);
 		assertEquals("someVar@[0..7]_a", node.depVarName());
 		// Window placeholders
@@ -39,7 +38,7 @@ public class TemporalNodeTest {
 		assertArrayEquals(windowPlaceholders, ((TemporalNode) node).getWindowPlaceholders());
 
 		// Check correctness of super-class methods
-		Indices range = new Indices(9, 2);
+		Range range = new Range(9, 2);
 		SourceLocation source = new SourceLocation(new File("Buba.aqa"), Collections.singleton(1991));
 		node = new TemporalNode.Builder(new Variable("someVar", Type.BIT_TYPE, new Flags()))
 				.createSuccessors(2)
