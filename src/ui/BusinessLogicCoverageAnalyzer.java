@@ -65,7 +65,7 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 
 		/* Collect execution string */
 		List<String> commandList = new ArrayList<String>(5);
-		commandList.add(ApplicationForm.LIB_DIR + (com.sun.jna.Platform.isWindows() ? "hlddsim.exe" : "hlddsim"));
+		commandList.add(ApplicationForm.LIB_DIR + (Platform.isWindows() ? "hlddsim.exe" : "hlddsim"));
 		if (isDoAssert) {
 			commandList.add("-coverage");
 			commandList.add(directive);
