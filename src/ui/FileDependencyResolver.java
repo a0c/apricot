@@ -27,6 +27,16 @@ public class FileDependencyResolver {
 		return vhdlFile;
 	}
 
+	public static File deriveHlddFile(File vhdlFile) {
+
+		File hlddFile = deriveFileFrom(vhdlFile, ".vhd", ".agm");
+
+		if (hlddFile == null)
+			hlddFile = deriveFileFrom(vhdlFile, ".vhdl", ".agm");
+
+		return hlddFile;
+	}
+
 	public static File deriveCovFile(File hlddFile) {
 
 		return deriveFileFrom(hlddFile, ".agm", ".cov");
@@ -92,10 +102,8 @@ public class FileDependencyResolver {
 		if (sourcePath.endsWith(sourceFileExtension)) {
 			File derivedFile = new File(sourcePath.replace(sourceFileExtension, derivedFileExtension));
 			return derivedFile.exists() ? derivedFile : null;
-		} else {
-			throw new RuntimeException("Mismatch between real sourceFile extension and provided sourceFileExtension: \"" +
-					sourcePath + "\" and \"" + sourceFileExtension + "\"");
 		}
+		return null;
 	}
 
 	public static boolean isVHDL(File file) {

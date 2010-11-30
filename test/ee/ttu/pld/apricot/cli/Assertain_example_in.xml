@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<apricot>
+    <action name="coverage">
+        <settings>
+            <design>.\test\designs\uart16750\rtl\diag\uart_16750.vhd</design>
+            <metric>node</metric>
+            <metric>edge</metric>
+        </settings>
+    </action>
+    <action name="assertion">
+        <settings>
+            <design>uart_16750.vhd</design>
+            <psl>p1.psl</psl>
+            <psl>p2.psl</psl>
+        </settings>
+    </action>
+</apricot>

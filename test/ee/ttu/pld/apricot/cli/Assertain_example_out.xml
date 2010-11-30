@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<apricot>
+    <action name="coverage">
+        <settings>
+            <design>uart_16750.vhd</design>
+            <metric>node</metric>
+            <metric>edge</metric>
+        </settings>
+        <result>
+            <coverage metric="node"><!-- Lists uncovered lines by files -->
+                <file name="slib_counter.vhd">
+                    <line>74</line>
+                </file>
+                <file name="uart_receiver.vhd">
+                    <line>225</line>
+                </file>
+                <file name="slib_counter.vhd">
+                    <line>53</line>
+                    <line>56</line>
+                    <line>67</line>
+                </file>
+                <file name="uart_receiver.vhd">
+                    <line>197</line>
+                    <line>198</line>
+                    <line>199</line>
+                    <line>200</line>
+                </file>
+            </coverage>
+            <coverage metric="edge"><!-- Lists uncovered lines by files -->
+                <file name="slib_counter.vhd">
+                    <line>74</line>
+                </file>
+                <file name="uart_receiver.vhd">
+                    <line>225</line>
+                </file>
+                <file name="slib_counter.vhd">
+                    <line>53</line>
+                    <line>56</line>
+                    <line>67</line>
+                </file>
+                <file name="uart_receiver.vhd">
+                    <line>197</line>
+                    <line>198</line>
+                    <line>199</line>
+                    <line>200</line>
+                </file>
+            </coverage>
+        </result>
+    </action>
+    <action name="assertion">
+        <settings>
+            <design>uart_16750.vhd</design>
+            <psl>p1.psl</psl>
+            <psl>p2.psl</psl>
+        </settings>
+        <result>
+            <assertion psl="p1.psl">
+                <fail>
+                    <time>8</time>
+                    <time>17</time>
+                    <time>188</time>
+                </fail>
+                <pass>
+                    <time>18</time>
+                    <time>19</time>
+                    <time>188</time>
+                </pass>
+            </assertion>
+            <assertion psl="p2.psl">
+                <fail>
+                    <time>99</time>
+                    <time>187</time>
+                    <time>188</time>
+                </fail>
+                <pass>
+                    <time>77</time>
+                    <time>89</time>
+                    <time>188</time>
+                </pass>
+            </assertion>
+        </result>
+    </action>
+</apricot>

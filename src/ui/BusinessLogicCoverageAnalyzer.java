@@ -1,5 +1,7 @@
 package ui;
 
+import ee.ttu.pld.apricot.cli.CoverageRequest;
+import ee.ttu.pld.apricot.cli.Request;
 import io.ConsoleWriter;
 import ui.utils.CoverageAnalyzingUI;
 import ui.utils.CoverageAnalyzingWorker;
@@ -8,7 +10,10 @@ import ui.utils.CoverageVisualizingWorker;
 import ui.utils.uiWithWorker.UIWithWorker;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -16,8 +21,8 @@ import java.util.List;
  */
 public class BusinessLogicCoverageAnalyzer implements Lockable {
 
-	private final ApplicationForm applicationForm;
-	private final ConsoleWriter consoleWriter;
+	private ApplicationForm applicationForm;
+	private ConsoleWriter consoleWriter;
 	private File hlddFile;
 	private File vhdlFile;
 	private File covFile;
@@ -28,6 +33,19 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 	public BusinessLogicCoverageAnalyzer(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
 		this.applicationForm = applicationForm;
 		this.consoleWriter = consoleWriter;
+	}
+
+	public BusinessLogicCoverageAnalyzer(Collection<Request> requests, String libPath) {
+		for (Request request : requests) {
+			if (request instanceof CoverageRequest) {
+				CoverageRequest coverageRequest = (CoverageRequest) request;
+				if (coverageRequest.isBroken()) {
+					coverageRequest.printError();
+					continue;
+				}
+				processRequest(coverageRequest, libPath);
+			}
+		}
 	}
 
 	public File getHlddFile() {
@@ -52,6 +70,70 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 		this.mappingFile = mappingFile;
 	}
 
+	private void processRequest(CoverageRequest coverageRequest, String libPath) {
+
+		if (libPath == null) {
+			libPath = "../lib/";
+		}
+
+		List<String> cmd = new ArrayList<String>(5);
+		cmd.add(libPath + (Platform.isWindows() ? "hlddsim.exe" : "hlddsim"));
+		cmd.add("-coverage");
+		cmd.add(coverageRequest.getDirective());
+		cmd.add(coverageRequest.getHlddFile().getAbsolutePath().replace(".agm", ""));
+
+		try {
+			Process process = Runtime.getRuntime().exec(cmd.toArray(new String[cmd.size()]));
+
+			waitForProcessToComplete(process);
+
+		} catch (IOException e) {
+			System.out.println("ERROR: " + e.getMessage());
+		}
+	}
+
+	private void waitForProcessToComplete(Process process) {
+		InputStream inputStream = process.getInputStream();
+		InputStream errorStream = process.getErrorStream();
+		boolean isProcessFinished = false;
+		try {
+			while (!isProcessFinished && !Thread.interrupted()) {
+				/* Read OUTPUT */
+				int byteCount = inputStream.available();
+				if (byteCount > 0) {
+					for (int i = 0; i < byteCount; i++) {
+						//todo: read N at once. + use buffered reader??
+						System.out.write(String.valueOf((char) inputStream.read()).getBytes());
+					}
+				}
+				/* Read ERROR */
+				int errorBytesAvailable = errorStream.available();
+				if (errorBytesAvailable > 0) {
+					for (int i = 0; i < errorBytesAvailable; i++) {
+						System.err.write(errorStream.read());
+					}
+				}
+
+				try {
+					int exitValue = process.exitValue();
+					isProcessFinished = true;
+					if (exitValue != 0) {
+						System.out.println("ERROR: Coverage Analyzer failed with error " + exitValue);
+					}
+				} catch (IllegalThreadStateException e) {
+					// indicates that process.exitValue() cannot return any value yet
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e1) {
+						break;
+					}
+				}
+			}
+		} catch (IOException e) {
+			System.out.println("ERROR: " + e.getMessage());
+		}
+	}
+
 	public void processAnalyze() throws ExtendedException {
 		/* Check design to be selected */
 		if (hlddFile == null) {
@@ -60,13 +142,13 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 
 		int patternCount = applicationForm.getPatternCountForCoverage();
 		boolean isRandom = applicationForm.isRandomCov();
-		boolean isDoAssert = applicationForm.isDoAnalyzeCoverage();
+		boolean isDoMeasureCoverage = applicationForm.isDoAnalyzeCoverage();
 		String directive = applicationForm.getCoverageAnalyzerDirective();
 
 		/* Collect execution string */
 		List<String> commandList = new ArrayList<String>(5);
 		commandList.add(ApplicationForm.LIB_DIR + (Platform.isWindows() ? "hlddsim.exe" : "hlddsim"));
-		if (isDoAssert) {
+		if (isDoMeasureCoverage) {
 			commandList.add("-coverage");
 			commandList.add(directive);
 		}
