@@ -5,8 +5,17 @@ import org.w3c.dom.Node;
 /**
  * @author Anton Chepurov
  */
-@SuppressWarnings({"InterfaceNamingConvention"})
-public interface Request {
+public abstract class Request {
 
-	public Node getRequestNode();
+	private boolean successful = false;
+
+	public abstract Node getRequestNode();
+
+	public void markSuccessful() {
+		successful = true;
+	}
+
+	public boolean isSuccessful() {
+		return successful;
+	}
 }

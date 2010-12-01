@@ -85,17 +85,23 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 		try {
 			Process process = Runtime.getRuntime().exec(cmd.toArray(new String[cmd.size()]));
 
-			waitForProcessToComplete(process);
+			boolean success = waitForProcessToComplete(process);
+
+			if (success) {
+				coverageRequest.markSuccessful();
+			}
 
 		} catch (IOException e) {
 			System.out.println("ERROR: " + e.getMessage());
 		}
 	}
 
-	private void waitForProcessToComplete(Process process) {
+	@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
+	private boolean waitForProcessToComplete(Process process) {
 		InputStream inputStream = process.getInputStream();
 		InputStream errorStream = process.getErrorStream();
 		boolean isProcessFinished = false;
+		boolean success = false;
 		try {
 			while (!isProcessFinished && !Thread.interrupted()) {
 				/* Read OUTPUT */
@@ -117,7 +123,8 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 				try {
 					int exitValue = process.exitValue();
 					isProcessFinished = true;
-					if (exitValue != 0) {
+					success = exitValue == 0;
+					if (!success) {
 						System.out.println("ERROR: Coverage Analyzer failed with error " + exitValue);
 					}
 				} catch (IllegalThreadStateException e) {
@@ -132,6 +139,7 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 		} catch (IOException e) {
 			System.out.println("ERROR: " + e.getMessage());
 		}
+		return success;
 	}
 
 	public void processAnalyze() throws ExtendedException {

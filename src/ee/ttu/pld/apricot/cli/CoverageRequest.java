@@ -9,7 +9,7 @@ import java.util.Collection;
 /**
  * @author Anton Chepurov
  */
-public class CoverageRequest implements Request {
+public class CoverageRequest extends Request {
 
 	private static final String NODE = "node";
 	private static final String EDGE = "edge";

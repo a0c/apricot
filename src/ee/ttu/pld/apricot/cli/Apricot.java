@@ -53,6 +53,8 @@ public class Apricot {
 
 			writeXml(xml, fileName);
 
+			printStat(requests);
+
 		} catch (IOException e) {
 			System.out.println("ERROR when reading XML: " + e.getMessage());
 		} catch (ParserConfigurationException e) {
@@ -67,6 +69,17 @@ public class Apricot {
 			System.out.println("ERROR when writing XML: " + e.getMessage());
 		}
 
+	}
+
+	private void printStat(Collection<Request> requests) {
+		int i = 0;
+		for (Request request : requests) {
+			if (request.isSuccessful()) {
+				i++;
+			}
+		}
+		System.out.println("");
+		System.out.println("[APRICOT] Nr. of processed requests: " + i);
 	}
 
 	private void writeXml(Document xml, String fileName) throws TransformerException {
