@@ -1,10 +1,9 @@
 package ee.ttu.pld.apricot.cli;
 
 import org.w3c.dom.Node;
-import ui.FileDependencyResolver;
 
-import java.io.File;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Anton Chepurov
@@ -16,16 +15,10 @@ public class CoverageRequest extends Request {
 	private static final String CONDITION = "condition";
 	private static final String TOGGLE = "toggle";
 
-	private final Node requestNode;
-
-	private final File designFile;
-
 	private final Collection<String> metrics;
 
 	public CoverageRequest(Node requestNode, String design, Collection<String> metrics) {
-		this.requestNode = requestNode;
-		design = new File(design).toURI().getPath();
-		this.designFile = new File(design);
+		super(requestNode, design);
 		this.metrics = metrics;
 	}
 
@@ -45,24 +38,14 @@ public class CoverageRequest extends Request {
 		return sb.toString();
 	}
 
-	public File getHlddFile() {
-		return FileDependencyResolver.deriveHlddFile(designFile);
-	}
-
 	public boolean isNodeRequested() {
 		return metrics.contains(NODE);
 	}
 
 	@Override
-	public Node getRequestNode() {
-		return requestNode;
-	}
-
-	public boolean isBroken() {
-		return !designFile.exists();
-	}
-
-	public void printError() {
-		System.out.println("ERROR: specified design file does not exist: " + designFile.getAbsolutePath());
+	public void buildCommand(List<String> cmd) {
+		cmd.add("-coverage");
+		cmd.add(getDirective());
+		cmd.add(getHlddFile().getAbsolutePath().replace(".agm", ""));
 	}
 }

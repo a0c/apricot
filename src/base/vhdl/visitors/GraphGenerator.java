@@ -188,7 +188,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			return;
 		}
 
-		AbstractVariable defaultValue = modelCollector.convertOperandToVariable(defaultValueOperand, signalVariable.getType(), true);
+		AbstractVariable defaultValue = modelCollector.convertOperandToVariable(defaultValueOperand, signalVariable.getType(), true, null);
 
 		if (!(defaultValue instanceof ConstantVariable)) {
 			throw new ExtendedException("Non-constant DEFAULT VALUE variable created for signal " + signalName +
@@ -257,12 +257,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		*       P R O C E S S     E X P R E S S I O N
 		* #################################################*/
 		Expression expression = ifNode.getConditionExpression();
+		SourceLocation source = ifNode.getSource();
 		/* Extract dependentVariable */
 		RangeVariableHolder depVariableHolder = doCreateGraphsForCS
-				? conditionGraphManager.convertConditionToBooleanGraph(ifNode)
-				: modelCollector.convertConditionalStmt(expression, doFlattenConditions);
+				? conditionGraphManager.convertConditionToBooleanGraph(ifNode, source)
+				: modelCollector.convertConditionalStmt(expression, doFlattenConditions, source);
 		if (doCreateSubGraphs) {
-			extraConditionGraphManager.generateExtraGraph(ifNode);
+			extraConditionGraphManager.generateExtraGraph(ifNode, source);
 		}
 		AbstractVariable dependentVariable = depVariableHolder.getVariable();
 		Range range = depVariableHolder.getRange();
@@ -273,7 +274,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 				? new CompositeNode((CompositeFunctionVariable) dependentVariable)
 				: new Node.Builder(dependentVariable).range(range).createSuccessors(2).build();
 		/* Add VHDL lines the node's been created from */
-		controlNode.setSource(ifNode.getSource());
+		controlNode.setSource(source);
 
 		/*#################################################
 		*       P R O C E S S     T R U E  P A R T
@@ -355,12 +356,14 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 		/* Only process TerminalNodes that set the graphVariable */
 		if (isGraphVariableSetIn(transitionNode)) {
+
+			SourceLocation source = transitionNode.getSource();
 			/* ######### Create TERMINAL NODE ############*/
 
 			/* Extract dependentVariable and range */
 			AbstractVariable dependentVariable = transitionNode.isNull()
 					? graphVariable // Retain value
-					: modelCollector.convertOperandToVariable(transitionNode.getValueOperand(), graphVariable.getType(), true);
+					: modelCollector.convertOperandToVariable(transitionNode.getValueOperand(), graphVariable.getType(), true, source);
 			/* branch <= not CCR(CBIT); =====> don't take range into account, they were already used during Function creation */
 			Range range = dependentVariable instanceof FunctionVariable && ((FunctionVariable) dependentVariable).getOperator() == Operator.INV
 					? null : transitionNode.getValueOperandRange();
@@ -395,7 +398,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			/* Create TerminalNode */
 			Node terminalNode = new Node.Builder(dependentVariable).range(range).build();
 			/* Add VHDL lines the node's been created from */
-			terminalNode.setSource(transitionNode.getSource());
+			terminalNode.setSource(source);
 			if (isDynamicRange) {
 				insertDynamicNode(transitionNode.getTargetOperand(), terminalNode);
 				return;
@@ -482,13 +485,14 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		/*#################################################
 		*       P R O C E S S     C O N D I T I O N
 		* #################################################*/
+		SourceLocation source = caseNode.getSource();
 		/* Extract dependentVariable */
 		AbstractOperand variableOperand = caseNode.getVariableOperand();
 		AbstractVariable dependentVariable = doCreateGraphsForCS
-				? conditionGraphManager.convertConditionToGraph(caseNode)
-				: modelCollector.convertOperandToVariable(variableOperand, null, false);
+				? conditionGraphManager.convertConditionToGraph(caseNode, source)
+				: modelCollector.convertOperandToVariable(variableOperand, null, false, source);
 		if (doCreateSubGraphs) {
-			extraConditionGraphManager.generateExtraGraph(caseNode);
+			extraConditionGraphManager.generateExtraGraph(caseNode, source);
 		}
 		Range range = variableOperand.getRange();
 		/* Count possible conditions of dependentVariable */
@@ -498,7 +502,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		/* Create Control Node */
 		Node controlNode = new Node.Builder(dependentVariable).range(range).createSuccessors(conditionValuesCount).build();
 		/* Add VHDL lines the node's been created from */
-		controlNode.setSource(caseNode.getSource()); //todo: inline with the creation process above...
+		controlNode.setSource(source); //todo: inline with the creation process above...
 
 		/*#################################################
 		*       P R O C E S S     C O N D I T I O N S

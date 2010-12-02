@@ -37,6 +37,11 @@ public class FileDependencyResolver {
 		return hlddFile;
 	}
 
+	public static File deriveDgnFile(File hlddFile) {
+
+		return deriveFileFrom(hlddFile, ".agm", ".dgn");
+	}
+
 	public static File deriveCovFile(File hlddFile) {
 
 		return deriveFileFrom(hlddFile, ".agm", ".cov");

@@ -4,6 +4,7 @@ import base.SourceLocation;
 import io.QuietCloser;
 import ui.base.HLDD2VHDLMapping;
 import ui.base.NodeItem;
+import ui.base.VariableItem;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,7 +19,6 @@ import java.util.regex.Pattern;
  */
 public class HLDD2VHDLMappingReader {
 
-	private final static int OFFSET = 1;
 	private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
 
 	private HLDD2VHDLMapping mapping = null;
@@ -55,7 +55,7 @@ public class HLDD2VHDLMappingReader {
 					String[] lineNumbersAsStrings = fileNameAndLines[1].split(",");
 					Collection<Integer> lines = new HashSet<Integer>();
 					for (String lineNumberAsString : lineNumbersAsStrings) {
-						lines.add(Integer.parseInt(lineNumberAsString.trim()) - OFFSET);
+						lines.add(Integer.parseInt(lineNumberAsString.trim()));
 					}
 
 					SourceLocation nextLocation = new SourceLocation(new File(mappingFile.getParent(), fileName), lines);
@@ -73,7 +73,11 @@ public class HLDD2VHDLMappingReader {
 					int graphIndex = Integer.parseInt(indices[0].trim());
 					int nodeIndex = Integer.parseInt(indices[1].trim());
 					mapping.addMapping(new NodeItem(graphIndex, nodeIndex), sourceLocation);
-				} //todo: EdgeMappingItem, etc...
+				} else if (indices.length == 1) {
+					int varIndex = Integer.parseInt(indices[0].trim());
+					mapping.addMapping(new VariableItem(varIndex), sourceLocation);
+				}
+				//todo: EdgeMappingItem, etc...
 			}
 		} finally {
 			QuietCloser.closeQuietly(reader);

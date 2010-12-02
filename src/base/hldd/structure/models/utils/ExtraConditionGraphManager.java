@@ -1,6 +1,7 @@
 package base.hldd.structure.models.utils;
 
 import base.Range;
+import base.SourceLocation;
 import base.Type;
 import base.hldd.structure.Flags;
 import base.hldd.structure.nodes.Node;
@@ -26,17 +27,17 @@ public class ExtraConditionGraphManager {
 		this.modelCollector = modelCollector;
 	}
 
-	public void generateExtraGraph(AbstractNode node) throws Exception {
+	public void generateExtraGraph(AbstractNode node, SourceLocation source) throws Exception {
 
 		if (node instanceof CaseNode) {
 
-			new ConditionGraphManager(modelCollector).convertConditionToGraph(node);
+			new ConditionGraphManager(modelCollector).convertConditionToGraph(node, source);
 
 		} else if (node instanceof IfNode) {
 
 			Expression expression = ((IfNode) node).getConditionExpression();
 
-			RangeVariableHolder conditionVarHolder = modelCollector.convertConditionalStmt(expression, false);
+			RangeVariableHolder conditionVarHolder = modelCollector.convertConditionalStmt(expression, false, source);
 			LinkedList<RangeVariableHolder> boolOperandsList = new BooleanOperandsCollector(conditionVarHolder).collect();
 
 			String baseName = ConditionGraphManager.createName(node);

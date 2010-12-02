@@ -7,6 +7,11 @@
             <metric>edge</metric>
         </settings>
     </action>
+    <action name="diagnosis">
+        <settings>
+            <design>.\test\designs\uart16750\rtl\diag\uart_16750.vhd</design>
+        </settings>
+    </action>
     <action name="assertion">
         <settings>
             <design>uart_16750.vhd</design>

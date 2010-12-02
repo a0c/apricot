@@ -29,17 +29,17 @@ public class ConditionGraphManager {
 		this.modelCollector = modelCollector;
 	}
 
-	public GraphVariable convertConditionToGraph(AbstractNode conditionNode) throws Exception { //todo: think over Exception strategy (HLDDException, ExtendedException, etc...)
+	public GraphVariable convertConditionToGraph(AbstractNode conditionNode, SourceLocation source) throws Exception { //todo: think over Exception strategy (HLDDException, ExtendedException, etc...)
 
 		GraphVariable graphVariable;
 
 		if (conditionNode instanceof CaseNode) {
 
-			graphVariable = caseToGraph((CaseNode) conditionNode);
+			graphVariable = caseToGraph((CaseNode) conditionNode, source);
 
 		} else if (conditionNode instanceof IfNode) {
 
-			graphVariable = ifToGraph(((IfNode) conditionNode));
+			graphVariable = ifToGraph((IfNode) conditionNode, source);
 
 		} else {
 
@@ -50,11 +50,11 @@ public class ConditionGraphManager {
 		return (GraphVariable) modelCollector.getIdenticalVariable(graphVariable);
 	}
 
-	public RangeVariableHolder convertConditionToBooleanGraph(AbstractNode conditionNode) throws Exception {
+	public RangeVariableHolder convertConditionToBooleanGraph(AbstractNode conditionNode, SourceLocation source) throws Exception {
 
 		if (conditionNode instanceof IfNode) {
 
-			GraphVariable graphVariable = convertConditionToGraph(conditionNode);
+			GraphVariable graphVariable = convertConditionToGraph(conditionNode, source);
 
 			return new RangeVariableHolder(graphVariable, null, 1);
 
@@ -65,13 +65,13 @@ public class ConditionGraphManager {
 
 	}
 
-	private GraphVariable caseToGraph(CaseNode caseNode) throws Exception {
+	private GraphVariable caseToGraph(CaseNode caseNode, SourceLocation source) throws Exception {
 		String baseVarName = createName(caseNode);
 
 		/* Root Node */
 		AbstractOperand caseOperand = caseNode.getVariableOperand();
 		Range range = caseOperand.getRange();
-		AbstractVariable caseVariable = modelCollector.convertOperandToVariable(caseOperand, null, false);
+		AbstractVariable caseVariable = modelCollector.convertOperandToVariable(caseOperand, null, false, source);
 		int conditionValuesCount = caseVariable.getType().countPossibleValues(range);
 		Node rootNode = new Node.Builder(caseVariable).createSuccessors(conditionValuesCount).
 				range(range).source(caseNode.getSource()).build();
@@ -124,9 +124,9 @@ public class ConditionGraphManager {
 		return graphVariable;
 	}
 
-	private GraphVariable ifToGraph(IfNode ifNode) throws Exception {
+	private GraphVariable ifToGraph(IfNode ifNode, SourceLocation source) throws Exception {
 
-		RangeVariableHolder conditionVarHolder = modelCollector.convertConditionalStmt(ifNode.getConditionExpression(), false);
+		RangeVariableHolder conditionVarHolder = modelCollector.convertConditionalStmt(ifNode.getConditionExpression(), false, source);
 
 		Node rootNode = new FullTreeCreator(conditionVarHolder, ifNode).create();
 

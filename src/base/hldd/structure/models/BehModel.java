@@ -218,6 +218,12 @@ public class BehModel {
 
 	public void printMapFile(OutputStream outputStream) throws Exception {
 		SourceLocationCollector sourceCollector = new SourceLocationCollector();
+		for (int index = funcOffset(), n = funcOffset() + funcCount; index < n; index++) {
+			AbstractVariable absVar = getVariableByIndex(index);
+			if (absVar instanceof FunctionVariable) {
+				sourceCollector.visitFunctionVariable((FunctionVariable) absVar);
+			}
+		}
 		for (int index = graphOffset(); index < varCount; index++) {
 			AbstractVariable absVar = getVariableByIndex(index);
 			if (absVar instanceof GraphVariable) {

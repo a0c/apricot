@@ -20,6 +20,9 @@ import java.util.LinkedList;
  * @author Anton Chepurov
  */
 public class TableForm {
+
+	private final static int OFFSET = 1;
+
 	private static final Color NODE_DEFAULT_COLOR = Color.ORANGE;
 	private static final Color EDGE_DEFAULT_COLOR = Color.CYAN;
 
@@ -166,7 +169,7 @@ public class TableForm {
 		}
 
 		private boolean isUncoveredLine(Collection<Integer> linesCollection, int row) {
-			return linesCollection != null && linesCollection.contains(row);
+			return linesCollection != null && linesCollection.contains(row + OFFSET);
 		}
 	}
 

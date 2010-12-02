@@ -1,6 +1,7 @@
 package base.hldd.structure.variables;
 
 import base.Range;
+import base.SourceLocation;
 import base.Type;
 import base.hldd.structure.models.utils.RangeVariableHolder;
 import base.vhdl.structure.Operator;
@@ -30,6 +31,8 @@ public class FunctionVariable extends Variable {
 	 * Index of function (denotes order)
 	 */
 	private int nameIdx;
+
+	private SourceLocation source;
 
 	/**
 	 * Constructor to override in inherited classes
@@ -128,7 +131,7 @@ public class FunctionVariable extends Variable {
 
 	/**
 	 * @param operandVariable operand to add
-	 * @param range range of the operand to add
+	 * @param range		   range of the operand to add
 	 * @throws Exception if the operand being added exceeds the limit of the operator operands limit
 	 */
 	public void addOperand(AbstractVariable operandVariable, Range range) throws Exception {
@@ -196,6 +199,22 @@ public class FunctionVariable extends Variable {
 
 	public static Comparator<FunctionVariable> getComparator() {
 		return new FunctionsComparator();
+	}
+
+	public void setSource(SourceLocation source) {
+		this.source = source;
+	}
+
+	public SourceLocation getSource() {
+		return source;
+	}
+
+	public void addSource(SourceLocation source) {
+		if (this.source == null) {
+			this.source = source;
+			return;
+		}
+		setSource(this.source.addSource(source));
 	}
 
 	//todo: useless comparator, consider removing it. See the difference with and without it.

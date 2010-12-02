@@ -6,11 +6,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import ui.BusinessLogicCoverageAnalyzer;
 import ui.FileDependencyResolver;
 import ui.base.HLDD2VHDLMapping;
 import ui.base.NodeItem;
+import ui.base.VariableItem;
 import ui.io.CoverageReader;
+import ui.io.DiagnosisReader;
 import ui.io.HLDD2VHDLMappingReader;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,21 +34,19 @@ public class Apricot {
 
 	public Apricot(String[] args) {
 
-		if (args.length == 0) {
-			System.out.println("ERROR: request XML file is not specified");
+		if (args.length != 1) {
+			System.out.println("[APRICOT] ### ERROR ###: request XML file is not specified");
 			return;
 		}
+		String fileName = args[0];
 
 		try {
-
-			String fileName = args[0];
 
 			Document xml = readXml(fileName);
 
 			Collection<Request> requests = buildRequests(xml);
 
-			String libPath = args.length == 2 ? args[1] : null;
-			new BusinessLogicCoverageAnalyzer(requests, libPath);
+			processRequests(requests);
 
 			buildResponses(requests, xml);
 
@@ -56,19 +55,25 @@ public class Apricot {
 			printStat(requests);
 
 		} catch (IOException e) {
-			System.out.println("ERROR when reading XML: " + e.getMessage());
+			System.out.println("[APRICOT] ### ERROR when reading XML ###: " + e.getMessage());
 		} catch (ParserConfigurationException e) {
-			System.out.println("ERROR when reading XML: " + e.getMessage());
+			System.out.println("[APRICOT] ### ERROR when reading XML ###: " + e.getMessage());
 		} catch (SAXException e) {
-			System.out.println("ERROR when reading XML: " + e.getMessage());
+			System.out.println("[APRICOT] ### ERROR when reading XML ###: " + e.getMessage());
 		} catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
 		} catch (TransformerConfigurationException e) {
-			System.out.println("ERROR when writing XML: " + e.getMessage());
+			System.out.println("[APRICOT] ### ERROR when writing XML ###: " + e.getMessage());
 		} catch (TransformerException e) {
-			System.out.println("ERROR when writing XML: " + e.getMessage());
+			System.out.println("[APRICOT] ### ERROR when writing XML ###: " + e.getMessage());
 		}
 
+	}
+
+	private void processRequests(Collection<Request> requests) {
+		for (Request request : requests) {
+			new TaskRunner(request);
+		}
 	}
 
 	private void printStat(Collection<Request> requests) {
@@ -79,7 +84,7 @@ public class Apricot {
 			}
 		}
 		System.out.println("");
-		System.out.println("[APRICOT] Nr. of processed requests: " + i);
+		System.out.println("[APRICOT] Total completed tasks: " + i);
 	}
 
 	private void writeXml(Document xml, String fileName) throws TransformerException {
@@ -99,49 +104,89 @@ public class Apricot {
 
 		for (Request request : requests) {
 
+			if (request.isBroken() || !request.isSuccessful()) {
+				continue;
+			}
+
+			Element result = xml.createElement("result");
+
+			Node requestNode = request.getRequestNode();
+
 			if (request instanceof CoverageRequest) {
-				CoverageRequest coverageRequest = (CoverageRequest) request;
 
-				if (coverageRequest.isBroken()) {
-					continue;
-				}
+				fillCoverageResult(result, (CoverageRequest) request, xml);
 
-				Element result = xml.createElement("result");
+			} else if (request instanceof DiagnosisRequest) {
 
-				File covFile = FileDependencyResolver.deriveCovFile(coverageRequest.getHlddFile());
-				File mapFile = FileDependencyResolver.deriveMapFile(covFile);
-				HLDD2VHDLMapping hldd2VHDLMapping = new HLDD2VHDLMappingReader(mapFile).getMapping();
-				CoverageReader coverageReader = new CoverageReader(covFile);
+				fillDiagnosisResult(result, (DiagnosisRequest) request, xml);
+			}
 
-				if (coverageRequest.isNodeRequested()) {
+			requestNode.appendChild(result);
 
-					Element coverage = xml.createElement("coverage");
-					coverage.setAttribute("metric", "node");
-					result.appendChild(coverage);
+		}
+	}
 
-					Collection<NodeItem> uncoveredNodeItems = coverageReader.getUncoveredNodeItems();
+	private void fillDiagnosisResult(Element result, DiagnosisRequest diagnosisRequest, Document xml) {
 
-					SourceLocation uncoveredSources = hldd2VHDLMapping.getSourceFor(uncoveredNodeItems);
+		File dgnFile = FileDependencyResolver.deriveDgnFile(diagnosisRequest.getHlddFile());
+		File mapFile = FileDependencyResolver.deriveFileFrom(dgnFile, ".dgn", ".map");
+		HLDD2VHDLMapping hldd2VHDLMapping = new HLDD2VHDLMappingReader(mapFile).getMapping();
+		DiagnosisReader diagnosisReader = new DiagnosisReader(dgnFile);
+		/* SCORE 1 */
+		Element score1 = xml.createElement("score1");
+		result.appendChild(score1);
 
-					for (File sourceFile : uncoveredSources.getFiles()) {
+		Collection<VariableItem> candidates1 = diagnosisReader.getCandidates1();
+		SourceLocation source1 = hldd2VHDLMapping.getSourceFor(candidates1);
 
-						Element file = xml.createElement("file");
-						file.setAttribute("name", sourceFile.getName());
-						coverage.appendChild(file);
+		fillSource(source1, score1, xml);
+		/* SCORE 2 */
+		Element score2 = xml.createElement("score2");
+		result.appendChild(score2);
 
-						Collection<Integer> lines = uncoveredSources.getLinesForFile(sourceFile);
-						for (Integer line : lines) {
-							Element lineEl = xml.createElement("line");
-							lineEl.setTextContent(line.toString());
-							file.appendChild(lineEl);
-						}
-					}
-				}
+		Collection<VariableItem> candidates2 = diagnosisReader.getCandidates2();
+		SourceLocation source2 = hldd2VHDLMapping.getSourceFor(candidates2);
 
-				Node requestNode = coverageRequest.getRequestNode();
+		fillSource(source2, score2, xml);
+	}
 
-				requestNode.appendChild(result);
+	private void fillCoverageResult(Element result, CoverageRequest coverageRequest, Document xml) {
 
+		File covFile = FileDependencyResolver.deriveCovFile(coverageRequest.getHlddFile());
+		File mapFile = FileDependencyResolver.deriveMapFile(covFile);
+		HLDD2VHDLMapping hldd2VHDLMapping = new HLDD2VHDLMappingReader(mapFile).getMapping();
+		CoverageReader coverageReader = new CoverageReader(covFile);
+
+		if (coverageRequest.isNodeRequested()) {
+
+			Element coverage = xml.createElement("coverage");
+			coverage.setAttribute("metric", "node");
+			result.appendChild(coverage);
+
+			Collection<NodeItem> uncoveredNodeItems = coverageReader.getUncoveredNodeItems();
+
+			SourceLocation uncoveredSources = hldd2VHDLMapping.getSourceFor(uncoveredNodeItems);
+
+			fillSource(uncoveredSources, coverage, xml);
+		}
+	}
+
+	private void fillSource(SourceLocation source, Element parent, Document xml) {
+
+		if (source == null) {
+			return;
+		}
+		for (File sourceFile : source.getFiles()) {
+
+			Element file = xml.createElement("file");
+			file.setAttribute("name", sourceFile.getName());
+			parent.appendChild(file);
+
+			Collection<Integer> lines = source.getLinesForFile(sourceFile);
+			for (Integer line : lines) {
+				Element lineEl = xml.createElement("line");
+				lineEl.setTextContent(line.toString());
+				file.appendChild(lineEl);
 			}
 		}
 	}
@@ -151,6 +196,38 @@ public class Apricot {
 		Collection<Request> requests = new LinkedList<Request>();
 
 		requests.addAll(buildCoverageRequests(xml));
+		requests.addAll(buildDiagnosisRequests(xml));
+
+		return requests;
+	}
+
+	private Collection<Request> buildDiagnosisRequests(Document xml) throws XPathExpressionException {
+
+		Collection<Request> requests = new LinkedList<Request>();
+
+		XPath xPath = XPathFactory.newInstance().newXPath();
+
+		XPathExpression expr = xPath.compile("apricot//action[@name='diagnosis']");
+		NodeList covNodes = (NodeList) expr.evaluate(xml, XPathConstants.NODESET);
+
+		for (int i = 0, n = covNodes.getLength(); i < n; i++) {
+
+			Node covNode = covNodes.item(i);
+			Node requestNode = covNode;
+			Object resultNode = xPath.compile("result").evaluate(requestNode, XPathConstants.NODE);
+			if (resultNode != null) {
+				continue;
+			}
+
+			expr = xPath.compile("settings");
+			covNode = (Node) expr.evaluate(covNode, XPathConstants.NODE);
+
+			expr = xPath.compile("design");
+			NodeList designList = (NodeList) expr.evaluate(covNode, XPathConstants.NODESET);
+			String design = designList.item(0).getTextContent();
+
+			requests.add(new DiagnosisRequest(requestNode, design));
+		}
 
 		return requests;
 	}
@@ -192,7 +269,7 @@ public class Apricot {
 		return requests;
 	}
 
-	private Document readXml(String fileName) throws IOException, ParserConfigurationException, SAXException {
+	static Document readXml(String fileName) throws IOException, ParserConfigurationException, SAXException {
 
 		InputStream inputStream = new FileInputStream(new File(fileName));
 

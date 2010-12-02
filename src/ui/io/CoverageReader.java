@@ -41,7 +41,7 @@ public class CoverageReader {
 			while ((line = reader.readLine()) != null && hasSomethingToFind) {
 				line = line.trim();
 				/* Skip comments and empty lines */
-				if (line.startsWith(DEFAULT_COMMENT) || line.length() == 0) continue;
+				if (line.startsWith(DEFAULT_COMMENT) || line.isEmpty()) continue;
 
 				if (line.startsWith(NODE_START_TEXT)) {
 

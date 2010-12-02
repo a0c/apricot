@@ -93,7 +93,7 @@ public class ComponentMerger {
 
 			try {
 
-				outerSignal = modelCollector.convertOperandToVariable(outerOperand, null, true);
+				outerSignal = modelCollector.convertOperandToVariable(outerOperand, null, true, null);
 
 			} catch (Exception e) {
 				throw new ExtendedException("ComponentMerger: failed to link INPUT port " + portName +

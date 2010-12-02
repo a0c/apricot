@@ -1,9 +1,6 @@
 package base.hldd.structure.models.utils;
 
-import base.HLDDException;
-import base.Range;
-import base.Type;
-import base.TypeResolver;
+import base.*;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
@@ -42,14 +39,14 @@ public class ModelManager implements TypeResolver {
 
 	public ConstantVariable getConstant0() throws Exception {
 		if (constant0 == null) {
-			constant0 = (ConstantVariable) convertOperandToVariable(new OperandImpl("0"), Type.BIT_TYPE, false);
+			constant0 = (ConstantVariable) convertOperandToVariable(new OperandImpl("0"), Type.BIT_TYPE, false, null);
 		}
 		return constant0;
 	}
 
 	public ConstantVariable getConstant1() throws Exception {
 		if (constant1 == null) {
-			constant1 = (ConstantVariable) convertOperandToVariable(new OperandImpl("1"), Type.BIT_TYPE, false);
+			constant1 = (ConstantVariable) convertOperandToVariable(new OperandImpl("1"), Type.BIT_TYPE, false, null);
 		}
 		return constant1;
 	}
@@ -153,19 +150,19 @@ public class ModelManager implements TypeResolver {
 		return new OperandImpl(wholeVariable.getName(), range, false).toString();
 	}
 
-	public RangeVariableHolder convertConditionalStmt(Expression conditionalStmt, boolean flattenCondition) throws Exception {
+	public RangeVariableHolder convertConditionalStmt(Expression conditionalStmt, boolean flattenCondition, SourceLocation source) throws Exception {
 		boolean inverted = conditionalStmt.isInverted();
 
 		/* Create FUNCTION */
 		FunctionVariable functionVariable;
 		if (flattenCondition) {
-			functionVariable = createCompositeFunction(conditionalStmt);
+			functionVariable = createCompositeFunction(conditionalStmt, source);
 			if (functionVariable != null) {
 				return new RangeVariableHolder(functionVariable, null, adjustBooleanCondition(1, inverted));
 			}
 		}
 
-		functionVariable = createFunction(conditionalStmt, false);
+		functionVariable = createFunction(conditionalStmt, false, source);
 		return detectTrueValueAndSimplify(functionVariable, inverted); //todo: don't represent NOT as isInverted(). Use Function instead. And remove isInverted() parameter from here and further on. But think carefully: it may be a deeply internal INV in condition (there INV-s are preserved as functions)
 	}
 
@@ -224,7 +221,7 @@ public class ModelManager implements TypeResolver {
 
 	public RangeVariableHolder extractBooleanDependentVariable(AbstractOperand abstractOperand, boolean useComposites) throws Exception {
 		if (abstractOperand instanceof Expression) {
-			return convertConditionalStmt((Expression) abstractOperand, useComposites);
+			return convertConditionalStmt((Expression) abstractOperand, useComposites, null);
 		} else if (abstractOperand instanceof OperandImpl) {
 			OperandImpl operand = (OperandImpl) abstractOperand;
 			return new RangeVariableHolder(getVariable(operand.getName()), operand.getRange(), getBooleanValueFromOperand(operand));
@@ -234,7 +231,7 @@ public class ModelManager implements TypeResolver {
 				Expression.class.getSimpleName() + " and " + OperandImpl.class.getSimpleName());
 	}
 
-	private CompositeFunctionVariable createCompositeFunction(Expression condition) throws Exception {
+	private CompositeFunctionVariable createCompositeFunction(Expression condition, SourceLocation source) throws Exception {
 		if (!condition.isCompositeCondition()) {
 			return null;
 		}
@@ -246,7 +243,7 @@ public class ModelManager implements TypeResolver {
 			/* All operands of a CompositeCondition are Expressions, not OperandImpls */
 			if (operand instanceof Expression) {
 				Expression operandExpression = (Expression) operand;
-				compositeElements.add(convertConditionalStmt(operandExpression, false));
+				compositeElements.add(convertConditionalStmt(operandExpression, false, source));
 			}
 		}
 
@@ -259,10 +256,11 @@ public class ModelManager implements TypeResolver {
 	 *                     (<code>true</code> value) or from condition (<code>false</code> value).
 	 *                     Depending on this, <i>inversion</i> in expression is either ignored (in case
 	 *                     of conditions), or treated as a Function (in case of transition).
+	 * @param source	   VHDL source
 	 * @return FunctionVariable which represents the specified operand
-	 * @throws Exception cause {@link #convertOperandToVariable(AbstractOperand, Type, boolean) cause }
+	 * @throws Exception cause {@link #convertOperandToVariable(AbstractOperand, Type, boolean, SourceLocation) cause }
 	 */
-	private FunctionVariable createFunction(AbstractOperand funcOperand, boolean isTransition) throws Exception {
+	private FunctionVariable createFunction(AbstractOperand funcOperand, boolean isTransition, SourceLocation source) throws Exception {
 		FunctionVariable functionVariable;
 
 		if (funcOperand instanceof OperandImpl) {
@@ -270,7 +268,7 @@ public class ModelManager implements TypeResolver {
 			if (!funcOperand.isInverted())
 				throw new Exception("Function is being created from a non-inverted operand: " + funcOperand);
 			/* Here isTransition was previously false. True cannot be, actually. todo: WTF? See CRC.vhd, transition of ips_xfr_wait */
-			functionVariable = createInversionFunction(funcOperand, isTransition);
+			functionVariable = createInversionFunction(funcOperand, isTransition, source);
 
 		} else if (funcOperand instanceof Expression) {
 			Expression expression = (Expression) funcOperand;
@@ -282,10 +280,10 @@ public class ModelManager implements TypeResolver {
 														   condition value)
 								 * NOT (REG1 AND REG2) --- in transition NOT should be treated as a Function
 								 * */
-				functionVariable = createInversionFunction(expression, isTransition);
+				functionVariable = createInversionFunction(expression, isTransition, source);
 
 			} else if (!(rangeAssignmentVarList = getRangeAssignmentVariablesFor(expression)).isEmpty()) {
-				functionVariable = doCreateFinalFunction(Operator.CAT,
+				functionVariable = doCreateFinalFunction(Operator.CAT, source,
 						rangeAssignmentVarList.toArray(new RangeVariableHolder[rangeAssignmentVarList.size()]));
 			} else {
 				/* Create and collect operands */
@@ -295,7 +293,7 @@ public class ModelManager implements TypeResolver {
 					int i = 0;
 					for (AbstractOperand operand : expression.getOperands()) {
 						operandsHolders[i++] = new RangeVariableHolder(convertOperandToVariable(operand, null,
-								isTransition),
+								isTransition, source),
 								operand.getRange());
 					}
 
@@ -308,7 +306,7 @@ public class ModelManager implements TypeResolver {
 						operandRange = operand.getRange();
 						if (operand instanceof Expression) {
 							/* Treat operand as condition and extract dependent variable from it */
-							RangeVariableHolder depVariableHolder = convertConditionalStmt((Expression) operand, false);
+							RangeVariableHolder depVariableHolder = convertConditionalStmt((Expression) operand, false, source);
 							operandVariable = getIdenticalVariable(depVariableHolder.getVariable());
 							operandRange = depVariableHolder.getRange();
 							/* If extracted dependent variable is OperandImpl or an inverted Expression,
@@ -318,10 +316,10 @@ public class ModelManager implements TypeResolver {
 							if (depVariableHolder.getTrueValue() != 1) {
 								/* Create INV function */
 								operandVariable = getIdenticalVariable(
-										doCreateFinalInversionFunction(operandVariable, operandRange));
+										doCreateFinalInversionFunction(operandVariable, operandRange, source));
 							}
 						} else if (operand instanceof OperandImpl) {
-							operandVariable = convertOperandToVariable(operand, null, false);
+							operandVariable = convertOperandToVariable(operand, null, false, source);
 						} else throw new Exception("Unexpected situation while creating function: " +
 								"operand is neither " + Expression.class.getSimpleName() +
 								" nor " + OperandImpl.class.getSimpleName());
@@ -329,7 +327,7 @@ public class ModelManager implements TypeResolver {
 					}
 
 				}
-				functionVariable = doCreateFinalFunction(expression.getOperator(), operandsHolders);
+				functionVariable = doCreateFinalFunction(expression.getOperator(), source, operandsHolders);
 
 			}
 
@@ -345,9 +343,10 @@ public class ModelManager implements TypeResolver {
 		return (FunctionVariable) getIdenticalVariable(functionVariable);
 	}
 
-	private FunctionVariable doCreateFinalInversionFunction(AbstractVariable operandVariable, Range operandRange) {
+	private FunctionVariable doCreateFinalInversionFunction(AbstractVariable operandVariable, Range operandRange, SourceLocation source) {
 		/* Create Function */
 		FunctionVariable invFunctionVariable = new FunctionVariable(Operator.INV, generateFunctionNameIdx(Operator.INV));
+		invFunctionVariable.setSource(source);
 		/* Add a single operand */
 		try {
 			invFunctionVariable.addOperand(operandVariable, operandRange);
@@ -358,9 +357,10 @@ public class ModelManager implements TypeResolver {
 		return invFunctionVariable;
 	}
 
-	private FunctionVariable doCreateFinalFunction(Operator operator, RangeVariableHolder... operandVariables) throws Exception {
+	private FunctionVariable doCreateFinalFunction(Operator operator, SourceLocation source, RangeVariableHolder... operandVariables) throws Exception {
 		/* Create new Function Variable */
 		FunctionVariable functionVariable = new FunctionVariable(operator, generateFunctionNameIdx(operator));
+		functionVariable.setSource(source);
 		/* Add operand variables one by one to the new Function Variable */
 		for (RangeVariableHolder operandVarHolder : operandVariables) {
 			try {
@@ -369,15 +369,16 @@ public class ModelManager implements TypeResolver {
 				if (!e.getMessage().startsWith(FunctionVariable.FAILED_ADD_OPERAND_TEXT))
 					throw e;
 				/* If Function Variable cannot accept operands anymore, add this Function Variable (1) as an
-								 * operand to the new Function Variable (2), replace the link of the Function Variable being
-								 * created to the new Function Variable (2) and proceed with adding operands, this time - to
-								 * the new Function Variable (2). */
+				* operand to the new Function Variable (2), replace the link of the Function Variable being
+				* created to the new Function Variable (2) and proceed with adding operands, this time - to
+				* the new Function Variable (2). */
 
 				/* Tune so far created functionVariable (1) and add it to collector */
 				tuneFunctionVariable(functionVariable);
 				functionVariable = (FunctionVariable) getIdenticalVariable(functionVariable);
 				/* Create new Function */
 				FunctionVariable newFunction = new FunctionVariable(operator, generateFunctionNameIdx(operator));
+				newFunction.setSource(source);
 				/* Make the previously created function an operand of the new one */
 				newFunction.addOperand(functionVariable, null);
 				/* Make the operand that failed to be added an operand of the new function */
@@ -399,7 +400,7 @@ public class ModelManager implements TypeResolver {
 	 * comparison operators: GT / U_GT, LT / U_LT, GE / U_GE, LE / U_LE.
 	 *
 	 * @param functionVariable variable to tune
-	 * @throws Exception {@link #convertOperandToVariable(AbstractOperand, Type, boolean)}.
+	 * @throws Exception {@link #convertOperandToVariable(AbstractOperand, Type, boolean, SourceLocation)}.
 	 */
 	private void tuneFunctionVariable(FunctionVariable functionVariable) throws Exception {
 		/* Replace DIVISION and MULTIPLICATION by power of 2 with SHIFTS */
@@ -512,7 +513,7 @@ public class ModelManager implements TypeResolver {
 			catExpression.addOperand(rangeAssignment);
 		}
 		/* Add the Expression to ModelCollector */
-		return (FunctionVariable) convertOperandToVariable(catExpression, null, true);
+		return (FunctionVariable) convertOperandToVariable(catExpression, null, true, null);
 	}
 
 	public void flattenVariableToBits(AbstractVariable wholeVariable) {
@@ -552,14 +553,14 @@ public class ModelManager implements TypeResolver {
 		}
 	}
 
-	private FunctionVariable createInversionFunction(AbstractOperand operand, boolean isTransition) throws Exception {
+	private FunctionVariable createInversionFunction(AbstractOperand operand, boolean isTransition, SourceLocation source) throws Exception {
 		/* Temporarily make the operand non-inversed to prevent
-				 * infinite recursion and create corresponding variable */
+		* infinite recursion and create corresponding variable */
 		operand.setInverted(false);
 		/* Create Function */
 		FunctionVariable invFunctionVariable
-				= doCreateFinalInversionFunction(convertOperandToVariable(operand, null, isTransition),
-				operand.getRange());
+				= doCreateFinalInversionFunction(convertOperandToVariable(operand, null, isTransition, source),
+				operand.getRange(), source);
 		/* Restore initial inverted state */
 		operand.setInverted(true);
 		return invFunctionVariable;
@@ -630,15 +631,26 @@ public class ModelManager implements TypeResolver {
 			/* Search amongst VARIABLES */
 			for (AbstractVariable variable : variableManager.getVariables()) {
 				if (variable.isIdenticalTo(variableToFind)) {
+					copySourceToFunction(variableToFind, variable);
 					return variable;
 				}
 			}
 		}
 
 		/* Identical variable was not found,
-				* so add the desired variable to the variables and return it */
+		* so add the desired variable to the variables and return it */
 		addVariable(variableToFind);
 		return variableToFind;
+	}
+
+	private void copySourceToFunction(AbstractVariable variableToFind, AbstractVariable variable) {
+		if (variableToFind instanceof FunctionVariable) {
+
+			FunctionVariable functionToFind = (FunctionVariable) variableToFind;
+			FunctionVariable function = (FunctionVariable) variable;
+
+			function.addSource(functionToFind.getSource());
+		}
 	}
 
 	public int getBooleanValueFromOperand(AbstractOperand abstractOperand) {
@@ -661,15 +673,16 @@ public class ModelManager implements TypeResolver {
 	 * @param operand	  base operand to extract variable from
 	 * @param targetType   desired length of the variable or <code>null<code> if doesn't matter.
 	 *                     <b>NB!</b> This currently matters for {@link ConstantVariable}-s only.
-	 * @param isTransition {@link #createFunction(base.vhdl.structure.AbstractOperand, boolean)}
+	 * @param isTransition {@link #createFunction(base.vhdl.structure.AbstractOperand, boolean, SourceLocation)}
+	 * @param source	   VHDL source
 	 * @return a ConstantVariable, FunctionVariable or Variable based on the <code>operand</code>
 	 * @throws Exception if the <code>operand</code> contains an undeclared variable
 	 */
-	public AbstractVariable convertOperandToVariable(AbstractOperand operand, Type targetType, boolean isTransition) throws Exception {
+	public AbstractVariable convertOperandToVariable(AbstractOperand operand, Type targetType, boolean isTransition, SourceLocation source) throws Exception {
 
 		if (operand instanceof Expression || operand instanceof OperandImpl && operand.isInverted()) {
 
-			return createFunction(operand, isTransition);
+			return createFunction(operand, isTransition, source);
 
 		} else if (operand instanceof OperandImpl) {
 			OperandImpl operandImpl = (OperandImpl) operand;
@@ -678,7 +691,7 @@ public class ModelManager implements TypeResolver {
 				Map<Condition, ConstantVariable> arrayValues = new TreeMap<Condition, ConstantVariable>();
 				for (OperandImpl.Element element : operandImpl.getElements()) {
 
-					AbstractVariable elVar = convertOperandToVariable(element.operand, elType, isTransition);
+					AbstractVariable elVar = convertOperandToVariable(element.operand, elType, isTransition, source);
 					if (!(elVar instanceof ConstantVariable)) {
 						throw new Exception("Non-constant array element found: " + elVar.getClass().getSimpleName());
 					}
@@ -717,9 +730,10 @@ public class ModelManager implements TypeResolver {
 					new UserDefinedFunctionVariable(udFunctionName,
 							generateUDFunctionNameIdx(udFunctionName),
 							udFunctionOperands.size(), operand.getLength());
+			udFunctionVariable.setSource(source);
 			// Create and add operands to UD Function Variable
 			for (AbstractOperand udFunctionOperand : udFunctionOperands) {
-				udFunctionVariable.addOperand(convertOperandToVariable(udFunctionOperand, null, true), udFunctionOperand.getRange());
+				udFunctionVariable.addOperand(convertOperandToVariable(udFunctionOperand, null, true, source), udFunctionOperand.getRange());
 			}
 			// Search for identical and add variable to collector if needed
 			return getIdenticalVariable(udFunctionVariable);
