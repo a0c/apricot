@@ -109,9 +109,10 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 			throw new ExtendedException(fileDescription + " file is missing", ExtendedException.MISSING_FILE_TEXT);
 		}
 
-		/*  */
+		File dgnFile = FileDependencyResolver.deriveDgnFile(covFile);
+
 		UIWithWorker.runUIWithWorker(new CoverageVisualizingUI(applicationForm.getFrame()),
-				new CoverageVisualizingWorker(vhdlFile, covFile, mappingFile, applicationForm, consoleWriter, simpleLock));
+				new CoverageVisualizingWorker(vhdlFile, covFile, dgnFile, mappingFile, applicationForm, consoleWriter, simpleLock));
 
 	}
 

@@ -12,8 +12,6 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.io.*;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -21,34 +19,36 @@ import java.util.LinkedList;
  */
 public class TableForm {
 
-	private final static int OFFSET = 1;
-
 	private static final Color NODE_DEFAULT_COLOR = Color.ORANGE;
 	private static final Color EDGE_DEFAULT_COLOR = Color.CYAN;
+	private static final Color CANDIDATES1_DEFAULT_COLOR = Color.PINK;
+	private static final Color CANDIDATES2_DEFAULT_COLOR = Color.YELLOW;
 
 	private static final String COLUMN_1_TITLE = "Nr.";
 	private static final String COLUMN_2_TITLE = "File line";
 
-	private static final String NODES_TOOLTIP = "Uncovered nodes";
-	private static final String EDGES_TOOLTIP = "Uncovered edges";
 	private static final int COLUMN_1_MAX_WIDTH = 50;
 
 	private JTable aTable;
 	private JPanel mainPanel;
 	private JCheckBox nodesCheckBox;
 	private JCheckBox edgesCheckBox;
+	private JCheckBox candidates1CheckBox;
+	private JCheckBox candidates2CheckBox;
 	private Color nodesColor = NODE_DEFAULT_COLOR;
 	private Color edgesColor = EDGE_DEFAULT_COLOR;
-
-	private Collection<Integer> nodesLines = new HashSet<Integer>();
-	private Collection<Integer> edgesLines = new HashSet<Integer>();
+	private Color candidates1Color = CANDIDATES1_DEFAULT_COLOR;
+	private Color candidates2Color = CANDIDATES2_DEFAULT_COLOR;
 
 	private String maxLine = "";
+	private final LinesStorage linesStorage;
 
-	public TableForm(File selectedFile, int totalVisibleWidth, Collection<Integer> nodesLines, Collection<Integer> edgesLines, FileDropHandler fileDropHandler) {
+	public TableForm(File selectedFile, int totalVisibleWidth, LinesStorage linesStorage, FileDropHandler fileDropHandler) {
+		this.linesStorage = linesStorage;
+		this.linesStorage.setOffset(1);
 		nodesCheckBox.addKeyListener(fileDropHandler);
-		this.nodesLines = nodesLines;
-		this.edgesLines = edgesLines;
+		candidates1CheckBox.addKeyListener(fileDropHandler);
+		candidates2CheckBox.addKeyListener(fileDropHandler);
 		/* Read File */
 		String[][] indicesAndFileLines = readFileAsLines(selectedFile);
 		/* Create table */
@@ -73,19 +73,25 @@ public class TableForm {
 		columnModel.getColumn(0).setCellRenderer(new ColorAndTooltipCellRenderer());
 		columnModel.getColumn(1).setCellRenderer(new ColorAndTooltipCellRenderer());
 
-		ChangeListener changeListener = new ChangeListener() {
+		ChangeListener tableRepainter = new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				aTable.repaint();
 			}
 		};
-		MouseAdapter mouseAdapter = new ColorChangingMouseAdapter(this);
-		nodesCheckBox.addChangeListener(changeListener);
-		edgesCheckBox.addChangeListener(changeListener);
-		nodesCheckBox.addMouseListener(mouseAdapter);
-		edgesCheckBox.addMouseListener(mouseAdapter);
+		MouseAdapter colorChanger = new ColorChangingMouseAdapter(this);
+		nodesCheckBox.addChangeListener(tableRepainter);
+		edgesCheckBox.addChangeListener(tableRepainter);
+		candidates1CheckBox.addChangeListener(tableRepainter);
+		candidates2CheckBox.addChangeListener(tableRepainter);
+		nodesCheckBox.addMouseListener(colorChanger);
+		edgesCheckBox.addMouseListener(colorChanger);
+		candidates1CheckBox.addMouseListener(colorChanger);
+		candidates2CheckBox.addMouseListener(colorChanger);
 
 		nodesCheckBox.setBackground(nodesColor);
 		edgesCheckBox.setBackground(edgesColor);
+		candidates1CheckBox.setBackground(candidates1Color);
+		candidates2CheckBox.setBackground(candidates2Color);
 	}
 
 	private String[][] readFileAsLines(File file) {
@@ -127,6 +133,10 @@ public class TableForm {
 			nodesColor = newColor;
 		} else if (checkBox == edgesCheckBox) {
 			edgesColor = newColor;
+		} else if (checkBox == candidates1CheckBox) {
+			candidates1Color = newColor;
+		} else if (checkBox == candidates2CheckBox) {
+			candidates2Color = newColor;
 		}
 		aTable.repaint();
 	}
@@ -138,10 +148,16 @@ public class TableForm {
 			if (isSelected) {
 				if (isUncoveredNode(row)) {
 					cell.setBackground(table.getSelectionBackground().brighter().brighter());
-					setToolTipText(NODES_TOOLTIP);
+					setToolTipText(linesStorage.generateNodeStat(row));
 				} else if (isUncoveredEdge(row)) {
 					cell.setBackground(table.getSelectionBackground().brighter().brighter());
-					setToolTipText(EDGES_TOOLTIP);
+					setToolTipText(linesStorage.generateEdgeStat(row));
+				} else if (isCandidate1(row)) {
+					cell.setBackground(table.getSelectionBackground().brighter().brighter());
+					setToolTipText(linesStorage.generateCandidate1Stat(row));
+				} else if (isCandidate2(row)) {
+					cell.setBackground(table.getSelectionBackground().brighter().brighter());
+					setToolTipText(linesStorage.generateCandidate2Stat(row));
 				} else {
 					cell.setBackground(table.getSelectionBackground());
 				}
@@ -150,10 +166,16 @@ public class TableForm {
 				setToolTipText(null);
 				if (isUncoveredNode(row)) {
 					bgColor = nodesColor;
-					setToolTipText(NODES_TOOLTIP);
+					setToolTipText(linesStorage.generateNodeStat(row));
 				} else if (isUncoveredEdge(row)) {
 					bgColor = edgesColor;
-					setToolTipText(EDGES_TOOLTIP);
+					setToolTipText(linesStorage.generateEdgeStat(row));
+				} else if (isCandidate1(row)) {
+					bgColor = candidates1Color;
+					setToolTipText(linesStorage.generateCandidate1Stat(row));
+				} else if (isCandidate2(row)) {
+					bgColor = candidates2Color;
+					setToolTipText(linesStorage.generateCandidate2Stat(row));
 				}
 				cell.setBackground(bgColor);
 			}
@@ -161,16 +183,21 @@ public class TableForm {
 		}
 
 		private boolean isUncoveredEdge(int row) {
-			return edgesCheckBox.isSelected() && isUncoveredLine(edgesLines, row);
+			return edgesCheckBox.isSelected() && linesStorage.hasEdgeLine(row);
 		}
 
 		private boolean isUncoveredNode(int row) {
-			return nodesCheckBox.isSelected() && isUncoveredLine(nodesLines, row);
+			return nodesCheckBox.isSelected() && linesStorage.hasNodeLine(row);
 		}
 
-		private boolean isUncoveredLine(Collection<Integer> linesCollection, int row) {
-			return linesCollection != null && linesCollection.contains(row + OFFSET);
+		private boolean isCandidate1(int row) {
+			return candidates1CheckBox.isSelected() && linesStorage.hasCandidate1Line(row);
 		}
+
+		private boolean isCandidate2(int row) {
+			return candidates2CheckBox.isSelected() && linesStorage.hasCandidate2Line(row);
+		}
+
 	}
 
 	private class NonEditableTableModel extends DefaultTableModel {

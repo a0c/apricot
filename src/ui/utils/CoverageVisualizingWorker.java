@@ -8,8 +8,11 @@ import ui.SimpleLock;
 import ui.base.HLDD2VHDLMapping;
 import ui.base.NodeItem;
 import ui.base.SplitCoverage;
+import ui.base.VariableItem;
+import ui.fileViewer.LinesStorage;
 import ui.graphics.CoveragePanel;
 import ui.io.CoverageReader;
+import ui.io.DiagnosisReader;
 import ui.io.HLDD2VHDLMappingReader;
 import ui.utils.uiWithWorker.TaskSwingWorker;
 
@@ -24,14 +27,16 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 
 	private final File vhdlFile;
 	private final File covFile;
+	private final File dgnFile;
 	private final File mappingFile;
 	private final ApplicationForm applicationForm;
 	private final ConsoleWriter consoleWriter;
 	private final SimpleLock simpleLock;
 
-	public CoverageVisualizingWorker(File vhdlFile, File covFile, File mappingFile, ApplicationForm applicationForm, ConsoleWriter consoleWriter, SimpleLock simpleLock) {
+	public CoverageVisualizingWorker(File vhdlFile, File covFile, File dgnFile, File mappingFile, ApplicationForm applicationForm, ConsoleWriter consoleWriter, SimpleLock simpleLock) {
 		this.vhdlFile = vhdlFile;
 		this.covFile = covFile;
+		this.dgnFile = dgnFile;
 		this.mappingFile = mappingFile;
 		this.applicationForm = applicationForm;
 		this.consoleWriter = consoleWriter;
@@ -54,6 +59,19 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					Collection<NodeItem> uncoveredNodeItems = coverageReader.getUncoveredNodeItems();
 					consoleWriter.done();
 
+					/* Read DGN file */
+					SourceLocation sourceCandidates1 = null;
+					SourceLocation sourceCandidates2 = null;
+					if (dgnFile != null) {
+						consoleWriter.write("Reading diagnosis file...");
+						DiagnosisReader diagnosisReader = new DiagnosisReader(dgnFile);
+						Collection<VariableItem> candidates1 = diagnosisReader.getCandidates1();
+						Collection<VariableItem> candidates2 = diagnosisReader.getCandidates2();
+						sourceCandidates1 = hldd2VHDLMapping.getSourceFor(candidates1);
+						sourceCandidates2 = hldd2VHDLMapping.getSourceFor(candidates2);
+						consoleWriter.done();
+					}
+
 					/* Extract lines for uncovered nodes */
 					SourceLocation allSources = hldd2VHDLMapping.getAllSources();
 					SourceLocation uncoveredSources = hldd2VHDLMapping.getSourceFor(uncoveredNodeItems);
@@ -66,8 +84,8 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					java.util.Collections.sort(allSourceFiles);
 					LinkedList<SplitCoverage> vhdlNodeCoverages = new LinkedList<SplitCoverage>();
 					for (File sourceFile : allSourceFiles) {
-						Collection<Integer> highlightedLines = uncoveredSources == null ? null : uncoveredSources.getLinesForFile(sourceFile);
-						applicationForm.addFileViewerTabFromFile(sourceFile, highlightedLines, null, null);	
+						LinesStorage linesStorage = buildLinesStorage(sourceFile, uncoveredSources, sourceCandidates1, sourceCandidates2);
+						applicationForm.addFileViewerTabFromFile(sourceFile, linesStorage, null);
 						/* Add coverage */
 						int total = 0;
 						if (allSources.hasFile(sourceFile)) {
@@ -99,6 +117,23 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 
 			}
 		};
+	}
+
+	private LinesStorage buildLinesStorage(File sourceFile,
+										   SourceLocation uncoveredSources,
+										   SourceLocation sourceCandidates1,
+										   SourceLocation sourceCandidates2) {
+		LinesStorage.Builder builder = new LinesStorage.Builder();
+		if (uncoveredSources != null) {
+			builder.nodes(uncoveredSources.getLinesForFile(sourceFile));
+		}
+		if (sourceCandidates1 != null && sourceCandidates1.hasFile(sourceFile)) {
+			builder.candidates1(sourceCandidates1.getLinesForFile(sourceFile));
+		}
+		if (sourceCandidates2 != null && sourceCandidates2.hasFile(sourceFile)) {
+			builder.candidates2(sourceCandidates2.getLinesForFile(sourceFile));
+		}
+		return builder.build();
 	}
 
 	private static String generateTabTitle(File aFile) {

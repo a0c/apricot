@@ -7,10 +7,7 @@ import ui.buttonPanels.BehButtons;
 import ui.buttonPanels.BehDDButtons;
 import ui.buttonPanels.PSLButtons;
 import ui.buttonPanels.RTLButtons;
-import ui.fileViewer.MouseSelectionAdapter;
-import ui.fileViewer.TabComponent;
-import ui.fileViewer.TabbedPaneListener;
-import ui.fileViewer.TableForm;
+import ui.fileViewer.*;
 import ui.optionPanels.HLDDBehOptionsPanel;
 import ui.optionPanels.PSLOptionsPanel;
 import ui.optionPanels.VHDLBehDdOptionsPanel;
@@ -25,7 +22,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.io.File;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -996,8 +992,7 @@ public class ApplicationForm implements ActionListener {
 		showButton.setEnabled(enable);
 	}
 
-	public void addFileViewerTabFromFile(File selectedFile, Collection<Integer> nodesLines,
-										 Collection<Integer> edgesLines, JTabbedPane tabbedPane) {
+	public void addFileViewerTabFromFile(File selectedFile, LinesStorage linesStorage, JTabbedPane tabbedPane) {
 		if (isWaveform(selectedFile)) {
 			setChkFile(selectedFile);
 			businessLogicAssertionChecker.processDraw();
@@ -1006,8 +1001,8 @@ public class ApplicationForm implements ActionListener {
 				tabbedPane = fileViewerTabbedPane1;
 			}
 			addFileViewerTab(tabbedPane, selectedFile.getName(), selectedFile.getAbsolutePath(), new TableForm(selectedFile,
-					tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1).getWidth(), nodesLines, edgesLines, fileDropHandler).getMainPanel(),
-					nodesLines != null && !nodesLines.isEmpty());
+					tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1).getWidth(), linesStorage, fileDropHandler).getMainPanel(),
+					!linesStorage.isEmpty());
 		}
 
 	}
@@ -1340,7 +1335,7 @@ public class ApplicationForm implements ActionListener {
 
 				waitForPreviousToComplete(applicationForm.businessLogicAssertionChecker);
 
-				applicationForm.addFileViewerTabFromFile(file, null, null, applicationForm.fileViewerTabbedPane2);
+				applicationForm.addFileViewerTabFromFile(file, LinesStorage.emptyStorage(), applicationForm.fileViewerTabbedPane2);
 
 				applicationForm.tabbedPane.setSelectedIndex(1);
 
@@ -1348,6 +1343,9 @@ public class ApplicationForm implements ActionListener {
 
 				applicationForm.setPslFile(file);
 
+			} else if (isDGN(file)) {
+
+				loadFile(deriveCovFile(file));
 			}
 		}
 

@@ -58,7 +58,7 @@ public class TabbedPaneListener extends MouseSelectionAdapter {
 					applicationForm.showErrorMessage(new ExtendedException(message, ExtendedException.FILE_NOT_FOUND_TEXT));
 					return;
 				}
-				applicationForm.addFileViewerTabFromFile(selectedFile, null, null, tabbedPane);
+				applicationForm.addFileViewerTabFromFile(selectedFile, LinesStorage.emptyStorage(), tabbedPane);
 			}
 		} else if (e.getClickCount() == 2) {
 
