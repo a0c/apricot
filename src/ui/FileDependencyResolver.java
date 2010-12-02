@@ -7,125 +7,115 @@ import java.io.File;
  */
 public class FileDependencyResolver {
 
-	public static File deriveVhdlFile(File hlddFile) {
+	public static File deriveVhdlFile(File file) {
 
 		File vhdlFile = null;
 
-		ConverterSettings settings = ConverterSettings.loadSmartComment(hlddFile);
+		if (isHLDD(file)) {
+			ConverterSettings settings = ConverterSettings.loadSmartComment(file);
 
-		if (settings != null) {
+			if (settings != null) {
 
-			vhdlFile = settings.getSourceFile();
+				vhdlFile = settings.getSourceFile();
+			}
 		}
 
 		if (vhdlFile == null)
-			vhdlFile = deriveFileFrom(hlddFile, ".agm", ".vhdl");
+			vhdlFile = deriveFileFrom(file, "vhdl");
 
 		if (vhdlFile == null)
-			vhdlFile = deriveFileFrom(hlddFile, ".agm", ".vhd");
+			vhdlFile = deriveFileFrom(file, "vhd");
 
 		return vhdlFile;
 	}
 
-	public static File deriveHlddFile(File vhdlFile) {
+	public static File deriveHlddFile(File file) {
 
-		File hlddFile = deriveFileFrom(vhdlFile, ".vhd", ".agm");
-
-		if (hlddFile == null)
-			hlddFile = deriveFileFrom(vhdlFile, ".vhdl", ".agm");
-
-		return hlddFile;
+		return deriveFileFrom(file, "agm");
 	}
 
-	public static File deriveDgnFile(File hlddFile) {
+	public static File deriveDgnFile(File file) {
 
-		return deriveFileFrom(hlddFile, ".agm", ".dgn");
+		return deriveFileFrom(file, "dgn");
 	}
 
-	public static File deriveCovFile(File hlddFile) {
+	public static File deriveCovFile(File file) {
 
-		return deriveFileFrom(hlddFile, ".agm", ".cov");
+		return deriveFileFrom(file, "cov");
 	}
 
-	public static File deriveTstFile(File hlddFile) {
+	public static File deriveTstFile(File file) {
 
-		return deriveFileFrom(hlddFile, ".agm", ".tst");
+		return deriveFileFrom(file, "tst");
 	}
 
-	public static File deriveBaseModelFile(File pslFile) {
+	public static File deriveBaseModelFile(File file) {
 
-		return deriveFileFrom(pslFile, ".psl", ".agm");
+		return deriveHlddFile(file);
 	}
 
-	public static File deriveTgmFile(File hlddFile) {
+	public static File deriveTgmFile(File file) {
 
-		return deriveFileFrom(hlddFile, ".agm", ".tgm");
+		return deriveFileFrom(file, "tgm");
 	}
 
-	@Deprecated
-	//todo: method used for temporal fix
-	public static File deriveMapFile(File covFile) {
+	public static File deriveMapFile(File file) {
 
-		return deriveFileFrom(covFile, ".cov", ".map");
+		return deriveFileFrom(file, "map");
 	}
 
 	//todo:...
 
-	public static File derivePngFile(File hlddFile) {
+	public static File derivePngFile(File file) {
 
-		return deriveFileFrom(hlddFile, ".agm", ".png");
+		return deriveFileFrom(file, "png");
 	}
 
-	public static File deriveConfigFile(File vhdlFile) {
+	public static File deriveConfigFile(File file) {
 
-		File configFile = null;
-		try {
-			configFile = deriveFileFrom(vhdlFile, ".vhd", ".config");
-		} catch (RuntimeException e) {
-			// do nothing, leave configFile == null
-		}
-
-		if (configFile == null) {
-			try {
-				configFile = deriveFileFrom(vhdlFile, ".vhdl", ".config");
-			} catch (RuntimeException e) {
-				// do nothing, leave configFile == null
-			}
-		}
-
-		return configFile;
+		return deriveFileFrom(file, "config");
 	}
 
 	/**
 	 * @param sourceFile		   file to derive from
-	 * @param sourceFileExtension  extension to replace
 	 * @param derivedFileExtension target extension
 	 * @return derived file, if it exists, or <code>null</code> if it doesn't exist.
 	 */
-	public static File deriveFileFrom(File sourceFile, String sourceFileExtension, String derivedFileExtension) {
-		String sourcePath = sourceFile.getAbsolutePath();
-		if (sourcePath.endsWith(sourceFileExtension)) {
-			File derivedFile = new File(sourcePath.replace(sourceFileExtension, derivedFileExtension));
+	public static File deriveFileFrom(File sourceFile, String derivedFileExtension) {
+		String derivedPath = deriveFilePathFrom(sourceFile, derivedFileExtension);
+		if (derivedPath != null) {
+			File derivedFile = new File(derivedPath);
 			return derivedFile.exists() ? derivedFile : null;
 		}
 		return null;
 	}
 
+	public static String deriveFilePathFrom(File sourceFile, String derivedExtension) {
+		String sourcePath = sourceFile.getAbsolutePath();
+		if (sourcePath.contains(".") && !sourcePath.endsWith(".")) {
+			return sourcePath.substring(0, sourcePath.lastIndexOf(".") + 1) + derivedExtension;
+		}
+		return null;
+	}
+
+	private static boolean endsWith(File file, String suffix) {
+		return file.getName().toLowerCase().endsWith(suffix);
+	}
+
 	public static boolean isVHDL(File file) {
-		String fileName = file.getName().toLowerCase();
-		return fileName.endsWith(".vhdl") || fileName.endsWith(".vhd");
+		return endsWith(file, ".vhdl") || endsWith(file, ".vhd");
 	}
 
 	public static boolean isCOV(File file) {
-		return file.getName().toLowerCase().endsWith(".cov");
+		return endsWith(file, ".cov");
 	}
 
 	public static boolean isHLDD(File file) {
-		return file.getName().toLowerCase().endsWith(".agm");
+		return endsWith(file, ".agm");
 	}
 
 	public static boolean isPPG(File file) {
-		return file.getName().toLowerCase().endsWith(".lib");
+		return endsWith(file, ".lib");
 	}
 
 	public static boolean isWaveform(File file) {
@@ -133,18 +123,22 @@ public class FileDependencyResolver {
 	}
 
 	public static boolean isCHK(File file) {
-		return file.getName().toLowerCase().endsWith(".chk");
+		return endsWith(file, ".chk");
 	}
 
 	public static boolean isSIM(File file) {
-		return file.getName().toLowerCase().endsWith(".sim");
+		return endsWith(file, ".sim");
 	}
 
 	public static boolean isTST(File file) {
-		return file.getName().toLowerCase().endsWith(".tst");
+		return endsWith(file, ".tst");
 	}
 
 	public static boolean isPSL(File file) {
-		return file.getName().toLowerCase().endsWith(".psl");
+		return endsWith(file, ".psl");
+	}
+
+	public static boolean isDGN(File file) {
+		return endsWith(file, ".dgn");
 	}
 }

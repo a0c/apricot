@@ -47,7 +47,7 @@ public class CoverageReader {
 
 					nodeCoverage = parseCoverage(line, NODE_START_TEXT, SplitCoverage.NODE_COVERAGE);
 
-					while ((line = reader.readLine()) != null && !line.startsWith(EDGE_START_TEXT)) {
+					while ((line = reader.readLine()) != null && !line.startsWith(".")) {
 						line = line.trim();
 						/* Skip comments and empty lines */
 						if (line.startsWith(DEFAULT_COMMENT) || line.length() == 0) continue;

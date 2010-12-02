@@ -129,7 +129,7 @@ public class Apricot {
 	private void fillDiagnosisResult(Element result, DiagnosisRequest diagnosisRequest, Document xml) {
 
 		File dgnFile = FileDependencyResolver.deriveDgnFile(diagnosisRequest.getHlddFile());
-		File mapFile = FileDependencyResolver.deriveFileFrom(dgnFile, ".dgn", ".map");
+		File mapFile = FileDependencyResolver.deriveMapFile(dgnFile);
 		HLDD2VHDLMapping hldd2VHDLMapping = new HLDD2VHDLMappingReader(mapFile).getMapping();
 		DiagnosisReader diagnosisReader = new DiagnosisReader(dgnFile);
 		/* SCORE 1 */

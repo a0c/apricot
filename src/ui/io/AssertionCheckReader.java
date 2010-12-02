@@ -115,8 +115,7 @@ public class AssertionCheckReader {
 		if (modelDataLoader.isModelFileMissing()) {
 			throw new IOException(modelDataLoader.getMissingFileMessage());
 		}
-		ModelDataLoader.FileType sourceFileType = modelDataLoader.getSourceFileType();
-		if (sourceFileType == ModelDataLoader.FileType.CHKfile) {
+		if (modelDataLoader.isSourceCHK()) {
 			/* File contains PATTERNS and ASSERTIONS. */
 			validVarIndices = modelDataLoader.getInputIndices();
 			validVarIndices.addAll(modelDataLoader.getGraphIndices());
@@ -127,7 +126,7 @@ public class AssertionCheckReader {
 		} else {
 			/* File contains PATTERNS only. */
 			validVarIndices = modelDataLoader.getInputIndices();
-			if (sourceFileType == ModelDataLoader.FileType.SIMfile) {
+			if (modelDataLoader.isSourceSIM()) {
 				validVarIndices.addAll(modelDataLoader.getGraphIndices());
 			}
 

@@ -2,13 +2,13 @@ package parsers.tgm;
 
 import io.scan.HLDDScanner;
 
-import java.util.List;
-import java.util.LinkedList;
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
-import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
-import ui.FileDependencyResolver;
+import static ui.FileDependencyResolver.*;
 
 /**
  * @author Anton Chepurov
@@ -97,10 +97,10 @@ public class ModelDataLoader {
 
 	private boolean isValidVariable(int index) {
 		switch (sourceFileType) {
-			case CHKfile:
-			case SIMfile:
+			case CHK:
+			case SIM:
 				return graphIndices.contains(index) || inputIndices.contains(index);
-			case TSTFile:
+			case TST:
 				return inputIndices.contains(index);
 			default:
 				return false;
@@ -142,27 +142,29 @@ public class ModelDataLoader {
 		return graphIndices;
 	}
 
-	public FileType getSourceFileType() {
-		return sourceFileType;
+	public boolean isSourceCHK() {
+		return sourceFileType == FileType.CHK;
 	}
 
-	public enum FileType {
-		CHKfile, SIMfile, TSTFile;
-		private static final String CHK_EXTENSION = ".chk";
-		private static final String SIM_EXTENSION = ".sim";
+	public boolean isSourceSIM() {
+		return sourceFileType == FileType.SIM;
+	}
+
+	@SuppressWarnings({"EnumeratedConstantNamingConvention"})
+	private enum FileType {
+		CHK, SIM, TST;
 		private static final String AGM_EXTENSION = ".agm";
 		private static final String TGM_EXTENSION = ".tgm";
-		private static final String TST_EXTENSION = ".tst";
 
 
 		public File deriveModelFile(File patternFile) {
 			switch (this) {
-				case CHKfile:
-					return FileDependencyResolver.deriveFileFrom(patternFile, CHK_EXTENSION, TGM_EXTENSION);
-				case SIMfile:
-					return FileDependencyResolver.deriveFileFrom(patternFile, SIM_EXTENSION, AGM_EXTENSION);
-				case TSTFile:
-					return FileDependencyResolver.deriveFileFrom(patternFile, TST_EXTENSION, AGM_EXTENSION);
+				case CHK:
+					return deriveFileFrom(patternFile, TGM_EXTENSION);
+				case SIM:
+					return deriveFileFrom(patternFile, AGM_EXTENSION);
+				case TST:
+					return deriveFileFrom(patternFile, AGM_EXTENSION);
 				default:
 					return null;
 			}
@@ -170,17 +172,17 @@ public class ModelDataLoader {
 
 		public String getMissingFileMessage(File patternFile) {
 			switch (this) {
-				case CHKfile:
+				case CHK:
 					return "To map CHK stimuli with signal names, please, place TGM file (" +
-							patternFile.getName().replace(CHK_EXTENSION, TGM_EXTENSION) + ") into the " +
+							deriveFilePathFrom(patternFile, TGM_EXTENSION) + ") into the " +
 							"following directory:\n" + patternFile.getParentFile().getAbsolutePath();
-				case SIMfile:
+				case SIM:
 					return "To map SIM stimuli with signal names, please, place AGM file (" +
-							patternFile.getName().replace(SIM_EXTENSION, AGM_EXTENSION) + ") into the " +
+							deriveFilePathFrom(patternFile, AGM_EXTENSION) + ") into the " +
 							"following directory:\n" + patternFile.getParentFile().getAbsolutePath();
-				case TSTFile:
+				case TST:
 					return "To map TST stimuli with signal names, please, place AGM file (" +
-							patternFile.getName().replace(TST_EXTENSION, AGM_EXTENSION) + ") into the " +
+							deriveFilePathFrom(patternFile, AGM_EXTENSION) + ") into the " +
 							"following directory:\n" + patternFile.getParentFile().getAbsolutePath();
 				default:
 					return "";
@@ -188,14 +190,13 @@ public class ModelDataLoader {
 		}
 
 		public static FileType parseFileType(File patternFile) {
-			String patternFileName = patternFile.getName().toLowerCase();
-			if (patternFileName.endsWith(CHK_EXTENSION)) {
-				return CHKfile;
-			} else if (patternFileName.endsWith(SIM_EXTENSION)) {
-				return SIMfile;
-			} else if (patternFileName.endsWith(TST_EXTENSION)) {
-				return TSTFile;
-			} else return null;
+			if (isCHK(patternFile))
+				return CHK;
+			else if (isSIM(patternFile))
+				return SIM;
+			else if (isTST(patternFile))
+				return TST;
+			else return null;
 		}
 	}
 }

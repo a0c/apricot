@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static ui.FileDependencyResolver.*;
+
 /**
  * @author Anton Chepurov
  */
@@ -432,7 +434,7 @@ public class ApplicationForm implements ActionListener {
 		updateTextFieldFor(hlddCoverageButton, hlddFile);
 
 		/* Automatically look for identical Patterns file */
-		selectIdenticalTSTFile(FileDependencyResolver.deriveTstFile(hlddFile),
+		selectIdenticalTSTFile(deriveTstFile(hlddFile),
 				tstCovRadioButton, randomCovRadioButton, patternNrSpinnerCoverage);
 
 		SingleFileSelector.setCurrentDirectory(hlddFile);
@@ -444,13 +446,13 @@ public class ApplicationForm implements ActionListener {
 		updateTextFieldFor(hlddAssertButton, hlddFile);
 
 		/* Automatically look for identical TGM file */
-		File tgmFile = FileDependencyResolver.deriveTgmFile(hlddFile);
+		File tgmFile = deriveTgmFile(hlddFile);
 		if (tgmFile != null) {
 			setTgmFile(tgmFile);
 		}
 
 		/* Automatically look for identical Patterns file */
-		selectIdenticalTSTFile(FileDependencyResolver.deriveTstFile(hlddFile),
+		selectIdenticalTSTFile(deriveTstFile(hlddFile),
 				tstAssertRadioButton, randomAssertRadioButton, patternNrSpinnerAssert);
 
 		SingleFileSelector.setCurrentDirectory(hlddFile);
@@ -471,7 +473,7 @@ public class ApplicationForm implements ActionListener {
 		updateTextFieldFor(pslBtn, pslFile);
 
 		/* Automatically look for identical PSL Base Model file */
-		File baseModelFile = FileDependencyResolver.deriveBaseModelFile(pslFile);
+		File baseModelFile = deriveBaseModelFile(pslFile);
 		if (baseModelFile != null) {
 			setBaseModelFile(baseModelFile);
 		}
@@ -563,9 +565,7 @@ public class ApplicationForm implements ActionListener {
 		updateCovTextField(covFile);
 
 		/* Auto load VHDL file and show coverage */
-		File hlddFile = FileDependencyResolver.deriveFileFrom(covFile, ".cov", ".agm");
-		ConverterSettings settings = ConverterSettings.loadSmartComment(hlddFile);
-		File vhdlFile = settings != null ? settings.getSourceFile() : FileDependencyResolver.deriveVhdlFile(hlddFile);
+		File vhdlFile = deriveVhdlFile(deriveHlddFile(covFile));
 
 		if (vhdlFile != null) {
 			setCovVhdlFile(vhdlFile);
@@ -998,7 +998,7 @@ public class ApplicationForm implements ActionListener {
 
 	public void addFileViewerTabFromFile(File selectedFile, Collection<Integer> nodesLines,
 										 Collection<Integer> edgesLines, JTabbedPane tabbedPane) {
-		if (FileDependencyResolver.isWaveform(selectedFile)) {
+		if (isWaveform(selectedFile)) {
 			setChkFile(selectedFile);
 			businessLogicAssertionChecker.processDraw();
 		} else {
@@ -1305,13 +1305,13 @@ public class ApplicationForm implements ActionListener {
 
 		private void loadFile(final File file) {
 
-			if (FileDependencyResolver.isVHDL(file)) {
+			if (isVHDL(file)) {
 
 				applicationForm.setBehVhdlFile(file);
 				applicationForm.setBehDDVhdlFile(file);
 				applicationForm.setCovVhdlFile(file);
 
-			} else if (FileDependencyResolver.isCOV(file)) {
+			} else if (isCOV(file)) {
 
 				waitForPreviousToComplete(applicationForm.businessLogicCoverageAnalyzer);
 
@@ -1319,7 +1319,7 @@ public class ApplicationForm implements ActionListener {
 
 				applicationForm.tabbedPane.setSelectedIndex(2);
 
-			} else if (FileDependencyResolver.isHLDD(file)) {
+			} else if (isHLDD(file)) {
 
 				applicationForm.setBehHlddFile(file);
 				applicationForm.setBehDDHlddFile(file);
@@ -1328,7 +1328,7 @@ public class ApplicationForm implements ActionListener {
 				applicationForm.setAssertHlddFile(file);
 				applicationForm.setCovHlddFile(file);
 
-			} else if (FileDependencyResolver.isPPG(file)) {
+			} else if (isPPG(file)) {
 
 				applicationForm.setPPGLibFile(file);
 
@@ -1336,7 +1336,7 @@ public class ApplicationForm implements ActionListener {
 
 				applicationForm.parserComboBox.setSelectedIndex(3);
 
-			} else if (FileDependencyResolver.isWaveform(file)) {
+			} else if (isWaveform(file)) {
 
 				waitForPreviousToComplete(applicationForm.businessLogicAssertionChecker);
 
@@ -1344,7 +1344,7 @@ public class ApplicationForm implements ActionListener {
 
 				applicationForm.tabbedPane.setSelectedIndex(1);
 
-			} else if (FileDependencyResolver.isPSL(file)) {
+			} else if (isPSL(file)) {
 
 				applicationForm.setPslFile(file);
 

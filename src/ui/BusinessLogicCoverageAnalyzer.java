@@ -102,11 +102,8 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 		} else if (covFile == null) {
 			fileDescription = "Coverage";
 		} else if (mappingFile == null) {
-			fileDescription = "Mapping";
-			//todo: temporary fix
 			mappingFile = FileDependencyResolver.deriveMapFile(covFile);
 			fileDescription = mappingFile == null ? "Mapping" : null;
-			//todo: temporary fix
 		}
 		if (fileDescription != null) {
 			throw new ExtendedException(fileDescription + " file is missing", ExtendedException.MISSING_FILE_TEXT);
