@@ -19,6 +19,7 @@ public class LinesStorage {
 	private ArrayList<Integer> candidates2LinesArray;
 
 	private int offset = 0;
+	private TableForm tableForm;
 
 	public static LinesStorage emptyStorage() {
 		return new LinesStorage.Builder().build();
@@ -49,23 +50,39 @@ public class LinesStorage {
 	}
 
 	public boolean isEmpty() {
-		return nodesLines == null || nodesLines.isEmpty();
+		return !hasNodes();
+	}
+
+	public boolean hasNodes() {
+		return nodesLines != null && !nodesLines.isEmpty();
+	}
+
+	public boolean hasEdges() {
+		return edgesLines != null && !edgesLines.isEmpty();
+	}
+
+	public boolean hasCandidates1() {
+		return candidates1Lines != null && !candidates1Lines.isEmpty();
+	}
+
+	public boolean hasCandidates2() {
+		return candidates2Lines != null && !candidates2Lines.isEmpty();
 	}
 
 	public boolean hasNodeLine(int line) {
-		return nodesLines != null && nodesLines.contains(line + offset);
+		return hasNodes() && nodesLines.contains(line + offset);
 	}
 
 	public boolean hasEdgeLine(int line) {
-		return edgesLines != null && edgesLines.contains(line + offset);
+		return hasEdges() && edgesLines.contains(line + offset);
 	}
 
 	public boolean hasCandidate1Line(int line) {
-		return candidates1Lines != null && candidates1Lines.contains(line + offset);
+		return hasCandidates1() && candidates1Lines.contains(line + offset);
 	}
 
 	public boolean hasCandidate2Line(int line) {
-		return candidates2Lines != null && candidates2Lines.contains(line + offset);
+		return hasCandidates2() && candidates2Lines.contains(line + offset);
 	}
 
 	public String generateNodeStat(int line) {
@@ -100,8 +117,99 @@ public class LinesStorage {
 		return "(" + (linesArray.indexOf(line + offset) + 1) + "/" + linesArray.size() + ")";
 	}
 
+	public String generateNodesStat() {
+		if (!hasNodes()) {
+			return null;
+		}
+		return "Uncovered nodes " + statFor(nodeLinesArray);
+	}
+
+	public String generateEdgesStat() {
+		if (!hasEdges()) {
+			return null;
+		}
+		return "Uncovered edges " + statFor(edgeLinesArray);
+	}
+
+	public String generateCandidates1Stat() {
+		if (!hasCandidates1()) {
+			return null;
+		}
+		return "Candidates 1 " + statFor(candidates1LinesArray);
+	}
+
+	public String generateCandidates2Stat() {
+		if (!hasCandidates2()) {
+			return null;
+		}
+		return "Candidates 2 " + statFor(candidates2LinesArray);
+	}
+
+	private String statFor(ArrayList<Integer> linesArray) {
+		return "(" + linesArray.size() + ")";
+	}
+
 	public void setOffset(int offset) {
 		this.offset = offset;
+	}
+
+	public int findPrevLine(int row) {
+		row += offset;
+		int prevLine = -1;
+		prevLine = Math.max(prevLine, findPrevLineIn(row, nodeLinesArray, tableForm.isNodesSelected()));
+		prevLine = Math.max(prevLine, findPrevLineIn(row, edgeLinesArray, tableForm.isEdgesSelected()));
+		prevLine = Math.max(prevLine, findPrevLineIn(row, candidates1LinesArray, tableForm.isCandidates1Selected()));
+		prevLine = Math.max(prevLine, findPrevLineIn(row, candidates2LinesArray, tableForm.isCandidates2Selected()));
+		if (prevLine != -1) {
+			prevLine -= offset;
+		}
+		return prevLine;
+	}
+
+	private int findPrevLineIn(int row, ArrayList<Integer> linesArray, boolean areLinesSelected) {
+		int prevLine = -1;
+		if (linesArray == null || !areLinesSelected) {
+			return prevLine;
+		}
+		for (Integer line : linesArray) {
+			if (line < row) {
+				prevLine = line;
+			} else {
+				break;
+			}
+		}
+		return prevLine;
+	}
+
+	public int findNextLine(int row) {
+		row += offset;
+		int nextLine = Integer.MAX_VALUE;
+		nextLine = Math.min(nextLine, findNextLineIn(row, nodeLinesArray, tableForm.isNodesSelected()));
+		nextLine = Math.min(nextLine, findNextLineIn(row, edgeLinesArray, tableForm.isEdgesSelected()));
+		nextLine = Math.min(nextLine, findNextLineIn(row, candidates1LinesArray, tableForm.isCandidates1Selected()));
+		nextLine = Math.min(nextLine, findNextLineIn(row, candidates2LinesArray, tableForm.isCandidates2Selected()));
+		if (nextLine != Integer.MAX_VALUE) {
+			nextLine -= offset;
+		}
+		return nextLine;
+	}
+
+	private int findNextLineIn(int row, ArrayList<Integer> linesArray, boolean areLinesSelected) {
+		int nextLine = Integer.MAX_VALUE;
+		if (linesArray == null || !areLinesSelected) {
+			return nextLine;
+		}
+		for (Integer line : linesArray) {
+			if (line > row) {
+				nextLine = line;
+				break;
+			}
+		}
+		return nextLine;
+	}
+
+	public void setTableForm(TableForm tableForm) {
+		this.tableForm = tableForm;
 	}
 
 	public static class Builder {

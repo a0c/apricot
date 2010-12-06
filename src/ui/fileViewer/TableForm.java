@@ -2,6 +2,7 @@ package ui.fileViewer;
 
 import io.QuietCloser;
 import ui.ApplicationForm.FileDropHandler;
+import ui.PairedTabbedPane;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -10,7 +11,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
+import java.awt.event.*;
 import java.io.*;
 import java.util.LinkedList;
 
@@ -46,6 +47,21 @@ public class TableForm {
 	public TableForm(File selectedFile, int totalVisibleWidth, LinesStorage linesStorage, FileDropHandler fileDropHandler) {
 		this.linesStorage = linesStorage;
 		this.linesStorage.setOffset(1);
+		this.linesStorage.setTableForm(this);
+
+		nodesCheckBox.setSelected(this.linesStorage.hasNodes());
+		nodesCheckBox.setEnabled(this.linesStorage.hasNodes());
+		candidates1CheckBox.setSelected(this.linesStorage.hasCandidates1());
+		candidates1CheckBox.setEnabled(this.linesStorage.hasCandidates1());
+		candidates2CheckBox.setSelected(this.linesStorage.hasCandidates2());
+		candidates2CheckBox.setEnabled(this.linesStorage.hasCandidates2());
+
+		nodesCheckBox.setToolTipText(this.linesStorage.generateNodesStat());
+		edgesCheckBox.setToolTipText(this.linesStorage.generateEdgesStat());
+		candidates1CheckBox.setToolTipText(this.linesStorage.generateCandidates1Stat());
+		candidates2CheckBox.setToolTipText(this.linesStorage.generateCandidates2Stat());
+
+		aTable.addKeyListener(fileDropHandler);
 		nodesCheckBox.addKeyListener(fileDropHandler);
 		candidates1CheckBox.addKeyListener(fileDropHandler);
 		candidates2CheckBox.addKeyListener(fileDropHandler);
@@ -92,6 +108,9 @@ public class TableForm {
 		edgesCheckBox.setBackground(edgesColor);
 		candidates1CheckBox.setBackground(candidates1Color);
 		candidates2CheckBox.setBackground(candidates2Color);
+
+		aTable.addKeyListener(new UpAndDownJumper());
+		aTable.addMouseMotionListener(new TooltipCleaner());
 	}
 
 	private String[][] readFileAsLines(File file) {
@@ -141,6 +160,22 @@ public class TableForm {
 		aTable.repaint();
 	}
 
+	boolean isNodesSelected() {
+		return nodesCheckBox.isSelected();
+	}
+
+	boolean isEdgesSelected() {
+		return edgesCheckBox.isSelected();
+	}
+
+	boolean isCandidates1Selected() {
+		return candidates1CheckBox.isSelected();
+	}
+
+	boolean isCandidates2Selected() {
+		return candidates2CheckBox.isSelected();
+	}
+
 	private class ColorAndTooltipCellRenderer extends DefaultTableCellRenderer {
 
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -183,19 +218,19 @@ public class TableForm {
 		}
 
 		private boolean isUncoveredEdge(int row) {
-			return edgesCheckBox.isSelected() && linesStorage.hasEdgeLine(row);
+			return isEdgesSelected() && linesStorage.hasEdgeLine(row);
 		}
 
 		private boolean isUncoveredNode(int row) {
-			return nodesCheckBox.isSelected() && linesStorage.hasNodeLine(row);
+			return isNodesSelected() && linesStorage.hasNodeLine(row);
 		}
 
 		private boolean isCandidate1(int row) {
-			return candidates1CheckBox.isSelected() && linesStorage.hasCandidate1Line(row);
+			return isCandidates1Selected() && linesStorage.hasCandidate1Line(row);
 		}
 
 		private boolean isCandidate2(int row) {
-			return candidates2CheckBox.isSelected() && linesStorage.hasCandidate2Line(row);
+			return isCandidates2Selected() && linesStorage.hasCandidate2Line(row);
 		}
 
 	}
@@ -204,6 +239,188 @@ public class TableForm {
 
 		public boolean isCellEditable(int row, int column) {
 			return false;
+		}
+	}
+
+	private class UpAndDownJumper extends KeyAdapter {
+		@Override
+		public void keyReleased(KeyEvent e) {
+
+			if (e.isAltDown() && e.isShiftDown()) {
+
+				if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT) {
+
+					moveTab();
+				}
+			} else if (e.isControlDown()) {
+
+				if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT) {
+
+					jumpToOtherTabbedPane();
+				}
+			} else if (e.isAltDown()) {
+
+				if (e.getKeyCode() == KeyEvent.VK_UP) {
+
+					gotoPreviousLine();
+
+				} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+
+					gotoNextLine();
+
+				} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+
+					switchNextTab();
+
+				} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+
+					switchPreviousTab();
+				}
+			}
+		}
+
+		private void switchNextTab() {
+
+			JTabbedPane tabbedPane = findTabbedPane();
+			if (tabbedPane == null) return;
+
+			int selected = tabbedPane.getSelectedIndex();
+			int total = tabbedPane.getTabCount();
+
+			int next = selected == (total - 1) ? 0 : selected + 1;
+
+			tabbedPane.setSelectedIndex(next);
+			tabbedPane.repaint();
+		}
+
+		private void switchPreviousTab() {
+
+			JTabbedPane tabbedPane = findTabbedPane();
+			if (tabbedPane == null) return;
+
+			int selected = tabbedPane.getSelectedIndex();
+			int total = tabbedPane.getTabCount();
+
+			int previous = selected == 0 ? total - 1 : selected - 1;
+
+			tabbedPane.setSelectedIndex(previous);
+			tabbedPane.repaint();
+		}
+
+		private void jumpToOtherTabbedPane() {
+
+			JTabbedPane tabbedPane = findTabbedPane();
+
+			if (tabbedPane instanceof PairedTabbedPane) {
+
+				JTabbedPane otherTabbedPane = ((PairedTabbedPane) tabbedPane).getPair();
+
+				JTable table = new TableFinder(otherTabbedPane).find();
+				if (table != null) {
+					table.requestFocus();
+				} else {
+					otherTabbedPane.requestFocus();
+				}
+			}
+		}
+
+		private void moveTab() {
+
+			JTabbedPane tabbedPane = findTabbedPane();
+			if (tabbedPane == null) return;
+
+			int i = tabbedPane.indexOfComponent(mainPanel);
+			TabComponent tabComponent = (TabComponent) tabbedPane.getTabComponentAt(i);
+
+			for (MouseListener mouseListener : tabComponent.getMouseListeners()) {
+				mouseListener.mouseClicked(new MouseEvent(tabComponent, 0, 0, 0, 0, 0, 2, false));
+			}
+		}
+
+		private JTabbedPane findTabbedPane() {
+			Container parent;
+			while (!((parent = mainPanel.getParent()) instanceof JTabbedPane)) {
+				if (parent == null) {
+					break;
+				}
+			}
+			if (parent == null) {
+				return null;
+			}
+			return (JTabbedPane) parent;
+		}
+
+		private void gotoNextLine() {
+			int row = aTable.getSelectedRow();
+			int targetRow = linesStorage.findNextLine(row);
+			if (targetRow == Integer.MAX_VALUE)
+				targetRow = row;
+			aTable.setRowSelectionInterval(targetRow, targetRow);
+			int overScrollRow = targetRow;
+			if (overScrollRow + 10 < aTable.getRowCount() - 1) {
+				overScrollRow += 10;
+			}
+			scrollToSelection(overScrollRow);
+			showTooltip(targetRow);
+		}
+
+		private void gotoPreviousLine() {
+			int row = aTable.getSelectedRow();
+			int targetRow = linesStorage.findPrevLine(row);
+			if (targetRow == -1)
+				targetRow = row;
+			aTable.setRowSelectionInterval(targetRow, targetRow);
+			int overScrollRow = targetRow;
+			if (overScrollRow - 10 > 0) {
+				overScrollRow -= 10;
+			}
+			scrollToSelection(overScrollRow);
+			showTooltip(targetRow);
+		}
+
+		private void showTooltip(int targetRow) {
+
+			Rectangle rect = aTable.getCellRect(targetRow, 1, true);
+			int tableWidth = aTable.getVisibleRect().width;
+			moveMouse(rect, tableWidth);
+			Component cell = aTable.getCellRenderer(targetRow, 1).
+					getTableCellRendererComponent(aTable, true, false, false, targetRow, 1);
+			aTable.setToolTipText(((ColorAndTooltipCellRenderer) cell).getToolTipText());
+			ToolTipManager.sharedInstance().mouseMoved(new MouseEvent(aTable, 0, 0, 0,
+					rect.x + tableWidth / 2, rect.y, // X-Y of the mouse for the tool tip
+					0, false));
+		}
+
+		private void moveMouse(Rectangle rect, int tableWidth) {
+			try {
+				Robot robot = new Robot();
+				Point tableLocation = aTable.getLocationOnScreen();
+				robot.mouseMove(tableLocation.x + tableWidth, tableLocation.y + rect.y);
+			} catch (AWTException e) {
+				/* do nothing */
+			}
+		}
+
+		private void scrollToSelection(int targetRow) {
+			aTable.scrollRectToVisible(aTable.getCellRect(targetRow, 1, true));
+		}
+	}
+
+	/**
+	 * We set a tooltip to aTable in UpAndDownJumper, so have to clean it
+	 * when we move mouse in a clean area, so that a tooltip from
+	 * UpAndDownJumper would not appear.
+	 */
+	private class TooltipCleaner extends MouseMotionAdapter {
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			Point point = e.getPoint();
+			int row = aTable.rowAtPoint(point);
+			int col = aTable.columnAtPoint(point);
+			String tooltip = ((ColorAndTooltipCellRenderer) aTable.getCellRenderer(row, col)).getToolTipText();
+			if (tooltip == null || tooltip.isEmpty()) {
+				aTable.setToolTipText(null);
+			}
 		}
 	}
 }

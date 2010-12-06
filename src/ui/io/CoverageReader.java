@@ -63,11 +63,11 @@ public class CoverageReader {
 					}
 				}
 				//todo: do like in ConverterSettings.loadSmartComment(): use isReadingSmth flag...
-				if (line.startsWith(EDGE_START_TEXT)) {
+				if (line != null && line.startsWith(EDGE_START_TEXT)) {
 					edgeCoverage = parseCoverage(line, EDGE_START_TEXT, SplitCoverage.EDGE_COVERAGE);
 				}
 
-				if (line.startsWith(TOGGLE_START_TEXT)) {
+				if (line != null && line.startsWith(TOGGLE_START_TEXT)) {
 					toggleCoverage = parseCoverage(line, TOGGLE_START_TEXT, SplitCoverage.TOGGLE_COVERAGE);
 					hasSomethingToFind = false;
 				}

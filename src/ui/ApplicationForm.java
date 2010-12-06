@@ -196,6 +196,10 @@ public class ApplicationForm implements ActionListener {
 		upperRightTabbedPaneAdapter = new MouseSelectionAdapter(upperRightTabbedPane);
 		picturePaneAdapter = new MouseSelectionAdapter(pictureTabPane);
 
+		fileViewerTabbedPane1.addKeyListener(new TabMover(fileViewerTabbedPane1));
+		fileViewerTabbedPane2.addKeyListener(new TabMover(fileViewerTabbedPane2));
+		fileViewerTabbedPane1.addChangeListener(new TableFormFocuser());
+		fileViewerTabbedPane2.addChangeListener(new TableFormFocuser());
 
 		/* Add empty Mouse Listener to the Glass Pane, to disable user input while SwingWorker is working */
 		Component glassPane = frame.getGlassPane();
@@ -945,6 +949,11 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	private void createUIComponents() {
+		fileViewerTabbedPane1 = new PairedTabbedPane();
+		fileViewerTabbedPane2 = new PairedTabbedPane();
+		((PairedTabbedPane) fileViewerTabbedPane1).setPair(fileViewerTabbedPane2);
+		((PairedTabbedPane) fileViewerTabbedPane2).setPair(fileViewerTabbedPane1);
+
 		drawPatternCountSpinner = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
 		patternNrSpinnerAssert = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
 		patternNrSpinnerCoverage = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
@@ -1387,5 +1396,27 @@ public class ApplicationForm implements ActionListener {
 			return e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V;
 		}
 
+	}
+
+	private class TableFormFocuser implements ChangeListener {
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			JTabbedPane tabbedPane = (JTabbedPane) e.getSource();
+			final JTable table = new TableFinder(tabbedPane).find();
+			if (table != null) {
+				// dirty hack: requesting focus at once will fail,
+				// because after invoking user-defined ChangeListeners,
+				// default ChangeListener of the JTabbedPane is invoked,
+				// which transfers the focus away from where we've set it.
+				Timer timer = new Timer(50, new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						table.requestFocus();
+					}
+				});
+				timer.setRepeats(false);
+				timer.start();
+			}
+		}
 	}
 }

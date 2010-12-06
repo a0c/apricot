@@ -32,7 +32,6 @@
             <properties>
               <autoResizeMode value="0"/>
               <fillsViewportHeight value="true"/>
-              <focusable value="false"/>
             </properties>
           </component>
         </children>

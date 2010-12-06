@@ -153,8 +153,8 @@ public class ModelDataLoader {
 	@SuppressWarnings({"EnumeratedConstantNamingConvention"})
 	private enum FileType {
 		CHK, SIM, TST;
-		private static final String AGM_EXTENSION = ".agm";
-		private static final String TGM_EXTENSION = ".tgm";
+		private static final String AGM_EXTENSION = "agm";
+		private static final String TGM_EXTENSION = "tgm";
 
 
 		public File deriveModelFile(File patternFile) {

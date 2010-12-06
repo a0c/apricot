@@ -35,6 +35,7 @@ public class ExtendedException extends Exception {
 			message = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
 			return new ExtendedException(message, FILE_NOT_FOUND_TEXT);
 		} else if (e instanceof NullPointerException || e instanceof EmptyStackException) {
+			e.printStackTrace();
 			String suffix = e instanceof NullPointerException ? "NPE" : "ESE";
 			message = "Critical error occurred while processing:" +
 					"\nSpecified source file contains unsupported constructs or is of a wrong type (" + suffix + ").";

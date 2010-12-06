@@ -63,8 +63,8 @@ public class TabComponent extends JPanel {
 		}
 	}
 
-	public static boolean isDirty(TabComponent tabComponent) {
-		return tabComponent.getBackground() == DIRTY_COLOR;
+	public boolean isDirty() {
+		return getBackground() == DIRTY_COLOR;
 	}
 
 	private class TabButton extends JButton implements ActionListener {

@@ -690,7 +690,7 @@
             </properties>
             <border type="none" title="File Viewer"/>
             <children>
-              <tabbedpane id="a3ff" binding="fileViewerTabbedPane1">
+              <tabbedpane id="a3ff" binding="fileViewerTabbedPane1" custom-create="true">
                 <constraints>
                   <splitpane position="left"/>
                 </constraints>
@@ -725,7 +725,7 @@
                   </grid>
                 </children>
               </tabbedpane>
-              <tabbedpane id="cf172" binding="fileViewerTabbedPane2">
+              <tabbedpane id="cf172" binding="fileViewerTabbedPane2" custom-create="true">
                 <constraints>
                   <splitpane position="right"/>
                 </constraints>
