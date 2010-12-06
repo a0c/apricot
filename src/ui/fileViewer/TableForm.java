@@ -352,6 +352,9 @@ public class TableForm {
 
 		private void gotoNextLine() {
 			int row = aTable.getSelectedRow();
+			if (row == -1) {
+				return;
+			}
 			int targetRow = linesStorage.findNextLine(row);
 			if (targetRow == Integer.MAX_VALUE)
 				targetRow = row;
@@ -366,6 +369,9 @@ public class TableForm {
 
 		private void gotoPreviousLine() {
 			int row = aTable.getSelectedRow();
+			if (row == -1) {
+				return;
+			}
 			int targetRow = linesStorage.findPrevLine(row);
 			if (targetRow == -1)
 				targetRow = row;
