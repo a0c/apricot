@@ -16,6 +16,7 @@ public class DiagnosisRequest extends Request {
 	@Override
 	public void buildCommand(List<String> cmd) {
 		cmd.add("-diagnosis");
+		cmd.add("optimize");
 		cmd.add(getHlddFile().getAbsolutePath().replace(".agm", ""));
 	}
 }
