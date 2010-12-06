@@ -20,6 +20,7 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 	private ConsoleWriter consoleWriter;
 	private File hlddFile;
 	private File vhdlFile;
+	private File dgnFile;
 	private File covFile;
 	private File mappingFile;
 
@@ -42,14 +43,12 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 		this.vhdlFile = vhdlFile;
 	}
 
-	public void setCovFile(File covFile) {
-		this.covFile = covFile;
-		/* Clear mapping file (this file is implicit for user, so must be manipulated carefully) */
-		setMappingFile(null);
+	public void setDgnFile(File dgnFile) {
+		this.dgnFile = dgnFile;
 	}
 
-	private void setMappingFile(File mappingFile) {
-		this.mappingFile = mappingFile;
+	public void setCovFile(File covFile) {
+		this.covFile = covFile;
 	}
 
 	public void processAnalyze() throws ExtendedException {
@@ -99,17 +98,22 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 		String fileDescription = null;
 		if (vhdlFile == null) {
 			fileDescription = "VHDL";
-		} else if (covFile == null) {
-			fileDescription = "Coverage";
-		} else if (mappingFile == null) {
-			mappingFile = FileDependencyResolver.deriveMapFile(covFile);
-			fileDescription = mappingFile == null ? "Mapping" : null;
+		} else if (covFile == null && dgnFile == null) {
+			fileDescription = "Coverage/Diagnosis";
+		} else {
+			File someExistingFile = covFile != null ? covFile : dgnFile;
+			mappingFile = FileDependencyResolver.deriveMapFile(someExistingFile);
+			if (mappingFile == null) {
+				fileDescription = "Mapping";
+			}
 		}
 		if (fileDescription != null) {
 			throw new ExtendedException(fileDescription + " file is missing", ExtendedException.MISSING_FILE_TEXT);
 		}
 
-		File dgnFile = FileDependencyResolver.deriveDgnFile(covFile);
+		if (dgnFile == null) {
+			dgnFile = FileDependencyResolver.deriveDgnFile(covFile);
+		}
 
 		UIWithWorker.runUIWithWorker(new CoverageVisualizingUI(applicationForm.getFrame()),
 				new CoverageVisualizingWorker(vhdlFile, covFile, dgnFile, mappingFile, applicationForm, consoleWriter, simpleLock));

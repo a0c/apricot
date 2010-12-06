@@ -559,6 +559,29 @@ public class ApplicationForm implements ActionListener {
 		SingleFileSelector.setCurrentDirectory(ppgLibFile);
 	}
 
+	public void setDgnFile(File dgnFile) {
+
+		File covFile = deriveCovFile(dgnFile);
+		businessLogicCoverageAnalyzer.setCovFile(covFile);
+		businessLogicCoverageAnalyzer.setDgnFile(dgnFile);
+		updateCovTextField(covFile);
+
+		/* Auto load VHDL file and show candidates */
+		File vhdlFile = deriveVhdlFile(deriveHlddFile(dgnFile));
+
+		if (vhdlFile != null) {
+			setCovVhdlFile(vhdlFile);
+		}
+
+		/* Automatically click Show button, if both files are set */
+		if (vhdlFile != null && dgnFile != null) {
+			doClickShowButton();
+		}
+
+		SingleFileSelector.setCurrentDirectory(dgnFile);
+
+	}
+
 	public void setCovFile(File covFile) {
 
 		businessLogicCoverageAnalyzer.setCovFile(covFile);
@@ -1354,7 +1377,12 @@ public class ApplicationForm implements ActionListener {
 
 			} else if (isDGN(file)) {
 
-				loadFile(deriveCovFile(file));
+				waitForPreviousToComplete(applicationForm.businessLogicCoverageAnalyzer);
+
+				applicationForm.setDgnFile(file);
+
+				applicationForm.tabbedPane.setSelectedIndex(2);
+
 			}
 		}
 

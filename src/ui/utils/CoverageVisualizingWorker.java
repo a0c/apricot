@@ -54,10 +54,14 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					consoleWriter.done();
 
 					/* Read COV file */
-					consoleWriter.write("Reading coverage file...");
-					CoverageReader coverageReader = new CoverageReader(covFile);
-					Collection<NodeItem> uncoveredNodeItems = coverageReader.getUncoveredNodeItems();
-					consoleWriter.done();
+					CoverageReader coverageReader = null;
+					Collection<NodeItem> uncoveredNodeItems = null;
+					if (covFile != null) {
+						consoleWriter.write("Reading coverage file...");
+						coverageReader = new CoverageReader(covFile);
+						uncoveredNodeItems = coverageReader.getUncoveredNodeItems();
+						consoleWriter.done();
+					}
 
 					/* Read DGN file */
 					SourceLocation sourceCandidates1 = null;
@@ -74,7 +78,8 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 
 					/* Extract lines for uncovered nodes */
 					SourceLocation allSources = hldd2VHDLMapping.getAllSources();
-					SourceLocation uncoveredSources = hldd2VHDLMapping.getSourceFor(uncoveredNodeItems);
+					SourceLocation uncoveredSources = uncoveredNodeItems != null
+							? hldd2VHDLMapping.getSourceFor(uncoveredNodeItems) : null;
 
 					/* Add tab to the FileViewer */
 					LinkedList<File> allSourceFiles = new LinkedList<File>(allSources.getFiles());
@@ -98,16 +103,18 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					}
 
 					/* Add coverage */
-					int total = allSources.getTotalLinesNum();
-					int uncovered = uncoveredSources == null ? 0 : uncoveredSources.getTotalLinesNum();
-					vhdlNodeCoverages.addFirst(new SplitCoverage(total - uncovered, total, SplitCoverage.STATEMENT_COVERAGE,
-							"Coverage for top level: " + vhdlFile.getPath()));
-					CoveragePanel coveragePanel = new CoveragePanel(
-							coverageReader.getNodeCoverage(),
-							coverageReader.getEdgeCoverage(),
-							coverageReader.getToggleCoverage(),
-							vhdlNodeCoverages);
-					applicationForm.addCoverage(generateTabTitle(covFile), covFile.getAbsolutePath(), coveragePanel);
+					if (covFile != null) {
+						int total = allSources.getTotalLinesNum();
+						int uncovered = uncoveredSources == null ? 0 : uncoveredSources.getTotalLinesNum();
+						vhdlNodeCoverages.addFirst(new SplitCoverage(total - uncovered, total, SplitCoverage.STATEMENT_COVERAGE,
+								"Coverage for top level: " + vhdlFile.getPath()));
+						CoveragePanel coveragePanel = new CoveragePanel(
+								coverageReader.getNodeCoverage(),
+								coverageReader.getEdgeCoverage(),
+								coverageReader.getToggleCoverage(),
+								vhdlNodeCoverages);
+						applicationForm.addCoverage(generateTabTitle(covFile), covFile.getAbsolutePath(), coveragePanel);
+					}
 
 					isProcessFinished = true;
 				} catch (Exception e) {
