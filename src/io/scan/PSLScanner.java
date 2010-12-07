@@ -1,8 +1,8 @@
 package io.scan;
 
-import java.io.IOException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * The class performs line reconstruction and rearranges the input
@@ -32,7 +32,7 @@ public class PSLScanner {
 	 *
 	 * @return rearranged (whitespace-s) property line or <code>null</code> when EOF reached
 	 * @throws Exception if {@link LexemeComposer#nextLexeme()}, {@link LexemeComposer#close()}
-	 * 					 or malformed (unclosed) token is read
+	 *                   or malformed (unclosed) token is read
 	 */
 	public String next() throws Exception {
 		StringBuffer token = new StringBuffer();
@@ -52,6 +52,7 @@ public class PSLScanner {
 				}
 			}
 
+			//todo: why managing space? why not simply adding everything as is??
 			/* Manage PRECEDING SPACE */
 			manageSpace(token, lexeme);
 
@@ -85,10 +86,21 @@ public class PSLScanner {
 		/* Remove trailing space BETWEEN '/' and '=' */
 		removeSpaceBetween('/', LexemeType.OP_EQ, token, lexeme);
 
+		/* Remove trailing space BETWEEN ''' and DIGIT */
+		removeSpaceBetween('\'', LexemeType.NUMBER, token, lexeme);
+
 		/* Remove space BEFORE '[' */
 		if (lexeme.getType() == LexemeType.OPEN_SQUARE_BRACKET) {
 			if (token.length() > 0 && Character.isWhitespace(token.charAt(token.length() - 1))) {
 				token.deleteCharAt(token.length() - 1);
+			}
+		}
+		/* Remove space AFTER DIGIT and BEFORE ''' */
+		if (lexeme.getType() == LexemeType.SINGLE_QUOTE && token.length() > 1) {
+			int lastCharIdx = token.length() - 1;
+			if (Character.isWhitespace(token.charAt(lastCharIdx)) &&
+					Character.isDigit(token.charAt(lastCharIdx - 1))) {
+				token.deleteCharAt(lastCharIdx);
 			}
 		}
 	}

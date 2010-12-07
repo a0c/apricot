@@ -477,6 +477,9 @@ public class ApplicationForm implements ActionListener {
 		if (baseModelFile != null) {
 			setBaseModelFile(baseModelFile);
 		}
+
+		//todo: move this to loadFile()?
+		SingleFileSelector.setCurrentDirectory(pslFile);
 	}
 
 	private void setBaseModelFile(File baseModelFile) {
@@ -1374,6 +1377,10 @@ public class ApplicationForm implements ActionListener {
 			} else if (isPSL(file)) {
 
 				applicationForm.setPslFile(file);
+
+				applicationForm.tabbedPane.setSelectedIndex(0);
+
+				applicationForm.parserComboBox.setSelectedIndex(3);
 
 			} else if (isDGN(file)) {
 
