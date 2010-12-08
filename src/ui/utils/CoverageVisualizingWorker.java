@@ -81,7 +81,6 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					SourceLocation uncoveredSources = uncoveredNodeItems != null
 							? hldd2VHDLMapping.getSourceFor(uncoveredNodeItems) : null;
 
-					/* Add tab to the FileViewer */
 					LinkedList<File> allSourceFiles = new LinkedList<File>(allSources.getFiles());
 					if (!allSourceFiles.contains(vhdlFile)) {
 						allSourceFiles.add(vhdlFile); // just in case it is not in allSources list (no transitions in it, only component instantiations)
@@ -89,29 +88,37 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					java.util.Collections.sort(allSourceFiles);
 					LinkedList<SplitCoverage> vhdlNodeCoverages = new LinkedList<SplitCoverage>();
 					for (File sourceFile : allSourceFiles) {
-						LinesStorage linesStorage = buildLinesStorage(sourceFile, uncoveredSources, sourceCandidates1, sourceCandidates2);
-						applicationForm.addFileViewerTabFromFile(sourceFile, linesStorage, null);
-						/* Add coverage */
-						int total = 0;
-						if (allSources.hasFile(sourceFile)) {
-							Collection<Integer> lines = allSources.getLinesForFile(sourceFile);
-							total = lines != null ? lines.size() : 0;
+						/* Add tab to the FileViewer */
+						if (coverageReader.hasNodeCoverage() || dgnFile != null) {
+							LinesStorage linesStorage = buildLinesStorage(sourceFile, uncoveredSources, sourceCandidates1, sourceCandidates2);
+							applicationForm.addFileViewerTabFromFile(sourceFile, linesStorage, null);
 						}
-						int uncovered = uncoveredSources != null && uncoveredSources.hasFile(sourceFile) ?
-								uncoveredSources.getLinesForFile(sourceFile).size() : 0;
-						vhdlNodeCoverages.add(new SplitCoverage(total - uncovered, total, sourceFile.getName(), null));
+						/* Add VHDL coverage bar */
+						if (coverageReader.hasNodeCoverage()) {
+							int total = 0;
+							if (allSources.hasFile(sourceFile)) {
+								Collection<Integer> lines = allSources.getLinesForFile(sourceFile);
+								total = lines != null ? lines.size() : 0;
+							}
+							int uncovered = uncoveredSources != null && uncoveredSources.hasFile(sourceFile) ?
+									uncoveredSources.getLinesForFile(sourceFile).size() : 0;
+							vhdlNodeCoverages.add(new SplitCoverage(total - uncovered, total, sourceFile.getName(), null));
+						}
 					}
 
 					/* Add coverage */
 					if (covFile != null) {
-						int total = allSources.getTotalLinesNum();
-						int uncovered = uncoveredSources == null ? 0 : uncoveredSources.getTotalLinesNum();
-						vhdlNodeCoverages.addFirst(new SplitCoverage(total - uncovered, total, SplitCoverage.STATEMENT_COVERAGE,
-								"Coverage for top level: " + vhdlFile.getPath()));
+						if (coverageReader.hasNodeCoverage()) {
+							int total = allSources.getTotalLinesNum();
+							int uncovered = uncoveredSources == null ? 0 : uncoveredSources.getTotalLinesNum();
+							vhdlNodeCoverages.addFirst(new SplitCoverage(total - uncovered, total, SplitCoverage.STATEMENT_COVERAGE,
+									"Coverage for top level: " + vhdlFile.getPath()));
+						}
 						CoveragePanel coveragePanel = new CoveragePanel(
 								coverageReader.getNodeCoverage(),
 								coverageReader.getEdgeCoverage(),
 								coverageReader.getToggleCoverage(),
+								coverageReader.getConditionCoverage(),
 								vhdlNodeCoverages);
 						applicationForm.addCoverage(generateTabTitle(covFile), covFile.getAbsolutePath(), coveragePanel);
 					}

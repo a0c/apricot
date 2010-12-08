@@ -1,6 +1,7 @@
 package ui.graphics;
 
 import ui.base.AbstractCoverage;
+import ui.base.SplitCoverage;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -46,12 +47,13 @@ public class CoveragePanel extends JPanel {
 		add(vhdlPanel);
 	}
 
-	public CoveragePanel(AbstractCoverage hlddNodeCoverage, AbstractCoverage hlddEdgeCoverage, AbstractCoverage hlddToggleCoverage,
+	public CoveragePanel(AbstractCoverage hlddNodeCoverage, AbstractCoverage hlddEdgeCoverage,
+						 AbstractCoverage hlddToggleCoverage, SplitCoverage hlddCondCoverage,
 						 Collection<? extends AbstractCoverage> vhdlNodeCoverages) {
 		this();
 
 		/* Don't show the frame if none of the coverages is available */ //todo...
-		if (hlddNodeCoverage == null && hlddEdgeCoverage == null && hlddToggleCoverage == null
+		if (hlddNodeCoverage == null && hlddEdgeCoverage == null && hlddToggleCoverage == null && hlddCondCoverage == null
 				&& (vhdlNodeCoverages == null || vhdlNodeCoverages.isEmpty())) {
 			return;
 		}
@@ -60,6 +62,7 @@ public class CoveragePanel extends JPanel {
 		addHLDDCoverage(hlddNodeCoverage);
 		addHLDDCoverage(hlddEdgeCoverage);
 		addHLDDCoverage(hlddToggleCoverage);
+		addHLDDCoverage(hlddCondCoverage);
 
 		if (vhdlNodeCoverages != null) {
 			for (AbstractCoverage vhdlNodeCoverage : vhdlNodeCoverages) {

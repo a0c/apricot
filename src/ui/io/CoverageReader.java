@@ -19,6 +19,7 @@ public class CoverageReader {
 	private static final String NODE_START_TEXT = ".NODE_COVERAGE";
 	private static final String EDGE_START_TEXT = ".EDGE_COVERAGE";
 	private static final String TOGGLE_START_TEXT = ".TOGGLE_COVERAGE";
+	private static final String CONDITION_START_TEXT = ".CONDITIONAL_COVERAGE";
 	private static final String DEFAULT_COMMENT = ";";
 
 	private final File covFile;
@@ -26,6 +27,7 @@ public class CoverageReader {
 	private SplitCoverage nodeCoverage;
 	private SplitCoverage edgeCoverage;
 	private SplitCoverage toggleCoverage;
+	private SplitCoverage conditionCoverage;
 
 	public CoverageReader(File covFile) {
 		this.covFile = covFile;
@@ -62,6 +64,10 @@ public class CoverageReader {
 						uncoveredNodeItems.add(new NodeItem(graphIndex, nodeIndex));
 					}
 				}
+
+				if (line != null && line.startsWith(CONDITION_START_TEXT)) {
+					conditionCoverage = parseCoverage(line, CONDITION_START_TEXT, SplitCoverage.CONDITION_COVERAGE);
+				}
 				//todo: do like in ConverterSettings.loadSmartComment(): use isReadingSmth flag...
 				if (line != null && line.startsWith(EDGE_START_TEXT)) {
 					edgeCoverage = parseCoverage(line, EDGE_START_TEXT, SplitCoverage.EDGE_COVERAGE);
@@ -86,6 +92,10 @@ public class CoverageReader {
 		return new SplitCoverage(covered, total, title, null);
 	}
 
+	public boolean hasNodeCoverage() {
+		return nodeCoverage != null;
+	}
+
 	public SplitCoverage getNodeCoverage() {
 		return nodeCoverage;
 	}
@@ -96,6 +106,10 @@ public class CoverageReader {
 
 	public SplitCoverage getToggleCoverage() {
 		return toggleCoverage;
+	}
+
+	public SplitCoverage getConditionCoverage() {
+		return conditionCoverage;
 	}
 
 	public Collection<NodeItem> getUncoveredNodeItems() {
