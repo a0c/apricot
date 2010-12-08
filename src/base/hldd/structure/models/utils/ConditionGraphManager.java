@@ -334,6 +334,11 @@ public class ConditionGraphManager {
 							opA = evaluate(operands.get(0));
 							result = !opA;
 							break;
+						case NEQ:
+							opA = evaluate(operands.get(0));
+							opB = evaluate(operands.get(1));
+							result = opA != opB;
+							break;
 						default:
 							throw new HLDDException("ConditionGraphManager: don't know how to evaluate " + operator + " (lines " + sourceAsString + ")");
 
