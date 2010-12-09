@@ -22,8 +22,8 @@ public class TableForm {
 
 	private static final Color NODE_DEFAULT_COLOR = Color.ORANGE;
 	private static final Color EDGE_DEFAULT_COLOR = Color.CYAN;
-	private static final Color CANDIDATES1_DEFAULT_COLOR = Color.PINK;
-	private static final Color CANDIDATES2_DEFAULT_COLOR = Color.YELLOW;
+	private static final Color CANDIDATES1_DEFAULT_COLOR = Color.YELLOW;
+	private static final Color CANDIDATES2_DEFAULT_COLOR = Color.PINK;
 
 	private static final String COLUMN_1_TITLE = "Nr.";
 	private static final String COLUMN_2_TITLE = "File line";
@@ -187,12 +187,12 @@ public class TableForm {
 				} else if (isUncoveredEdge(row)) {
 					cell.setBackground(table.getSelectionBackground().brighter().brighter());
 					setToolTipText(linesStorage.generateEdgeStat(row));
-				} else if (isCandidate1(row)) {
-					cell.setBackground(table.getSelectionBackground().brighter().brighter());
-					setToolTipText(linesStorage.generateCandidate1Stat(row));
 				} else if (isCandidate2(row)) {
 					cell.setBackground(table.getSelectionBackground().brighter().brighter());
 					setToolTipText(linesStorage.generateCandidate2Stat(row));
+				} else if (isCandidate1(row)) {
+					cell.setBackground(table.getSelectionBackground().brighter().brighter());
+					setToolTipText(linesStorage.generateCandidate1Stat(row));
 				} else {
 					cell.setBackground(table.getSelectionBackground());
 				}
@@ -205,12 +205,12 @@ public class TableForm {
 				} else if (isUncoveredEdge(row)) {
 					bgColor = edgesColor;
 					setToolTipText(linesStorage.generateEdgeStat(row));
-				} else if (isCandidate1(row)) {
-					bgColor = candidates1Color;
-					setToolTipText(linesStorage.generateCandidate1Stat(row));
 				} else if (isCandidate2(row)) {
 					bgColor = candidates2Color;
 					setToolTipText(linesStorage.generateCandidate2Stat(row));
+				} else if (isCandidate1(row)) {
+					bgColor = candidates1Color;
+					setToolTipText(linesStorage.generateCandidate1Stat(row));
 				}
 				cell.setBackground(bgColor);
 			}
