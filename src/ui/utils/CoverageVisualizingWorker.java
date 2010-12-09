@@ -89,12 +89,12 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					LinkedList<SplitCoverage> vhdlNodeCoverages = new LinkedList<SplitCoverage>();
 					for (File sourceFile : allSourceFiles) {
 						/* Add tab to the FileViewer */
-						if (coverageReader.hasNodeCoverage() || dgnFile != null) {
+						if (hasNodeCoverage(coverageReader) || dgnFile != null) {
 							LinesStorage linesStorage = buildLinesStorage(sourceFile, uncoveredSources, sourceCandidates1, sourceCandidates2);
 							applicationForm.addFileViewerTabFromFile(sourceFile, linesStorage, null);
 						}
 						/* Add VHDL coverage bar */
-						if (coverageReader.hasNodeCoverage()) {
+						if (hasNodeCoverage(coverageReader)) {
 							int total = 0;
 							if (allSources.hasFile(sourceFile)) {
 								Collection<Integer> lines = allSources.getLinesForFile(sourceFile);
@@ -108,7 +108,7 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 
 					/* Add coverage */
 					if (covFile != null) {
-						if (coverageReader.hasNodeCoverage()) {
+						if (hasNodeCoverage(coverageReader)) {
 							int total = allSources.getTotalLinesNum();
 							int uncovered = uncoveredSources == null ? 0 : uncoveredSources.getTotalLinesNum();
 							vhdlNodeCoverages.addFirst(new SplitCoverage(total - uncovered, total, SplitCoverage.STATEMENT_COVERAGE,
@@ -131,6 +131,10 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 
 			}
 		};
+	}
+
+	private boolean hasNodeCoverage(CoverageReader coverageReader) {
+		return coverageReader != null && coverageReader.hasNodeCoverage();
 	}
 
 	private LinesStorage buildLinesStorage(File sourceFile,
