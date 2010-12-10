@@ -1601,6 +1601,7 @@ public class ApplicationForm implements ActionListener {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							table.requestFocus();
+							table.getSelectionModel().setSelectionInterval(0, 0);
 						}
 					});
 					timer.setRepeats(false);
