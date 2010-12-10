@@ -2,9 +2,10 @@ package ui.base;
 
 import base.SourceLocation;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Anton Chepurov
@@ -17,6 +18,12 @@ public class HLDD2VHDLMapping {
 		mapping.put(newItem, lines);
 	}
 
+	@SuppressWarnings({"OverloadedMethodsWithSameNumberOfParameters"})
+	public SourceLocation getSourceFor(AbstractItem uncoveredItem) {
+		return getSourceFor(Arrays.asList(uncoveredItem));
+	}
+
+	@SuppressWarnings({"OverloadedMethodsWithSameNumberOfParameters"})
 	public SourceLocation getSourceFor(Collection<? extends AbstractItem> uncoveredItems) {
 		SourceLocation location = null;
 		for (AbstractItem uncoveredItem : uncoveredItems) {

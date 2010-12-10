@@ -5,6 +5,7 @@ import ui.ApplicationForm.FileDropHandler;
 import ui.PairedTabbedPane;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -25,6 +26,8 @@ public class TableForm {
 	private static final Color CANDIDATES1_DEFAULT_COLOR = Color.YELLOW;
 	private static final Color CANDIDATES2_DEFAULT_COLOR = Color.PINK;
 
+	static final Border MUTATION_BORDER = BorderFactory.createLineBorder(Color.GREEN, 2);
+
 	private static final String COLUMN_1_TITLE = "Nr.";
 	private static final String COLUMN_2_TITLE = "File line";
 
@@ -43,6 +46,8 @@ public class TableForm {
 
 	private String maxLine = "";
 	private final LinesStorage linesStorage;
+	private boolean showMutation = false;
+	private TabComponent tabComponent;
 
 	public TableForm(File selectedFile, int totalVisibleWidth, LinesStorage linesStorage, FileDropHandler fileDropHandler) {
 		this.linesStorage = linesStorage;
@@ -176,6 +181,63 @@ public class TableForm {
 		return candidates2CheckBox.isSelected();
 	}
 
+	private void createUIComponents() {
+		mainPanel = new TableFormPanel(this);
+	}
+
+	@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
+	public boolean setShowingMutation(boolean show) {
+		showMutation = show;
+		aTable.repaint();
+		boolean isShowing = linesStorage.hasMutation() && showMutation;
+		if (isShowing) {
+			scrollToSelection(linesStorage.getFirstMutationLine());
+		}
+		return isShowing;
+	}
+
+	public boolean isShowingMutation() {
+		return showMutation;
+	}
+
+	public void setTabComponent(TabComponent tabComponent) {
+		this.tabComponent = tabComponent;
+	}
+
+	public TabComponent getTabComponent() {
+		return tabComponent;
+	}
+
+	private void scrollToSelection(int targetRow) {
+		int overScrollRow = calculateOverScrollRow(targetRow);
+		aTable.scrollRectToVisible(aTable.getCellRect(overScrollRow, 0, true));
+	}
+
+	private int calculateOverScrollRow(int targetRow) {
+
+		int selectedRow = aTable.getSelectedRow();
+		boolean isMovingDown = selectedRow == -1 || selectedRow <= targetRow;
+
+		int overScrollRow = targetRow;
+		if (isMovingDown) {
+			int maxRow = aTable.getRowCount() - 1;
+			if (overScrollRow + 10 < maxRow) {
+				overScrollRow += 10;
+			} else {
+				overScrollRow = maxRow;
+			}
+		} else {
+			int minRow = 0;
+			if (overScrollRow - 10 > minRow) {
+				overScrollRow -= 10;
+			} else {
+				overScrollRow = minRow;
+			}
+		}
+
+		return overScrollRow;
+	}
+
 	private class ColorAndTooltipCellRenderer extends DefaultTableCellRenderer {
 
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -213,6 +275,11 @@ public class TableForm {
 					setToolTipText(linesStorage.generateCandidate1Stat(row));
 				}
 				cell.setBackground(bgColor);
+			}
+			if (linesStorage.hasMutationLine(row)) {
+				if (cell instanceof JComponent) {
+					((JComponent) cell).setBorder(showMutation ? MUTATION_BORDER : null);
+				}
 			}
 			return cell;
 		}
@@ -358,12 +425,8 @@ public class TableForm {
 			int targetRow = linesStorage.findNextLine(row);
 			if (targetRow == Integer.MAX_VALUE)
 				targetRow = row;
+			scrollToSelection(targetRow);
 			aTable.setRowSelectionInterval(targetRow, targetRow);
-			int overScrollRow = targetRow;
-			if (overScrollRow + 10 < aTable.getRowCount() - 1) {
-				overScrollRow += 10;
-			}
-			scrollToSelection(overScrollRow);
 			showTooltip(targetRow);
 		}
 
@@ -375,12 +438,8 @@ public class TableForm {
 			int targetRow = linesStorage.findPrevLine(row);
 			if (targetRow == -1)
 				targetRow = row;
+			scrollToSelection(targetRow);
 			aTable.setRowSelectionInterval(targetRow, targetRow);
-			int overScrollRow = targetRow;
-			if (overScrollRow - 10 > 0) {
-				overScrollRow -= 10;
-			}
-			scrollToSelection(overScrollRow);
 			showTooltip(targetRow);
 		}
 
@@ -406,10 +465,6 @@ public class TableForm {
 				/* do nothing */
 			}
 		}
-
-		private void scrollToSelection(int targetRow) {
-			aTable.scrollRectToVisible(aTable.getCellRect(targetRow, 1, true));
-		}
 	}
 
 	/**
@@ -427,6 +482,19 @@ public class TableForm {
 			if (tooltip == null || tooltip.isEmpty()) {
 				aTable.setToolTipText(null);
 			}
+		}
+	}
+
+	public class TableFormPanel extends JPanel {
+
+		private final TableForm tableForm;
+
+		public TableFormPanel(TableForm tableForm) {
+			this.tableForm = tableForm;
+		}
+
+		public TableForm getTableForm() {
+			return tableForm;
 		}
 	}
 }

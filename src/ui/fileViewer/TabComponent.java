@@ -67,6 +67,10 @@ public class TabComponent extends JPanel {
 		return getBackground() == DIRTY_COLOR;
 	}
 
+	public void markMutated(boolean isMutated) {
+		setBorder(isMutated ? TableForm.MUTATION_BORDER : null);
+	}
+
 	private class TabButton extends JButton implements ActionListener {
 
 		private TabButton() {

@@ -9,6 +9,7 @@ import java.util.Collections;
  */
 public class LinesStorage {
 
+	private final Collection<Integer> mutationLines;
 	private final Collection<Integer> nodesLines;
 	private final Collection<Integer> edgesLines;
 	private final Collection<Integer> candidates1Lines;
@@ -17,6 +18,7 @@ public class LinesStorage {
 	private ArrayList<Integer> edgeLinesArray;
 	private ArrayList<Integer> candidates1LinesArray;
 	private ArrayList<Integer> candidates2LinesArray;
+	private ArrayList<Integer> mutationLinesArray;
 
 	private int offset = 0;
 	private TableForm tableForm;
@@ -30,6 +32,7 @@ public class LinesStorage {
 		edgesLines = builder.edgesLines;
 		candidates1Lines = builder.candidates1Lines;
 		candidates2Lines = builder.candidates2Lines;
+		mutationLines = builder.mutationLines;
 
 		if (nodesLines != null) {
 			nodeLinesArray = new ArrayList<Integer>(nodesLines);
@@ -47,6 +50,25 @@ public class LinesStorage {
 			candidates2LinesArray = new ArrayList<Integer>(candidates2Lines);
 			Collections.sort(candidates2LinesArray);
 		}
+		if (mutationLines != null) {
+			mutationLinesArray = new ArrayList<Integer>(mutationLines);
+			Collections.sort(mutationLinesArray);
+		}
+	}
+
+	public boolean hasMutation() {
+		return mutationLines != null && !mutationLines.isEmpty();
+	}
+
+	public boolean hasMutationLine(int line) {
+		return hasMutation() && mutationLines.contains(line + offset);
+	}
+
+	public int getFirstMutationLine() {
+		if (!hasMutation()) {
+			return -1;
+		}
+		return mutationLinesArray.get(0);
 	}
 
 	public boolean isEmpty() {
@@ -160,6 +182,7 @@ public class LinesStorage {
 		prevLine = Math.max(prevLine, findPrevLineIn(row, edgeLinesArray, tableForm.isEdgesSelected()));
 		prevLine = Math.max(prevLine, findPrevLineIn(row, candidates1LinesArray, tableForm.isCandidates1Selected()));
 		prevLine = Math.max(prevLine, findPrevLineIn(row, candidates2LinesArray, tableForm.isCandidates2Selected()));
+		prevLine = Math.max(prevLine, findPrevLineIn(row, mutationLinesArray, tableForm.isShowingMutation()));
 		if (prevLine != -1) {
 			prevLine -= offset;
 		}
@@ -188,6 +211,7 @@ public class LinesStorage {
 		nextLine = Math.min(nextLine, findNextLineIn(row, edgeLinesArray, tableForm.isEdgesSelected()));
 		nextLine = Math.min(nextLine, findNextLineIn(row, candidates1LinesArray, tableForm.isCandidates1Selected()));
 		nextLine = Math.min(nextLine, findNextLineIn(row, candidates2LinesArray, tableForm.isCandidates2Selected()));
+		nextLine = Math.min(nextLine, findNextLineIn(row, mutationLinesArray, tableForm.isShowingMutation()));
 		if (nextLine != Integer.MAX_VALUE) {
 			nextLine -= offset;
 		}
@@ -217,6 +241,7 @@ public class LinesStorage {
 		private Collection<Integer> edgesLines = null;
 		private Collection<Integer> candidates1Lines = null;
 		private Collection<Integer> candidates2Lines = null;
+		private Collection<Integer> mutationLines = null;
 
 		public Builder nodes(Collection<Integer> nodesLines) {
 			this.nodesLines = nodesLines;
@@ -235,6 +260,11 @@ public class LinesStorage {
 
 		public Builder candidates2(Collection<Integer> candidates2Lines) {
 			this.candidates2Lines = candidates2Lines;
+			return this;
+		}
+
+		public Builder mutation(Collection<Integer> mutationLines) {
+			this.mutationLines = mutationLines;
 			return this;
 		}
 

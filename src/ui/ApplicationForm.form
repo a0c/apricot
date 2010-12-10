@@ -591,6 +591,247 @@
                       </grid>
                     </children>
                   </grid>
+                  <grid id="20107" layout-manager="FormLayout">
+                    <rowspec value="top:d:noGrow"/>
+                    <rowspec value="fill:d:grow"/>
+                    <colspec value="fill:d:noGrow"/>
+                    <colspec value="fill:d:grow"/>
+                    <constraints>
+                      <tabbedpane title="Diagnosis"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <grid id="48241" layout-manager="FormLayout">
+                        <rowspec value="fill:d:noGrow"/>
+                        <rowspec value="top:4dlu:noGrow"/>
+                        <rowspec value="fill:d:noGrow"/>
+                        <rowspec value="top:1dlu:noGrow"/>
+                        <rowspec value="center:d:grow"/>
+                        <rowspec value="top:1dlu:noGrow"/>
+                        <rowspec value="fill:d:noGrow"/>
+                        <rowspec value="top:4dlu:noGrow"/>
+                        <rowspec value="center:max(d;25px):noGrow"/>
+                        <rowspec value="top:4dlu:noGrow"/>
+                        <rowspec value="fill:d:noGrow"/>
+                        <rowspec value="top:0dlu:noGrow"/>
+                        <rowspec value="center:max(d;4px):noGrow"/>
+                        <colspec value="fill:d:noGrow"/>
+                        <colspec value="left:6dlu:noGrow"/>
+                        <colspec value="fill:d:grow"/>
+                        <colspec value="left:4dlu:noGrow"/>
+                        <colspec value="fill:max(d;4px):noGrow"/>
+                        <colspec value="left:4dlu:noGrow"/>
+                        <colspec value="fill:max(d;4px):noGrow"/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <forms defaultalign-vert="false"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none" title="Diagnosis Analyzer"/>
+                        <children>
+                          <component id="1c6d2" class="javax.swing.JTextField" binding="diagHlddTextField">
+                            <constraints>
+                              <grid row="0" column="2" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false">
+                                <preferred-size width="150" height="-1"/>
+                              </grid>
+                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                            </constraints>
+                            <properties>
+                              <background color="-1"/>
+                              <editable value="false"/>
+                              <focusable value="false"/>
+                              <opaque value="false"/>
+                            </properties>
+                          </component>
+                          <component id="d7527" class="javax.swing.JButton" binding="diagSimulButton">
+                            <constraints>
+                              <grid row="10" column="0" row-span="1" col-span="7" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false"/>
+                            </constraints>
+                            <properties>
+                              <text value="&amp;Simulate"/>
+                            </properties>
+                          </component>
+                          <component id="6d38f" class="javax.swing.JRadioButton" binding="diagRandomRButton">
+                            <constraints>
+                              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-vert="false"/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="&amp;Random Stimuli"/>
+                            </properties>
+                          </component>
+                          <component id="6997" class="javax.swing.JRadioButton" binding="diagTstRButton">
+                            <constraints>
+                              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <text value="Stimuli from .TST &amp;File"/>
+                            </properties>
+                          </component>
+                          <component id="2121e" class="javax.swing.JSpinner" binding="diagPatternNrSpinner" custom-create="true">
+                            <constraints>
+                              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                            </constraints>
+                            <properties/>
+                          </component>
+                          <component id="67c3d" class="javax.swing.JCheckBox" binding="potentialCheckBox">
+                            <constraints>
+                              <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="false"/>
+                              <text value="&amp;potential"/>
+                            </properties>
+                          </component>
+                          <component id="a336d" class="javax.swing.JCheckBox" binding="score1byratioCheckBox">
+                            <constraints>
+                              <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="false"/>
+                              <text value="score1&amp;byratio"/>
+                            </properties>
+                          </component>
+                          <component id="d2960" class="javax.swing.JCheckBox" binding="optimizeCheckBox">
+                            <constraints>
+                              <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="&amp;optimize"/>
+                            </properties>
+                          </component>
+                          <component id="a5c29" class="javax.swing.JCheckBox" binding="score1byfailedCheckBox">
+                            <constraints>
+                              <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="false"/>
+                              <text value="s&amp;core1byfailed"/>
+                            </properties>
+                          </component>
+                          <component id="192e7" class="javax.swing.JCheckBox" binding="diagnoseCheckBox">
+                            <constraints>
+                              <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false"/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="&amp;Diagnose"/>
+                            </properties>
+                          </component>
+                          <component id="a21ff" class="javax.swing.JSeparator">
+                            <constraints>
+                              <grid row="4" column="4" row-span="1" col-span="3" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                            </constraints>
+                            <properties/>
+                          </component>
+                          <component id="4c139" class="javax.swing.JButton" binding="diagHlddButton">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <font style="0"/>
+                              <text value="&amp;HLDD"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </grid>
+                      <grid id="837dd" layout-manager="FormLayout">
+                        <rowspec value="fill:d:noGrow"/>
+                        <rowspec value="top:4dlu:noGrow"/>
+                        <rowspec value="fill:max(d;25px):noGrow"/>
+                        <rowspec value="top:4dlu:noGrow"/>
+                        <rowspec value="fill:d:noGrow"/>
+                        <rowspec value="top:4dlu:noGrow"/>
+                        <rowspec value="center:max(d;4px):noGrow"/>
+                        <colspec value="fill:126px:noGrow"/>
+                        <colspec value="left:6dlu:noGrow"/>
+                        <colspec value="center:d:grow"/>
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <forms/>
+                        </constraints>
+                        <properties/>
+                        <border type="none" title="Diagnosis Highlighter"/>
+                        <children>
+                          <component id="2df21" class="javax.swing.JButton" binding="diagVhdlButton">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <text value="&amp;VHDL"/>
+                            </properties>
+                          </component>
+                          <component id="bf379" class="javax.swing.JButton" binding="dgnButton">
+                            <constraints>
+                              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <text value=".DG&amp;N File"/>
+                            </properties>
+                          </component>
+                          <component id="23706" class="javax.swing.JTextField" binding="diagVhdlTextField">
+                            <constraints>
+                              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                                <preferred-size width="150" height="-1"/>
+                              </grid>
+                              <forms defaultalign-horz="false"/>
+                            </constraints>
+                            <properties>
+                              <editable value="false"/>
+                              <focusable value="false"/>
+                              <opaque value="false"/>
+                            </properties>
+                          </component>
+                          <component id="9dcbf" class="javax.swing.JTextField" binding="dgnTextField">
+                            <constraints>
+                              <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                                <preferred-size width="150" height="-1"/>
+                              </grid>
+                              <forms defaultalign-horz="false"/>
+                            </constraints>
+                            <properties>
+                              <editable value="false"/>
+                              <focusable value="false"/>
+                              <opaque value="false"/>
+                            </properties>
+                          </component>
+                          <component id="74b16" class="javax.swing.JButton" binding="diagHighlightButton">
+                            <constraints>
+                              <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false"/>
+                            </constraints>
+                            <properties>
+                              <text value="Hi&amp;ghlight"/>
+                            </properties>
+                          </component>
+                          <component id="af428" class="javax.swing.JToggleButton" binding="revealMutationButton" default-binding="true">
+                            <constraints>
+                              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <text value="Reveal &amp;mutation"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </grid>
+                    </children>
+                  </grid>
                 </children>
               </tabbedpane>
               <tabbedpane id="18218" binding="upperRightTabbedPane">
@@ -773,6 +1014,10 @@
       <member id="6f7d2"/>
       <member id="5fc6e"/>
     </group>
+    <group name="diagnosisBGroup">
+      <member id="6d38f"/>
+      <member id="6997"/>
+    </group>
   </buttonGroups>
   <inspectionSuppressions>
     <suppress inspection="NoLabelFor" id="b61a"/>
@@ -791,5 +1036,9 @@
     <suppress inspection="NoLabelFor" id="75d37"/>
     <suppress inspection="NoLabelFor" id="bce00"/>
     <suppress inspection="NoLabelFor" id="ef10e"/>
+    <suppress inspection="NoLabelFor" id="1c6d2"/>
+    <suppress inspection="NoLabelFor" id="2121e"/>
+    <suppress inspection="NoLabelFor" id="23706"/>
+    <suppress inspection="NoLabelFor" id="9dcbf"/>
   </inspectionSuppressions>
 </form>

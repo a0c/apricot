@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 /**
  * @author Anton Chepurov
@@ -17,13 +18,13 @@ public class DiagnosisReader {
 
 	private static final String SCORE1_START_TEXT = ".SCORE1_CANDIDATES";
 	private static final String SCORE2_START_TEXT = ".SCORE2_CANDIDATES";
-	private static final String SCORE1_END_TEXT = ";.SCORE1_DETECTED";
-	private static final String SCORE2_END_TEXT = ";.SCORE2_DETECTED";
+	private static final Pattern ACTUAL_MUTATION_PATTERN = Pattern.compile("^Function .* replaced by .*");
 
 	private final File diagnosisFile;
 
 	private Collection<VariableItem> candidates1;
 	private Collection<VariableItem> candidates2;
+	private VariableItem actualMutation;
 
 	public DiagnosisReader(File diagnosisFile) {
 		this.diagnosisFile = diagnosisFile;
@@ -51,9 +52,15 @@ public class DiagnosisReader {
 				} else if (line.startsWith(SCORE2_START_TEXT)) {
 					filling = Filling.Candidates2;
 					continue;
-				} else if (line.startsWith(SCORE1_END_TEXT) || line.startsWith(SCORE2_END_TEXT)) {
-					filling = Filling.NONE;
-					continue;
+				} else if (ACTUAL_MUTATION_PATTERN.matcher(line).matches()) {
+					if (!(line.contains("[") && line.contains("]"))) {
+						throw new RuntimeException("Malformed DGN file (or format is changed)." +
+								"\nActual mutation line is expected to contain \'Var[XXX]\'. Actual: " + line);
+					}
+					int start = line.indexOf("[") + 1;
+					int end = line.indexOf("]");
+					line = line.substring(start, end);
+					actualMutation = new VariableItem(Integer.parseInt(line));
 				}
 
 				switch (filling) {
@@ -92,6 +99,17 @@ public class DiagnosisReader {
 			}
 		}
 		return candidates2;
+	}
+
+	public VariableItem getActualMutation() {
+		if (actualMutation == null) {
+			try {
+				read();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return actualMutation;
 	}
 
 	@SuppressWarnings({"EnumeratedClassNamingConvention"})

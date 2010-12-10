@@ -64,15 +64,18 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					}
 
 					/* Read DGN file */
-					SourceLocation sourceCandidates1 = null;
-					SourceLocation sourceCandidates2 = null;
+					SourceLocation actualMutationSources = null;
+					SourceLocation candidates1Sources = null;
+					SourceLocation candidates2Sources = null;
 					if (dgnFile != null) {
 						consoleWriter.write("Reading diagnosis file...");
 						DiagnosisReader diagnosisReader = new DiagnosisReader(dgnFile);
 						Collection<VariableItem> candidates1 = diagnosisReader.getCandidates1();
 						Collection<VariableItem> candidates2 = diagnosisReader.getCandidates2();
-						sourceCandidates1 = hldd2VHDLMapping.getSourceFor(candidates1);
-						sourceCandidates2 = hldd2VHDLMapping.getSourceFor(candidates2);
+						candidates1Sources = hldd2VHDLMapping.getSourceFor(candidates1);
+						candidates2Sources = hldd2VHDLMapping.getSourceFor(candidates2);
+						VariableItem actualMutation = diagnosisReader.getActualMutation();
+						actualMutationSources = hldd2VHDLMapping.getSourceFor(actualMutation);
 						consoleWriter.done();
 					}
 
@@ -90,7 +93,8 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 					for (File sourceFile : allSourceFiles) {
 						/* Add tab to the FileViewer */
 						if (hasNodeCoverage(coverageReader) || dgnFile != null) {
-							LinesStorage linesStorage = buildLinesStorage(sourceFile, uncoveredSources, sourceCandidates1, sourceCandidates2);
+							LinesStorage linesStorage = buildLinesStorage(sourceFile, uncoveredSources,
+									candidates1Sources, candidates2Sources, actualMutationSources);
 							applicationForm.addFileViewerTabFromFile(sourceFile, linesStorage, null);
 						}
 						/* Add VHDL coverage bar */
@@ -139,17 +143,21 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 
 	private LinesStorage buildLinesStorage(File sourceFile,
 										   SourceLocation uncoveredSources,
-										   SourceLocation sourceCandidates1,
-										   SourceLocation sourceCandidates2) {
+										   SourceLocation candidates1Sources,
+										   SourceLocation candidates2Sources,
+										   SourceLocation mutationSources) {
 		LinesStorage.Builder builder = new LinesStorage.Builder();
 		if (uncoveredSources != null) {
 			builder.nodes(uncoveredSources.getLinesForFile(sourceFile));
 		}
-		if (sourceCandidates1 != null && sourceCandidates1.hasFile(sourceFile)) {
-			builder.candidates1(sourceCandidates1.getLinesForFile(sourceFile));
+		if (candidates1Sources != null && candidates1Sources.hasFile(sourceFile)) {
+			builder.candidates1(candidates1Sources.getLinesForFile(sourceFile));
 		}
-		if (sourceCandidates2 != null && sourceCandidates2.hasFile(sourceFile)) {
-			builder.candidates2(sourceCandidates2.getLinesForFile(sourceFile));
+		if (candidates2Sources != null && candidates2Sources.hasFile(sourceFile)) {
+			builder.candidates2(candidates2Sources.getLinesForFile(sourceFile));
+		}
+		if (mutationSources != null) {
+			builder.mutation(mutationSources.getLinesForFile(sourceFile));
 		}
 		return builder.build();
 	}

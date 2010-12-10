@@ -22,6 +22,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,23 @@ public class ApplicationForm implements ActionListener {
 	private JCheckBox conditionCheckBox;
 	private JPanel buttonsPanel;
 	private JCheckBox commentCheckBox;
+	private JTextField diagHlddTextField;
+	private JButton diagSimulButton;
+	private JSpinner diagPatternNrSpinner;
+	private JRadioButton diagRandomRButton;
+	private JRadioButton diagTstRButton;
+	private JCheckBox diagnoseCheckBox;
+	private JCheckBox optimizeCheckBox;
+	private JCheckBox potentialCheckBox;
+	private JCheckBox score1byratioCheckBox;
+	private JCheckBox score1byfailedCheckBox;
+	private JButton diagHlddButton;
+	private JButton diagVhdlButton;
+	private JButton dgnButton;
+	private JTextField diagVhdlTextField;
+	private JTextField dgnTextField;
+	private JButton diagHighlightButton;
+	private JToggleButton revealMutationButton;
 	private MouseSelectionAdapter upperRightTabbedPaneAdapter;
 	private MouseSelectionAdapter picturePaneAdapter;
 
@@ -134,7 +152,11 @@ public class ApplicationForm implements ActionListener {
 				randomAssertRadioButton, patternNrSpinnerAssert, tgmButton, checkButton, checkAssertionCheckBox,
 				chkFileButton, drawButton, drawPatternCountSpinner, hlddCoverageButton, analyzeButton, tstCovRadioButton,
 				randomCovRadioButton, analyzeCoverageCheckBox, nodeCheckBox, toggleCheckBox, conditionCheckBox,
-				edgeCheckBox, vhdlCovButton, covButton, showButton);
+				edgeCheckBox, vhdlCovButton, covButton, showButton,
+				diagHlddTextField, diagSimulButton, diagPatternNrSpinner, diagRandomRButton, diagTstRButton,
+				diagnoseCheckBox, optimizeCheckBox, potentialCheckBox, score1byratioCheckBox,
+				score1byfailedCheckBox, diagHlddButton, diagVhdlButton, dgnButton,
+				diagVhdlTextField, dgnTextField, diagHighlightButton, revealMutationButton);
 
 		/* ConsoleWriter to write into a consoleTextArea */
 		ConsoleWriter consoleWriter = new ConsoleWriter(consoleTextArea, false);
@@ -187,6 +209,9 @@ public class ApplicationForm implements ActionListener {
 		/* COVERAGE ANALYSIS */
 		businessLogicCoverageAnalyzer = new BusinessLogicCoverageAnalyzer(this, consoleWriter);
 		addActionListener(hlddCoverageButton, analyzeButton, vhdlCovButton, covButton, showButton);
+		/* DIAGNOSIS */
+		addActionListener(diagHlddButton, diagSimulButton, diagVhdlButton, dgnButton, diagHighlightButton, revealMutationButton);
+		revealMutationButton.addChangeListener(new TableFormFocuser());
 
 		/* Add Mouse Listener to the File Viewer Tabbed Pane */
 		tabbedPaneListener = new TabbedPaneListener(this, fileViewerTabbedPane1, clickMePanel1, fileViewerTabbedPane2);
@@ -246,7 +271,10 @@ public class ApplicationForm implements ActionListener {
 				new ButtonAndTextField(chkFileButton, chkFileTextField),
 				new ButtonAndTextField(hlddCoverageButton, hlddCoverageTextField),
 				new ButtonAndTextField(vhdlCovButton, vhdlCovTextField),
-				new ButtonAndTextField(covButton, covTextField)
+				new ButtonAndTextField(covButton, covTextField),
+				new ButtonAndTextField(diagHlddButton, diagHlddTextField),
+				new ButtonAndTextField(diagVhdlButton, diagVhdlTextField),
+				new ButtonAndTextField(dgnButton, dgnTextField)
 		};
 
 		for (ButtonAndTextField holder : store) {
@@ -334,7 +362,7 @@ public class ApplicationForm implements ActionListener {
 			extensions = new String[]{"agm"};
 			dialogTitle = "Select HLDD model file to analyze";
 			invalidFileMessage = "Selected file is not an HLDD file!";
-		} else if (sourceButton == vhdlCovButton) {
+		} else if (sourceButton == vhdlCovButton || sourceButton == diagVhdlButton) {
 			extensions = new String[]{"vhdl", "vhd"};
 			dialogTitle = "Select source VHDL Behavioural file";
 			invalidFileMessage = "Selected file is not a VHDL file!";
@@ -342,6 +370,14 @@ public class ApplicationForm implements ActionListener {
 			extensions = new String[]{"cov"};
 			dialogTitle = "Select Coverage file";
 			invalidFileMessage = "Selected file is not a Coverage file!";
+		} else if (sourceButton == diagHlddButton) {
+			extensions = new String[]{"agm"};
+			dialogTitle = "Select HLDD model file to diagnose";
+			invalidFileMessage = "Selected file is not an HLDD file!";
+		} else if (sourceButton == dgnButton) {
+			extensions = new String[]{"dgn"};
+			dialogTitle = "Select Diagnosis file";
+			invalidFileMessage = "Selected file is not a Diagnosis file!";
 		} else return;
 
 		SingleFileSelector selector = SingleFileSelector.getInstance(SingleFileSelector.DialogType.OPEN,
@@ -411,6 +447,18 @@ public class ApplicationForm implements ActionListener {
 
 					setPslFile(selectedFile);
 
+				} else if (sourceButton == dgnButton) {
+
+					setDgnFile(selectedFile);
+
+				} else if (sourceButton == diagVhdlButton) {
+
+					setDiagVhdlFile(selectedFile);
+
+				} else if (sourceButton == diagHlddButton) {
+
+					setDiagHlddFile(selectedFile);
+
 				}
 
 			} catch (ExtendedException e) {
@@ -418,6 +466,27 @@ public class ApplicationForm implements ActionListener {
 			}
 		}
 
+	}
+
+	private void setDiagHlddFile(File hlddFile) {
+
+		//todo: businessLogic, or rather a TaskRunner
+		updateTextFieldFor(diagHlddButton, hlddFile);
+
+		/* Automatically look for identical Patterns file */
+		selectIdenticalTSTFile(deriveTstFile(hlddFile),
+				diagTstRButton, diagRandomRButton, diagPatternNrSpinner);
+
+		SingleFileSelector.setCurrentDirectory(hlddFile);
+	}
+
+	private void setDiagVhdlFile(File vhdlFile) {
+
+		updateTextFieldFor(diagVhdlButton, vhdlFile);
+
+		setCovVhdlFile(vhdlFile);
+
+		SingleFileSelector.setCurrentDirectory(vhdlFile);
 	}
 
 	private void setChkFile(File chkFile) {
@@ -563,22 +632,34 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public void setDgnFile(File dgnFile) {
+		setDgnFile(dgnFile, true);
+	}
 
-		File covFile = deriveCovFile(dgnFile);
-		businessLogicCoverageAnalyzer.setCovFile(covFile);
+	public void setDgnFile(File dgnFile, boolean doClick) {
+
+		if (doClick) {
+			File covFile = deriveCovFile(dgnFile);
+			setCovFile(covFile, false);
+		}
+
 		businessLogicCoverageAnalyzer.setDgnFile(dgnFile);
-		updateCovTextField(covFile);
+		updateDgnTextField(dgnFile);
 
+		if (dgnFile == null) {
+			return;
+		}
 		/* Auto load VHDL file and show candidates */
 		File vhdlFile = deriveVhdlFile(deriveHlddFile(dgnFile));
 
 		if (vhdlFile != null) {
-			setCovVhdlFile(vhdlFile);
+			setDiagVhdlFile(vhdlFile);
 		}
 
 		/* Automatically click Show button, if both files are set */
-		if (vhdlFile != null && dgnFile != null) {
-			doClickShowButton();
+		if (doClick) {
+			if (vhdlFile != null) {
+				doClickShowButton();
+			}
 		}
 
 		SingleFileSelector.setCurrentDirectory(dgnFile);
@@ -586,10 +667,22 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public void setCovFile(File covFile) {
+		setCovFile(covFile, true);
+	}
+
+	public void setCovFile(File covFile, boolean doClick) {
+
+		if (doClick) {
+			File dgnFile = deriveDgnFile(covFile);
+			setDgnFile(dgnFile, false);
+		}
 
 		businessLogicCoverageAnalyzer.setCovFile(covFile);
 		updateCovTextField(covFile);
 
+		if (covFile == null) {
+			return;
+		}
 		/* Auto load VHDL file and show coverage */
 		File vhdlFile = deriveVhdlFile(deriveHlddFile(covFile));
 
@@ -598,8 +691,10 @@ public class ApplicationForm implements ActionListener {
 		}
 
 		/* Automatically click Show button, if both files are set */
-		if (vhdlFile != null && covFile != null) {
-			doClickShowButton();
+		if (doClick) {
+			if (vhdlFile != null) {
+				doClickShowButton();
+			}
 		}
 
 		SingleFileSelector.setCurrentDirectory(covFile);
@@ -811,7 +906,8 @@ public class ApplicationForm implements ActionListener {
 					|| source == baseModelBtn || source == pslBtn
 					|| source == ppgLibButton
 					|| source == chkFileButton || source == hlddAssertButton || source == tgmButton
-					|| source == hlddCoverageButton || source == vhdlCovButton || source == covButton)) {
+					|| source == hlddCoverageButton || source == vhdlCovButton || source == covButton
+					|| source == diagHlddButton || source == diagVhdlButton || source == dgnButton)) {
 
 				showSelectFileDialog(((JButton) source));
 
@@ -833,9 +929,53 @@ public class ApplicationForm implements ActionListener {
 				businessLogicCoverageAnalyzer.processAnalyze();
 			} else if (source == showButton) {
 				businessLogicCoverageAnalyzer.processShow();
+			} else if (source == diagSimulButton) {
+				JOptionPane.showMessageDialog(frame, "Coming soon...", "Under development", JOptionPane.WARNING_MESSAGE);
+			} else if (source == diagHighlightButton) {
+				businessLogicCoverageAnalyzer.processShow();
+			} else if (source == revealMutationButton) {
+				toggleMutations();
 			}
 		} catch (ExtendedException e1) {
 			JOptionPane.showMessageDialog(frame, e1.getMessage(), e1.getTitle(), JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
+	private void toggleMutations() {
+
+		boolean isOn = revealMutationButton.isSelected();
+
+		revealMutationButton.setText(isOn ? "Hide mutation" : "Reveal mutation");
+
+		toggleMutationsInTabbedPane(fileViewerTabbedPane1, isOn);
+		toggleMutationsInTabbedPane(fileViewerTabbedPane2, isOn);
+
+	}
+
+	private void toggleMutationsInTabbedPane(JTabbedPane tabbedPane, boolean isOn) {
+
+		Collection<TableForm> tableForms = new TableFormFinder(tabbedPane).find();
+		for (TableForm tableForm : tableForms) {
+
+			boolean isShowing = tableForm.setShowingMutation(isOn);
+
+			TabComponent tabComponent = tableForm.getTabComponent();
+
+			tabComponent.markMutated(isShowing);
+
+			if (isShowing) {
+				selectTab(tabComponent, tabbedPane);
+			}
+		}
+	}
+
+	private void selectTab(TabComponent tabComponent, JTabbedPane tabbedPane) {
+		for (int i = 0, n = tabbedPane.getTabCount(); i < n; i++) {
+			Component tComponent = tabbedPane.getTabComponentAt(i);
+			if (tComponent == tabComponent) {
+				tabbedPane.setSelectedIndex(i);
+				return;
+			}
 		}
 	}
 
@@ -965,6 +1105,10 @@ public class ApplicationForm implements ActionListener {
 		updateTextFieldFor(covButton, file);
 	}
 
+	private void updateDgnTextField(File file) {
+		updateTextFieldFor(dgnButton, file);
+	}
+
 	private void updateVhdlCovTextField(File file) {
 		updateTextFieldFor(vhdlCovButton, file);
 	}
@@ -983,7 +1127,8 @@ public class ApplicationForm implements ActionListener {
 		drawPatternCountSpinner = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
 		patternNrSpinnerAssert = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
 		patternNrSpinnerCoverage = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
-		addAllSelectingFocusListeners(drawPatternCountSpinner, patternNrSpinnerAssert, patternNrSpinnerCoverage);
+		diagPatternNrSpinner = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
+		addAllSelectingFocusListeners(drawPatternCountSpinner, patternNrSpinnerAssert, patternNrSpinnerCoverage, diagPatternNrSpinner);
 
 		consolePanel = new ConsolePanel();
 	}
@@ -1043,22 +1188,27 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public void addFileViewerTab(JTabbedPane tabbedPane, String tabTitle, String tabToolTip, JComponent component, boolean isDirty) {
+		TabComponent tabComponent;
 		/* Search for equal existing tab */
 		int insertionIndex = getIdenticalTabIndex(tabbedPane, tabToolTip);
 		if (insertionIndex == -1) {
 			/* Previously existing tab is not found. Create a new one. */
 			insertionIndex = tabbedPane.getTabCount() - 1;
 			tabbedPane.insertTab(tabTitle, null, component, null, insertionIndex);
-			TabComponent tabComponent = new TabComponent(tabbedPane, tabTitle, tabToolTip,
+			tabComponent = new TabComponent(tabbedPane, tabTitle, tabToolTip,
 					tabbedPane == fileViewerTabbedPane1 ? tabbedPaneListener : tabbedPaneListener2);
 			TabComponent.setBackgroundFor(tabComponent, isDirty);
 			tabbedPane.setTabComponentAt(insertionIndex, tabComponent);
 		} else {
 			/* Previously existing tab is found. Replace its component with a new one (the specified one). */
-			TabComponent.setBackgroundFor(tabbedPane.getTabComponentAt(insertionIndex), isDirty);
+			tabComponent = (TabComponent) tabbedPane.getTabComponentAt(insertionIndex);
+			TabComponent.setBackgroundFor(tabComponent, isDirty);
 			tabbedPane.setComponentAt(insertionIndex, component);
 			tabbedPane.repaint();
 			System.gc();
+		}
+		if (component instanceof TableForm.TableFormPanel) {
+			((TableForm.TableFormPanel) component).getTableForm().setTabComponent(tabComponent);
 		}
 		synchronizeScroll(tabbedPane, component, tabToolTip);
 		/* Activate new tab */
@@ -1340,6 +1490,7 @@ public class ApplicationForm implements ActionListener {
 				applicationForm.setBehVhdlFile(file);
 				applicationForm.setBehDDVhdlFile(file);
 				applicationForm.setCovVhdlFile(file);
+				applicationForm.setDiagVhdlFile(file);
 
 			} else if (isCOV(file)) {
 
@@ -1357,6 +1508,7 @@ public class ApplicationForm implements ActionListener {
 				applicationForm.setBaseModelFile(file);
 				applicationForm.setAssertHlddFile(file);
 				applicationForm.setCovHlddFile(file);
+				applicationForm.setDiagHlddFile(file);
 
 			} else if (isPPG(file)) {
 
@@ -1388,7 +1540,7 @@ public class ApplicationForm implements ActionListener {
 
 				applicationForm.setDgnFile(file);
 
-				applicationForm.tabbedPane.setSelectedIndex(2);
+				applicationForm.tabbedPane.setSelectedIndex(3);
 
 			}
 		}
@@ -1436,21 +1588,32 @@ public class ApplicationForm implements ActionListener {
 	private class TableFormFocuser implements ChangeListener {
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			JTabbedPane tabbedPane = (JTabbedPane) e.getSource();
-			final JTable table = new TableFinder(tabbedPane).find();
-			if (table != null) {
-				// dirty hack: requesting focus at once will fail,
-				// because after invoking user-defined ChangeListeners,
-				// default ChangeListener of the JTabbedPane is invoked,
-				// which transfers the focus away from where we've set it.
-				Timer timer = new Timer(50, new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						table.requestFocus();
-					}
-				});
-				timer.setRepeats(false);
-				timer.start();
+			Object source = e.getSource();
+			if (source instanceof JTabbedPane) {
+				JTabbedPane tabbedPane = (JTabbedPane) source;
+				final JTable table = new TableFinder(tabbedPane).find();
+				if (table != null) {
+					// dirty hack: requesting focus at once will fail,
+					// because after invoking user-defined ChangeListeners,
+					// default ChangeListener of the JTabbedPane is invoked,
+					// which transfers the focus away from where we've set it.
+					Timer timer = new Timer(50, new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							table.requestFocus();
+						}
+					});
+					timer.setRepeats(false);
+					timer.start();
+				}
+			} else {
+				JTable table = new TableFinder(fileViewerTabbedPane1).find();
+				if (table == null) {
+					table = new TableFinder(fileViewerTabbedPane2).find();
+				}
+				if (table != null) {
+					table.requestFocus();
+				}
 			}
 		}
 	}
