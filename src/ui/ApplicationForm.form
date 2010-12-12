@@ -400,7 +400,7 @@
                         <properties/>
                         <border type="none" title="Coverage Analyzer"/>
                         <children>
-                          <component id="640a5" class="javax.swing.JTextField" binding="hlddCoverageTextField">
+                          <component id="640a5" class="javax.swing.JTextField" binding="covHlddTextField">
                             <constraints>
                               <grid row="0" column="2" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false">
                                 <preferred-size width="150" height="-1"/>
@@ -414,7 +414,7 @@
                               <opaque value="false"/>
                             </properties>
                           </component>
-                          <component id="d340a" class="javax.swing.JButton" binding="analyzeButton" default-binding="true">
+                          <component id="d340a" class="javax.swing.JButton" binding="covSimulButton" default-binding="true">
                             <constraints>
                               <grid row="10" column="0" row-span="1" col-span="7" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-horz="false"/>
@@ -423,7 +423,7 @@
                               <text value="&amp;Simulate"/>
                             </properties>
                           </component>
-                          <component id="6f7d2" class="javax.swing.JRadioButton" binding="randomCovRadioButton">
+                          <component id="6f7d2" class="javax.swing.JRadioButton" binding="covRandomRButton">
                             <constraints>
                               <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-vert="false"/>
@@ -433,7 +433,7 @@
                               <text value="&amp;Random Stimuli"/>
                             </properties>
                           </component>
-                          <component id="5fc6e" class="javax.swing.JRadioButton" binding="tstCovRadioButton">
+                          <component id="5fc6e" class="javax.swing.JRadioButton" binding="covTstRButton">
                             <constraints>
                               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                               <forms/>
@@ -442,7 +442,7 @@
                               <text value="Stimuli from .TST &amp;File"/>
                             </properties>
                           </component>
-                          <component id="40a13" class="javax.swing.JSpinner" binding="patternNrSpinnerCoverage" custom-create="true">
+                          <component id="40a13" class="javax.swing.JSpinner" binding="covPatternNrSpinner" custom-create="true">
                             <constraints>
                               <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-horz="false" defaultalign-vert="false"/>
@@ -489,7 +489,7 @@
                               <text value="&amp;toggle"/>
                             </properties>
                           </component>
-                          <component id="770a3" class="javax.swing.JCheckBox" binding="analyzeCoverageCheckBox" default-binding="true">
+                          <component id="770a3" class="javax.swing.JCheckBox" binding="coverageCheckBox" default-binding="true">
                             <constraints>
                               <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-horz="false"/>
@@ -506,7 +506,7 @@
                             </constraints>
                             <properties/>
                           </component>
-                          <component id="3b4f4" class="javax.swing.JButton" binding="hlddCoverageButton">
+                          <component id="3b4f4" class="javax.swing.JButton" binding="covHlddButton">
                             <constraints>
                               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <forms/>
@@ -534,7 +534,7 @@
                         <properties/>
                         <border type="none" title="Coverage Highlighter"/>
                         <children>
-                          <component id="77e0f" class="javax.swing.JButton" binding="vhdlCovButton">
+                          <component id="77e0f" class="javax.swing.JButton" binding="covVhdlButton">
                             <constraints>
                               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <forms/>
@@ -552,7 +552,7 @@
                               <text value=".&amp;COV File"/>
                             </properties>
                           </component>
-                          <component id="af675" class="javax.swing.JTextField" binding="vhdlCovTextField">
+                          <component id="af675" class="javax.swing.JTextField" binding="covVhdlTextField">
                             <constraints>
                               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                                 <preferred-size width="150" height="-1"/>
@@ -578,7 +578,7 @@
                               <opaque value="false"/>
                             </properties>
                           </component>
-                          <component id="b5e3e" class="javax.swing.JButton" binding="showButton" default-binding="true">
+                          <component id="b5e3e" class="javax.swing.JButton" binding="covHighlightButton" default-binding="true">
                             <constraints>
                               <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-horz="false"/>

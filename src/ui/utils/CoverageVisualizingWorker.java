@@ -186,6 +186,6 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 	}
 
 	private void enableUI(boolean enable) {
-		applicationForm.enableCoverageHighlighter(enable);
+		applicationForm.enableHighlighter(enable);
 	}
 }

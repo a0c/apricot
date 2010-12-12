@@ -3,8 +3,6 @@ package ui;
 import io.ConsoleWriter;
 import ui.utils.CoverageAnalyzingUI;
 import ui.utils.CoverageAnalyzingWorker;
-import ui.utils.CoverageVisualizingUI;
-import ui.utils.CoverageVisualizingWorker;
 import ui.utils.uiWithWorker.UIWithWorker;
 
 import java.io.File;
@@ -14,17 +12,11 @@ import java.util.List;
 /**
  * @author Anton Chepurov
  */
-public class BusinessLogicCoverageAnalyzer implements Lockable {
+public class BusinessLogicCoverageAnalyzer {
 
 	private ApplicationForm applicationForm;
 	private ConsoleWriter consoleWriter;
 	private File hlddFile;
-	private File vhdlFile;
-	private File dgnFile;
-	private File covFile;
-	private File mappingFile;
-
-	private final SimpleLock simpleLock = new SimpleLock();
 
 	public BusinessLogicCoverageAnalyzer(ApplicationForm applicationForm, ConsoleWriter consoleWriter) {
 		this.applicationForm = applicationForm;
@@ -37,18 +29,6 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 
 	public void setHlddFile(File hlddFile) {
 		this.hlddFile = hlddFile;
-	}
-
-	public void setVhdlFile(File vhdlFile) {
-		this.vhdlFile = vhdlFile;
-	}
-
-	public void setDgnFile(File dgnFile) {
-		this.dgnFile = dgnFile;
-	}
-
-	public void setCovFile(File covFile) {
-		this.covFile = covFile;
 	}
 
 	public void processAnalyze() throws ExtendedException {
@@ -93,45 +73,4 @@ public class BusinessLogicCoverageAnalyzer implements Lockable {
 		return applicationForm;
 	}
 
-	public void processShow() throws ExtendedException {
-		/* Check all files to be selected */
-		String fileDescription = null;
-		if (vhdlFile == null) {
-			fileDescription = "VHDL";
-		} else if (covFile == null && dgnFile == null) {
-			fileDescription = "Coverage/Diagnosis";
-		} else {
-			File someExistingFile = covFile != null ? covFile : dgnFile;
-			mappingFile = FileDependencyResolver.deriveMapFile(someExistingFile);
-			if (mappingFile == null) {
-				fileDescription = "Mapping";
-			}
-		}
-		if (fileDescription != null) {
-			throw new ExtendedException(fileDescription + " file is missing", ExtendedException.MISSING_FILE_TEXT);
-		}
-
-		if (dgnFile == null) {
-			dgnFile = FileDependencyResolver.deriveDgnFile(covFile);
-		}
-
-		UIWithWorker.runUIWithWorker(new CoverageVisualizingUI(applicationForm.getFrame()),
-				new CoverageVisualizingWorker(vhdlFile, covFile, dgnFile, mappingFile, applicationForm, consoleWriter, simpleLock));
-
-	}
-
-	@Override
-	public boolean isLocked() {
-		return simpleLock.isLocked();
-	}
-
-	@Override
-	public void lock() {
-		simpleLock.lock();
-	}
-
-	@Override
-	public void unlock() {
-		simpleLock.unlock();
-	}
 }

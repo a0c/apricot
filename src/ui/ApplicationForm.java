@@ -50,10 +50,10 @@ public class ApplicationForm implements ActionListener {
 	private JTextField hlddAssertTextField;
 	private JButton tgmButton;
 	private JButton checkButton;
-	private JButton hlddCoverageButton;
-	private JTextField hlddCoverageTextField;
-	private JButton analyzeButton;
-	private JSpinner patternNrSpinnerCoverage;
+	private JButton covHlddButton;
+	private JTextField covHlddTextField;
+	private JButton covSimulButton;
+	private JSpinner covPatternNrSpinner;
 	private JPanel mainPanel;
 	private JTextArea consoleTextArea;
 	private JTabbedPane fileViewerTabbedPane1;
@@ -62,15 +62,15 @@ public class ApplicationForm implements ActionListener {
 	private JPanel consolePanel;
 	private JRadioButton randomAssertRadioButton;
 	private JRadioButton tstAssertRadioButton;
-	private JRadioButton tstCovRadioButton;
-	private JRadioButton randomCovRadioButton;
-	private JButton vhdlCovButton;
-	private JTextField vhdlCovTextField;
+	private JRadioButton covTstRButton;
+	private JRadioButton covRandomRButton;
+	private JButton covVhdlButton;
+	private JTextField covVhdlTextField;
 	private JButton covButton;
 	private JTextField covTextField;
-	private JButton showButton;
+	private JButton covHighlightButton;
 	private JTextField tgmTextField;
-	private JCheckBox analyzeCoverageCheckBox;
+	private JCheckBox coverageCheckBox;
 	private JTabbedPane pictureTabPane;
 	private JTabbedPane upperRightTabbedPane;
 	private JTabbedPane fileViewerTabbedPane2;
@@ -124,6 +124,7 @@ public class ApplicationForm implements ActionListener {
 
 	private BusinessLogicAssertionChecker businessLogicAssertionChecker = null;
 	private BusinessLogicCoverageAnalyzer businessLogicCoverageAnalyzer = null;
+	private Highlighter highlighter;
 
 	private TabbedPaneListener tabbedPaneListener;
 	private TabbedPaneListener tabbedPaneListener2;
@@ -150,9 +151,9 @@ public class ApplicationForm implements ActionListener {
 		addKeyListener(tabbedPane, parserComboBox, commentCheckBox, parseButton, upperRightTabbedPane,
 				fileViewerTabbedPane1, fileViewerTabbedPane2, hlddAssertButton, tstAssertRadioButton,
 				randomAssertRadioButton, patternNrSpinnerAssert, tgmButton, checkButton, checkAssertionCheckBox,
-				chkFileButton, drawButton, drawPatternCountSpinner, hlddCoverageButton, analyzeButton, tstCovRadioButton,
-				randomCovRadioButton, analyzeCoverageCheckBox, nodeCheckBox, toggleCheckBox, conditionCheckBox,
-				edgeCheckBox, vhdlCovButton, covButton, showButton,
+				chkFileButton, drawButton, drawPatternCountSpinner, covHlddButton, covSimulButton, covTstRButton,
+				covRandomRButton, coverageCheckBox, nodeCheckBox, toggleCheckBox, conditionCheckBox,
+				edgeCheckBox, covVhdlButton, covButton, covHighlightButton,
 				diagHlddTextField, diagSimulButton, diagPatternNrSpinner, diagRandomRButton, diagTstRButton,
 				diagnoseCheckBox, optimizeCheckBox, potentialCheckBox, score1byratioCheckBox,
 				score1byfailedCheckBox, diagHlddButton, diagVhdlButton, dgnButton,
@@ -208,10 +209,13 @@ public class ApplicationForm implements ActionListener {
 		addActionListener(hlddAssertButton, tgmButton, checkButton, chkFileButton, drawButton);
 		/* COVERAGE ANALYSIS */
 		businessLogicCoverageAnalyzer = new BusinessLogicCoverageAnalyzer(this, consoleWriter);
-		addActionListener(hlddCoverageButton, analyzeButton, vhdlCovButton, covButton, showButton);
+		addActionListener(covHlddButton, covSimulButton);
 		/* DIAGNOSIS */
-		addActionListener(diagHlddButton, diagSimulButton, diagVhdlButton, dgnButton, diagHighlightButton, revealMutationButton);
+		addActionListener(diagHlddButton, diagSimulButton, revealMutationButton);
 		revealMutationButton.addChangeListener(new TableFormFocuser());
+		/* HIGHLIGHTER */
+		highlighter = new Highlighter(this, consoleWriter);
+		addActionListener(covVhdlButton, covButton, covHighlightButton, diagVhdlButton, dgnButton, diagHighlightButton);
 
 		/* Add Mouse Listener to the File Viewer Tabbed Pane */
 		tabbedPaneListener = new TabbedPaneListener(this, fileViewerTabbedPane1, clickMePanel1, fileViewerTabbedPane2);
@@ -237,11 +241,11 @@ public class ApplicationForm implements ActionListener {
 		mapTextFieldsToButtons();
 		randomAssertRadioButton.addChangeListener(
 				new RadioButtonToSpinnerLinker(randomAssertRadioButton, patternNrSpinnerAssert));
-		randomCovRadioButton.addChangeListener(
-				new RadioButtonToSpinnerLinker(randomCovRadioButton, patternNrSpinnerCoverage));
+		covRandomRButton.addChangeListener(
+				new RadioButtonToSpinnerLinker(covRandomRButton, covPatternNrSpinner));
 
 		CoverageCheckBoxSetter checkBoxSetter = new CoverageCheckBoxSetter();
-		analyzeCoverageCheckBox.addActionListener(checkBoxSetter);
+		coverageCheckBox.addActionListener(checkBoxSetter);
 		edgeCheckBox.addActionListener(checkBoxSetter);
 		conditionCheckBox.addActionListener(checkBoxSetter);
 		nodeCheckBox.addActionListener(checkBoxSetter);
@@ -269,8 +273,8 @@ public class ApplicationForm implements ActionListener {
 				new ButtonAndTextField(hlddAssertButton, hlddAssertTextField),
 				new ButtonAndTextField(tgmButton, tgmTextField),
 				new ButtonAndTextField(chkFileButton, chkFileTextField),
-				new ButtonAndTextField(hlddCoverageButton, hlddCoverageTextField),
-				new ButtonAndTextField(vhdlCovButton, vhdlCovTextField),
+				new ButtonAndTextField(covHlddButton, covHlddTextField),
+				new ButtonAndTextField(covVhdlButton, covVhdlTextField),
 				new ButtonAndTextField(covButton, covTextField),
 				new ButtonAndTextField(diagHlddButton, diagHlddTextField),
 				new ButtonAndTextField(diagVhdlButton, diagVhdlTextField),
@@ -358,11 +362,11 @@ public class ApplicationForm implements ActionListener {
 			}
 			dialogTitle = "Select TGM file with assertions to check";
 			invalidFileMessage = "Selected file is not a TGM file!";
-		} else if (sourceButton == hlddCoverageButton) {
+		} else if (sourceButton == covHlddButton) {
 			extensions = new String[]{"agm"};
 			dialogTitle = "Select HLDD model file to analyze";
 			invalidFileMessage = "Selected file is not an HLDD file!";
-		} else if (sourceButton == vhdlCovButton || sourceButton == diagVhdlButton) {
+		} else if (sourceButton == covVhdlButton || sourceButton == diagVhdlButton) {
 			extensions = new String[]{"vhdl", "vhd"};
 			dialogTitle = "Select source VHDL Behavioural file";
 			invalidFileMessage = "Selected file is not a VHDL file!";
@@ -403,11 +407,11 @@ public class ApplicationForm implements ActionListener {
 
 					setChkFile(selectedFile);
 
-				} else if (sourceButton == hlddCoverageButton) {
+				} else if (sourceButton == covHlddButton) {
 
 					setCovHlddFile(selectedFile);
 
-				} else if (sourceButton == vhdlCovButton) {
+				} else if (sourceButton == covVhdlButton) {
 
 					setCovVhdlFile(selectedFile);
 
@@ -500,11 +504,11 @@ public class ApplicationForm implements ActionListener {
 	private void setCovHlddFile(File hlddFile) {
 
 		businessLogicCoverageAnalyzer.setHlddFile(hlddFile);
-		updateTextFieldFor(hlddCoverageButton, hlddFile);
+		updateTextFieldFor(covHlddButton, hlddFile);
 
 		/* Automatically look for identical Patterns file */
 		selectIdenticalTSTFile(deriveTstFile(hlddFile),
-				tstCovRadioButton, randomCovRadioButton, patternNrSpinnerCoverage);
+				covTstRButton, covRandomRButton, covPatternNrSpinner);
 
 		SingleFileSelector.setCurrentDirectory(hlddFile);
 	}
@@ -642,7 +646,7 @@ public class ApplicationForm implements ActionListener {
 			setCovFile(covFile, false);
 		}
 
-		businessLogicCoverageAnalyzer.setDgnFile(dgnFile);
+		highlighter.setDgnFile(dgnFile);
 		updateDgnTextField(dgnFile);
 
 		if (dgnFile == null) {
@@ -655,10 +659,10 @@ public class ApplicationForm implements ActionListener {
 			setDiagVhdlFile(vhdlFile);
 		}
 
-		/* Automatically click Show button, if both files are set */
+		/* Automatically click HIGHLIGHT button, if both files are set */
 		if (doClick) {
 			if (vhdlFile != null) {
-				doClickShowButton();
+				doClickHighlightButton();
 			}
 		}
 
@@ -677,7 +681,7 @@ public class ApplicationForm implements ActionListener {
 			setDgnFile(dgnFile, false);
 		}
 
-		businessLogicCoverageAnalyzer.setCovFile(covFile);
+		highlighter.setCovFile(covFile);
 		updateCovTextField(covFile);
 
 		if (covFile == null) {
@@ -690,10 +694,10 @@ public class ApplicationForm implements ActionListener {
 			setCovVhdlFile(vhdlFile);
 		}
 
-		/* Automatically click Show button, if both files are set */
+		/* Automatically click HIGHLIGHT button, if both files are set */
 		if (doClick) {
 			if (vhdlFile != null) {
-				doClickShowButton();
+				doClickHighlightButton();
 			}
 		}
 
@@ -702,9 +706,9 @@ public class ApplicationForm implements ActionListener {
 
 	private void setCovVhdlFile(File vhdlFile) {
 
-		businessLogicCoverageAnalyzer.setVhdlFile(vhdlFile);
+		highlighter.setVhdlFile(vhdlFile);
 
-		updateVhdlCovTextField(vhdlFile);
+		updateCovVhdlTextField(vhdlFile);
 
 		SingleFileSelector.setCurrentDirectory(vhdlFile);
 	}
@@ -790,7 +794,7 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public boolean isRandomCov() {
-		return randomCovRadioButton.isSelected();
+		return covRandomRButton.isSelected();
 	}
 
 	public boolean shouldFlattenCS() {
@@ -906,7 +910,7 @@ public class ApplicationForm implements ActionListener {
 					|| source == baseModelBtn || source == pslBtn
 					|| source == ppgLibButton
 					|| source == chkFileButton || source == hlddAssertButton || source == tgmButton
-					|| source == hlddCoverageButton || source == vhdlCovButton || source == covButton
+					|| source == covHlddButton || source == covVhdlButton || source == covButton
 					|| source == diagHlddButton || source == diagVhdlButton || source == dgnButton)) {
 
 				showSelectFileDialog(((JButton) source));
@@ -925,14 +929,14 @@ public class ApplicationForm implements ActionListener {
 				businessLogicAssertionChecker.processCheck();
 			} else if (source == drawButton) {
 				businessLogicAssertionChecker.processDraw();
-			} else if (source == analyzeButton) {
+			} else if (source == covSimulButton) {
 				businessLogicCoverageAnalyzer.processAnalyze();
-			} else if (source == showButton) {
-				businessLogicCoverageAnalyzer.processShow();
+			} else if (source == covHighlightButton) {
+				highlighter.highlight();
 			} else if (source == diagSimulButton) {
 				JOptionPane.showMessageDialog(frame, "Coming soon...", "Under development", JOptionPane.WARNING_MESSAGE);
 			} else if (source == diagHighlightButton) {
-				businessLogicCoverageAnalyzer.processShow();
+				highlighter.highlight();
 			} else if (source == revealMutationButton) {
 				toggleMutations();
 			}
@@ -1047,8 +1051,8 @@ public class ApplicationForm implements ActionListener {
 		businessLogic.addComment(commentDialog.getComment());
 	}
 
-	public void doClickShowButton() {
-		showButton.doClick();
+	public void doClickHighlightButton() {
+		covHighlightButton.doClick();
 	}
 
 	public void doLoadHlddGraph(File hlddGraphFile) {
@@ -1062,7 +1066,7 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public int getPatternCountForCoverage() {
-		return (Integer) patternNrSpinnerCoverage.getValue();
+		return (Integer) covPatternNrSpinner.getValue();
 	}
 
 	public int getDrawPatternCount() {
@@ -1074,7 +1078,7 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public boolean isDoAnalyzeCoverage() {
-		return analyzeCoverageCheckBox.isSelected();
+		return coverageCheckBox.isSelected();
 	}
 
 	public String getCoverageAnalyzerDirective() {
@@ -1109,8 +1113,8 @@ public class ApplicationForm implements ActionListener {
 		updateTextFieldFor(dgnButton, file);
 	}
 
-	private void updateVhdlCovTextField(File file) {
-		updateTextFieldFor(vhdlCovButton, file);
+	private void updateCovVhdlTextField(File file) {
+		updateTextFieldFor(covVhdlButton, file);
 	}
 
 	public void updateDrawSpinner(int maxValue) {
@@ -1126,9 +1130,9 @@ public class ApplicationForm implements ActionListener {
 
 		drawPatternCountSpinner = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
 		patternNrSpinnerAssert = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
-		patternNrSpinnerCoverage = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
+		covPatternNrSpinner = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
 		diagPatternNrSpinner = new JSpinner(new SpinnerNumberModel(1000, 1, null, 1));
-		addAllSelectingFocusListeners(drawPatternCountSpinner, patternNrSpinnerAssert, patternNrSpinnerCoverage, diagPatternNrSpinner);
+		addAllSelectingFocusListeners(drawPatternCountSpinner, patternNrSpinnerAssert, covPatternNrSpinner, diagPatternNrSpinner);
 
 		consolePanel = new ConsolePanel();
 	}
@@ -1158,18 +1162,22 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public void enableCoverageAnalyzer(boolean enable) {
-		hlddCoverageButton.setEnabled(enable);
-		analyzeButton.setEnabled(enable);
+		covHlddButton.setEnabled(enable);
+		covSimulButton.setEnabled(enable);
 	}
 
 	public void enableAssertionLoader(boolean enable) {
 		drawButton.setEnabled(enable);
 	}
 
-	public void enableCoverageHighlighter(boolean enable) {
-		vhdlCovButton.setEnabled(enable);
+	public void enableHighlighter(boolean enable) {
+		covVhdlButton.setEnabled(enable);
 		covButton.setEnabled(enable);
-		showButton.setEnabled(enable);
+		covHighlightButton.setEnabled(enable);
+
+		diagVhdlButton.setEnabled(enable);
+		dgnButton.setEnabled(enable);
+		diagHighlightButton.setEnabled(enable);
 	}
 
 	public void addFileViewerTabFromFile(File selectedFile, LinesStorage linesStorage, JTabbedPane tabbedPane) {
@@ -1403,8 +1411,8 @@ public class ApplicationForm implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object source = e.getSource();
-			if (source == analyzeCoverageCheckBox) {
-				boolean isSelected = analyzeCoverageCheckBox.isSelected();
+			if (source == coverageCheckBox) {
+				boolean isSelected = coverageCheckBox.isSelected();
 				/* Switch ALL boxes ON/OFF */
 				edgeCheckBox.setSelected(isSelected);
 				conditionCheckBox.setSelected(isSelected);
@@ -1413,9 +1421,9 @@ public class ApplicationForm implements ActionListener {
 			} else {
 				if (edgeCheckBox.isSelected() || conditionCheckBox.isSelected()
 						|| nodeCheckBox.isSelected() || toggleCheckBox.isSelected()) {
-					analyzeCoverageCheckBox.setSelected(true);
+					coverageCheckBox.setSelected(true);
 				} else {
-					analyzeCoverageCheckBox.setSelected(false);
+					coverageCheckBox.setSelected(false);
 				}
 			}
 		}
@@ -1494,7 +1502,7 @@ public class ApplicationForm implements ActionListener {
 
 			} else if (isCOV(file)) {
 
-				waitForPreviousToComplete(applicationForm.businessLogicCoverageAnalyzer);
+				waitForPreviousToComplete(applicationForm.highlighter);
 
 				applicationForm.setCovFile(file);
 
@@ -1536,7 +1544,7 @@ public class ApplicationForm implements ActionListener {
 
 			} else if (isDGN(file)) {
 
-				waitForPreviousToComplete(applicationForm.businessLogicCoverageAnalyzer);
+				waitForPreviousToComplete(applicationForm.highlighter);
 
 				applicationForm.setDgnFile(file);
 
