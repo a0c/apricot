@@ -125,6 +125,7 @@ public class ApplicationForm implements ActionListener {
 	private BusinessLogicAssertionChecker businessLogicAssertionChecker = null;
 	private BusinessLogicCoverageAnalyzer businessLogicCoverageAnalyzer = null;
 	private Highlighter highlighter;
+	private Diagnosis diagnosis;
 
 	private TabbedPaneListener tabbedPaneListener;
 	private TabbedPaneListener tabbedPaneListener2;
@@ -207,12 +208,19 @@ public class ApplicationForm implements ActionListener {
 		/* ASSERTION CHECKER */
 		businessLogicAssertionChecker = new BusinessLogicAssertionChecker(this, consoleWriter);
 		addActionListener(hlddAssertButton, tgmButton, checkButton, chkFileButton, drawButton);
+		checkAssertionCheckBox.addChangeListener(createAssertionButtonChanger());
 		/* COVERAGE ANALYSIS */
 		businessLogicCoverageAnalyzer = new BusinessLogicCoverageAnalyzer(this, consoleWriter);
 		addActionListener(covHlddButton, covSimulButton);
+		coverageCheckBox.addChangeListener(createCoverageButtonChanger());
 		/* DIAGNOSIS */
+		diagnosis = new Diagnosis(this, consoleWriter);
 		addActionListener(diagHlddButton, diagSimulButton, revealMutationButton);
 		revealMutationButton.addChangeListener(new TableFormFocuser());
+		diagnoseCheckBox.addChangeListener(createDiagnoseButtonChanger());
+		Score1Toggler score1Toggler = new Score1Toggler();
+		score1byfailedCheckBox.addChangeListener(score1Toggler);
+		score1byratioCheckBox.addChangeListener(score1Toggler);
 		/* HIGHLIGHTER */
 		highlighter = new Highlighter(this, consoleWriter);
 		addActionListener(covVhdlButton, covButton, covHighlightButton, diagVhdlButton, dgnButton, diagHighlightButton);
@@ -250,6 +258,54 @@ public class ApplicationForm implements ActionListener {
 		conditionCheckBox.addActionListener(checkBoxSetter);
 		nodeCheckBox.addActionListener(checkBoxSetter);
 		toggleCheckBox.addActionListener(checkBoxSetter);
+	}
+
+	private ChangeListener createDiagnoseButtonChanger() {
+		return new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (diagnoseCheckBox.isSelected()) {
+					diagSimulButton.setText("Diagnose");
+					diagSimulButton.setMnemonic(KeyEvent.VK_D);
+				} else {
+					diagSimulButton.setText("Simulate");
+					diagSimulButton.setMnemonic(KeyEvent.VK_S);
+				}
+				diagSimulButton.repaint();
+			}
+		};
+	}
+
+	private ChangeListener createCoverageButtonChanger() {
+		return new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (coverageCheckBox.isSelected()) {
+					covSimulButton.setText("Measure coverage");
+					covSimulButton.setMnemonic(KeyEvent.VK_M);
+				} else {
+					covSimulButton.setText("Simulate");
+					covSimulButton.setMnemonic(KeyEvent.VK_S);
+				}
+				covSimulButton.repaint();
+			}
+		};
+	}
+
+	private ChangeListener createAssertionButtonChanger() {
+		return new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (checkAssertionCheckBox.isSelected()) {
+					checkButton.setText("Check assertions");
+					checkButton.setMnemonic(KeyEvent.VK_C);
+				} else {
+					checkButton.setText("Simulate");
+					checkButton.setMnemonic(KeyEvent.VK_S);
+				}
+				checkButton.repaint();
+			}
+		};
 	}
 
 	private void addKeyListener(Component... components) {
@@ -474,7 +530,7 @@ public class ApplicationForm implements ActionListener {
 
 	private void setDiagHlddFile(File hlddFile) {
 
-		//todo: businessLogic, or rather a TaskRunner
+		diagnosis.setHlddFile(hlddFile);
 		updateTextFieldFor(diagHlddButton, hlddFile);
 
 		/* Automatically look for identical Patterns file */
@@ -797,6 +853,10 @@ public class ApplicationForm implements ActionListener {
 		return covRandomRButton.isSelected();
 	}
 
+	public boolean isRandomDiag() {
+		return diagRandomRButton.isSelected();
+	}
+
 	public boolean shouldFlattenCS() {
 		switch (selectedParserId) {
 			case VhdlBeh2HlddBeh:
@@ -934,7 +994,7 @@ public class ApplicationForm implements ActionListener {
 			} else if (source == covHighlightButton) {
 				highlighter.highlight();
 			} else if (source == diagSimulButton) {
-				JOptionPane.showMessageDialog(frame, "Coming soon...", "Under development", JOptionPane.WARNING_MESSAGE);
+				diagnosis.diagnose();
 			} else if (source == diagHighlightButton) {
 				highlighter.highlight();
 			} else if (source == revealMutationButton) {
@@ -1069,6 +1129,10 @@ public class ApplicationForm implements ActionListener {
 		return (Integer) covPatternNrSpinner.getValue();
 	}
 
+	public int getPatternCountForDiag() {
+		return (Integer) diagPatternNrSpinner.getValue();
+	}
+
 	public int getDrawPatternCount() {
 		return (Integer) drawPatternCountSpinner.getValue();
 	}
@@ -1080,6 +1144,27 @@ public class ApplicationForm implements ActionListener {
 	public boolean isDoAnalyzeCoverage() {
 		return coverageCheckBox.isSelected();
 	}
+
+	public boolean isDoDiagnose() {
+		return diagnoseCheckBox.isSelected();
+	}
+
+	public boolean isDoDiagOptimize() {
+		return optimizeCheckBox.isSelected();
+	}
+
+	public boolean isDoDiagPotential() {
+		return potentialCheckBox.isSelected();
+	}
+
+	public boolean isDoDiagScore1ByFailed() {
+		return score1byfailedCheckBox.isSelected();
+	}
+
+	public boolean isDoDiagScore1ByRatio() {
+		return score1byratioCheckBox.isSelected();
+	}
+
 
 	public String getCoverageAnalyzerDirective() {
 		if (!isDoAnalyzeCoverage()) {
@@ -1168,6 +1253,11 @@ public class ApplicationForm implements ActionListener {
 
 	public void enableAssertionLoader(boolean enable) {
 		drawButton.setEnabled(enable);
+	}
+
+	public void enableDiagnosis(boolean enable) {
+		diagHlddButton.setEnabled(enable);
+		diagSimulButton.setEnabled(enable);
 	}
 
 	public void enableHighlighter(boolean enable) {
@@ -1622,6 +1712,23 @@ public class ApplicationForm implements ActionListener {
 				}
 				if (table != null) {
 					table.requestFocus();
+				}
+			}
+		}
+	}
+
+	private class Score1Toggler implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			Object source = e.getSource();
+			if (source == score1byfailedCheckBox) {
+				if (score1byfailedCheckBox.isSelected()) {
+					score1byratioCheckBox.setSelected(false);
+				}
+			} else if (source == score1byratioCheckBox) {
+				if (score1byratioCheckBox.isSelected()) {
+					score1byfailedCheckBox.setSelected(false);
 				}
 			}
 		}

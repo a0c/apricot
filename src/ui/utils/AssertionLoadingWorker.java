@@ -39,6 +39,7 @@ public class AssertionLoadingWorker extends TaskSwingWorker {
 		};
 	}
 
+	@Override
 	protected void done() {
 		super.done();
 		try {
@@ -72,6 +73,7 @@ public class AssertionLoadingWorker extends TaskSwingWorker {
 		enableUI(true);
 	}
 
+	@Override
 	public void stopWorker() {
 		super.stopWorker();
 		/* Update UI and BL */

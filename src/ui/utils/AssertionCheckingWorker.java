@@ -24,6 +24,7 @@ public class AssertionCheckingWorker extends TaskSwingWorker {
 		this.simulationFilePath = simulationFilePath;
 	}
 
+	@Override
 	protected void done() {
 		super.done();
 		try {

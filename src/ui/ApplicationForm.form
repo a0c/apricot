@@ -299,7 +299,7 @@
                             </constraints>
                             <properties>
                               <selected value="true"/>
-                              <text value="&amp;Random Stimuli"/>
+                              <text value="&amp;Random stimuli"/>
                             </properties>
                           </component>
                           <component id="a248e" class="javax.swing.JButton" binding="checkButton" default-binding="true">
@@ -320,7 +320,7 @@
                               <background color="-1"/>
                               <opaque value="false"/>
                               <selected value="false"/>
-                              <text value="Ch&amp;eck Assertions"/>
+                              <text value="Ch&amp;eck assertions"/>
                             </properties>
                           </component>
                           <component id="75d37" class="javax.swing.JSpinner" binding="patternNrSpinnerAssert" custom-create="true">
@@ -420,7 +420,7 @@
                               <forms defaultalign-horz="false"/>
                             </constraints>
                             <properties>
-                              <text value="&amp;Simulate"/>
+                              <text value="&amp;Measure coverage"/>
                             </properties>
                           </component>
                           <component id="6f7d2" class="javax.swing.JRadioButton" binding="covRandomRButton">
@@ -430,7 +430,7 @@
                             </constraints>
                             <properties>
                               <selected value="true"/>
-                              <text value="&amp;Random Stimuli"/>
+                              <text value="&amp;Random stimuli"/>
                             </properties>
                           </component>
                           <component id="5fc6e" class="javax.swing.JRadioButton" binding="covTstRButton">
@@ -496,7 +496,7 @@
                             </constraints>
                             <properties>
                               <selected value="true"/>
-                              <text value="&amp;Analyze Coverage"/>
+                              <text value="Meas&amp;ure coverage"/>
                             </properties>
                           </component>
                           <component id="f317e" class="javax.swing.JSeparator">
@@ -650,7 +650,7 @@
                               <forms defaultalign-horz="false"/>
                             </constraints>
                             <properties>
-                              <text value="&amp;Simulate"/>
+                              <text value="&amp;Diagnose"/>
                             </properties>
                           </component>
                           <component id="6d38f" class="javax.swing.JRadioButton" binding="diagRandomRButton">
@@ -726,7 +726,7 @@
                             </constraints>
                             <properties>
                               <selected value="true"/>
-                              <text value="&amp;Diagnose"/>
+                              <text value="D&amp;iagnose"/>
                             </properties>
                           </component>
                           <component id="a21ff" class="javax.swing.JSeparator">

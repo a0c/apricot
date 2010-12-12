@@ -40,6 +40,7 @@ public class AssertionLoadingWaiter extends TaskSwingWorker {
 		};
 	}
 
+	@Override
 	public void stopWorker() {
 		Thread.currentThread().interrupt();
 		super.stopWorker();

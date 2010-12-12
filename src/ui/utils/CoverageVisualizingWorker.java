@@ -169,6 +169,7 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 		return sb.toString();
 	}
 
+	@Override
 	protected Boolean doInBackground() {
 		/* Disable UI */
 		enableUI(false);
@@ -176,6 +177,7 @@ public class CoverageVisualizingWorker extends TaskSwingWorker {
 		return super.doInBackground();
 	}
 
+	@Override
 	protected void done() {
 		/* Enable UI */
 		enableUI(true);

@@ -24,15 +24,17 @@ public class CoverageAnalyzingWorker extends TaskSwingWorker {
 		this.businessLogic = businessLogic;
 	}
 
+	@Override
 	protected Boolean doInBackground() {
-		/* Disable HLDD BUTTON and ANALYZE BUTTON */
+		/* Disable HLDD BUTTON and SIMULATE BUTTON */
 		setEnableUI(false);
 		/* Start worker */
 		return super.doInBackground();
 	}
 
+	@Override
 	protected void done() {
-		/* Enable HLDD BUTTON and ANALYZE BUTTON */
+		/* Enable HLDD BUTTON and SIMULATE BUTTON */
 		setEnableUI(true);
 
 		super.done();
