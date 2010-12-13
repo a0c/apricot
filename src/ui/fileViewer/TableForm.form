@@ -27,7 +27,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="86f7b" class="javax.swing.JTable" binding="aTable">
+          <component id="86f7b" class="javax.swing.JTable" binding="aTable" custom-create="true">
             <constraints/>
             <properties>
               <autoResizeMode value="0"/>

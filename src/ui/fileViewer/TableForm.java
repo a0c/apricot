@@ -183,6 +183,7 @@ public class TableForm {
 
 	private void createUIComponents() {
 		mainPanel = new TableFormPanel(this);
+		aTable = new TableWithSecondRowUnselectable();
 	}
 
 	@SuppressWarnings({"BooleanMethodNameMustStartWithQuestion"})
@@ -495,6 +496,16 @@ public class TableForm {
 
 		public TableForm getTableForm() {
 			return tableForm;
+		}
+	}
+
+	private class TableWithSecondRowUnselectable extends JTable {
+		@Override
+		public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+			if (columnIndex == 1) {
+				columnIndex = 0;
+			}
+			super.changeSelection(rowIndex, columnIndex, toggle, extend);
 		}
 	}
 }
