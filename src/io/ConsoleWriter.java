@@ -32,7 +32,7 @@ public class ConsoleWriter {
 			write(lastLine);
 		}
 		writeLn(insertMs(ms));
-		hasWarnings = false;
+		invalidateWarnings();
 	}
 
 	public void done() {
@@ -40,7 +40,7 @@ public class ConsoleWriter {
 			write(lastLine);
 		}
 		writeLn(DONE_TEXT);
-		hasWarnings = false;
+		invalidateWarnings();
 	}
 
 	public void failed() {
@@ -113,5 +113,9 @@ public class ConsoleWriter {
 
 	public static ConsoleWriter getStub() {
 		return new ConsoleWriter(new JTextArea(), false);
+	}
+
+	public void invalidateWarnings() {
+		hasWarnings = false;
 	}
 }

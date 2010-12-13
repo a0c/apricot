@@ -84,6 +84,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 		int current = 1, total;
 		long startTime;
 
+		consoleWriter.invalidateWarnings();
 		consoleWriter.writeLn(getTimeAsString() + "\tRunning " + parserId.getTitle() + " converter:");
 
 		try {
