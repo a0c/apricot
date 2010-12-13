@@ -1,27 +1,27 @@
 package parsers;
 
-import base.hldd.structure.models.utils.ModelManager;
+import base.Range;
+import base.Type;
+import base.hldd.structure.Flags;
+import base.hldd.structure.Graph;
 import base.hldd.structure.models.BehModel;
-import base.hldd.structure.models.utils.RTLModelCreatorImpl;
-import base.hldd.structure.models.utils.ModelCreator;
 import base.hldd.structure.models.Model;
+import base.hldd.structure.models.utils.ModelCreator;
+import base.hldd.structure.models.utils.ModelManager;
+import base.hldd.structure.models.utils.RTLModelCreatorImpl;
+import base.hldd.structure.nodes.Node;
+import base.hldd.structure.nodes.fsm.Transitions;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
+import base.hldd.visitors.FsmGraphCreator;
 import base.hldd.visitors.ResetInspector;
 import base.hldd.visitors.TerminalNodeCollector;
-import base.hldd.visitors.FsmGraphCreator;
-import base.hldd.structure.nodes.fsm.Transitions;
-import base.hldd.structure.nodes.Node;
-import base.hldd.structure.Graph;
-import base.hldd.structure.Flags;
-import base.Type;
-import base.Range;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
+import io.ConsoleWriter;
 import ui.ConfigurationHandler;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author Anton Chepurov
@@ -34,10 +34,12 @@ public class Beh2RtlTransformer {
 
 	private ModelManager modelCollector;
 	private BehModel behModel;
+	private final ConsoleWriter consoleWriter;
 	private Model rtlModel;
 
-	public Beh2RtlTransformer(BehModel behModel) {
+	public Beh2RtlTransformer(BehModel behModel, ConsoleWriter consoleWriter) {
 		this.behModel = behModel;
+		this.consoleWriter = consoleWriter;
 	}
 
 	public void transform() throws Exception {
@@ -78,7 +80,7 @@ public class Beh2RtlTransformer {
 		createGraphs(resetInspector, controlPartManager);
 
 		/* Create new MODEL */
-		ModelCreator modelCreator = new RTLModelCreatorImpl(modelCollector.getConstants(), modelCollector.getVariables(), controlPartManager);
+		ModelCreator modelCreator = new RTLModelCreatorImpl(modelCollector.getConstants(), modelCollector.getVariables(), controlPartManager, consoleWriter);
 		rtlModel = (Model) modelCreator.getModel();
 
 	}
@@ -342,7 +344,7 @@ public class Beh2RtlTransformer {
 		 * @param controlPartVariable transition variable (AT WHAT PLACE in the destination to insert to)
 		 * @param value			   value of the transition (WHAT to insert)
 		 * @throws Exception if specified Control Part Variable doesn't exist.
-		 * 					 <br>{@link base.hldd.structure.nodes.fsm.Transitions#insertTransition(Integer, int) cause2 }
+		 *                   <br>{@link base.hldd.structure.nodes.fsm.Transitions#insertTransition(Integer, int) cause2 }
 		 */
 		public void insertTransition(Transitions transitions, AbstractVariable controlPartVariable, int value) throws Exception {
 			if (!varIndexHash.containsKey(controlPartVariable)) {

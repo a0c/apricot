@@ -1,13 +1,15 @@
 package parsers.psl;
 
 import base.hldd.structure.models.BehModel;
-import base.hldd.structure.models.utils.*;
 import base.hldd.structure.models.utils.ModelManager;
+import base.hldd.structure.models.utils.TGMModelCreatorImpl;
+import base.hldd.structure.variables.AbstractVariable;
+import base.hldd.structure.variables.GraphVariable;
+import base.hldd.structure.variables.Variable;
 import base.psl.structure.PPGLibrary;
 import base.psl.structure.Property;
-import base.hldd.structure.variables.*;
-import io.PPGLibraryReader;
 import io.ConsoleWriter;
+import io.PPGLibraryReader;
 import io.scan.PSLScanner;
 
 import java.io.File;
@@ -94,7 +96,7 @@ public class ParserShell {
 	private void constructPropertyGraphs() throws Exception {
 		consoleWriter.write("(4/4) Constructing THLDDs for properties...");
 		long startTime = System.currentTimeMillis();
-		TGMModelCreatorImpl modelCreator = new TGMModelCreatorImpl(newProperties, hlddModelManager);
+		TGMModelCreatorImpl modelCreator = new TGMModelCreatorImpl(newProperties, hlddModelManager, consoleWriter);
 		model = modelCreator.getModel();
 		consoleWriter.done(System.currentTimeMillis() - startTime);
 		comment = modelCreator.getComment();

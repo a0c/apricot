@@ -116,7 +116,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
 					/* Create HLDD model */
 					consoleWriter.write(stat(current++, total) + "Creating HLDD model...");
-					modelCreator = new BehModelCreatorImpl(modelCollector.getConstants(), modelCollector.getVariables());
+					modelCreator = new BehModelCreatorImpl(modelCollector.getConstants(), modelCollector.getVariables(), consoleWriter);
 					model = modelCreator.getModel();
 					consoleWriter.done();
 
@@ -170,7 +170,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
 					/* Create HLDD model */
 					consoleWriter.write(stat(current++, total) + "Creating HLDD model...");
-					modelCreator = new BehModelCreatorImpl(modelCollector.getConstants(), modelCollector.getVariables());
+					modelCreator = new BehModelCreatorImpl(modelCollector.getConstants(), modelCollector.getVariables(), consoleWriter);
 					model = modelCreator.getModel();
 					consoleWriter.done();
 
@@ -202,7 +202,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 					startTime = System.currentTimeMillis();
 					/* Transform HLDD structure from Beh to RTL level*/
 					consoleWriter.write("(2/3) Converting Beh to RTL...");
-					Beh2RtlTransformer transformer = new Beh2RtlTransformer(behModel);
+					Beh2RtlTransformer transformer = new Beh2RtlTransformer(behModel, consoleWriter);
 					model = transformer.getRtlModel();
 					consoleWriter.done();
 

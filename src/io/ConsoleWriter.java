@@ -16,6 +16,8 @@ public class ConsoleWriter {
 	private final JTextArea consoleTextArea;
 	private final boolean toConsole;
 	private StringBuilder logMessageBuilder = null;
+	private String lastLine;
+	private boolean hasWarnings;
 	private static final String DOT_TEXT = ".";
 	private static final String IN_TEXT = " in ";
 	private static final String MS_TEXT = " ms.";
@@ -26,11 +28,19 @@ public class ConsoleWriter {
 	}
 
 	public void done(long ms) {
+		if (hasWarnings) {
+			write(lastLine);
+		}
 		writeLn(insertMs(ms));
+		hasWarnings = false;
 	}
 
 	public void done() {
+		if (hasWarnings) {
+			write(lastLine);
+		}
 		writeLn(DONE_TEXT);
+		hasWarnings = false;
 	}
 
 	public void failed() {
@@ -55,6 +65,16 @@ public class ConsoleWriter {
 		logCollect(line); // collect for further print into log
 		/* Auto-Scroll to bottom */
 		autoScrollToBottom();
+		lastLine = line;
+	}
+
+	public void newLine() {
+		writeLn("");
+	}
+
+	public void warning(String line) {
+		writeLn("### WARNING ###  " + line);
+		hasWarnings = true;
 	}
 
 	private String insertMs(long ms) {

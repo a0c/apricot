@@ -1,10 +1,14 @@
 package base.hldd.structure.models.utils;
 
-import base.hldd.structure.variables.*;
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.nodes.Node;
+import base.hldd.structure.variables.AbstractVariable;
+import base.hldd.structure.variables.ConstantVariable;
+import base.hldd.structure.variables.GraphVariable;
+import io.ConsoleWriter;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Creates {@link base.hldd.structure.models.BehModel}, where all HLDD structure elements are indexed.
@@ -14,8 +18,9 @@ import java.util.*;
 public class BehModelCreatorImpl extends AbstractModelCreator {
 	private BehModel model;
 
-	public BehModelCreatorImpl(Collection<ConstantVariable> constants, Collection<AbstractVariable> variables) {
-		super(constants, variables);
+	public BehModelCreatorImpl(Collection<ConstantVariable> constants, Collection<AbstractVariable> variables,
+							   ConsoleWriter consoleWriter) {
+		super(constants, variables, consoleWriter);
 	}
 
 

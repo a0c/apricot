@@ -2,10 +2,11 @@ package base.hldd.structure.models.utils;
 
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.nodes.Node;
-import base.psl.structure.Property;
 import base.psl.structure.AbstractExpression;
 import base.psl.structure.ExpressionImpl;
 import base.psl.structure.PSLOperator;
+import base.psl.structure.Property;
+import io.ConsoleWriter;
 import parsers.psl.ModelManager;
 
 import java.util.logging.Logger;
@@ -16,12 +17,15 @@ import java.util.logging.Logger;
 public class TGMModelCreatorImpl implements ModelCreator {
 	private static final Logger LOGGER = Logger.getLogger(TGMModelCreatorImpl.class.getName());
 	private final Property[] properties;
+	private final ConsoleWriter consoleWriter;
 	private final ModelManager modelManager;
 
 	private BehModel model;
 
-	public TGMModelCreatorImpl(Property[] properties, base.hldd.structure.models.utils.ModelManager hlddModelManager) {
+	public TGMModelCreatorImpl(Property[] properties, base.hldd.structure.models.utils.ModelManager hlddModelManager,
+							   ConsoleWriter consoleWriter) {
 		this.properties = properties;
+		this.consoleWriter = consoleWriter;
 		this.modelManager = new ModelManager(hlddModelManager);
 	}
 
@@ -38,7 +42,7 @@ public class TGMModelCreatorImpl implements ModelCreator {
 	 * <p/>
 	 * In case of <b>CYCLIC HLDDs</b>, not all of the successors are available
 	 * at the time when the Control Node is reached. The addition of the missing successors is <b>postponed</b>
-	 * ({@link ModelManager.ContextManager#postpone(base.hldd.structure.nodes.utils.Condition,int,base.hldd.structure.nodes.TemporalNode)}) and performed after
+	 * ({@link ModelManager.ContextManager#postpone(base.hldd.structure.nodes.utils.Condition, int, base.hldd.structure.nodes.TemporalNode)}) and performed after
 	 * all the nodes in property graph are added to collector.
 	 * <p/>
 	 * Traversal of property graphs has a slight difference between processing
@@ -111,7 +115,7 @@ public class TGMModelCreatorImpl implements ModelCreator {
 		/* Here use functionality of standard BehModelCreatorImpl (one ModelCreator implementation invokes another) */
 		LOGGER.info("Creating " + BehModel.class.getSimpleName() + " ( TGM file )");
 		BehModelCreatorImpl modelCreator =
-				new BehModelCreatorImpl(modelManager.getConstants(), modelManager.getVariables());
+				new BehModelCreatorImpl(modelManager.getConstants(), modelManager.getVariables(), consoleWriter);
 		model = modelCreator.getModel();
 		model.setMode("BEHAVIORAL");
 

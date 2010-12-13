@@ -1,10 +1,11 @@
 package base.hldd.structure.models.utils;
 
-import base.hldd.structure.variables.*;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.utils.Utility;
+import base.hldd.structure.variables.*;
 import base.hldd.visitors.UsedFunctionsCollectorImpl;
 import base.vhdl.structure.Operator;
+import io.ConsoleWriter;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -14,13 +15,16 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractModelCreator implements ModelCreator {
 	protected static final Logger LOGGER = Logger.getLogger(AbstractModelCreator.class.getName());
+	private final ConsoleWriter consoleWriter;
 	protected Collection<ConstantVariable> constants;
 	protected Collection<AbstractVariable> variables;
 	protected Collection<AbstractVariable> variablesCollection;
 
-	public AbstractModelCreator(Collection<ConstantVariable> constants, Collection<AbstractVariable> variables) {
+	public AbstractModelCreator(Collection<ConstantVariable> constants, Collection<AbstractVariable> variables,
+								ConsoleWriter consoleWriter) {
 		this.constants = constants;
 		this.variables = variables;
+		this.consoleWriter = consoleWriter;
 		variablesCollection = new LinkedList<AbstractVariable>();
 	}
 
@@ -214,6 +218,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 		private Set<Node> processedNodes = new HashSet<Node>();
 		private Map<GraphVariable, Set<GraphVariable>> dependenciesByVar = new HashMap<GraphVariable, Set<GraphVariable>>();
 		private GraphVariable currentlyProcessedVar;
+		private Set<String> nonInitialisedVars = new TreeSet<String>();
 
 		/**
 		 * For Delay graphs, no order constraints exist (since their values get assigned at the end of a cycle).
@@ -241,7 +246,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 					}
 				}
 			}
-
+			printNonInitialisedVars();
 			/* For debugging purposes: */
 //            printDependencies(nonDelayGraphList);
 			/* For debugging purposes: */
@@ -353,7 +358,10 @@ public abstract class AbstractModelCreator implements ModelCreator {
 
 		private void addNonDelayGraph(AbstractVariable dependentVariable, Set<GraphVariable> depVarSet) {
 			/* Skip value retaining nodes (case when variable depends on itself) */
-			if (currentlyProcessedVar == dependentVariable) return;
+			if (currentlyProcessedVar == dependentVariable) {
+				nonInitialisedVars.add(currentlyProcessedVar.getName());
+				return;
+			}
 			/* Skip usages of base whole variables in range variables */
 			if (isUsageOfBaseVariableInRange(dependentVariable)) return;
 			/* Check for GraphVariables and if failed --- for FunctionVariables */
@@ -376,6 +384,16 @@ public abstract class AbstractModelCreator implements ModelCreator {
 			return currentlyProcessedVar.getPureName().equals(depVar.getPureName())
 					&& currentlyProcessedVar.getBaseVariable() instanceof RangeVariable
 					&& !(depVar.getBaseVariable() instanceof RangeVariable);
+		}
+
+		private void printNonInitialisedVars() {
+			if (nonInitialisedVars.isEmpty()) {
+				return;
+			}
+			consoleWriter.newLine();
+			for (String varName : nonInitialisedVars) {
+				consoleWriter.warning("Non-delay variable " + varName + " reads itself (is not initialised).");
+			}
 		}
 
 	}

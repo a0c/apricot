@@ -53,7 +53,7 @@ public class ConfigurationHandler {
 			}
 		} else {
 			LOGGER.info("Configuration file is missing.");
-			consoleWriter.writeLn("### WARNING ###  Configuration file is N/A for source " + properties.getProperty(SOURCE_FILE_NAME));
+			consoleWriter.warning("Configuration file is N/A for source " + properties.getProperty(SOURCE_FILE_NAME));
 		}
 
 		// empty properties, in case propFile == null
@@ -65,15 +65,15 @@ public class ConfigurationHandler {
 
 	private void verify(ConsoleWriter consoleWriter) {
 		if (getStateVarName() == null) {
-			consoleWriter.writeLn("### WARNING ###  STATE name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
+			consoleWriter.warning("STATE name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
 					". Further RTL HLDD generation will be impossible.");
 		}
 		if (getClockName() == null) {
-			consoleWriter.writeLn("### WARNING ###  CLOCK name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
+			consoleWriter.warning("CLOCK name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
 					". D-flags might not be set correctly. Cyclic dependencies between signal assignments may occur.");
 		}
 		if (getResetName() == null) {
-			consoleWriter.writeLn("### WARNING ###  RESET name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
+			consoleWriter.warning("RESET name is not set in config file of source " + properties.getProperty(SOURCE_FILE_NAME) +
 					". Un-resettable graphs may become resettable.");
 		}
 	}
