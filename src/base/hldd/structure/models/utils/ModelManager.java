@@ -4,6 +4,7 @@ import base.*;
 import base.hldd.structure.nodes.Node;
 import base.hldd.structure.nodes.utils.Condition;
 import base.hldd.structure.variables.*;
+import base.hldd.structure.variables.Variable;
 import base.hldd.visitors.DependentVariableReplacer;
 import base.vhdl.structure.*;
 import parsers.vhdl.PackageParser;
@@ -57,6 +58,10 @@ public class ModelManager implements TypeResolver {
 		removeVariable(variableToRebase);
 		/* Remove base variable from hash */
 		removeVariable(newBaseVariable);
+
+		if (newBaseVariable instanceof Variable) {
+			((Variable) newBaseVariable).setDelay(variableToRebase.isDelay());
+		}
 
 		/* Replace base variable */
 		((GraphVariable) variableToRebase).setBaseVariable(newBaseVariable);
