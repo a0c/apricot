@@ -90,8 +90,8 @@ public class ApplicationForm implements ActionListener {
 	private JCheckBox diagnoseCheckBox;
 	private JCheckBox optimizeCheckBox;
 	private JCheckBox potentialCheckBox;
-	private JCheckBox score1byratioCheckBox;
-	private JCheckBox score1byfailedCheckBox;
+	private JCheckBox scorebyratioCheckBox;
+	private JCheckBox scorebyfailedCheckBox;
 	private JButton diagHlddButton;
 	private JButton diagVhdlButton;
 	private JButton dgnButton;
@@ -156,8 +156,8 @@ public class ApplicationForm implements ActionListener {
 				covRandomRButton, coverageCheckBox, nodeCheckBox, toggleCheckBox, conditionCheckBox,
 				edgeCheckBox, covVhdlButton, covButton, covHighlightButton,
 				diagHlddTextField, diagSimulButton, diagPatternNrSpinner, diagRandomRButton, diagTstRButton,
-				diagnoseCheckBox, optimizeCheckBox, potentialCheckBox, score1byratioCheckBox,
-				score1byfailedCheckBox, diagHlddButton, diagVhdlButton, dgnButton,
+				diagnoseCheckBox, optimizeCheckBox, potentialCheckBox, scorebyratioCheckBox,
+				scorebyfailedCheckBox, diagHlddButton, diagVhdlButton, dgnButton,
 				diagVhdlTextField, dgnTextField, diagHighlightButton, revealMutationButton);
 
 		/* ConsoleWriter to write into a consoleTextArea */
@@ -218,9 +218,9 @@ public class ApplicationForm implements ActionListener {
 		addActionListener(diagHlddButton, diagSimulButton, revealMutationButton);
 		revealMutationButton.addChangeListener(new TableFormFocuser());
 		diagnoseCheckBox.addChangeListener(createDiagnoseButtonChanger());
-		Score1Toggler score1Toggler = new Score1Toggler();
-		score1byfailedCheckBox.addChangeListener(score1Toggler);
-		score1byratioCheckBox.addChangeListener(score1Toggler);
+		ScoreToggler scoreToggler = new ScoreToggler();
+		scorebyfailedCheckBox.addChangeListener(scoreToggler);
+		scorebyratioCheckBox.addChangeListener(scoreToggler);
 		/* HIGHLIGHTER */
 		highlighter = new Highlighter(this, consoleWriter);
 		addActionListener(covVhdlButton, covButton, covHighlightButton, diagVhdlButton, dgnButton, diagHighlightButton);
@@ -1157,12 +1157,12 @@ public class ApplicationForm implements ActionListener {
 		return potentialCheckBox.isSelected();
 	}
 
-	public boolean isDoDiagScore1ByFailed() {
-		return score1byfailedCheckBox.isSelected();
+	public boolean isDoDiagScoreByFailed() {
+		return scorebyfailedCheckBox.isSelected();
 	}
 
-	public boolean isDoDiagScore1ByRatio() {
-		return score1byratioCheckBox.isSelected();
+	public boolean isDoDiagScoreByRatio() {
+		return scorebyratioCheckBox.isSelected();
 	}
 
 
@@ -1717,18 +1717,18 @@ public class ApplicationForm implements ActionListener {
 		}
 	}
 
-	private class Score1Toggler implements ChangeListener {
+	private class ScoreToggler implements ChangeListener {
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			Object source = e.getSource();
-			if (source == score1byfailedCheckBox) {
-				if (score1byfailedCheckBox.isSelected()) {
-					score1byratioCheckBox.setSelected(false);
+			if (source == scorebyfailedCheckBox) {
+				if (scorebyfailedCheckBox.isSelected()) {
+					scorebyratioCheckBox.setSelected(false);
 				}
-			} else if (source == score1byratioCheckBox) {
-				if (score1byratioCheckBox.isSelected()) {
-					score1byfailedCheckBox.setSelected(false);
+			} else if (source == scorebyratioCheckBox) {
+				if (scorebyratioCheckBox.isSelected()) {
+					scorebyfailedCheckBox.setSelected(false);
 				}
 			}
 		}

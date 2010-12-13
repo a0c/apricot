@@ -40,8 +40,8 @@ public class Diagnosis {
 		boolean diagnose = applicationForm.isDoDiagnose();
 		boolean optimize = applicationForm.isDoDiagOptimize();
 		boolean potential = applicationForm.isDoDiagPotential();
-		boolean scoreByFailed = applicationForm.isDoDiagScore1ByFailed();
-		boolean scoreByRatio = applicationForm.isDoDiagScore1ByRatio();
+		boolean scoreByFailed = applicationForm.isDoDiagScoreByFailed();
+		boolean scoreByRatio = applicationForm.isDoDiagScoreByRatio();
 
 		List<String> cmd = new ArrayList<String>(10);
 		cmd.add(ApplicationForm.LIB_DIR + (Platform.isWindows() ? "hlddsim.exe" : "hlddsim"));
@@ -54,10 +54,10 @@ public class Diagnosis {
 				cmd.add("potential");
 			}
 			if (scoreByFailed) {
-				cmd.add("score1byfailed");
+				cmd.add("scorebyfailed");
 			}
 			if (scoreByRatio) {
-				cmd.add("score1byratio");
+				cmd.add("scorebyratio");
 			}
 		}
 		if (isRandom) {
