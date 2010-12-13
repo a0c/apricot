@@ -61,30 +61,13 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 				int exitValue = -999;
 
 				while (!isProcessFinished && !Thread.interrupted()) {
-					/* Read OUTPUT */
-					int byteCount = inputStream.available();
-					if (byteCount > 0) {
-						for (int i = 0; i < byteCount; i++) {
-							int aChar = inputStream.read();
-							//todo: read N at once. + use buffered reader??
-							consoleWriter.write(String.valueOf((char) aChar));
-							consoleTracer.append((char) aChar);
-						}
-					}
-					/* Read ERROR */
-					int errorBytesAvailable = errorStream.available();
-					if (errorBytesAvailable > 0) {
-						for (int i = 0; i < errorBytesAvailable; i++) {
-							errorOut.write(errorStream.read());
-						}
-						errorOut.flush();
-					}
+
+					readInputAndErrorStreams(inputStream, errorStream, consoleTracer);
 
 					try {
 						exitValue = process.exitValue();
 						isProcessFinished = true;
-					}
-					catch (IllegalThreadStateException e) {
+					} catch (IllegalThreadStateException e) {
 						// indicates that process.exitValue() cannot return any value yet!!!
 						try {
 							// still running.
@@ -112,6 +95,9 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 						}
 					}
 				}
+
+				readInputAndErrorStreams(inputStream, errorStream, consoleTracer);
+
 				if (isProcessFinished) {
 					// finished running
 					if (exitValue != 0) {
@@ -126,17 +112,14 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 				}
 				return exitValue == 0;
 
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				uiHolder.hideDialog();
 				Thread.currentThread().interrupt();
 				/* Remember the exceptions because none of the Exceptions thrown from doInBackground() method is caught.
 				* Process the occurred exception in done() method, run in EDT.  */
 				occurredException = ExtendedException.create(e);
 				return false;
-			}
-
-			finally {
+			} finally {
 				QuietCloser.closeQuietly(inputStream);
 				QuietCloser.closeQuietly(errorStream);
 			}
@@ -151,6 +134,37 @@ public abstract class TaskSwingWorker extends SwingWorker<Boolean, Integer> {
 		occurredException = new ExtendedException(message, ExtendedException.ERROR_TEXT);
 		return false;
 	}
+
+	private void readInputAndErrorStreams(InputStream inputStream, InputStream errorStream, StringBuilder consoleTracer) throws IOException {
+		/* Read OUTPUT */
+		readFromStream(inputStream, consoleWriter, consoleTracer);
+		/* Read ERROR */
+		readFromStream(errorStream, errorOut);
+	}
+
+	@SuppressWarnings({"ResultOfMethodCallIgnored"})
+	private void readFromStream(InputStream inputStream, OutputStream outputStream) throws IOException {
+		int byteCount = inputStream.available();
+		if (byteCount > 0) {
+			byte[] bytes = new byte[byteCount];
+			inputStream.read(bytes);
+			outputStream.write(bytes);
+			outputStream.flush();
+		}
+	}
+
+	@SuppressWarnings({"ResultOfMethodCallIgnored"})
+	private void readFromStream(InputStream inputStream, ConsoleWriter consoleWriter, StringBuilder consoleTracer) throws IOException {
+		int byteCount = inputStream.available();
+		if (byteCount > 0) {
+			byte[] bytes = new byte[byteCount];
+			inputStream.read(bytes);
+			String line = new String(bytes);
+			consoleWriter.write(line);
+			consoleTracer.append(line);
+		}
+	}
+
 
 	public void stopWorker() {
 		if (process != null) {
