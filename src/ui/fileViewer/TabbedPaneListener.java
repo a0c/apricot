@@ -72,7 +72,7 @@ public class TabbedPaneListener extends MouseSelectionAdapter {
 			Component selectedComponent = tabbedPane.getSelectedComponent();
 
 			applicationForm.addFileViewerTab(otherTabbedPane, tabComponent.getTitle(), tabComponent.getToolTipText(),
-					(JComponent) selectedComponent, tabComponent.isDirty());
+					(JComponent) selectedComponent, tabComponent.getColor());
 
 			tabbedPane.remove(selectedComponent);
 

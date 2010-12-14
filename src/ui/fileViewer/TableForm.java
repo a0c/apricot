@@ -1,6 +1,7 @@
 package ui.fileViewer;
 
 import io.QuietCloser;
+import ui.ApplicationForm;
 import ui.ApplicationForm.FileDropHandler;
 import ui.PairedTabbedPane;
 
@@ -35,10 +36,10 @@ public class TableForm {
 
 	private JTable aTable;
 	private JPanel mainPanel;
-	private JCheckBox nodesCheckBox;
+	private JLabel nodesLabel;
 	private JCheckBox edgesCheckBox;
-	private JCheckBox candidates1CheckBox;
-	private JCheckBox candidates2CheckBox;
+	private JLabel candidates1Label;
+	private JLabel candidates2Label;
 	private Color nodesColor = NODE_DEFAULT_COLOR;
 	private Color edgesColor = EDGE_DEFAULT_COLOR;
 	private Color candidates1Color = CANDIDATES1_DEFAULT_COLOR;
@@ -46,30 +47,30 @@ public class TableForm {
 
 	private String maxLine = "";
 	private final LinesStorage linesStorage;
+	private final ApplicationForm applicationForm;
 	private boolean showMutation = false;
 	private TabComponent tabComponent;
 
-	public TableForm(File selectedFile, int totalVisibleWidth, LinesStorage linesStorage, FileDropHandler fileDropHandler) {
+	public TableForm(File selectedFile, int totalVisibleWidth, LinesStorage linesStorage,
+					 FileDropHandler fileDropHandler, ApplicationForm applicationForm) {
 		this.linesStorage = linesStorage;
+		this.applicationForm = applicationForm;
 		this.linesStorage.setOffset(1);
 		this.linesStorage.setTableForm(this);
 
-		nodesCheckBox.setSelected(this.linesStorage.hasNodes());
-		nodesCheckBox.setEnabled(this.linesStorage.hasNodes());
-		candidates1CheckBox.setSelected(this.linesStorage.hasCandidates1());
-		candidates1CheckBox.setEnabled(this.linesStorage.hasCandidates1());
-		candidates2CheckBox.setSelected(this.linesStorage.hasCandidates2());
-		candidates2CheckBox.setEnabled(this.linesStorage.hasCandidates2());
+		nodesLabel.setText(nodesLabel.getText() + this.linesStorage.generateNodesInfo());
+		nodesLabel.setVisible(this.linesStorage.hasNodes());
+		candidates1Label.setText(candidates1Label.getText() + this.linesStorage.generateCandidates1Info());
+		candidates1Label.setVisible(this.linesStorage.hasCandidates1());
+		candidates2Label.setText(candidates2Label.getText() + this.linesStorage.generateCandidates2Info());
+		candidates2Label.setVisible(this.linesStorage.hasCandidates2());
 
-		nodesCheckBox.setToolTipText(this.linesStorage.generateNodesStat());
+		nodesLabel.setToolTipText(this.linesStorage.generateNodesStat());
 		edgesCheckBox.setToolTipText(this.linesStorage.generateEdgesStat());
-		candidates1CheckBox.setToolTipText(this.linesStorage.generateCandidates1Stat());
-		candidates2CheckBox.setToolTipText(this.linesStorage.generateCandidates2Stat());
+		candidates1Label.setToolTipText(this.linesStorage.generateCandidates1Stat());
+		candidates2Label.setToolTipText(this.linesStorage.generateCandidates2Stat());
 
 		aTable.addKeyListener(fileDropHandler);
-		nodesCheckBox.addKeyListener(fileDropHandler);
-		candidates1CheckBox.addKeyListener(fileDropHandler);
-		candidates2CheckBox.addKeyListener(fileDropHandler);
 		/* Read File */
 		String[][] indicesAndFileLines = readFileAsLines(selectedFile);
 		/* Create table */
@@ -100,19 +101,16 @@ public class TableForm {
 			}
 		};
 		MouseAdapter colorChanger = new ColorChangingMouseAdapter(this);
-		nodesCheckBox.addChangeListener(tableRepainter);
 		edgesCheckBox.addChangeListener(tableRepainter);
-		candidates1CheckBox.addChangeListener(tableRepainter);
-		candidates2CheckBox.addChangeListener(tableRepainter);
-		nodesCheckBox.addMouseListener(colorChanger);
+		nodesLabel.addMouseListener(colorChanger);
 		edgesCheckBox.addMouseListener(colorChanger);
-		candidates1CheckBox.addMouseListener(colorChanger);
-		candidates2CheckBox.addMouseListener(colorChanger);
+		candidates1Label.addMouseListener(colorChanger);
+		candidates2Label.addMouseListener(colorChanger);
 
-		nodesCheckBox.setBackground(nodesColor);
+		nodesLabel.setBackground(nodesColor);
 		edgesCheckBox.setBackground(edgesColor);
-		candidates1CheckBox.setBackground(candidates1Color);
-		candidates2CheckBox.setBackground(candidates2Color);
+		candidates1Label.setBackground(candidates1Color);
+		candidates2Label.setBackground(candidates2Color);
 
 		aTable.addKeyListener(new UpAndDownJumper());
 		aTable.addMouseMotionListener(new TooltipCleaner());
@@ -151,22 +149,35 @@ public class TableForm {
 		return mainPanel;
 	}
 
-	public void setColorFor(JCheckBox checkBox, Color newColor) {
-		checkBox.setBackground(newColor);
-		if (checkBox == nodesCheckBox) {
+	public Color getColor() {
+		if (linesStorage.hasCandidates2()) {
+			return candidates2Color;
+		}
+		if (linesStorage.hasCandidates1()) {
+			return candidates1Color;
+		}
+		if (linesStorage.hasNodes()) {
+			return nodesColor;
+		}
+		return null;
+	}
+
+	public void setColorFor(JComponent component, Color newColor) {
+		component.setBackground(newColor);
+		if (component == nodesLabel) {
 			nodesColor = newColor;
-		} else if (checkBox == edgesCheckBox) {
+		} else if (component == edgesCheckBox) {
 			edgesColor = newColor;
-		} else if (checkBox == candidates1CheckBox) {
+		} else if (component == candidates1Label) {
 			candidates1Color = newColor;
-		} else if (checkBox == candidates2CheckBox) {
+		} else if (component == candidates2Label) {
 			candidates2Color = newColor;
 		}
 		aTable.repaint();
 	}
 
 	boolean isNodesSelected() {
-		return nodesCheckBox.isSelected();
+		return applicationForm.isCovNodesSelected();
 	}
 
 	boolean isEdgesSelected() {
@@ -174,11 +185,11 @@ public class TableForm {
 	}
 
 	boolean isCandidates1Selected() {
-		return candidates1CheckBox.isSelected();
+		return applicationForm.isDiagCandidates1Selected();
 	}
 
 	boolean isCandidates2Selected() {
-		return candidates2CheckBox.isSelected();
+		return applicationForm.isDiagCandidates2Selected();
 	}
 
 	private void createUIComponents() {

@@ -1,9 +1,9 @@
 package ui.fileViewer;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.*;
 
 /**
  * @author Anton Chepurov
@@ -11,7 +11,7 @@ import java.awt.*;
 public class ColorChangingMouseAdapter extends MouseAdapter {
 
 	private final static ColorStore COLOR_STORE = new ColorStore();
-	
+
 	private final TableForm tableForm;
 
 	public ColorChangingMouseAdapter(TableForm tableForm) {
@@ -20,13 +20,13 @@ public class ColorChangingMouseAdapter extends MouseAdapter {
 
 	public void mouseClicked(MouseEvent e) {
 		Object source = e.getSource();
-		if (e.getButton() == MouseEvent.BUTTON3 && source instanceof JCheckBox) {
-			toggleColor(((JCheckBox) source));
+		if (e.getButton() == MouseEvent.BUTTON3 && source instanceof JComponent) {
+			toggleColor((JComponent) source);
 		}
 	}
 
-	private void toggleColor(JCheckBox checkBox) {
-		tableForm.setColorFor(checkBox, COLOR_STORE.next(checkBox.getBackground()));
+	private void toggleColor(JComponent component) {
+		tableForm.setColorFor(component, COLOR_STORE.next(component.getBackground()));
 	}
 
 	private static class ColorStore {

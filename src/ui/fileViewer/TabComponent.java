@@ -11,6 +11,7 @@ import java.awt.event.*;
 public class TabComponent extends JPanel {
 
 	private static final Color DIRTY_COLOR = Color.ORANGE;
+	private Color color;
 	private Color defaultColor;
 
 	private final JTabbedPane tabbedPane;
@@ -26,6 +27,7 @@ public class TabComponent extends JPanel {
 		this.title = title;
 		setOpaque(false);
 		defaultColor = getBackground();
+		color = defaultColor;
 
 		/* Make JLabel read title from tabbedPane */
 		JLabel label = new JLabel(title);
@@ -46,6 +48,22 @@ public class TabComponent extends JPanel {
 
 	public String getTitle() {
 		return title;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+		if (color != null) {
+			setOpaque(true);
+			setBackground(color);
+		} else {
+			setOpaque(false);
+			setBackground(defaultColor);
+			this.color = defaultColor;
+		}
 	}
 
 	public static void setBackgroundFor(Component component, boolean isDirty) {

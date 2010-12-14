@@ -2,6 +2,8 @@ package ui.fileViewer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Anton Chepurov
@@ -10,42 +12,44 @@ public class TableFinder {
 
 	private final JTabbedPane tabbedPane;
 
+	private List<JTable> tables;
+
 	public TableFinder(JTabbedPane tabbedPane) {
 		this.tabbedPane = tabbedPane;
 	}
 
+	public List<JTable> findAll() {
+		clearTables();
+		findTablesIn(tabbedPane.getComponents());
+		return tables;
+	}
+
 	public JTable find() {
-		return findTable(tabbedPane.getSelectedComponent());
+		clearTables();
+		findTables(tabbedPane.getSelectedComponent());
+		return tables.isEmpty() ? null : tables.get(0);
 	}
 
-	private JTable findTable(Component component) {
+	private void findTables(Component component) {
 		if (component instanceof JTable) {
-			return (JTable) component;
+			tables.add((JTable) component);
 		} else if (component instanceof JPanel) {
-			JTable table = findTableIn(((JPanel) component).getComponents());
-			if (table != null) {
-				return table;
-			}
+			findTablesIn(((JPanel) component).getComponents());
 		} else if (component instanceof JScrollPane) {
-			JTable table = findTableIn(((JScrollPane) component).getViewport().getComponents());
-			if (table != null) {
-				return table;
-			}
+			findTablesIn(((JScrollPane) component).getViewport().getComponents());
 		}
-		return null;
 	}
 
-	private JTable findTableIn(Component... components) {
+	private void findTablesIn(Component... components) {
 		if (components == null) {
-			return null;
+			return;
 		}
 		for (Component component : components) {
-			JTable table = findTable(component);
-			if (table != null) {
-				return table;
-			}
+			findTables(component);
 		}
-		return null;
 	}
 
+	private void clearTables() {
+		tables = new LinkedList<JTable>();
+	}
 }

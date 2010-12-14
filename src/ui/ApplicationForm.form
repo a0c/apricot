@@ -433,15 +433,6 @@
                               <text value="&amp;Random stimuli"/>
                             </properties>
                           </component>
-                          <component id="5fc6e" class="javax.swing.JRadioButton" binding="covTstRButton">
-                            <constraints>
-                              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                              <forms/>
-                            </constraints>
-                            <properties>
-                              <text value="Stimuli from .TST &amp;File"/>
-                            </properties>
-                          </component>
                           <component id="40a13" class="javax.swing.JSpinner" binding="covPatternNrSpinner" custom-create="true">
                             <constraints>
                               <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false"/>
@@ -516,6 +507,15 @@
                               <text value="&amp;HLDD"/>
                             </properties>
                           </component>
+                          <component id="5fc6e" class="javax.swing.JRadioButton" binding="covTstRButton">
+                            <constraints>
+                              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <text value="Stimuli from .TST &amp;File"/>
+                            </properties>
+                          </component>
                         </children>
                       </grid>
                       <grid id="3e9cc" layout-manager="FormLayout">
@@ -524,6 +524,8 @@
                         <rowspec value="fill:max(d;25px):noGrow"/>
                         <rowspec value="top:4dlu:noGrow"/>
                         <rowspec value="fill:d:noGrow"/>
+                        <rowspec value="top:4dlu:noGrow"/>
+                        <rowspec value="center:max(d;4px):noGrow"/>
                         <colspec value="fill:126px:noGrow"/>
                         <colspec value="left:6dlu:noGrow"/>
                         <colspec value="center:d:grow"/>
@@ -585,6 +587,16 @@
                             </constraints>
                             <properties>
                               <text value="Hi&amp;ghlight"/>
+                            </properties>
+                          </component>
+                          <component id="17c8b" class="javax.swing.JCheckBox" binding="covNodesCheckBox">
+                            <constraints>
+                              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="No&amp;des"/>
                             </properties>
                           </component>
                         </children>
@@ -685,11 +697,11 @@
                               <forms/>
                             </constraints>
                             <properties>
-                              <selected value="false"/>
+                              <selected value="true"/>
                               <text value="&amp;potential"/>
                             </properties>
                           </component>
-                          <component id="a336d" class="javax.swing.JCheckBox" binding="scorebyratioCheckBox">
+                          <component id="1f733" class="javax.swing.JRadioButton" binding="scorebyratioRButton">
                             <constraints>
                               <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                               <forms/>
@@ -709,24 +721,14 @@
                               <text value="&amp;optimize"/>
                             </properties>
                           </component>
-                          <component id="a5c29" class="javax.swing.JCheckBox" binding="scorebyfailedCheckBox">
+                          <component id="66584" class="javax.swing.JRadioButton" binding="scorebyfailedRButton">
                             <constraints>
                               <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                               <forms/>
                             </constraints>
                             <properties>
-                              <selected value="false"/>
-                              <text value="s&amp;corebyfailed"/>
-                            </properties>
-                          </component>
-                          <component id="192e7" class="javax.swing.JCheckBox" binding="diagnoseCheckBox">
-                            <constraints>
-                              <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                              <forms defaultalign-horz="false"/>
-                            </constraints>
-                            <properties>
                               <selected value="true"/>
-                              <text value="D&amp;iagnose"/>
+                              <text value="s&amp;corebyfailed"/>
                             </properties>
                           </component>
                           <component id="a21ff" class="javax.swing.JSeparator">
@@ -746,6 +748,98 @@
                               <text value="&amp;HLDD"/>
                             </properties>
                           </component>
+                          <grid id="4b3cf" layout-manager="FormLayout">
+                            <rowspec value="center:d:grow"/>
+                            <colspec value="fill:d:noGrow"/>
+                            <colspec value="left:4dlu:noGrow"/>
+                            <colspec value="fill:max(d;4px):noGrow"/>
+                            <colspec value="left:2dlu:noGrow"/>
+                            <colspec value="fill:max(d;4px):noGrow"/>
+                            <colspec value="left:2dlu:noGrow"/>
+                            <colspec value="fill:max(d;4px):noGrow"/>
+                            <colspec value="left:2dlu:noGrow"/>
+                            <colspec value="fill:max(d;4px):noGrow"/>
+                            <colspec value="left:2dlu:noGrow"/>
+                            <colspec value="fill:max(d;4px):noGrow"/>
+                            <constraints>
+                              <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <forms defaultalign-horz="false"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="20e84" class="javax.swing.JToggleButton" binding="aButton" default-binding="true">
+                                <constraints>
+                                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                  <forms/>
+                                </constraints>
+                                <properties>
+                                  <margin top="2" left="2" bottom="2" right="2"/>
+                                  <selected value="true"/>
+                                  <text value="a"/>
+                                  <toolTipText value="Insert fault into ARITHMETICAL functions"/>
+                                </properties>
+                              </component>
+                              <component id="9dca1" class="javax.swing.JToggleButton" binding="rButton">
+                                <constraints>
+                                  <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                  <forms/>
+                                </constraints>
+                                <properties>
+                                  <margin top="2" left="3" bottom="2" right="2"/>
+                                  <selected value="true"/>
+                                  <text value="r"/>
+                                  <toolTipText value="Insert fault into RELATIONAL (comparison) functions"/>
+                                </properties>
+                              </component>
+                              <component id="9c2ab" class="javax.swing.JToggleButton" binding="lButton">
+                                <constraints>
+                                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="1" use-parent-layout="false"/>
+                                  <forms/>
+                                </constraints>
+                                <properties>
+                                  <margin top="2" left="4" bottom="2" right="3"/>
+                                  <selected value="true"/>
+                                  <text value="l"/>
+                                  <toolTipText value="Insert fault into LOGICAL functions"/>
+                                </properties>
+                              </component>
+                              <component id="9b518" class="javax.swing.JToggleButton" binding="uButton">
+                                <constraints>
+                                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                  <forms/>
+                                </constraints>
+                                <properties>
+                                  <margin top="2" left="2" bottom="2" right="2"/>
+                                  <selected value="true"/>
+                                  <text value="u"/>
+                                  <toolTipText value="Insert fault into UNARY functions"/>
+                                </properties>
+                              </component>
+                              <component id="1d97c" class="javax.swing.JToggleButton" binding="sButton">
+                                <constraints>
+                                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                  <forms/>
+                                </constraints>
+                                <properties>
+                                  <margin top="2" left="2" bottom="2" right="2"/>
+                                  <selected value="true"/>
+                                  <text value="s"/>
+                                  <toolTipText value="Insert fault into SHIFT functions"/>
+                                </properties>
+                              </component>
+                              <component id="192e7" class="javax.swing.JCheckBox" binding="diagnoseCheckBox">
+                                <constraints>
+                                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <forms defaultalign-horz="false"/>
+                                </constraints>
+                                <properties>
+                                  <selected value="true"/>
+                                  <text value="D&amp;iagnose"/>
+                                </properties>
+                              </component>
+                            </children>
+                          </grid>
                         </children>
                       </grid>
                       <grid id="837dd" layout-manager="FormLayout">
@@ -757,6 +851,8 @@
                         <rowspec value="top:4dlu:noGrow"/>
                         <rowspec value="center:max(d;4px):noGrow"/>
                         <colspec value="fill:126px:noGrow"/>
+                        <colspec value="left:6dlu:noGrow"/>
+                        <colspec value="fill:max(d;4px):noGrow"/>
                         <colspec value="left:6dlu:noGrow"/>
                         <colspec value="center:d:grow"/>
                         <constraints>
@@ -786,7 +882,7 @@
                           </component>
                           <component id="23706" class="javax.swing.JTextField" binding="diagVhdlTextField">
                             <constraints>
-                              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                              <grid row="0" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                                 <preferred-size width="150" height="-1"/>
                               </grid>
                               <forms defaultalign-horz="false"/>
@@ -799,7 +895,7 @@
                           </component>
                           <component id="9dcbf" class="javax.swing.JTextField" binding="dgnTextField">
                             <constraints>
-                              <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                              <grid row="2" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                                 <preferred-size width="150" height="-1"/>
                               </grid>
                               <forms defaultalign-horz="false"/>
@@ -812,7 +908,7 @@
                           </component>
                           <component id="74b16" class="javax.swing.JButton" binding="diagHighlightButton">
                             <constraints>
-                              <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                              <grid row="4" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-horz="false"/>
                             </constraints>
                             <properties>
@@ -821,11 +917,31 @@
                           </component>
                           <component id="af428" class="javax.swing.JToggleButton" binding="revealMutationButton" default-binding="true">
                             <constraints>
-                              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                               <forms/>
                             </constraints>
                             <properties>
                               <text value="Reveal &amp;mutation"/>
+                            </properties>
+                          </component>
+                          <component id="ed141" class="javax.swing.JCheckBox" binding="diagCandidates1CheckBox">
+                            <constraints>
+                              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="Candidates &amp;1"/>
+                            </properties>
+                          </component>
+                          <component id="ada21" class="javax.swing.JCheckBox" binding="diagCandidates2CheckBox">
+                            <constraints>
+                              <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <forms/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="Candidates &amp;2"/>
                             </properties>
                           </component>
                         </children>
@@ -1017,6 +1133,10 @@
     <group name="diagnosisBGroup">
       <member id="6d38f"/>
       <member id="6997"/>
+    </group>
+    <group name="diagScoreBGroup">
+      <member id="66584"/>
+      <member id="1f733"/>
     </group>
   </buttonGroups>
   <inspectionSuppressions>

@@ -71,10 +71,6 @@ public class LinesStorage {
 		return mutationLinesArray.get(0);
 	}
 
-	public boolean isEmpty() {
-		return !hasNodes();
-	}
-
 	public boolean hasNodes() {
 		return nodesLines != null && !nodesLines.isEmpty();
 	}
@@ -143,32 +139,53 @@ public class LinesStorage {
 		if (!hasNodes()) {
 			return null;
 		}
-		return "Uncovered nodes " + statFor(nodeLinesArray);
+		return "Uncovered nodes" + generateNodesInfo();
+	}
+
+	public String generateNodesInfo() {
+		if (!hasNodes()) {
+			return "";
+		}
+		return statFor(nodeLinesArray);
 	}
 
 	public String generateEdgesStat() {
 		if (!hasEdges()) {
 			return null;
 		}
-		return "Uncovered edges " + statFor(edgeLinesArray);
+		return "Uncovered edges" + statFor(edgeLinesArray);
 	}
 
 	public String generateCandidates1Stat() {
 		if (!hasCandidates1()) {
 			return null;
 		}
-		return "Candidates 1 " + statFor(candidates1LinesArray);
+		return "Candidates 1" + generateCandidates1Info();
+	}
+
+	public String generateCandidates1Info() {
+		if (!hasCandidates1()) {
+			return "";
+		}
+		return statFor(candidates1LinesArray);
 	}
 
 	public String generateCandidates2Stat() {
 		if (!hasCandidates2()) {
 			return null;
 		}
-		return "Candidates 2 " + statFor(candidates2LinesArray);
+		return "Candidates 2" + generateCandidates2Info();
+	}
+
+	public String generateCandidates2Info() {
+		if (!hasCandidates2()) {
+			return "";
+		}
+		return statFor(candidates2LinesArray);
 	}
 
 	private String statFor(ArrayList<Integer> linesArray) {
-		return "(" + linesArray.size() + ")";
+		return " (" + linesArray.size() + ")";
 	}
 
 	public void setOffset(int offset) {

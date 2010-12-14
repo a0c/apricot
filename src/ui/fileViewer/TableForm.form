@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ui.fileViewer.TableForm">
   <grid id="27dc6" binding="mainPanel" custom-create="true" default-binding="true" layout-manager="FormLayout">
+    <rowspec value="center:1px:noGrow"/>
+    <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="fill:d:grow"/>
+    <colspec value="fill:2px:noGrow"/>
+    <colspec value="left:4dlu:noGrow"/>
     <colspec value="left:63px:noGrow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
@@ -21,7 +25,7 @@
     <children>
       <scrollpane id="c2be3">
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="9" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="0" row-span="1" col-span="11" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <forms defaultalign-horz="false" defaultalign-vert="false"/>
         </constraints>
         <properties/>
@@ -36,19 +40,19 @@
           </component>
         </children>
       </scrollpane>
-      <component id="54e39" class="javax.swing.JCheckBox" binding="nodesCheckBox" default-binding="true">
+      <component id="f360e" class="javax.swing.JLabel" binding="nodesLabel" default-binding="true">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <forms/>
         </constraints>
         <properties>
-          <selected value="true"/>
+          <opaque value="true"/>
           <text value="Nodes"/>
         </properties>
       </component>
       <component id="7029d" class="javax.swing.JCheckBox" binding="edgesCheckBox" default-binding="true">
         <constraints>
-          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <forms/>
         </constraints>
         <properties>
@@ -60,30 +64,42 @@
       </component>
       <hspacer id="5e933">
         <constraints>
-          <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="10" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <forms defaultalign-horz="false"/>
         </constraints>
       </hspacer>
-      <component id="573f6" class="javax.swing.JCheckBox" binding="candidates1CheckBox">
+      <component id="89e57" class="javax.swing.JLabel" binding="candidates1Label">
         <constraints>
-          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <forms/>
         </constraints>
         <properties>
-          <selected value="true"/>
+          <opaque value="true"/>
           <text value="Candidates 1"/>
         </properties>
       </component>
-      <component id="2ab20" class="javax.swing.JCheckBox" binding="candidates2CheckBox">
+      <component id="e8f88" class="javax.swing.JLabel" binding="candidates2Label">
         <constraints>
-          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
           <forms/>
         </constraints>
         <properties>
-          <selected value="true"/>
+          <opaque value="true"/>
           <text value="Candidates 2"/>
         </properties>
       </component>
+      <vspacer id="3dacf">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="9" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="1" use-parent-layout="false"/>
+          <forms defaultalign-vert="false"/>
+        </constraints>
+      </vspacer>
+      <hspacer id="f4519">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <forms defaultalign-horz="false"/>
+        </constraints>
+      </hspacer>
     </children>
   </grid>
   <inspectionSuppressions>

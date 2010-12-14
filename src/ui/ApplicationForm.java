@@ -90,8 +90,8 @@ public class ApplicationForm implements ActionListener {
 	private JCheckBox diagnoseCheckBox;
 	private JCheckBox optimizeCheckBox;
 	private JCheckBox potentialCheckBox;
-	private JCheckBox scorebyratioCheckBox;
-	private JCheckBox scorebyfailedCheckBox;
+	private JRadioButton scorebyratioRButton;
+	private JRadioButton scorebyfailedRButton;
 	private JButton diagHlddButton;
 	private JButton diagVhdlButton;
 	private JButton dgnButton;
@@ -99,6 +99,14 @@ public class ApplicationForm implements ActionListener {
 	private JTextField dgnTextField;
 	private JButton diagHighlightButton;
 	private JToggleButton revealMutationButton;
+	private JToggleButton aButton;
+	private JToggleButton rButton;
+	private JToggleButton lButton;
+	private JToggleButton uButton;
+	private JToggleButton sButton;
+	private JCheckBox covNodesCheckBox;
+	private JCheckBox diagCandidates1CheckBox;
+	private JCheckBox diagCandidates2CheckBox;
 	private MouseSelectionAdapter upperRightTabbedPaneAdapter;
 	private MouseSelectionAdapter picturePaneAdapter;
 
@@ -124,7 +132,8 @@ public class ApplicationForm implements ActionListener {
 
 	private BusinessLogicAssertionChecker businessLogicAssertionChecker = null;
 	private BusinessLogicCoverageAnalyzer businessLogicCoverageAnalyzer = null;
-	private Highlighter highlighter;
+	private Highlighter covHighlighter;
+	private Highlighter diagHighlighter;
 	private Diagnosis diagnosis;
 
 	private TabbedPaneListener tabbedPaneListener;
@@ -156,8 +165,8 @@ public class ApplicationForm implements ActionListener {
 				covRandomRButton, coverageCheckBox, nodeCheckBox, toggleCheckBox, conditionCheckBox,
 				edgeCheckBox, covVhdlButton, covButton, covHighlightButton,
 				diagHlddTextField, diagSimulButton, diagPatternNrSpinner, diagRandomRButton, diagTstRButton,
-				diagnoseCheckBox, optimizeCheckBox, potentialCheckBox, scorebyratioCheckBox,
-				scorebyfailedCheckBox, diagHlddButton, diagVhdlButton, dgnButton,
+				diagnoseCheckBox, optimizeCheckBox, potentialCheckBox, scorebyratioRButton,
+				scorebyfailedRButton, diagHlddButton, diagVhdlButton, dgnButton,
 				diagVhdlTextField, dgnTextField, diagHighlightButton, revealMutationButton);
 
 		/* ConsoleWriter to write into a consoleTextArea */
@@ -213,16 +222,17 @@ public class ApplicationForm implements ActionListener {
 		businessLogicCoverageAnalyzer = new BusinessLogicCoverageAnalyzer(this, consoleWriter);
 		addActionListener(covHlddButton, covSimulButton);
 		coverageCheckBox.addChangeListener(createCoverageButtonChanger());
+		covNodesCheckBox.addChangeListener(new TableFormFocuser());
 		/* DIAGNOSIS */
 		diagnosis = new Diagnosis(this, consoleWriter);
 		addActionListener(diagHlddButton, diagSimulButton, revealMutationButton);
 		revealMutationButton.addChangeListener(new TableFormFocuser());
+		diagCandidates1CheckBox.addChangeListener(new TableFormFocuser());
+		diagCandidates2CheckBox.addChangeListener(new TableFormFocuser());
 		diagnoseCheckBox.addChangeListener(createDiagnoseButtonChanger());
-		ScoreToggler scoreToggler = new ScoreToggler();
-		scorebyfailedCheckBox.addChangeListener(scoreToggler);
-		scorebyratioCheckBox.addChangeListener(scoreToggler);
 		/* HIGHLIGHTER */
-		highlighter = new Highlighter(this, consoleWriter);
+		covHighlighter = new Highlighter(this, consoleWriter);
+		diagHighlighter = new Highlighter(this, consoleWriter);
 		addActionListener(covVhdlButton, covButton, covHighlightButton, diagVhdlButton, dgnButton, diagHighlightButton);
 
 		/* Add Mouse Listener to the File Viewer Tabbed Pane */
@@ -258,6 +268,10 @@ public class ApplicationForm implements ActionListener {
 		conditionCheckBox.addActionListener(checkBoxSetter);
 		nodeCheckBox.addActionListener(checkBoxSetter);
 		toggleCheckBox.addActionListener(checkBoxSetter);
+		TableRepainter tableRepainter = new TableRepainter();
+		covNodesCheckBox.addChangeListener(tableRepainter);
+		diagCandidates1CheckBox.addChangeListener(tableRepainter);
+		diagCandidates2CheckBox.addChangeListener(tableRepainter);
 	}
 
 	private ChangeListener createDiagnoseButtonChanger() {
@@ -542,9 +556,9 @@ public class ApplicationForm implements ActionListener {
 
 	private void setDiagVhdlFile(File vhdlFile) {
 
-		updateTextFieldFor(diagVhdlButton, vhdlFile);
+		diagHighlighter.setVhdlFile(vhdlFile);
 
-		setCovVhdlFile(vhdlFile);
+		updateTextFieldFor(diagVhdlButton, vhdlFile);
 
 		SingleFileSelector.setCurrentDirectory(vhdlFile);
 	}
@@ -692,17 +706,8 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public void setDgnFile(File dgnFile) {
-		setDgnFile(dgnFile, true);
-	}
 
-	public void setDgnFile(File dgnFile, boolean doClick) {
-
-		if (doClick) {
-			File covFile = deriveCovFile(dgnFile);
-			setCovFile(covFile, false);
-		}
-
-		highlighter.setDgnFile(dgnFile);
+		diagHighlighter.setDgnFile(dgnFile);
 		updateDgnTextField(dgnFile);
 
 		if (dgnFile == null) {
@@ -716,10 +721,8 @@ public class ApplicationForm implements ActionListener {
 		}
 
 		/* Automatically click HIGHLIGHT button, if both files are set */
-		if (doClick) {
-			if (vhdlFile != null) {
-				doClickHighlightButton();
-			}
+		if (vhdlFile != null) {
+			diagHighlightButton.doClick();
 		}
 
 		SingleFileSelector.setCurrentDirectory(dgnFile);
@@ -727,17 +730,8 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public void setCovFile(File covFile) {
-		setCovFile(covFile, true);
-	}
 
-	public void setCovFile(File covFile, boolean doClick) {
-
-		if (doClick) {
-			File dgnFile = deriveDgnFile(covFile);
-			setDgnFile(dgnFile, false);
-		}
-
-		highlighter.setCovFile(covFile);
+		covHighlighter.setCovFile(covFile);
 		updateCovTextField(covFile);
 
 		if (covFile == null) {
@@ -751,10 +745,8 @@ public class ApplicationForm implements ActionListener {
 		}
 
 		/* Automatically click HIGHLIGHT button, if both files are set */
-		if (doClick) {
-			if (vhdlFile != null) {
-				doClickHighlightButton();
-			}
+		if (vhdlFile != null) {
+			covHighlightButton.doClick();
 		}
 
 		SingleFileSelector.setCurrentDirectory(covFile);
@@ -762,9 +754,9 @@ public class ApplicationForm implements ActionListener {
 
 	private void setCovVhdlFile(File vhdlFile) {
 
-		highlighter.setVhdlFile(vhdlFile);
+		covHighlighter.setVhdlFile(vhdlFile);
 
-		updateCovVhdlTextField(vhdlFile);
+		updateTextFieldFor(covVhdlButton, vhdlFile);
 
 		SingleFileSelector.setCurrentDirectory(vhdlFile);
 	}
@@ -992,11 +984,11 @@ public class ApplicationForm implements ActionListener {
 			} else if (source == covSimulButton) {
 				businessLogicCoverageAnalyzer.processAnalyze();
 			} else if (source == covHighlightButton) {
-				highlighter.highlight();
+				covHighlighter.highlight();
 			} else if (source == diagSimulButton) {
 				diagnosis.diagnose();
 			} else if (source == diagHighlightButton) {
-				highlighter.highlight();
+				diagHighlighter.highlight();
 			} else if (source == revealMutationButton) {
 				toggleMutations();
 			}
@@ -1111,10 +1103,6 @@ public class ApplicationForm implements ActionListener {
 		businessLogic.addComment(commentDialog.getComment());
 	}
 
-	public void doClickHighlightButton() {
-		covHighlightButton.doClick();
-	}
-
 	public void doLoadHlddGraph(File hlddGraphFile) {
 		if (hlddGraphFile != null) {
 			addPictureTab(hlddGraphFile.getName(), hlddGraphFile.getAbsolutePath(), new PicturePanel(hlddGraphFile));
@@ -1158,11 +1146,11 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public boolean isDoDiagScoreByFailed() {
-		return scorebyfailedCheckBox.isSelected();
+		return scorebyfailedRButton.isSelected();
 	}
 
 	public boolean isDoDiagScoreByRatio() {
-		return scorebyratioCheckBox.isSelected();
+		return scorebyratioRButton.isSelected();
 	}
 
 
@@ -1186,6 +1174,50 @@ public class ApplicationForm implements ActionListener {
 		return directiveBuilder.toString();
 	}
 
+	@SuppressWarnings({"StandardVariableNames"})
+	public String getDiagnosisOperatorDirective() {
+
+		boolean a = aButton.isSelected();
+		boolean r = rButton.isSelected();
+		boolean l = lButton.isSelected();
+		boolean u = uButton.isSelected();
+		boolean s = sButton.isSelected();
+
+		if (!(a || r || l || u || s)) {
+			return "arlus";
+		} else {
+			StringBuilder operators = new StringBuilder();
+			if (a) {
+				operators.append("a");
+			}
+			if (r) {
+				operators.append("r");
+			}
+			if (l) {
+				operators.append("l");
+			}
+			if (u) {
+				operators.append("u");
+			}
+			if (s) {
+				operators.append("s");
+			}
+			return operators.toString();
+		}
+	}
+
+	public boolean isCovNodesSelected() {
+		return covNodesCheckBox.isSelected();
+	}
+
+	public boolean isDiagCandidates1Selected() {
+		return diagCandidates1CheckBox.isSelected();
+	}
+
+	public boolean isDiagCandidates2Selected() {
+		return diagCandidates2CheckBox.isSelected();
+	}
+
 	public void updateChkFileTextField(File file) {
 		updateTextFieldFor(chkFileButton, file);
 	}
@@ -1196,10 +1228,6 @@ public class ApplicationForm implements ActionListener {
 
 	private void updateDgnTextField(File file) {
 		updateTextFieldFor(dgnButton, file);
-	}
-
-	private void updateCovVhdlTextField(File file) {
-		updateTextFieldFor(covVhdlButton, file);
 	}
 
 	public void updateDrawSpinner(int maxValue) {
@@ -1278,14 +1306,15 @@ public class ApplicationForm implements ActionListener {
 			if (tabbedPane == null) {
 				tabbedPane = fileViewerTabbedPane1;
 			}
-			addFileViewerTab(tabbedPane, selectedFile.getName(), selectedFile.getAbsolutePath(), new TableForm(selectedFile,
-					tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1).getWidth(), linesStorage, fileDropHandler).getMainPanel(),
-					!linesStorage.isEmpty());
+			int visibleWidth = tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1).getWidth();
+			TableForm tableForm = new TableForm(selectedFile, visibleWidth, linesStorage, fileDropHandler, this);
+			addFileViewerTab(tabbedPane, selectedFile.getName(), selectedFile.getAbsolutePath(), tableForm.getMainPanel(),
+					tableForm.getColor());
 		}
 
 	}
 
-	public void addFileViewerTab(JTabbedPane tabbedPane, String tabTitle, String tabToolTip, JComponent component, boolean isDirty) {
+	public void addFileViewerTab(JTabbedPane tabbedPane, String tabTitle, String tabToolTip, JComponent component, Color color) {
 		TabComponent tabComponent;
 		/* Search for equal existing tab */
 		int insertionIndex = getIdenticalTabIndex(tabbedPane, tabToolTip);
@@ -1295,12 +1324,12 @@ public class ApplicationForm implements ActionListener {
 			tabbedPane.insertTab(tabTitle, null, component, null, insertionIndex);
 			tabComponent = new TabComponent(tabbedPane, tabTitle, tabToolTip,
 					tabbedPane == fileViewerTabbedPane1 ? tabbedPaneListener : tabbedPaneListener2);
-			TabComponent.setBackgroundFor(tabComponent, isDirty);
+			tabComponent.setColor(color);
 			tabbedPane.setTabComponentAt(insertionIndex, tabComponent);
 		} else {
 			/* Previously existing tab is found. Replace its component with a new one (the specified one). */
 			tabComponent = (TabComponent) tabbedPane.getTabComponentAt(insertionIndex);
-			TabComponent.setBackgroundFor(tabComponent, isDirty);
+			tabComponent.setColor(color);
 			tabbedPane.setComponentAt(insertionIndex, component);
 			tabbedPane.repaint();
 			System.gc();
@@ -1371,7 +1400,7 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public void addSimulation(String tabTitle, String tabToolTip, JComponent component) {
-		addFileViewerTab(fileViewerTabbedPane2, tabTitle, tabToolTip, component, false);
+		addFileViewerTab(fileViewerTabbedPane2, tabTitle, tabToolTip, component, null);
 	}
 
 	public void addPictureTab(String tabTitle, String tabToolTip, JComponent component) {
@@ -1592,7 +1621,7 @@ public class ApplicationForm implements ActionListener {
 
 			} else if (isCOV(file)) {
 
-				waitForPreviousToComplete(applicationForm.highlighter);
+				waitForPreviousToComplete(applicationForm.covHighlighter);
 
 				applicationForm.setCovFile(file);
 
@@ -1634,7 +1663,7 @@ public class ApplicationForm implements ActionListener {
 
 			} else if (isDGN(file)) {
 
-				waitForPreviousToComplete(applicationForm.highlighter);
+				waitForPreviousToComplete(applicationForm.diagHighlighter);
 
 				applicationForm.setDgnFile(file);
 
@@ -1717,19 +1746,16 @@ public class ApplicationForm implements ActionListener {
 		}
 	}
 
-	private class ScoreToggler implements ChangeListener {
-
+	private class TableRepainter implements ChangeListener {
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			Object source = e.getSource();
-			if (source == scorebyfailedCheckBox) {
-				if (scorebyfailedCheckBox.isSelected()) {
-					scorebyratioCheckBox.setSelected(false);
-				}
-			} else if (source == scorebyratioCheckBox) {
-				if (scorebyratioCheckBox.isSelected()) {
-					scorebyfailedCheckBox.setSelected(false);
-				}
+			List<JTable> tables = new TableFinder(fileViewerTabbedPane1).findAll();
+			for (JTable table : tables) {
+				table.repaint();
+			}
+			tables = new TableFinder(fileViewerTabbedPane2).findAll();
+			for (JTable table : tables) {
+				table.repaint();
 			}
 		}
 	}
