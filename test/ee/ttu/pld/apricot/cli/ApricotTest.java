@@ -1,6 +1,5 @@
 package ee.ttu.pld.apricot.cli;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -24,31 +23,34 @@ public class ApricotTest {
 
 		String xmlPath = ".\\classes\\test\\VertigoInterfaceParsers\\ee\\ttu\\pld\\apricot\\cli\\Assertain_example_in.xml";
 		File xmlFile = new File(new File(xmlPath).toURI().getPath());
-		File copyXmlFile = new File(xmlFile.getParent(), "Copy Assertain_example_in.xml");
+		File outXmlFile = new File(xmlFile.getParent(), "OUT_Assertain_example_in.xml");
 
 		try {
-			FileUtils.copyFile(xmlFile, copyXmlFile);
 
-			assertTrue(copyXmlFile.exists());
+			assertTrue(xmlFile.exists());
+			if (outXmlFile.exists()) {
+				assertTrue(outXmlFile.delete());
+				assertTrue(!outXmlFile.exists());
+			}
 
-			Document xml = Apricot.readXml(copyXmlFile.getAbsolutePath());
+			Document xml = Apricot.readXml(xmlFile.getAbsolutePath());
 
 			assertTrue(findResults(xml, "\'coverage\'") == 0);
 			assertTrue(findResults(xml, "\'diagnosis\'") == 0);
 
-			long oldLength = copyXmlFile.length();
-			new Apricot(new String[]{copyXmlFile.getAbsolutePath()});
-			long newLength = copyXmlFile.length();
+			long oldLength = xmlFile.length();
+			new Apricot(new String[]{xmlFile.getAbsolutePath(), outXmlFile.getAbsolutePath()});
+			long newLength = outXmlFile.length();
 
 			assertTrue(newLength > oldLength);
 
-			xml = Apricot.readXml(copyXmlFile.getAbsolutePath());
+			xml = Apricot.readXml(outXmlFile.getAbsolutePath());
 
 			assertTrue(findResults(xml, "\'coverage\'") == 1);
 			assertTrue(findResults(xml, "\'diagnosis\'") == 1);
 
 		} finally {
-			assertTrue(copyXmlFile.delete());
+			assertTrue(outXmlFile.delete());
 		}
 	}
 

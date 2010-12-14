@@ -10,6 +10,9 @@
     <action name="diagnosis">
         <settings>
             <design>.\test\designs\uart16750\rtl\diag\uart_16750.vhd</design>
+            <optimize>true</optimize>
+            <potential>true</potential>
+            <operators>a</operators>
         </settings>
     </action>
     <action name="assertion">

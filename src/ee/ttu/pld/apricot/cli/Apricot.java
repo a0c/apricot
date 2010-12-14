@@ -34,11 +34,12 @@ public class Apricot {
 
 	public Apricot(String[] args) {
 
-		if (args.length != 1) {
+		if (args.length < 1) {
 			System.out.println("[APRICOT] ### ERROR ###: request XML file is not specified");
 			return;
 		}
 		String fileName = args[0];
+		String outFileName = args.length == 2 ? args[1] : fileName;
 
 		try {
 
@@ -50,7 +51,7 @@ public class Apricot {
 
 			buildResponses(requests, xml);
 
-			writeXml(xml, fileName);
+			writeXml(xml, outFileName);
 
 			printStat(requests);
 
@@ -208,25 +209,44 @@ public class Apricot {
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
 		XPathExpression expr = xPath.compile("apricot//action[@name='diagnosis']");
-		NodeList covNodes = (NodeList) expr.evaluate(xml, XPathConstants.NODESET);
+		NodeList diagNodes = (NodeList) expr.evaluate(xml, XPathConstants.NODESET);
 
-		for (int i = 0, n = covNodes.getLength(); i < n; i++) {
+		for (int i = 0, n = diagNodes.getLength(); i < n; i++) {
 
-			Node covNode = covNodes.item(i);
-			Node requestNode = covNode;
+			Node requestNode = diagNodes.item(i);
 			Object resultNode = xPath.compile("result").evaluate(requestNode, XPathConstants.NODE);
 			if (resultNode != null) {
 				continue;
 			}
 
-			expr = xPath.compile("settings");
-			covNode = (Node) expr.evaluate(covNode, XPathConstants.NODE);
+			Node settingsNode = (Node) xPath.compile("settings").evaluate(requestNode, XPathConstants.NODE);
 
-			expr = xPath.compile("design");
-			NodeList designList = (NodeList) expr.evaluate(covNode, XPathConstants.NODESET);
-			String design = designList.item(0).getTextContent();
+			Node designNode = (Node) xPath.compile("design").evaluate(settingsNode, XPathConstants.NODE);
+			String design = designNode.getTextContent();
 
-			requests.add(new DiagnosisRequest(requestNode, design));
+			Node optimizeNode = (Node) xPath.compile("optimize").evaluate(settingsNode, XPathConstants.NODE);
+			String optimize = optimizeNode.getTextContent();
+
+			Node potentialNode = (Node) xPath.compile("potential").evaluate(settingsNode, XPathConstants.NODE);
+			String potential = potentialNode.getTextContent();
+
+			Node sortNode = (Node) xPath.compile("sort").evaluate(settingsNode, XPathConstants.NODE);
+			String sort = sortNode != null ? sortNode.getTextContent() : null;
+
+			Node operatorsNode = (Node) xPath.compile("operators").evaluate(settingsNode, XPathConstants.NODE);
+			String operators = operatorsNode.getTextContent();
+
+			Node randomNode = (Node) xPath.compile("random").evaluate(settingsNode, XPathConstants.NODE);
+			String random = randomNode != null ? randomNode.getTextContent() : null;
+
+			DiagnosisRequest.Settings settings = new DiagnosisRequest.Settings(design);
+			settings.setOptimize(optimize);
+			settings.setPotential(potential);
+			settings.setSort(sort);
+			settings.setOperators(operators);
+			settings.setRandom(random);
+
+			requests.add(new DiagnosisRequest(requestNode, settings));
 		}
 
 		return requests;
