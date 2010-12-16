@@ -48,7 +48,7 @@
                     <rowspec value="top:4dlu:noGrow"/>
                     <rowspec value="center:5px:noGrow"/>
                     <rowspec value="top:4dlu:noGrow"/>
-                    <rowspec value="fill:54px:noGrow"/>
+                    <rowspec value="fill:50dlu:noGrow"/>
                     <rowspec value="top:4dlu:noGrow"/>
                     <rowspec value="fill:156px:noGrow"/>
                     <rowspec value="top:1dlu:noGrow"/>
@@ -65,8 +65,7 @@
                         <colspec value="center:79px:noGrow"/>
                         <colspec value="left:4dlu:noGrow"/>
                         <colspec value="fill:max(d;4px):noGrow"/>
-                        <colspec value="left:51dlu:noGrow"/>
-                        <colspec value="fill:max(d;4px):noGrow"/>
+                        <colspec value="fill:d:grow"/>
                         <constraints>
                           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                           <forms/>
@@ -102,10 +101,11 @@
                           </component>
                           <component id="2056a" class="javax.swing.JCheckBox" binding="commentCheckBox" default-binding="true">
                             <constraints>
-                              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                               <forms/>
                             </constraints>
                             <properties>
+                              <horizontalAlignment value="4"/>
                               <horizontalTextPosition value="10"/>
                               <text value="+ Commen&amp;t"/>
                               <toolTipText value="Ask for comment to be added to the beginning of output file"/>
@@ -762,7 +762,7 @@
                             <colspec value="left:2dlu:noGrow"/>
                             <colspec value="fill:max(d;4px):noGrow"/>
                             <constraints>
-                              <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="4" fill="2" indent="0" use-parent-layout="false"/>
                               <forms defaultalign-horz="false"/>
                             </constraints>
                             <properties/>
