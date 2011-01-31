@@ -196,7 +196,7 @@ public class ExpressionBuilder {
 			/* d_in ( 8 downto 1 ) */
 			/* d_in ( 1 to 8 ) */
 			RangeDeclaration rangeDeclaration =
-					parseRangeDeclaration(line.substring(line.indexOf("(") + 1, line.indexOf(")")).trim());
+					parseRangeDeclaration(line.substring(line.indexOf("(") + 1, line.lastIndexOf(")")).trim());
 			int lowestIndex = evaluateNumerically(rangeDeclaration.lowestIndex, line);
 			int highestIndex = evaluateNumerically(rangeDeclaration.highestIndex, line);
 			return new Range(highestIndex, lowestIndex, rangeDeclaration.isDescending);

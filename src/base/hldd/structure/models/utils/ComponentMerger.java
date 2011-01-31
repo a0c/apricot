@@ -2,6 +2,7 @@ package base.hldd.structure.models.utils;
 
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.variables.AbstractVariable;
+import base.hldd.structure.variables.ConstantVariable;
 import base.vhdl.structure.AbstractOperand;
 import base.vhdl.structure.ComponentInstantiation;
 import ui.ExtendedException;
@@ -33,12 +34,13 @@ public class ComponentMerger {
 	private void merge(ModelManager modelCollector) {
 
 		for (AbstractVariable absVar : componentModel.getVariables()) {
-
 			if (!absVar.isInput()) {
-
 				modelCollector.addVariable(absVar);
 			}
+		}
 
+		for (ConstantVariable constant : componentModel.getConstants()) {
+			modelCollector.addVariable(constant);
 		}
 	}
 

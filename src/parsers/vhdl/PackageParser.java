@@ -69,6 +69,8 @@ public class PackageParser {
 				case PACKAGE_BODY_DECL:
 					/* Stop parser. */
 					return;
+				default:
+					System.out.println("Unknown TOKEN is met: \"" + value + "\"");
 			}
 		}
 	}
@@ -256,7 +258,8 @@ public class PackageParser {
 
 			type = Type.createFromValues(valueRange);/*todo: , valueRange.isDescending() ? */   // todo: <== isDescending() for #length#
 
-		} else if ((typeAndValue.startsWith("BIT_VECTOR ") || typeAndValue.startsWith("STD_LOGIC_VECTOR ") || typeAndValue.startsWith("UNSIGNED"))
+		} else if ((typeAndValue.startsWith("BIT_VECTOR ") || typeAndValue.startsWith("STD_LOGIC_VECTOR ")
+				|| typeAndValue.startsWith("UNSIGNED") || typeAndValue.startsWith("SIGNED"))
 				&& ExpressionBuilder.BIT_RANGE_PATTERN.matcher(typeAndValue).matches()) {
 			/* BIT_VECTOR ( 8 DOWNTO 0) */
 			/* {IN} STD_LOGIC_VECTOR(MOD_EN_BITS-3 DOWNTO 0) */
@@ -271,6 +274,7 @@ public class PackageParser {
 		} else if (typeAndValue.equals("BOOLEAN")) {
 			type = Type.BOOLEAN_TYPE;
 		} else if (typeAndValue.equals("INTEGER") || typeAndValue.equals("NATURAL")) {
+			//todo instead of parseConstantValue(), use ValueCalculator, or how it was?... (EEG ANALYZER => fft_transform.vhd)
 			BigInteger valueInt = valueAsString == null ? null : parseConstantValue(valueAsString);
 			if (valueInt == null) {
 				throw new UnsupportedConstructException("Unconstrained type " + typeAndValue + " is not synthesizable.\n" +
@@ -347,7 +351,7 @@ public class PackageParser {
 		BINARY(2), BOOLEAN(2), HEXADECIMAL(16), ARBITRARY(-1), DECIMAL(10);
 
 		private static final Pattern BIN_PATTERN = Pattern.compile("(\'[01]+\')|(\"[01]+\")");
-		private static final Pattern HEX_PATTERN = Pattern.compile("^X \" ?[0-9a-f]+ ?\"$", Pattern.CASE_INSENSITIVE);
+		private static final Pattern HEX_PATTERN = Pattern.compile("^X \" ?[0-9a-f ]+ ?\"$", Pattern.CASE_INSENSITIVE);
 		private static final Pattern BASED_PATTERN = Pattern.compile("^\\d+ # [\\._0-9a-f]+ #( E\\+?[0-9]+)?$", Pattern.CASE_INSENSITIVE);
 		private static final Pattern DEC_PATTERN = Pattern.compile("-?\\d+");
 
@@ -388,7 +392,9 @@ public class PackageParser {
 				case ARBITRARY:
 					return variableString;
 				default:
-					return variableString.substring(3, variableString.length() - 1).trim();
+					variableString = variableString.substring(3, variableString.length() - 1).trim();
+					variableString = variableString.replaceAll(" ", "");
+					return variableString;
 			}
 		}
 

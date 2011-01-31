@@ -973,7 +973,12 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 				/* Adjust Constant Length */
 				Range length = leftOperand.isRange() ? leftOperand.getRange() : leftVariable.getLength();
-				constantVariable.setLength(length);
+				Range constLength = constantVariable.getLength();
+				if (length.contains(constLength)) { // only expand the length, never narrow it
+					constantVariable.setLength(length);
+				} else {
+					leftVariable.getType().setLength(constLength);
+				}
 			}
 		}
 	}

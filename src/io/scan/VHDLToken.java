@@ -61,13 +61,13 @@ public class VHDLToken {
 				"|(((BIT)|(STD_LOGIC))_VECTOR \\( " + EXPRESSION.regexp + " DOWNTO " + EXPRESSION.regexp + " \\))" +
 				"|(INTEGER)" +
 				"|(INTEGER RANGE " + EXPRESSION.regexp + " ((DOWNTO)|(TO)) " + EXPRESSION.regexp + ")" +
-				"|(UNSIGNED \\( " + EXPRESSION.regexp + " ((DOWNTO)|(TO)) " + EXPRESSION.regexp + " \\))" +
+				"|((UN)?SIGNED \\( " + EXPRESSION.regexp + " ((DOWNTO)|(TO)) " + EXPRESSION.regexp + " \\))" +
 				"|(BOOLEAN)" +
 				"|(NATURAL)" +
 				"|(" + LBL.regexp + "))"), // User declared type
 		NUMERIC_VALUE("(" + BIT.regexp + "|" + INTEGER.regexp + "|" + BOOLEAN.regexp + "|" + HEX.regexp + "|" + BASED_LITERAL.regexp + ")"),
-		INIT("( :=" + NUMERIC_VALUE.regexp + ")?"),
-		MUST_INIT(" :=" + NUMERIC_VALUE.regexp),
+		INIT("( :=" + EXPRESSION.regexp + ")?"),
+		MUST_INIT(" :=" + EXPRESSION.regexp),
 		OPERAND("((" + LBL.regexp + ")" +
 				"|(" + LBL.regexp + " \\( [\\w\'\"]+? \\))" +
 				"|(" + LBL.regexp + " \\( \\d+ DOWNTO \\d+ \\)))"),;
