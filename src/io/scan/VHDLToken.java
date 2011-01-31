@@ -93,6 +93,7 @@ public class VHDLToken {
 		DECL_CLOSE("^END .*;$"),
 		TYPE_ENUM_DECL("^TYPE " + Sub.LBL.regexp + " IS \\( .* \\) ;$"),
 		TYPE_DECL("^TYPE " + Sub.LBL.regexp + " IS .+ ;$"),
+		WITH("^WITH " + Sub.LBL.regexp + " SELECT .+ ;$"),
 		GENERIC_OPEN("^(IS )?GENERIC \\($"),
 		GENERIC_DECL("^" + Sub.LBL.regexp + "( , " + Sub.LBL.regexp + ")* :" + Sub.TYPE.regexp + Sub.INIT.regexp + " ;$"),
 		PORT_OPEN("^(IS )?PORT \\($"),
@@ -115,7 +116,6 @@ public class VHDLToken {
 		WHEN_STATEMENT("^WHEN .* =>$"),
 		PACKAGE_DECL("^PACKAGE(?!( BODY )) .+ IS$"),
 		PACKAGE_BODY_DECL("^PACKAGE BODY .+ IS$"),
-		WITH("^WITH " + Sub.LBL.regexp + " SELECT .+ ;$"),
 		UNKNOWN("");
 
 		private final Pattern pattern;

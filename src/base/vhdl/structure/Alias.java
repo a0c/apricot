@@ -23,4 +23,8 @@ public class Alias {
 	public OperandImpl getActual() {
 		return actual;
 	}
+
+	public Type getType() {
+		return type;
+	}
 }

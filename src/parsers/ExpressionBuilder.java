@@ -1,6 +1,7 @@
 package parsers;
 
 import base.Range;
+import base.Type;
 import base.helpers.RegexpFactory;
 import base.hldd.structure.nodes.utils.Condition;
 import base.vhdl.structure.*;
@@ -149,19 +150,31 @@ public class ExpressionBuilder {
 			return operand;
 		}
 
+		Alias alias = aliasByName.get(operand.getName());
+		Type aliasType = alias.getType();
+		OperandImpl actualOperand = alias.getActual();
+		Range actualRange = actualOperand.getRange();
+
 		if (operand.isRange()) {
-			//todo: range ALIAS, see VHDL2008_comments.pdf => p.105
-			throw new RuntimeException("Implement me: RANGE ALIAS. todo: merge ranges");
+			Range range = operand.getRange();
+			if (range.isDescending() ^ actualRange.isDescending()) {
+				//todo: range ALIAS, see VHDL2008_comments.pdf => p.105
+				throw new RuntimeException("Implement me: RANGE ALIAS. todo: merge ranges with opposing directions");
+			}
+			if (!range.isDescending()) {
+				throw new RuntimeException("RANGE ALIAS with ASCENDING DIRECTION: Check this to work properly");
+			}
+
+			actualRange = range.absoluteFor(aliasType.getLength(), actualRange);
 		}
 
-		OperandImpl actualOperand = aliasByName.get(operand.getName()).getActual();
-
-		return new OperandImpl(actualOperand.getName(), actualOperand.getRange(), operand.isInverted());
+		return new OperandImpl(actualOperand.getName(), actualRange, operand.isInverted());
 	}
 
 	private boolean isUserDefinedFunction(String line) throws Exception {
 		return USER_DEFINED_CONV.matcher(line).matches()
 				&& !variableNames.contains(extractPureOperand(line, true))
+				&& !aliasByName.containsKey(extractPureOperand(line, true))
 				&& getClosingIndex(line, line.indexOf("(")) == line.length() - 1;
 	}
 
