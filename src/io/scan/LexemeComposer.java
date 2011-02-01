@@ -16,7 +16,6 @@ public class LexemeComposer {
 	private boolean toUpperCase = true;
 	private final VHDLLinesTracker vhdlLinesTracker;
 
-	private static final char NEW_LINE = '\r';
 	private static final char END_OF_FILE = 65535;
 	public static final String DEFAULT_COMMENT = "--";
 
@@ -103,7 +102,7 @@ public class LexemeComposer {
 			/* Check COMMENTS */
 			if (newLexemeType == LexemeType.OP_SUBTR && newLexemeValue.toString().equals(DEFAULT_COMMENT)) {
 				bReader.readLine();
-				vhdlLinesTracker.append(NEW_LINE);
+				vhdlLinesTracker.newLine();
 				newLexemeType = null;
 				newLexemeValue = new StringBuilder();
 				continue;
@@ -187,11 +186,15 @@ public class LexemeComposer {
 			line = new StringBuilder();
 		}
 
+		public void newLine() {
+			addLineToCurrentLines();
+			currentLineCount++;
+		}
+
 		public void append(char newChar) {
 			/* Count lines */
 			if (isNewLine(newChar)) {
-				addLineToCurrentLines();
-				currentLineCount++;
+				newLine();
 			}
 			/* Append the character */
 			if (newChar != END_OF_FILE) {
