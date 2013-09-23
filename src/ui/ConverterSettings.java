@@ -296,7 +296,7 @@ public class ConverterSettings {
 
 	public void writeSmartComment(StringBuilder sb) {
 
-		String newLine = System.getProperty("line.separator");
+		String newLine = "\n";
 		//todo: replace all stuff below with formatted print. see how Zamia does this.
 		sb.append(";  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!").append(newLine);
 		sb.append(";").append(newLine);

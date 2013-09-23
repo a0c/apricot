@@ -1,24 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module relativePaths="true" type="JAVA_MODULE" version="4">
-  <component name="BuildJarSettings">
-    <containerInfo>
-      <containerElement type="module" name="VertigoInterfaceParsers">
-        <attribute name="method" value="1" />
-        <attribute name="URI" value="/" />
-      </containerElement>
-      <containerElement type="library" name="JGoodies" level="module">
-        <attribute name="method" value="2" />
-        <attribute name="URI" value="/" />
-      </containerElement>
-      <containerElement type="library" name="LibExternal" level="project">
-        <attribute name="method" value="2" />
-        <attribute name="URI" value="/" />
-      </containerElement>
-    </containerInfo>
-    <setting name="jarUrl" value="file://$MODULE_DIR$/HLDDTools_16_FEB.jar" />
-    <setting name="buildJar" value="true" />
-    <setting name="mainClass" value="ui.ApplicationForm" />
-  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/classes/production/VertigoInterfaceParsers" />
     <output-test url="file://$MODULE_DIR$/classes/test/VertigoInterfaceParsers" />

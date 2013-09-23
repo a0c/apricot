@@ -891,6 +891,9 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public static void main(String[] args) {
+
+		new File(System.getProperty("java.io.tmpdir"), "apricotCAD").mkdirs();
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			if (System.getProperty("os.name").toUpperCase().startsWith("WIN")) {

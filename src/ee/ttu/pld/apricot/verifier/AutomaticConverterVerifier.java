@@ -19,6 +19,8 @@ public class AutomaticConverterVerifier {
 
 	public void verify(Statistics statistics) {
 
+		new File(System.getProperty("java.io.tmpdir"), "apricotCAD").mkdirs();
+
 		Collection<Design> designs = DesignCreator.create(statistics);
 
 		for (Design design : designs) {

@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ApricotCAD_CLI_win32">
+    <output-path>$PROJECT_DIR$/SETUP</output-path>
+    <root id="archive" name="ApricotCAD_CLI.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/SETUP/META-INF CLI/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="VertigoInterfaceParsers" />
+      <element id="directory" name="lib">
+        <element id="file-copy" path="$PROJECT_DIR$/lib/hlddsim.exe" />
+      </element>
+    </root>
+  </artifact>
+</component>
