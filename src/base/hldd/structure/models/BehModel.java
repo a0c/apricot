@@ -206,7 +206,7 @@ public class BehModel {
 			AbstractVariable absVar = getVariableByIndex(index);
 			if (absVar instanceof GraphVariable) {
 				Graph graph = ((GraphVariable) absVar).getGraph();
-				if (!absVar.isExpansion()) {
+				if (!absVar.isExpansion() && !absVar.isMemory()) {
 					graph.setRootNode(graph.getRootNode().reduce(rootNodeAbsIndex));
 				}
 				rootNodeAbsIndex += graph.getSize();

@@ -40,7 +40,7 @@ public class UserDefinedFunctionVariable extends FunctionVariable {
 		return type;
 	}
 
-	protected boolean isValidAddition() {
+	public boolean isValidAddition() {
 		return operands.size() < expectedOperandsSize;
 	}
 

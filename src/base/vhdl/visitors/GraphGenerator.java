@@ -41,6 +41,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	protected static final Logger LOGGER = Logger.getLogger(GraphGenerator.class.getName());
 
+	public static final int MAX_DYNAMIC_RANGE_ALLOWED = 64;
+
 	private final ConfigurationHandler config;
 	private final ConverterSettings settings;
 	private final Collection<Constant> generics;
@@ -222,6 +224,11 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			String dynRangeReadName = OperandImpl.generateNameForDynamicRangeRead(dynamicRangeRead);
 			AbstractVariable baseVariable = new base.hldd.structure.variables.Variable(dynRangeReadName, type);
 
+			if (isMemoryVariableRequired(wholeVariable)) {
+				modelCollector.createMemory(dynamicRangeRead, source, dynRangeReadName);
+				continue;
+			}
+
 			Node rootNode = createDynamicNode(dynamicRangeRead, source);
 			for (int i = 0; i < rootNode.getConditionValuesCount(); i++) {
 				Node successor = new Node.Builder(wholeVariable).range(new Range(i, i)).build();
@@ -229,6 +236,10 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			}
 			modelCollector.createAndReplaceNewGraph(baseVariable, rootNode, false);
 		}
+	}
+
+	private boolean isMemoryVariableRequired(AbstractVariable variable) {
+		return variable.getType().getLength().length() > MAX_DYNAMIC_RANGE_ALLOWED;
 	}
 
 	private OperandStorage collectRangeAssignments(Architecture architecture) throws Exception {
@@ -400,13 +411,29 @@ public abstract class GraphGenerator extends AbstractVisitor {
 			/* Add VHDL lines the node's been created from */
 			terminalNode.setSource(source);
 			if (isDynamicRange) {
-				insertDynamicNode(transitionNode.getTargetOperand(), terminalNode);
+				if (isMemoryVariableRequired(graphVariable)) {
+					insertIndexNode(transitionNode.getTargetOperand(), terminalNode);
+					((base.hldd.structure.variables.Variable) graphVariable).setMemory(true);
+				} else {
+					insertDynamicNode(transitionNode.getTargetOperand(), terminalNode);
+				}
 				return;
 			}
 			/* Add TerminalNode to Current Context and remove Current Context from stack, if the stack is NOT empty.
 			* If the stack is empty, initiate the root node */
 			contextManager.fillCurrentContextWith(terminalNode);
 		}
+	}
+
+	private void insertIndexNode(OperandImpl targetOperand, Node terminalNode) throws Exception {
+		Node controlNode = createDynamicNode(targetOperand, terminalNode.getSource());
+		Condition others = controlNode.getOthers();
+
+		contextManager.addContext(new Context(controlNode, others));
+		contextManager.fillCurrentContextWith(terminalNode);
+		contextManager.removeContext();
+
+		insertControlNode(controlNode);
 	}
 
 	private void insertDynamicNode(OperandImpl targetOperand, Node terminalNode) throws Exception {
@@ -418,15 +445,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		int condition = range.getHighest();
 
 		contextManager.addContext(new Context(controlNode, Condition.createCondition(condition)));
-
 		contextManager.fillCurrentContextWith(terminalNode);
-
 		contextManager.removeContext();
 
 		insertControlNode(controlNode);
 	}
 
-	private Node createDynamicNode(OperandImpl dynamicRangeOperand, SourceLocation source) throws Exception {
+	private Node createDynamicNode(OperandImpl dynamicRangeOperand, SourceLocation source) {
 		int wholeLength = modelCollector.getVariable(dynamicRangeOperand.getName()).getLength().length();
 		OperandImpl dynamicRange = dynamicRangeOperand.getDynamicRange();
 		AbstractVariable dynamicVariable = modelCollector.getVariable(dynamicRange.getName());
@@ -444,13 +469,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		if (graphVariable == null) {
 			if (transitionNode.isNull()) return false;
 			/* GraphVariable to process has not been set yet. */
-			/* Check whether the transition variable has been processed already.
-			*  If not, then set graphVariable to this transition variable. */
-			String transitionVarName = transitionNode.getTargetOperand().toString();
-			if (!processedGraphVars.contains(transitionVarName)) {
-				setGraphVariable(modelCollector.getVariable(transitionVarName));
-				if (graphVariable == null) {
-					return false;//todo: commented for DEMO. (Informs that the initial variable of range assignment variables is not found or the like... In any way, has something to do with range assignment variables)
+			OperandImpl targetOperand = transitionNode.getTargetOperand();
+			String transitionVarName = targetOperand.isDynamicRange() ? targetOperand.getName() : targetOperand.toString();
+			if (processedGraphVars.contains(transitionVarName)) return false;
+
+			setGraphVariable(modelCollector.getVariable(transitionVarName));
+			if (graphVariable == null) {
+				return false;//todo: commented for DEMO. (Informs that the initial variable of range assignment variables is not found or the like... In any way, has something to do with range assignment variables)
 //                    Exception exception = new Exception("GraphVariable to process could not be set:" +
 //                            "\nModel collector does not contain the requested variable: " + transitionVarName +
 //                            "\nVariable " + transitionVarName + " is not declared.");
@@ -460,10 +485,8 @@ public abstract class GraphGenerator extends AbstractVisitor {
 //
 //                        return false;
 //                    } else throw exception;
-				}
-				return true;/* A new graphVariable is set. Start processing its TransitionNodes. */
 			}
-			return false; /* This transition variable has already been processed. */
+			return true;/* A new graphVariable is set. Start processing its TransitionNodes. */
 
 		} else return isVariableSetIn(transitionNode, graphVariable, isNullATransition, modelCollector);
 	}

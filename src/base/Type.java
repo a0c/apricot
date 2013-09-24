@@ -203,4 +203,12 @@ public final class Type {
 	public static Type createFromValues(int largestValue, int smallestValue) {
 		return createFromValues(new Range(largestValue, smallestValue));
 	}
+
+	public Type getTargetElementType() {
+		Type elType = this;
+		while (elType.isArray()) {
+			elType = elType.getArrayElementType();
+		}
+		return elType;
+	}
 }

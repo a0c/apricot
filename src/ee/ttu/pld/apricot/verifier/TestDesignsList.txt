@@ -124,3 +124,9 @@ test/designs/uart16750/rtl/uart_baudgen_M_FU.agm
 test/designs/uart16750/rtl/uart_interrupt_M_FU.agm
 test/designs/uart16750/rtl/uart_receiver_M_FU.agm
 test/designs/uart16750/rtl/uart_transmitter_M_FU.agm
+
+########################################################################################################################################
+#### Codec
+
+test/designs/codec/funcmi_edit_F_FU.agm
+test/designs/codec/funcmi_edit_M_FU.agm

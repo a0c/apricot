@@ -47,6 +47,8 @@ public abstract class AbstractVariable implements Comparable<AbstractVariable> {
 
 	public abstract boolean isDelay();
 
+	public abstract boolean isMemory();
+
 	public boolean isExpansion() { // todo: do the same (default behavior) for other methods, where possible (e.g. FSM)
 		return false;
 	}

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
  * When adding a new operator, change getHighestPrecedenceOperator(),
  * FunctionVariable.isIdenticalTo(), FunctionVariable.computeHsb();
  * computeHSB() also.
+ * See adjustLength().
  *
  * @author Anton Chepurov
  */
@@ -37,7 +38,8 @@ public enum Operator {
 	EXP(" * * ", false, false, 2),
 	SHIFT_RIGHT(false, 2),
 	SHIFT_LEFT(false, 2),
-	INV(false, true, 1);
+	INV(false, true, 1),
+	ARRAY(false, Integer.MAX_VALUE);
 
 	private final String delim;
 	private final boolean isCondition;

@@ -16,7 +16,7 @@ import java.util.List;
  * @author Anton Chepurov
  */
 public class FunctionVariable extends Variable {
-	public static final String FAILED_ADD_OPERAND_TEXT = "Cannot add operand ";
+
 	private static final int INITIAL_OPERAND_COUNT = 5;
 
 	/**
@@ -33,6 +33,8 @@ public class FunctionVariable extends Variable {
 	private int nameIdx;
 
 	private SourceLocation source;
+
+	private String arrayIdxs = "";
 
 	/**
 	 * Constructor to override in inherited classes
@@ -57,6 +59,9 @@ public class FunctionVariable extends Variable {
 		this(nameIdx);
 		this.operator = operator;
 		operands = new ArrayList<RangeVariableHolder>(INITIAL_OPERAND_COUNT);
+		if (operator == Operator.ARRAY) {
+			setMemory(true);
+		}
 	}
 
 	protected FunctionVariable(int nameIdx) {
@@ -65,12 +70,20 @@ public class FunctionVariable extends Variable {
 	}
 
 	public String toString() {
-		return super.toString() +
+		return super.toString() + arrayIdxs +
 				"\nFUN#\t" + operatorToString() + "\t(" + operandsToString() + ")";
+	}
+
+	public void setArrayIdxs(Type arrayType) {
+		Range length = arrayType.getLength();
+		arrayIdxs = String.format(" [%d-%d]", length.getHighest(), length.getLowest());
 	}
 
 	@Override
 	public String getName() {
+		if (operator == Operator.ARRAY) {
+			return super.getName();
+		}
 		return super.getName() + operatorToString() + "____" + nameIdx;
 	}
 
@@ -132,17 +145,16 @@ public class FunctionVariable extends Variable {
 	/**
 	 * @param operandVariable operand to add
 	 * @param range		   range of the operand to add
-	 * @throws Exception if the operand being added exceeds the limit of the operator operands limit
 	 */
-	public void addOperand(AbstractVariable operandVariable, Range range) throws Exception {
-		if (!isValidAddition()) throw new Exception(FAILED_ADD_OPERAND_TEXT + " to Function." +
+	public void addOperand(AbstractVariable operandVariable, Range range) {
+		if (!isValidAddition()) throw new RuntimeException("Cannot add operand to Function." +
 				"\nOperator " + operator + " supports only " + operator.getNumberOfOperands() + " operand(s).");
 		operands.add(new RangeVariableHolder(operandVariable, range));
 		/* Update highestSB */
 		type = adjustType(type, operandVariable.getType(), range);
 	}
 
-	protected boolean isValidAddition() {
+	public boolean isValidAddition() {
 		return operands.size() < operator.getNumberOfOperands();
 	}
 
@@ -152,6 +164,12 @@ public class FunctionVariable extends Variable {
 				return null;
 			}
 			throw new RuntimeException("Don't know how to adjust type for EXPONENT function (while adding operand to function)");
+		}
+		if (operator == Operator.ARRAY) {
+			if (currentType != null) {
+				return currentType;
+			}
+			return addedType.getTargetElementType();
 		}
 		/* Update highestSB */
 		Range addedLength = addedType.getLength();

@@ -1,5 +1,6 @@
 package base.vhdl.visitors;
 
+import base.TypeResolver;
 import base.vhdl.structure.*;
 import base.vhdl.structure.nodes.CaseNode;
 import base.vhdl.structure.nodes.IfNode;
@@ -10,6 +11,7 @@ import ui.ConfigurationHandler;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * Class searches for clocked processes using their sensitivity lists.
@@ -30,7 +32,7 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 	 */
 	private final Collection<String> pendingSignals = new HashSet<String>();
 
-	private Architecture currentArchitecture;
+	private LinkedList<TypeResolver> contexts = new LinkedList<TypeResolver>();
 
 	private final ConfigurationHandler config;
 
@@ -55,11 +57,12 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 	}
 
 	public void visitArchitecture(Architecture architecture) throws Exception {
-		currentArchitecture = architecture;
+		contexts.add(architecture);
 		/* Collect Signal names */
 		for (Signal signal : architecture.getSignals()) {
 			pendingSignals.add(signal.getName());
 		}
+		contexts.removeLast();
 	}
 
 	public void visitProcess(base.vhdl.structure.Process process) throws Exception {
@@ -69,7 +72,9 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 		if (!hasClockInSensitivityList(process.getSensitivityList())) return;
 		/* Traverse the tree */
 		isInsideClock = false;
+		contexts.add(process);
 		process.getRootNode().traverse(this);
+		contexts.removeLast();
 	}
 
 	public void visitIfNode(IfNode ifNode) throws Exception {
@@ -142,7 +147,7 @@ public class SignalDelayFlagCollector extends AbstractVisitor {
 			pendingSignals.remove(signalName);
 		} else {
 			/* check the whole range to be set */
-			if (dFlagOperands.isWholeRangeSet(signalName, currentArchitecture)) {
+			if (dFlagOperands.isWholeRangeSet(signalName, contexts.getLast())) {
 				pendingSignals.remove(signalName);
 			}
 		}

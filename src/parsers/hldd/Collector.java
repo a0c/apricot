@@ -54,8 +54,8 @@ public class Collector {
 		indexVarHash.put(newVariable.getIndex(), newVariable);
 	}
 
-	void addFunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Range[] inputRanges, Range length) {
-		indexVarHash.put(index, new FunctionData(functionType, nameIdx, index, inputIndices, inputRanges, length));
+	void addFunctionData(String functionType, String name, int nameIdx, int index, int[] inputIndices, Range[] inputRanges, Range length) {
+		indexVarHash.put(index, new FunctionData(functionType, name, nameIdx, index, inputIndices, inputRanges, length));
 	}
 
 	void addGraphVariableData(GraphVariable newGraphVariable, int graphLength, int graphIndex) {
@@ -104,14 +104,16 @@ public class Collector {
 
 	public class FunctionData {
 		final String functionType;
+		final String name;
 		final int nameIdx;
 		final int index;
 		final int[] inputIndices;
 		Range[] inputRanges;
 		final Range length;
 
-		public FunctionData(String functionType, int nameIdx, int index, int[] inputIndices, Range[] inputRanges, Range length) {
+		public FunctionData(String functionType, String name, int nameIdx, int index, int[] inputIndices, Range[] inputRanges, Range length) {
 			this.functionType = functionType;
+			this.name = name;
 			this.nameIdx = nameIdx;
 			this.index = index;
 			this.inputIndices = inputIndices;

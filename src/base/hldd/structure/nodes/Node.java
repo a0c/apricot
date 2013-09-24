@@ -9,6 +9,7 @@ import base.hldd.structure.variables.AbstractVariable;
 import base.hldd.structure.nodes.utils.Utility;
 import base.hldd.visitors.Visitable;
 import base.hldd.visitors.HLDDVisitor;
+import base.vhdl.visitors.GraphGenerator;
 
 import java.util.Collection;
 
@@ -113,8 +114,13 @@ public class Node implements Visitable, Cloneable {
 
 	protected String nodeTypeToString() {
 
-		return isTerminalNode() ? "(____)" : "(n___)";
+		return isTerminalNode() ? "(____)" : isIndexNode() ? "(x___)" : "(n___)";
 
+	}
+
+	private boolean isIndexNode() {
+		return successors.getConditionsCount() <= 1
+				&& successors.getConditionValuesCount() > GraphGenerator.MAX_DYNAMIC_RANGE_ALLOWED;
 	}
 
 	public boolean isIdenticalTo(Node comparedNode) {

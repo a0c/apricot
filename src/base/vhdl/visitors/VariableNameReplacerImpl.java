@@ -171,6 +171,12 @@ public class VariableNameReplacerImpl extends AbstractVisitor {
 			if (variableNames.contains(operand.getName())) {
 				operand.setName(newName(operand.getName()));
 			}
+			if (operand.isDynamicRange()) {
+				OperandImpl dynamicRange = operand.getDynamicRange();
+				if (variableNames.contains(dynamicRange.getName())) {
+					dynamicRange.setName(newName(dynamicRange.getName()));
+				}
+			}
 		}
 	}
 

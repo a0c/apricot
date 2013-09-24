@@ -4,6 +4,7 @@ import base.Range;
 import base.Type;
 import base.TypeResolver;
 import base.vhdl.structure.OperandImpl;
+import base.vhdl.visitors.GraphGenerator;
 
 import java.util.*;
 
@@ -19,6 +20,8 @@ public class SplittableOperandStorage extends OperandStorage {
 	 */
 	public void splitOverlaps(TypeResolver typeResolver) {
 
+		Set<String> toBeRemoved = new HashSet<String>();
+
 		for (Map.Entry<String, Set<OperandImpl>> entry : operandsByName.entrySet()) {
 
 			String varName = entry.getKey();
@@ -28,6 +31,10 @@ public class SplittableOperandStorage extends OperandStorage {
 
 			flattenDynamicRangesToBits(oldRanges, varName, typeResolver);
 
+			if (oldRanges.size() < 1) {
+				toBeRemoved.add(varName);
+				continue;
+			}
 			/* Use 2 SortedSets: a separate one for START and END markers.
 			* 1) Place START and END markers into 2 SortedSets according to the following:
 			*      a) Starting index -> "i" for START and "i - 1" for END
@@ -70,11 +77,14 @@ public class SplittableOperandStorage extends OperandStorage {
 			operandsByName.put(varName, newRanges);
 		}
 
+		operandsByName.keySet().removeAll(toBeRemoved);
 	}
 
 	private void flattenDynamicRangesToBits(Set<OperandImpl> operands, String varName, TypeResolver typeResolver) {
 
 		int wholeLength = typeResolver.resolveType(varName).getLength().length();
+		Set<OperandImpl> toBeRemoved = new HashSet<OperandImpl>();
+		Set<OperandImpl> toBeAdded = new HashSet<OperandImpl>();
 
 		for (OperandImpl operand : operands) {
 
@@ -85,12 +95,18 @@ public class SplittableOperandStorage extends OperandStorage {
 			Type type = typeResolver.resolveType(operand.getDynamicRange().getName());
 
 			int length = type.countPossibleValues(operand.getRange(), wholeLength);
+			if (length > GraphGenerator.MAX_DYNAMIC_RANGE_ALLOWED) {
+				toBeRemoved.add(operand);
+				continue;
+			}
 
-			operands.remove(operand);
+			toBeRemoved.add(operand);
 			for (int index = 0; index < length; index++) {
-				operands.add(new OperandImpl(varName, new Range(index, index), false));
+				toBeAdded.add(new OperandImpl(varName, new Range(index, index), false));
 			}
 		}
+		operands.removeAll(toBeRemoved);
+		operands.addAll(toBeAdded);
 	}
 
 	private static int getLowest(Set<OperandImpl> operands) {

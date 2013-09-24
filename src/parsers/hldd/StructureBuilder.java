@@ -55,6 +55,9 @@ public class StructureBuilder {
 						functionVariable = new FunctionVariable(Operator.valueOf(
 								functionData.functionType),
 								functionData.nameIdx);
+						if (functionVariable.isMemory()) {
+							functionVariable.setName(functionData.name);
+						}
 					} catch (IllegalArgumentException e) {
 						/* User defined function */
 						functionVariable = new UserDefinedFunctionVariable(
@@ -150,11 +153,11 @@ public class StructureBuilder {
 		collector.addVariable(newConstantVariable);
 	}
 
-	public void buildFunction(int index, int nameIdx, String functionType, int[] inputIndices, Range[] inputRanges, Range length) {
+	public void buildFunction(int index, String name, int nameIdx, String functionType, int[] inputIndices, Range[] inputRanges, Range length) {
 		varCount--;
 		funcCount--;
 		/* Collect FunctionData */
-		collector.addFunctionData(functionType, nameIdx, index, inputIndices, inputRanges, length);
+		collector.addFunctionData(functionType, name, nameIdx, index, inputIndices, inputRanges, length);
 	}
 
 	public void buildGraph(int index, Flags flags, String name, Range range, Range length, int graphLength, int graphIndex) {

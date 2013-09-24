@@ -76,7 +76,13 @@ public class Variable extends AbstractVariable {
 
 	public String lengthToString() {
 		/* for FSM Control GraphVariable return "" */
-		return type == null ? "" : type.lengthToString(); // "<" + highestSB + ":0>";
+		if (type == null) {
+			return "";
+		}
+		if (isMemory()) {
+			return type.getTargetElementType().lengthToString();
+		}
+		return type.lengthToString(); // "<" + highestSB + ":0>";
 	}
 
 	protected String flagsToString() {
@@ -162,6 +168,10 @@ public class Variable extends AbstractVariable {
 
 	/* Setters START */
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public void setIndex(int index) {
 
 		if (!isIndexSet()) this.index = index;
@@ -176,6 +186,14 @@ public class Variable extends AbstractVariable {
 
 	public void setConstant(boolean isConstant) {
 		flags.setConstant(isConstant);
+	}
+
+	public void setMemory(boolean isMemory) {
+		flags.setMemory(isMemory);
+	}
+
+	public boolean isMemory() {
+		return flags.isMemory();
 	}
 
 	public void setFunction(boolean isFunction) {

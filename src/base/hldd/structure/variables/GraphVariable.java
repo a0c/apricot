@@ -119,6 +119,10 @@ public class GraphVariable extends AbstractVariable implements Visitable {
 		return baseVariable.isInput();
 	}
 
+	public boolean isMemory() {
+		return baseVariable.isMemory();
+	}
+
 	public Range getLength() {
 		return baseVariable.getLength();
 	}

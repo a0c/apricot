@@ -79,8 +79,8 @@ public class StructureParser {
 						inputIndices[i] = inputIndex;
 						inputRanges[i] = parseRange(inputDeclaration.substring(inputDeclaration.indexOf("=")));
 					}
-					int nameIdx = Integer.parseInt(name.substring(name.lastIndexOf("_") + 1));
-					builder.buildFunction(index, nameIdx, functionType, inputIndices, inputRanges, length);
+					int nameIdx = name.contains("____") ? Integer.parseInt(name.substring(name.lastIndexOf("_") + 1)) : -1;
+					builder.buildFunction(index, name, nameIdx, functionType, inputIndices, inputRanges, length);
 
 				} else if (flags.isInput()) {
 					/* VARIABLE (INPUT PORTS) */
@@ -181,7 +181,8 @@ public class StructureParser {
 						theOnlyIndex = Integer.parseInt(line.trim());
 						range = new Range(theOnlyIndex, theOnlyIndex);
 					} catch (NumberFormatException e) {
-						throw new Exception("Could not parse Integers in the following range: " + line);
+						return new NameAndRange(nameAndRange, null);
+//						throw new Exception("Could not parse Integers in the following range: " + line);
 					}
 				}
 

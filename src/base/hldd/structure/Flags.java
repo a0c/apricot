@@ -25,6 +25,7 @@ public final class Flags {
 	private boolean isReset;
 	private boolean isState;
 	private boolean isExpansion;
+	private boolean isMemory;
 
 	/**
 	 * Empty flags.
@@ -43,6 +44,7 @@ public final class Flags {
 		isReset = flags.isReset;
 		isState = flags.isState;
 		isExpansion = flags.isExpansion;
+		isMemory = flags.isMemory;
 	}
 
 	public Flags setCout(boolean isCout) {
@@ -133,6 +135,14 @@ public final class Flags {
 		isConstant = constant;
 	}
 
+	public boolean isMemory() {
+		return isMemory;
+	}
+
+	public void setMemory(boolean memory) {
+		this.isMemory = memory;
+	}
+
 	public Flags merge(Flags otherFlags) {
 
 		Flags newFlags = new Flags(this);
@@ -146,6 +156,7 @@ public final class Flags {
 		if (otherFlags.isReset) newFlags.isReset = true;
 		if (otherFlags.isState) newFlags.isState = true;
 		if (otherFlags.isExpansion) newFlags.isExpansion = true;
+		if (otherFlags.isMemory) newFlags.isMemory = true;
 
 		return newFlags;
 	}
@@ -163,6 +174,7 @@ public final class Flags {
 		if (isReset) sb.setCharAt(2, 'r');
 		if (isState) sb.setCharAt(2, 's');
 		if (isExpansion) sb.setCharAt(8, 'E');
+		if (isMemory) sb.setCharAt(0, 'm');
 
 		return sb.toString();
 	}
@@ -187,6 +199,7 @@ public final class Flags {
 		if (flagsAsString.contains("O")) flags.setOutput(true);
 		if (flagsAsString.contains("R")) flags.setReset(true);
 		if (flagsAsString.contains("S")) flags.setState(true);
+		if (flagsAsString.contains("M")) flags.setMemory(true);
 
 		return flags;
 	}

@@ -255,6 +255,16 @@ public class ModelManager implements TypeResolver {
 		return new CompositeFunctionVariable(compositeOperator, compositeElements.toArray(new RangeVariableHolder[compositeElements.size()]));
 	}
 
+	public void createMemory(OperandImpl memoryOperand, SourceLocation source, String name) {
+		AbstractVariable memVar = getVariable(memoryOperand.getName());
+		AbstractVariable idxVar = getVariable(memoryOperand.getDynamicRange().getName());
+		RangeVariableHolder[] operands = { new RangeVariableHolder(memVar, null), new RangeVariableHolder(idxVar, null) };
+		FunctionVariable memFunction = doCreateFinalFunction(Operator.ARRAY, source, operands);
+		memFunction.setName(name);
+		memFunction.setArrayIdxs(memVar.getType());
+		getIdenticalVariable(memFunction);
+	}
+
 	/**
 	 * @param funcOperand  either Expression or inverted Operand to create a Function from
 	 * @param isTransition flag marks whether the expression originates from transition
@@ -353,26 +363,19 @@ public class ModelManager implements TypeResolver {
 		FunctionVariable invFunctionVariable = new FunctionVariable(Operator.INV, generateFunctionNameIdx(Operator.INV));
 		invFunctionVariable.setSource(source);
 		/* Add a single operand */
-		try {
-			invFunctionVariable.addOperand(operandVariable, operandRange);
-		} catch (Exception e) {
-			throw new RuntimeException("Unexpected exception: " +
-					"Cannot add a single operand (" + operandVariable + ") to " + Operator.INV + " Function");
-		}
+		invFunctionVariable.addOperand(operandVariable, operandRange);
 		return invFunctionVariable;
 	}
 
-	private FunctionVariable doCreateFinalFunction(Operator operator, SourceLocation source, RangeVariableHolder... operandVariables) throws Exception {
+	private FunctionVariable doCreateFinalFunction(Operator operator, SourceLocation source, RangeVariableHolder... operandVariables) {
 		/* Create new Function Variable */
 		FunctionVariable functionVariable = new FunctionVariable(operator, generateFunctionNameIdx(operator));
 		functionVariable.setSource(source);
 		/* Add operand variables one by one to the new Function Variable */
 		for (RangeVariableHolder operandVarHolder : operandVariables) {
-			try {
+			if (functionVariable.isValidAddition()) {
 				functionVariable.addOperand(operandVarHolder.getVariable(), operandVarHolder.getRange());
-			} catch (Exception e) {
-				if (!e.getMessage().startsWith(FunctionVariable.FAILED_ADD_OPERAND_TEXT))
-					throw e;
+			} else {
 				/* If Function Variable cannot accept operands anymore, add this Function Variable (1) as an
 				* operand to the new Function Variable (2), replace the link of the Function Variable being
 				* created to the new Function Variable (2) and proceed with adding operands, this time - to
@@ -405,9 +408,8 @@ public class ModelManager implements TypeResolver {
 	 * comparison operators: GT / U_GT, LT / U_LT, GE / U_GE, LE / U_LE.
 	 *
 	 * @param functionVariable variable to tune
-	 * @throws Exception {@link #convertOperandToVariable(AbstractOperand, Type, boolean, SourceLocation)}.
 	 */
-	private void tuneFunctionVariable(FunctionVariable functionVariable) throws Exception {
+	private void tuneFunctionVariable(FunctionVariable functionVariable) {
 		/* Replace DIVISION and MULTIPLICATION by power of 2 with SHIFTS */
 		Operator operator = functionVariable.getOperator();
 		List<RangeVariableHolder> operandHolders = functionVariable.getOperands();
@@ -621,9 +623,8 @@ public class ModelManager implements TypeResolver {
 	 *
 	 * @param variableToFind variable to search for amongst existent variables
 	 * @return an existent identical variable or the desired variable if an existent is not found
-	 * @throws Exception cause {@link #addVariable(AbstractVariable) cause}
 	 */
-	AbstractVariable getIdenticalVariable(AbstractVariable variableToFind) throws Exception {
+	AbstractVariable getIdenticalVariable(AbstractVariable variableToFind) {
 
 		if (variableToFind instanceof ConstantVariable) {
 			/* Search amongst CONSTANTS */
