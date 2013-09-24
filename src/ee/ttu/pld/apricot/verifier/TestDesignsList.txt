@@ -108,3 +108,19 @@ test/designs/CRC/crc_demo_F_FU.agm
 test/designs/CRC/crc_demo_M_FU.agm
 test/designs/CRC/crc_demo_M_GR.agm
 test/designs/CRC/crc_demo_R_FU.agm
+
+########################################################################################################################################
+#### UART
+
+test/designs/uart16750/rtl/slib_clock_div_M_FU.agm
+test/designs/uart16750/rtl/slib_counter_M_FU.agm
+test/designs/uart16750/rtl/slib_edge_detect_M_FU.agm
+test/designs/uart16750/rtl/slib_fifo_M_FU.agm
+test/designs/uart16750/rtl/slib_input_filter_M_FU.agm
+test/designs/uart16750/rtl/slib_input_sync_M_FU.agm
+test/designs/uart16750/rtl/slib_mv_filter_M_FU.agm
+test/designs/uart16750/rtl/uart_16750_M_FU.agm
+test/designs/uart16750/rtl/uart_baudgen_M_FU.agm
+test/designs/uart16750/rtl/uart_interrupt_M_FU.agm
+test/designs/uart16750/rtl/uart_receiver_M_FU.agm
+test/designs/uart16750/rtl/uart_transmitter_M_FU.agm

@@ -30,7 +30,7 @@ public class ComponentLoader {
 				throw new RuntimeException("ComponentLoader: implement me!!! Create stub for missing component implementation");
 			}
 
-			ConverterSettings settings = new ConverterSettings.Builder(baseSettings).setSourceFile(sourceFile).build();
+			ConverterSettings settings = new ConverterSettings.Builder(baseSettings, sourceFile).build();
 
 			BehModel model = ConvertingWorker.convertInSeparateThreadAndWait(settings, component.getGenerics());
 

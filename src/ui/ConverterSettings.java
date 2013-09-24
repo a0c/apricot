@@ -37,6 +37,7 @@ public class ConverterSettings {
 	private final boolean doCreateExtraCSGraphs;
 	private final BusinessLogic.HLDDRepresentationType hlddType;
 	private final Set<File> sourceFiles = new TreeSet<File>();
+	private final boolean isComponent;
 	/* Mutable fields */
 	private OutputStream mapFileStream;
 
@@ -51,6 +52,7 @@ public class ConverterSettings {
 		doCreateCSGraphs = builder.doCreateCSGraphs;
 		doCreateExtraCSGraphs = builder.doCreateExtraCSGraphs;
 		hlddType = builder.hlddType;
+		isComponent = builder.isComponent;
 	}
 
 	public void setMapFileStream(OutputStream mapFileStream) {
@@ -102,7 +104,7 @@ public class ConverterSettings {
 	}
 
 	public OutputStream getMapFileStream() throws ExtendedException {
-		if (!Builder.isMapFileAllowed(parserId)) {
+		if (!Builder.isMapFileAllowed(parserId, isComponent)) {
 			return null;
 		}
 		if (mapFileStream == null) {
@@ -467,6 +469,7 @@ public class ConverterSettings {
 		private boolean doCreateCSGraphs;
 		private boolean doCreateExtraCSGraphs;
 		private BusinessLogic.HLDDRepresentationType hlddType;
+		private boolean isComponent;
 
 		public Builder(BusinessLogic.ParserID parserId, File sourceFile, File pslFile) {
 			this.parserId = parserId;
@@ -474,33 +477,33 @@ public class ConverterSettings {
 			this.pslFile = pslFile;
 		}
 
-		public Builder(ConverterSettings defaultSettings) {
-			this(defaultSettings.parserId, defaultSettings.sourceFile, defaultSettings.pslFile);
-			setBaseModelFile(defaultSettings.baseModelFile);
-			setDoSimplify(defaultSettings.doSimplify);
-			setDoFlattenConditions(defaultSettings.doFlattenConditions);
-			setDoCreateCSGraphs(defaultSettings.doCreateCSGraphs);
-			setDoCreateExtraCSGraphs(defaultSettings.doCreateExtraCSGraphs);
-			setHlddType(defaultSettings.hlddType);
+		public Builder(ConverterSettings baseSettings, File componentSource) {
+			this(baseSettings.parserId, componentSource, null);
+			setIsComponent(true);
+			setBaseModelFile(baseSettings.baseModelFile);
+			setDoSimplify(baseSettings.doSimplify);
+			setDoFlattenConditions(baseSettings.doFlattenConditions);
+			setDoCreateCSGraphs(baseSettings.doCreateCSGraphs);
+			setDoCreateExtraCSGraphs(baseSettings.doCreateExtraCSGraphs);
+			setHlddType(baseSettings.hlddType);
 		}
 
 		public ConverterSettings build() throws ExtendedException {
 			validate();
 			// generate Map file
-			if (isMapFileAllowed(parserId)) {
+			if (isMapFileAllowed(parserId, isComponent)) {
 				mapFile = new File(pslFile.getAbsolutePath().replaceFirst(".agm$", ".map"));
 			}
 
 			return new ConverterSettings(this);
 		}
 
-		private static boolean isMapFileAllowed(final BusinessLogic.ParserID parserId) {
-			return parserId == VhdlBeh2HlddBeh || parserId == VhdlBehDd2HlddBeh;
+		private static boolean isMapFileAllowed(final BusinessLogic.ParserID parserId, boolean isComponent) {
+			return (parserId == VhdlBeh2HlddBeh || parserId == VhdlBehDd2HlddBeh) && !isComponent;
 		}
 
-		public Builder setSourceFile(File sourceFile) {
-			this.sourceFile = sourceFile;
-			return this;
+		public void setIsComponent(boolean isComponent) {
+			this.isComponent = isComponent;
 		}
 
 		public Builder setBaseModelFile(File baseModelFile) {
@@ -546,7 +549,7 @@ public class ConverterSettings {
 						: MISSING_SOURCE_FILE;
 				throw new ExtendedException(message, ExtendedException.MISSING_FILE_TEXT);
 			}
-			if (pslFile == null) {
+			if (pslFile == null && !isComponent) {
 				message = parserId == PSL2THLDD
 						? MISSING_PSL_FILE
 						: MISSING_DESTINATION_FILE;
