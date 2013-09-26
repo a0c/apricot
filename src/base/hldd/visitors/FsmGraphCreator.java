@@ -185,33 +185,13 @@ public class FsmGraphCreator implements HLDDVisitor {
 				}
 			} else {
 
-				if (node.isTerminalNode() && fsmNode.isTerminalNode()) {
-					/* Both nodes are TERMINAL */
-
+				if (node.isTerminalNode() || node.isIndexNode()) {
 					/* Insert Control Part Output into Existing FSM transitions */
-					mergeControlPartOutput(node, fsmNode); // todo: call propagateControlPartOutput(node, fsmNode) and replace this and the next conditions with single " if (node.isTerminalNode())"
-
-				} else if (node.isTerminalNode() && fsmNode.isControlNode()) {
-					/* Graph node is TERMINAL, EXISTING node is CONTROL */
-
-					/* Propagate Control Part Output amongst all the CONTROL NODE SUCCESSORS */
-					for (Node successor : fsmNode.getSuccessors()) {
-						propagateControlPartOutput(node, successor);
-					}
-
-				} else if (node.isControlNode() && fsmNode.isTerminalNode()) {
-					/* Graph node is CONTROL, EXISTING node is TERMINAL */
-
-					/* Insert new CONTROL NODE into EXIST, propagate EXISTING node amongst all the REG CONTROL NODE SUCCESSORS:*/
-					addControlNode(node, fsmNode); // todo: replace this and the next conditions with single " if (node.isControlNode())"
-
+					insertTransition(node, fsmNode);
 				} else {
-					/* Both nodes are CONTROL, but different CONTROL VARIABLES (dependent variables) */
-
-					/* Traverse GraphNode for every successor of FSMNode */
+					/* Insert new CONTROL NODE into EXIST, propagate EXISTING node amongst all the REG CONTROL NODE SUCCESSORS:*/
 					addControlNode(node, fsmNode);
 				}
-
 			}
 
 		}
@@ -265,22 +245,16 @@ public class FsmGraphCreator implements HLDDVisitor {
 
 		}
 
-		private void propagateControlPartOutput(Node graphTerminalNode, Node fsmNode) throws Exception {
+		private void insertTransition(Node node, Node fsmNode) throws Exception {
 			if (fsmNode == null) return;
 			if (fsmNode.isControlNode()) {
 				for (Node successor : fsmNode.getSuccessors()) {
-					propagateControlPartOutput(graphTerminalNode, successor);
+					insertTransition(node, successor);
 				}
 			} else {
-				mergeControlPartOutput(graphTerminalNode, fsmNode);
+				Transitions transitions = ((FSMNode) fsmNode).getTransitions();
+				controlPartManager.insertTransition(transitions, node, graphVariable, resetTracker.isResetingTerminalNode());
 			}
-		}
-
-		private void mergeControlPartOutput(Node node, Node fsmNode) throws Exception {
-
-			Transitions transitions = ((FSMNode) fsmNode).getTransitions();
-			controlPartManager.insertTransition(transitions, node, graphVariable, resetTracker.isResetingTerminalNode());
-
 		}
 
 		private boolean areControlNodesIdentical(Node graphNode) {

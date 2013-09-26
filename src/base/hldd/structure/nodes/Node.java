@@ -118,8 +118,8 @@ public class Node implements Visitable, Cloneable {
 
 	}
 
-	private boolean isIndexNode() {
-		return successors.getConditionsCount() <= 1
+	public boolean isIndexNode() {
+		return isControlNode() && successors.getConditionsCount() <= 1
 				&& successors.getConditionValuesCount() > GraphGenerator.MAX_DYNAMIC_RANGE_ALLOWED;
 	}
 

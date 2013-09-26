@@ -29,7 +29,7 @@ public class TerminalNodeCollector implements HLDDVisitor {
 
 	public void visitNode(Node node) throws Exception {
 
-		if (node.isTerminalNode()) {
+		if (node.isTerminalNode() || node.isIndexNode()) {
 			/* Skip Terminal Node that retains value */
 			if (node.getDependentVariable() == currentGraphVariable) {
 				valueRetainingNodeUsed.add(currentGraphVariable);

@@ -140,8 +140,7 @@ public class Beh2RtlTransformer {
 						if (muxAddrNode == null) {
 							/* ENABLE */
 							/* Fill ENABLE with the only Terminal Node */
-							Node theOnlyTerminalNode = new Node.Builder(controlPartManager.termNodeCollector.getTerminalNodes(graphVariable).get(0).getDependentVariable()).build();
-							enableNode.setSuccessor(Condition.TRUE, theOnlyTerminalNode);
+							enableNode.setSuccessor(Condition.TRUE, controlPartManager.termNodeCollector.getTerminalNodes(graphVariable).get(0).clone());
 
 						} else {
 							/* ENABLE + MUX_ADDR */
@@ -158,7 +157,7 @@ public class Beh2RtlTransformer {
 					if (valueRetainingCount == 1) {
 						nodeForRoot = new Node.Builder(graphVariable).build();
 					} else {
-						nodeForRoot = new Node.Builder(controlPartManager.termNodeCollector.getTerminalNodes(graphVariable).get(0).getDependentVariable()).build();
+						nodeForRoot = controlPartManager.termNodeCollector.getTerminalNodes(graphVariable).get(0).clone();
 					}
 				}
 				/* Set the 0-successor for rootNode or rootNode itself if it's missing */
