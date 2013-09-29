@@ -11,12 +11,11 @@ import static ui.BusinessLogic.HLDDRepresentationType.*;
 /**
  * @author Anton Chepurov
  */
-//todo: rename to BehHlddFileGenerator
-public class OutputFileGenerator implements ChangeListener, DocumentListener {
+public class HLDDFileGenerator implements ChangeListener, DocumentListener {
 
 	private final ApplicationForm applicationForm;
 
-	public OutputFileGenerator(ApplicationForm applicationForm) {
+	public HLDDFileGenerator(ApplicationForm applicationForm) {
 		this.applicationForm = applicationForm;
 	}
 
@@ -103,7 +102,7 @@ public class OutputFileGenerator implements ChangeListener, DocumentListener {
 		} else if (hlddType == MINIMIZED) {
 			name.append("_M");
 		} else {
-			throw new RuntimeException("OutputFileGenerator.generate(): unknown HLDDRepresentationType: " + hlddType);
+			throw new RuntimeException("HLDDFileGenerator.generate(): unknown HLDDRepresentationType: " + hlddType);
 		}
 
 		if (doCreateCSGraphs) {

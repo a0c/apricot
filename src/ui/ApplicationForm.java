@@ -177,8 +177,8 @@ public class ApplicationForm implements ActionListener {
 		fileViewerSplitPane.setDividerLocation(700);
 		/* Create PARSERS options panels */
 		updateParserId();
-		OutputFileGenerator outputFileGenerator = new OutputFileGenerator(this);
-		vhdlBehOptionsPanel = new VHDLBehOptionsPanel(outputFileGenerator, fileDropHandler);
+		HLDDFileGenerator hlddFileGenerator = new HLDDFileGenerator(this);
+		vhdlBehOptionsPanel = new VHDLBehOptionsPanel(hlddFileGenerator, fileDropHandler);
 		vhdlBehDdOptionsPanel = new VHDLBehDdOptionsPanel(fileDropHandler);
 		hlddBehOptionsPanel = new HLDDBehOptionsPanel();
 		pslOptionsPanel = new PSLOptionsPanel(fileDropHandler);
@@ -211,7 +211,7 @@ public class ApplicationForm implements ActionListener {
 
 		/* PARSERS */
 		businessLogic = new BusinessLogic(this, consoleWriter);
-		behButtons.addFileGenerator(outputFileGenerator);
+		behButtons.addFileGenerator(hlddFileGenerator);
 		rtlButtons.addFileGenerator(new RTLOutputFileGenerator(this));
 		//todo: FileGenerator for pslButtons. or like in setCOVFile() ?...
 		/* ASSERTION CHECKER */

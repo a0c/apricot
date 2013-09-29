@@ -16,8 +16,8 @@ public class DesignTest {
 
 	@Test
 	public void initNewDesignFile() throws ConverterSettings.ConverterSettingsParseException {
-		File hlddFile = new File("D:\\WORKSPACE\\tr\\b13_M_EX.agm");
-		File newDesignFile = new File("D:\\WORKSPACE\\tr\\verif\\b13_M_EX.agm");
+		File hlddFile = new File("test/designs/ITC99/orig/b00/b00_M_FU.agm");
+		File newDesignFile = new File("test/designs/ITC99/orig/b00/verif/b00_M_FU.agm");
 		Design design = new Design(hlddFile, ConverterSettings.parse(hlddFile.getAbsolutePath()));
 
 		assertEquals("Design(): should create newDesignFile in \'" + Design.NEW_DESIGN_DIR + "\' folder.",
@@ -26,7 +26,7 @@ public class DesignTest {
 
 	@Test
 	public void createNewDesignDir() throws IOException, ConverterSettings.ConverterSettingsParseException {
-		File hlddFile = new File("D:\\WORKSPACE\\tr\\b13_M_EX.agm");
+		File hlddFile = new File("test/designs/ITC99/orig/b00/b00_M_FU.agm");
 		Design design = new Design(hlddFile, ConverterSettings.parse(hlddFile.getAbsolutePath()));
 
 		design.createNewDesignDir();
@@ -40,8 +40,8 @@ public class DesignTest {
 
 	@Test
 	public void initNewMapFile() throws ConverterSettings.ConverterSettingsParseException {
-		File hlddFile = new File("D:\\WORKSPACE\\tr\\b13_M_EX.agm");
-		File newMapFile = new File("D:\\WORKSPACE\\tr\\verif\\b13_M_EX.map");
+		File hlddFile = new File("test/designs/ITC99/orig/b00/b00_M_FU.agm");
+		File newMapFile = new File("test/designs/ITC99/orig/b00/verif/b00_M_FU.map");
 		Design design = new Design(hlddFile, ConverterSettings.parse(hlddFile.getAbsolutePath()));
 
 		assertEquals("Design(): should create newMapFile in \'" + Design.NEW_DESIGN_DIR + "\' folder.",

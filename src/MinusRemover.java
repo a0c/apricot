@@ -45,7 +45,7 @@ public class MinusRemover {
 	}
 
 	public static void main(String[] args) throws IOException {
-		MinusRemover minusRemover = new MinusRemover("C:\\Documents and Settings\\Randy\\Desktop\\TTU temp\\Elsevier IST paper\\Designs\\For parse\\DONE\\Simul\\convert_no_ph1_testmode_input\\TOTAL_M\\hc11rtl_edit2_M_DH_POS.tst");
+		MinusRemover minusRemover = new MinusRemover("Desktop/TTU temp/Elsevier IST paper/Designs/For parse/DONE/Simul/convert_no_ph1_testmode_input/TOTAL_M/hc11rtl_edit2_M_DH_POS.tst");
 		minusRemover.remove();
 	}
 }

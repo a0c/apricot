@@ -16,7 +16,7 @@ import helpers.PSLProperties;
  */
 public class PPGLibraryTest {
 
-	private static final String PPG_LIBRARY_PATH = "D:\\Documents and Settings\\Randy\\My Documents\\Anton\\TTU\\RAIK\\VERTIGO docs\\PSL\\ppg.lib2"; //todo: change back to ppg_future.lib
+	private static final String PPG_LIBRARY_PATH = "test/base/psl/structure/ppg_future.lib"; // todo: see also ppg.lib and ppg.lib_current
 
 	private PPGLibrary library;
 

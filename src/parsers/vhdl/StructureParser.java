@@ -36,7 +36,7 @@ public class StructureParser {
 
 			switch (token.getType()) {
 				case USE_DECL:
-					//todo: Fix package loading. For this use crc_half_modified.vhd and crc_pkg.vhd from C:\Documents and Settings\Randy\Desktop\TTU temp\Elsevier IST paper\Designs\CRC_41\CRC\
+					//todo: Fix package loading. For this use crc_half_modified.vhd and crc_pkg.vhd from Desktop\TTU temp\Elsevier IST paper\Designs\CRC_41\CRC\
 					/* Split to {library_name, package_name, all} */
 					String[] packageParts = value.substring(4, value.lastIndexOf(";")).trim().split("\\.");
 					if (packageParts.length == 3) {

@@ -23,7 +23,7 @@ public class DesignCreatorTest {
 
 	@Test
 	public void skipMissingFile() {
-		Collection<Design> designs = DesignCreator.create(Collections.singletonList("m:\\someNonExistentFile.buba"), statistics);
+		Collection<Design> designs = DesignCreator.create(Collections.singletonList("/someNonExistentFile.buba"), statistics);
 		assertNotNull("DesignCreator.create(): should return an empty collection for missing file. Actual: null.", designs);
 		assertEquals("DesignCreator.create(): should create an empty design collection from a missing file.", 0, designs.size());
 		String message = statistics.getMessage();
@@ -33,7 +33,7 @@ public class DesignCreatorTest {
 
 	@Test
 	public void skipMissingVHDLFile() {
-		Collection<Design> designs = DesignCreator.create(Collections.singletonList("D:\\WORKSPACE\\tr\\b13_M_EX.agm"), statistics);
+		Collection<Design> designs = DesignCreator.create(Collections.singletonList("test/designs/ITC99/orig/b00/b000_dummy_M_FU.agm"), statistics);
 		assertNotNull("DesignCreator.create(): should return an empty collection for missing VHDL file.\nActual: null.", designs);
 		assertEquals("DesignCreator.create(): should create an empty design collection from a file with missing VHDL file.", 0, designs.size());
 		String message = statistics.getMessage();
@@ -44,7 +44,7 @@ public class DesignCreatorTest {
 	@Test
 	public void skipWhenParseFails() {
 		Collection<Design> designs = DesignCreator.create(
-				Collections.singletonList("D:\\Programming\\Apricot\\DESIGNS\\branch\\ITC99\\orig\\b11\\b11_F.agm"), statistics);
+				Collections.singletonList("test/designs/ITC99/orig/b00/b000_dummy_M.agm"), statistics);
 		assertNotNull("DesignCreator.create(): should return an empty collection when settings' parse fails. Actual: null.", designs);
 		assertEquals("DesignCreator.create(): should create an empty design collection when settings' parse fails.", 0, designs.size());
 		String message = statistics.getMessage();
@@ -55,8 +55,8 @@ public class DesignCreatorTest {
 	@Test
 	public void createCorrectFiles() {
 		Collection<Design> designs = DesignCreator.create(Arrays.asList(
-				"D:\\Programming\\Apricot\\DESIGNS\\branch\\ITC99\\orig\\b13\\tr_E\\b13_M_FU.agm",
-				"D:\\Programming\\Apricot\\DESIGNS\\branch\\ITC99\\orig\\b13\\tr_E\\b13_M_GR.agm"), null);
+				"test/designs/ITC99/orig/b00/b00_F4_FU_RTL.agm",
+				"test/designs/ITC99/orig/b00/b00_M_FU.agm"), null);
 		assertNotNull("DesignCreator.create(): should return collection for correct files.\nActual: null.", designs);
 		assertEquals("DesignCreator.create(): should create collection with size 2 for correct files.", 2, designs.size());
 	}
@@ -65,7 +65,7 @@ public class DesignCreatorTest {
 	public void loadCorrectNumberOfTestDesigns() {
 		Collection<String> designPaths = DesignCreator.loadTestDesignsPaths();
 		assertNotNull("DesignCreator.loadTestDesignsPaths(): non-null designs expected. Actual: null", designPaths);
-		assertEquals(81, designPaths.size());
+		assertEquals(105, designPaths.size());
 	}
 
 	@Test

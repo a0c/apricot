@@ -1,7 +1,7 @@
 package ui.buttonPanels;
 
 import ui.ApplicationForm;
-import ui.OutputFileGenerator;
+import ui.HLDDFileGenerator;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -49,9 +49,9 @@ public class BehButtons {
 		return smartNameCheckbox.isSelected();
 	}
 
-	public void addFileGenerator(OutputFileGenerator outputFileGenerator) {
-		vhdlTextField.getDocument().addDocumentListener(outputFileGenerator);
-		smartNameCheckbox.addChangeListener(outputFileGenerator);
+	public void addFileGenerator(HLDDFileGenerator hlddFileGenerator) {
+		vhdlTextField.getDocument().addDocumentListener(hlddFileGenerator);
+		smartNameCheckbox.addChangeListener(hlddFileGenerator);
 	}
 
 	public void triggerSmartNames() {

@@ -2,7 +2,7 @@ package ui.optionPanels;
 
 import ui.ApplicationForm.FileDropHandler;
 import ui.BusinessLogic.HLDDRepresentationType;
-import ui.OutputFileGenerator;
+import ui.HLDDFileGenerator;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -23,15 +23,15 @@ public class VHDLBehOptionsPanel {
 	private JRadioButton fullTree4RTLRadioButton;
 
 
-	public VHDLBehOptionsPanel(OutputFileGenerator outputFileGenerator, FileDropHandler fileDropHandler) {
-		fullTree4RTLRadioButton.addChangeListener(outputFileGenerator);
-		fullRadioButton.addChangeListener(outputFileGenerator);
-		reducedRadioButton.addChangeListener(outputFileGenerator);
-		minimizedRadioButton.addChangeListener(outputFileGenerator);
-		asFunctionRadioButton.addChangeListener(outputFileGenerator);
-		asGraphsRadioButton.addChangeListener(outputFileGenerator);
-		flattenRadioButton.addChangeListener(outputFileGenerator);
-		extraGraphsRadioButton.addChangeListener(outputFileGenerator);
+	public VHDLBehOptionsPanel(HLDDFileGenerator hlddFileGenerator, FileDropHandler fileDropHandler) {
+		fullTree4RTLRadioButton.addChangeListener(hlddFileGenerator);
+		fullRadioButton.addChangeListener(hlddFileGenerator);
+		reducedRadioButton.addChangeListener(hlddFileGenerator);
+		minimizedRadioButton.addChangeListener(hlddFileGenerator);
+		asFunctionRadioButton.addChangeListener(hlddFileGenerator);
+		asGraphsRadioButton.addChangeListener(hlddFileGenerator);
+		flattenRadioButton.addChangeListener(hlddFileGenerator);
+		extraGraphsRadioButton.addChangeListener(hlddFileGenerator);
 
 		fullTree4RTLRadioButton.addKeyListener(fileDropHandler);
 		fullRadioButton.addKeyListener(fileDropHandler);
