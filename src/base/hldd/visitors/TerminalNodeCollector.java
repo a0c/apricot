@@ -78,9 +78,7 @@ public class TerminalNodeCollector implements HLDDVisitor {
 		return valueRetainingNodeUsed.contains(graphVariable);
 	}
 
-	// todo: rename to getMuxAddrFor()
-
-	public int getTransitionValue(GraphVariable graphVariable, Node terminalNode) throws Exception {
+	public int getMuxAddrValueFor(Node terminalNode, GraphVariable graphVariable) throws Exception {
 		if (!muxAddrValueMap.containsKey(graphVariable)) {
 			throw new Exception("Cannot return TRANSITION INDEX for the following GraphVariable: " + graphVariable.getName() +
 					"\nNo terminal nodes have been registered for this variable.");

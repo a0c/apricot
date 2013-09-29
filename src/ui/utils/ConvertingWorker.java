@@ -1,10 +1,12 @@
 package ui.utils;
 
+import base.helpers.ExceptionSolver;
 import base.hldd.structure.models.BehModel;
 import base.hldd.structure.models.Model;
 import base.hldd.structure.models.utils.BehModelCreatorImpl;
 import base.hldd.structure.models.utils.ModelCreator;
 import base.hldd.structure.models.utils.ModelManager;
+import base.vhdl.structure.Architecture;
 import base.vhdl.structure.Constant;
 import base.vhdl.structure.Entity;
 import base.vhdl.visitors.*;
@@ -102,6 +104,8 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 					startTime = System.currentTimeMillis();
 					/* Process received VHDL structure */
 					consoleWriter.write(stat(current++, total) + "Pre-processing VHDL structure...");
+					boolean isF4RTL = hlddType == HLDDRepresentationType.FULL_TREE_4_RTL;
+					discardMultipleProcessInFull4RTL(isF4RTL, entity);
 					entity.traverse(new VariableNameReplacerImpl(config)); // todo: varNR.getStateName()
 					DelayFlagCollector delayCollector = new DelayFlagCollector(config);
 					entity.traverse(delayCollector);
@@ -110,7 +114,7 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 
 					/* Generate Graphs (GraphVariables) and collect all variables */
 					consoleWriter.write(stat(current++, total) + "Generating HLDDs...");
-					graphCreatingVisitor = new BehGraphGenerator(config, settings, generics, delayCollector.getDFlagOperands());
+					graphCreatingVisitor = new BehGraphGenerator(config, settings, generics, delayCollector.getDFlagOperands(), isF4RTL);
 					entity.traverse(graphCreatingVisitor);
 					modelCollector = graphCreatingVisitor.getModelCollector();
 					consoleWriter.done();
@@ -231,6 +235,9 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 					/* do nothing. Model = null. */
 			}
 
+		} catch (ExceptionSolver.CancellingException e) {
+			consoleWriter.cancelled();
+			cancel(true);
 		} catch (Exception e) {
 			StringWriter stringWriter = new StringWriter();
 			e.printStackTrace(new PrintWriter(stringWriter));
@@ -246,6 +253,28 @@ public class ConvertingWorker extends SwingWorker<BehModel, Void> {
 		}
 
 		return model;
+	}
+
+	private void discardMultipleProcessInFull4RTL(boolean isF4RTL, Entity entity) throws Exception {
+		if (!isF4RTL) {
+			return;
+		}
+		Architecture architecture = entity.getArchitecture();
+		int numAnonProc = architecture.getTransitions().getChildren().size();
+		int numProc = architecture.getProcesses().size();
+		int numComp = architecture.getComponents().size();
+		if (numAnonProc + numProc + numComp > 1) {
+			Object answer = ExceptionSolver.getInstance().findSolution("Multiple processes/components found." +
+					"\nNo point in running 'Full-tree 4 RTL' converter," +
+					" 'cos chances are high RTL will still explode." +
+					"\n'Full-tree' converter should be preferred" +
+					" instead to avoid even greater explosion." +
+					"\n\nYou can still run 'Full-tree 4 RTL' converter by pressing <Ignore>.", ExceptionSolver.SolutionOptions.IGNORE);
+
+			if (answer instanceof ExceptionSolver.CancellingException) {
+				throw (Exception) answer;
+			}
+		}
 	}
 
 	private String stat(int current, int total) {

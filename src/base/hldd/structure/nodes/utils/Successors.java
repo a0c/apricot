@@ -119,7 +119,7 @@ public class Successors {
 		return true;
 	}
 
-	public void fillEmptyWith(Node fillingNode, SourceLocation source) {
+	public void fillEmptyWith(Node fillingNode, SourceLocation source, boolean isF4RTL) {
 		for (Map.Entry<Condition, Node> entry : successorByCondition.entrySet()) {
 			Condition condition = entry.getKey();
 			Node successor = entry.getValue();
@@ -137,7 +137,7 @@ public class Successors {
 				}
 			} else if (successor.isControlNode()) {
 				/* Fill recursively every non-empty successor */
-				successor.fillEmptySuccessorsWith(fillingNode);
+				successor.fillEmptySuccessorsWith(fillingNode, isF4RTL);
 			}
 		}
 	}

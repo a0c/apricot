@@ -77,6 +77,7 @@
           <forms/>
         </constraints>
         <properties>
+          <selected value="true"/>
           <text value=""/>
           <toolTipText value="&lt;html&gt;Smart &lt;u&gt;N&lt;/u&gt;ame&lt;/html&gt;"/>
         </properties>

@@ -17,8 +17,8 @@ public class BehGraphGenerator extends GraphGenerator {
 
 	private OperandStorage registers;
 
-	public BehGraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<Constant> generics, OperandStorage registers) {
-		super(config, settings, generics, GeneratorType.Behavioural);
+	public BehGraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<Constant> generics, OperandStorage registers, boolean isF4RTL) {
+		super(config, settings, generics, GeneratorType.Behavioural, isF4RTL);
 		this.registers = registers;
 	}
 

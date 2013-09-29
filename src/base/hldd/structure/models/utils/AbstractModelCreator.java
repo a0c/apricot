@@ -287,10 +287,12 @@ public abstract class AbstractModelCreator implements ModelCreator {
 					}
 				}
 				if (noDependenciesVar == null) {
+					noDependenciesVar = nonDelayGraphList.get(0);
 					printDependencies(nonDelayGraphList);
-					throw new RuntimeException(getClass().getSimpleName() + ": Cannot order Non-Delay GraphVariables." +
-							"\nReason: Cyclic dependency exists." +
-							"\n(NonDelayGraphList is not empty, but doesn't contain a variable WITHOUT dependencies)");
+					LOGGER.warning(getClass().getSimpleName() +
+							": Cyclic dependency found when ordering Non-Delay GraphVariables." +
+							"\n(NonDelayGraphList is not empty, but doesn't contain a variable WITHOUT dependencies)." +
+							"\nTaking first var from NonDelayGraphList (sorted alphabetically).");
 				}
 
 				/* Add to sorted list */
@@ -311,6 +313,7 @@ public abstract class AbstractModelCreator implements ModelCreator {
 		}
 
 		private void printDependencies(List<GraphVariable> nonDelayGraphList) {
+			System.out.println("Cyclic dependency => Taking first var from NonDelayGraphList (sorted alphabetically).");
 			int i = 0;
 			for (GraphVariable graphVariable : dependenciesByVar.keySet()) {
 				Set<GraphVariable> set = dependenciesByVar.get(graphVariable);

@@ -16,9 +16,12 @@ import ui.ConfigurationHandler;
  * <br>1) is read without being set before.
  * <br>For a given {@link Signal}, flag is set if the Signal:
  * <br>1) is set in a clocked process;
- * <br>2) is set in a non-clocked process, which has a branch
- * where the Signal is not set. <b>NB! </b> Currently an exception
- * (warning) is thrown for the second case.
+ * <br>
+ * <br> <b>NB! </b> A warning is issued if a Signal is set in a
+ * non-clocked process, which has a branch where the Signal is not set.
+ * See {@link
+ * base.hldd.structure.models.utils.AbstractModelCreator.GraphVariablesSorter#printNonInitialisedVars()
+ * GraphVariablesSorter.printNonInitialisedVars()}.
  *
  * @author Anton Chepurov
  */
@@ -37,22 +40,12 @@ public class DelayFlagCollector extends AbstractVisitor {
 	}
 
 	public void visitEntity(Entity entity) throws Exception {
-		/* ##########################
-		###### Collect SIGNALS ######
-		###########################*/
-		/* Traverse the architecture with a new SignalDelayFlagCollector */
 		SignalDelayFlagCollector sigCollector = new SignalDelayFlagCollector(config);
 		entity.traverse(sigCollector);
-		/* Add collected Signal dFlagOperands to the global dFlagOperands collection */
 		dFlagOperands.storeAll(sigCollector.getDFlagOperands());
 
-		/* ##########################
-		##### Collect VARIABLES #####
-		###########################*/
-		/* Traverse the process with a new VariableDelayFlagCollector */
 		VariableDelayFlagCollector varCollector = new VariableDelayFlagCollector();
 		entity.traverse(varCollector);
-		/* Add collected Variable dFlagOperands to the global dFlagOperands collection */
 		dFlagOperands.storeAll(varCollector.getDFlagOperands());
 	}
 

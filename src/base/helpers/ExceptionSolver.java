@@ -57,8 +57,10 @@ public class ExceptionSolver {
 				return PackageParser.parseConstantValueWithLength(new VHDLScanner(new LexemeComposer(valueAsString)).next().getValue());
 			case IGNORE:
 				return true;
-			case TERMINATE:
+			case EXIT:
 				System.exit(0);
+			case CANCEL:
+				return CancellingException.getInstance();
 			case PATH:
 //                new SingleFileSelector()
 				break;
@@ -69,15 +71,21 @@ public class ExceptionSolver {
 	private SolutionOptions chooseSolution(String message, SolutionOptions expectedSolution) {
 		int answer = JOptionPane.showOptionDialog(frame, createMessage(message), MAIN_TITLE, JOptionPane.DEFAULT_OPTION,
 				JOptionPane.INFORMATION_MESSAGE, null, SolutionOptions.titles(), expectedSolution.title);
-		if (answer == 0) {
-			return SolutionOptions.VALUE;
-		} else if (answer == 1) {
-			return SolutionOptions.PATH;
-		} else if (answer == 2) {
-			return SolutionOptions.IGNORE;
-		} else if (answer == 3) {
-			return SolutionOptions.TERMINATE;
-		} else return null;
+		switch (answer) {
+			case 0:
+				return SolutionOptions.VALUE;
+			case 1:
+				return SolutionOptions.PATH;
+			case 2:
+				return SolutionOptions.IGNORE;
+			case 3:
+				return SolutionOptions.EXIT;
+			case 4:
+			case -1:
+				return SolutionOptions.CANCEL;
+			default:
+				return null;
+		}
 	}
 
 	private String createMessage(String message) {
@@ -93,7 +101,8 @@ public class ExceptionSolver {
 		VALUE("Constant value", "Enter constant value:"),
 		PATH("File path", ""),
 		IGNORE("Ignore", ""),
-		TERMINATE("Exit", "");
+		EXIT("Exit", ""),
+		CANCEL("Cancel", "");
 
 		private final String title;
 		private final String message;
@@ -110,6 +119,17 @@ public class ExceptionSolver {
 				messages[i++] = solutionOption.title;
 			}
 			return messages;
+		}
+	}
+
+	public static class CancellingException extends Exception {
+		static CancellingException instance;
+
+		public static CancellingException getInstance() {
+			if (instance == null) {
+				instance = new CancellingException();
+			}
+			return instance;
 		}
 	}
 }

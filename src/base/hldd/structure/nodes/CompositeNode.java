@@ -89,15 +89,16 @@ public class CompositeNode extends Node {
 		return lastNode.isEmptyControlNode();
 	}
 
-	public void fillEmptySuccessorsWith(Node fillingNode) {
-		fillEmptySuccessorsWith(rootNode, fillingNode);
+	public void fillEmptySuccessorsWith(Node fillingNode, boolean isF4RTL) {
+		if (isF4RTL && fillingNode == null) return;
+		fillEmptySuccessorsWith(rootNode, fillingNode, isF4RTL);
 	}
 
-	private static void fillEmptySuccessorsWith(Node node, Node fillingNode) {
+	private static void fillEmptySuccessorsWith(Node node, Node fillingNode, boolean isF4RTL) {
 		if (node.isControlNode()) {
-			node.fillEmptySuccessorsWith(fillingNode);
+			node.fillEmptySuccessorsWith(fillingNode, isF4RTL);
 			for (Node successor : node.getSuccessors()) {
-				fillEmptySuccessorsWith(successor, fillingNode);
+				fillEmptySuccessorsWith(successor, fillingNode, isF4RTL);
 			}
 		}
 	}

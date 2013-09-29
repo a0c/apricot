@@ -14,7 +14,7 @@ import java.util.Collection;
 public class BehDDGraphGenerator extends GraphGenerator {
 
 	public BehDDGraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<Constant> generics) {
-		super(config, settings, generics, GeneratorType.BehaviouralDD);
+		super(config, settings, generics, GeneratorType.BehaviouralDD, false);
 	}
 
 	public void visitProcess(base.vhdl.structure.Process process) throws Exception {

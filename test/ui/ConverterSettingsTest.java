@@ -15,8 +15,8 @@ public class ConverterSettingsTest {
 
 	@Test
 	public void correctHasAmongstParents() {
-		File behDDFile = new File("D:\\Programming\\Apricot\\DESIGNS\\branch\\ITC99\\trees\\b00\\b00.vhd");
-		File behFile = new File("D:\\Programming\\Apricot\\DESIGNS\\branch\\ITC99\\orig\\b13\\tr_E\\b13.vhd");
+		File behDDFile = new File("/ITC99/trees/b00/b00.vhd");
+		File behFile = new File("/ITC99/orig/b13/tr_E/b13.vhd");
 
 		assertTrue("ConverterSettings.hasAmongstParents(): should detect 'trees'-named parent in " +
 				behDDFile.getAbsolutePath(), ConverterSettings.hasAmongstParents("trees", behDDFile));
@@ -129,12 +129,12 @@ public class ConverterSettingsTest {
 			String parent;
 			if (i == 0) {
 				parserId = VhdlBeh2HlddBeh;
-				parent = "D:\\WORKSPACE\\tr\\";
-				sourceFile = new File(parent + "B03.VHD");
+				parent = "/tr/";
+				sourceFile = new File(parent + "b03.vhd");
 			} else {
 				parserId = VhdlBehDd2HlddBeh;
-				parent = "D:\\WORKSPACE\\tr\\trees\\";
-				sourceFile = new File(parent + "B03.VHD");
+				parent = "/tr/trees/";
+				sourceFile = new File(parent + "b03.vhd");
 			}
 
 			// FULL
@@ -164,6 +164,13 @@ public class ConverterSettingsTest {
 					.setDoFlattenConditions(true).build();
 			settings = ConverterSettings.parse(destinationFilePath);
 			assertEquals("Settings parsed incorrectly for " + parserId + " (" + destinationFilePath + ")", correctSettings, settings);
+			// FULL 4 RTL
+			destinationFilePath = parent + "b03_F4_EX.agm";
+			correctSettings = build(parserId, sourceFile, new File(destinationFilePath))
+					.setHlddType(FULL_TREE_4_RTL)
+					.setDoCreateExtraCSGraphs(true).build();
+			settings = ConverterSettings.parse(destinationFilePath);
+			assertEquals("Settings parsed incorrectly for " + parserId + " (" + destinationFilePath + ")", correctSettings, settings);
 			// MIN
 			destinationFilePath = parent + "b03_M_FL.agm";
 			correctSettings = build(parserId, sourceFile, new File(destinationFilePath))
@@ -182,8 +189,8 @@ public class ConverterSettingsTest {
 
 		/* HlddBeh2HlddRtl */
 		parserId = HlddBeh2HlddRtl;
-		destinationFilePath = "D:\\WORKSPACE\\tr\\b13_M_EX_RTL.agm";
-		correctSettings = new ConverterSettings.Builder(parserId, new File("D:\\WORKSPACE\\tr\\b13_M_EX.agm"),
+		destinationFilePath = "/tr/b13_M_EX_RTL.agm";
+		correctSettings = new ConverterSettings.Builder(parserId, new File("/tr/b13_M_EX.agm"),
 				new File(destinationFilePath))
 				.setHlddType(MINIMIZED)
 				.setDoCreateExtraCSGraphs(true).build();
@@ -192,10 +199,10 @@ public class ConverterSettingsTest {
 
 		/* PSL2THLDD */
 		parserId = PSL2THLDD;
-		destinationFilePath = "D:\\WORKSPACE\\tr\\b13_M_EX.tgm";
-		correctSettings = new ConverterSettings.Builder(parserId, new File("D:\\WORKSPACE\\tr\\b13_M_EX.psl"),
+		destinationFilePath = "/tr/b13_M_EX.tgm";
+		correctSettings = new ConverterSettings.Builder(parserId, new File("/tr/b13_M_EX.psl"),
 				new File(destinationFilePath))
-				.setBaseModelFile(new File("D:\\WORKSPACE\\tr\\b13_M_EX.agm")).build();
+				.setBaseModelFile(new File("/tr/b13_M_EX.agm")).build();
 		settings = ConverterSettings.parse(destinationFilePath);
 		assertEquals("Settings parsed incorrectly for " + parserId + " (" + destinationFilePath + ")", correctSettings, settings);
 

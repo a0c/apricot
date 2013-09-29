@@ -94,7 +94,9 @@ public class OutputFileGenerator implements ChangeListener, DocumentListener {
 
 		name.append(sourceFile.getName().replaceAll(".(vhd|vhdl)$", ""));
 
-		if (hlddType == FULL_TREE) {
+		if (hlddType == FULL_TREE_4_RTL) {
+			name.append("_F4");
+		} else if (hlddType == FULL_TREE) {
 			name.append("_F");
 		} else if (hlddType == REDUCED) {
 			name.append("_R");

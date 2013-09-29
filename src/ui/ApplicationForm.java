@@ -1465,11 +1465,21 @@ public class ApplicationForm implements ActionListener {
 	}
 
 	public BusinessLogic.HLDDRepresentationType getHlddRepresentationType() {
-		if (selectedParserId == ParserID.VhdlBeh2HlddBeh) {
-			return vhdlBehOptionsPanel.getHlddType();
-		} else if (selectedParserId == ParserID.VhdlBehDd2HlddBeh) {
-			return vhdlBehDdOptionsPanel.getHlddType();
-		} else return null;
+		switch (selectedParserId) {
+			case VhdlBeh2HlddBeh:
+				return vhdlBehOptionsPanel.getHlddType();
+			case VhdlBehDd2HlddBeh:
+				return vhdlBehDdOptionsPanel.getHlddType();
+			case HlddBeh2HlddRtl:
+				try {
+					ConverterSettings settings = ConverterSettings.parse(getSourceFile().getPath());
+					return settings.getHlddType();
+				} catch (ConverterSettings.ConverterSettingsParseException e) {
+					return null;
+				}
+			default:
+				return null;
+		}
 	}
 
 

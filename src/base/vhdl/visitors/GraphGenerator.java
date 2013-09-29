@@ -45,6 +45,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 	private final ConfigurationHandler config;
 	private final ConverterSettings settings;
+	private final boolean isF4RTL;
 	private final Collection<Constant> generics;
 	protected ModelManager modelCollector;
 	private ConditionGraphManager conditionGraphManager;
@@ -74,10 +75,12 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	 * @param settings	  base settings for conversion
 	 * @param generics	  from component instantiation
 	 * @param generatorType generator's type. Used for initialization of isNullTransition only.
+	 * @param isF4RTL       <tt>true</tt> if a true 'full tree 4 RTL' is to be generated
 	 */
-	protected GraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<Constant> generics, GeneratorType generatorType) {
+	protected GraphGenerator(ConfigurationHandler config, ConverterSettings settings, Collection<Constant> generics, GeneratorType generatorType, boolean isF4RTL) {
 		this.config = config;
 		this.settings = settings;
+		this.isF4RTL = isF4RTL;
 		this.generics = generics != null ? generics : Collections.<Constant>emptyList();
 		modelCollector = new ModelManager();
 		this.doFlattenConditions = settings.isDoFlattenConditions();
@@ -333,7 +336,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 	 * @throws HLDDException if 'others' could not be obtained
 	 */
 	private void finalizeControlNode(Node controlNode) throws HLDDException {
-		if (controlNode.isTerminalNode() || controlNode.isEmptyControlNode()) return;
+		if (controlNode.isTerminalNode() || (!isF4RTL && controlNode.isEmptyControlNode())) return;
 
 		Condition others = controlNode.getOthers();
 		if (others == null) return;
@@ -613,16 +616,21 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 		if (graphVariableRootNode == null) {
 			graphVariableRootNode = getDefaultValueNode();
-			if (graphVariableRootNode == null) {
+			if (!isF4RTL && graphVariableRootNode == null) {
 				return false;
 			}
+		}
+		if (isF4RTL && (graphVariableRootNode == null || graphVariable == null)) {
+			return false;
 		}
 		/* Create new GraphVariable and replace old one */
 		GraphVariable newGraphVariable = modelCollector.createAndReplaceNewGraph(graphVariable, graphVariableRootNode,
 				isDelay(new OperandImpl(graphVariable.getName())));
 
 		/* Remove redundant resets */
-		graphVariableRootNode.traverse(new ObsoleteResetRemoverImpl(newGraphVariable));
+		if (!isF4RTL) {
+			graphVariableRootNode.traverse(new ObsoleteResetRemoverImpl(newGraphVariable));
+		}
 
 		return true;
 	}
@@ -689,6 +697,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		return new Node.Builder(defaultValueVariable).build();
 	}
 
+	private Node createGraphNode() {
+		if (graphVariable != null)
+			return new Node.Builder(graphVariable).build();
+		else
+			return null;
+	}
+
 	/* AUXILIARY methods and classes */
 
 	/**
@@ -746,7 +761,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 
 		public void fillCurrentContextWith(Node fillingNode) throws Exception {
 			/* Add Control Node to Current Context only if the former is not empty */
-			if (fillingNode.isControlNode() && fillingNode.isEmptyControlNode()) return;
+			if (!isF4RTL && fillingNode.isControlNode() && fillingNode.isEmptyControlNode()) return;
 
 			/* Update Default Value */
 			updateDefaultValue(fillingNode);
@@ -759,9 +774,23 @@ public abstract class GraphGenerator extends AbstractVisitor {
 				if (graphVariableRootNode != null && defaultValueStack.peek().defaultValueContext != null) {
 					LOGGER.warning("Rewriting graphVariableRootNode for " + graphVariable.getName() + " and the defaultValueStack is not empty.");
 				}
+				if (isF4RTL && (graphVariable == null || isValueRetainingGraph(fillingNode, graphVariable))) return;
 				graphVariableRootNode = fillingNode instanceof CompositeNode
 						? ((CompositeNode) fillingNode).getRootNode()
 						: fillingNode;
+			}
+		}
+
+		private boolean isValueRetainingGraph(Node fillingNode, AbstractVariable graphVariable) {
+			if (fillingNode.isTerminalNode()) {
+				return fillingNode.getDependentVariable() == graphVariable;
+			} else {
+				for (Node successor : fillingNode.getSuccessors()) {
+					if (!isValueRetainingGraph(successor, graphVariable)) {
+						return false;
+					}
+				}
+				return true;
 			}
 		}
 
@@ -804,7 +833,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 					&& getCurrentContext() == getDefaultValueContext()) {
 				/* When leaving the context and discarding Default Value, before leaving fill missing
 				* successors of Current Context Awaited Nodes with the Default Value being removed.*/
-				if (!contextStack.isEmpty()) {
+				if (!contextStack.isEmpty() && !isF4RTL) {
 					fillEmptySuccessorsFor(getCurrentContext().getAwaitedNode());
 				}
 				/* Remove Default Value */
@@ -821,13 +850,13 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		 *
 		 * @param nodeToFill where to fill empty successors
 		 * @throws Exception {@link base.hldd.structure.nodes.Node#isEmptyControlNode()},
-		 *                   {@link Node#fillEmptySuccessorsWith(base.hldd.structure.nodes.Node)}
+		 *                   {@link Node#fillEmptySuccessorsWith(base.hldd.structure.nodes.Node, boolean)}
 		 */
 		private void fillEmptySuccessorsFor(Node nodeToFill) throws Exception {
 			/* For non-empty ControlNodes fill the missing successors with the latest defaultValue */
 			if (nodeToFill != null &&
-					nodeToFill.isControlNode() && !nodeToFill.isEmptyControlNode()) { // todo: consider removing 2nd and 3rd condition from here, if previous checks filter "bad" nodes out
-				nodeToFill.fillEmptySuccessorsWith(getDefaultValueNode());
+					nodeToFill.isControlNode() && (isF4RTL || !nodeToFill.isEmptyControlNode())) { // todo: consider removing 2nd and 3rd condition from here, if previous checks filter "bad" nodes out
+				nodeToFill.fillEmptySuccessorsWith(getDefaultValueNode(), isF4RTL);
 			}
 		}
 
@@ -841,7 +870,7 @@ public abstract class GraphGenerator extends AbstractVisitor {
 		 */
 		private Node getDefaultValueNode() {
 			if (defaultValueStack.isEmpty()) {
-				return new Node.Builder(graphVariable).build();
+				return createGraphNode();
 			} else {
 				Node defaultValueNode = defaultValueStack.peek().defaultValueNode;
 				return Node.clone(defaultValueNode);

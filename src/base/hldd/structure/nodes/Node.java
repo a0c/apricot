@@ -309,17 +309,18 @@ public class Node implements Visitable, Cloneable {
 	/**
 	 * @param fillingNode node to fill missing successors with
 	 */
-	public void fillEmptySuccessorsWith(Node fillingNode) {
+	public void fillEmptySuccessorsWith(Node fillingNode, boolean isF4RTL) {
 		/* Check the node to be a CONTROL node*/
 		if (isTerminalNode()) return;
 		/* Don't fill emptyNodes */
 		try {
-			if (isEmptyControlNode()) return;
+			if (!isF4RTL && isEmptyControlNode()) return;
 		} catch (HLDDException e) {
 			throw new RuntimeException(e); // Should not occur
 		}
+		if (isF4RTL && fillingNode == null) return;
 
-		successors.fillEmptyWith(fillingNode, getSource());
+		successors.fillEmptyWith(fillingNode, getSource(), isF4RTL);
 	}
 
 	/**

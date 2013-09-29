@@ -4,7 +4,7 @@
     <rowspec value="top:d:noGrow"/>
     <colspec value="fill:367px:grow"/>
     <constraints>
-      <xy x="20" y="20" width="386" height="131"/>
+      <xy x="20" y="20" width="386" height="184"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -27,17 +27,19 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:169px:noGrow"/>
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <forms/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-vert="false"/>
             </constraints>
             <properties/>
             <border type="none" title="Model Compactness" title-justification="2"/>
             <children>
               <component id="4e4cd" class="javax.swing.JRadioButton" binding="reducedRadioButton" default-binding="true">
                 <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -46,7 +48,7 @@
               </component>
               <component id="30eac" class="javax.swing.JRadioButton" binding="minimizedRadioButton" default-binding="true">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -54,9 +56,19 @@
                   <text value="&amp;Minimized (default)"/>
                 </properties>
               </component>
-              <component id="f689e" class="javax.swing.JRadioButton" binding="fullRadioButton">
+              <component id="178c1" class="javax.swing.JRadioButton" binding="fullTree4RTLRadioButton" default-binding="true">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Full-tree &amp;4 RTL"/>
+                  <toolTipText value="True Full-tree from single-process designs for compact RTL generation "/>
+                </properties>
+              </component>
+              <component id="f689e" class="javax.swing.JRadioButton" binding="fullRadioButton">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -77,8 +89,8 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:177px:noGrow"/>
             <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <forms/>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-vert="false"/>
             </constraints>
             <properties/>
             <border type="none" title="Conditional Statements" title-justification="2"/>
@@ -140,6 +152,7 @@
       <member id="f689e"/>
       <member id="4e4cd"/>
       <member id="30eac"/>
+      <member id="178c1"/>
     </group>
     <group name="conditionalStatementsBGroup">
       <member id="9bfed"/>

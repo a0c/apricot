@@ -230,6 +230,7 @@ public class BusinessLogic {
 
 	@SuppressWarnings({"EnumeratedConstantNamingConvention"})
 	public enum HLDDRepresentationType {
+		FULL_TREE_4_RTL,
 		FULL_TREE,
 		REDUCED,
 		MINIMIZED

@@ -390,8 +390,8 @@ public class Beh2RtlTransformer {
 				/* 2 */
 				controlPartVariable = modelCollector.getVariable(graphVariable.getName() + SUFFIX_MUX_ADDR);
 				if (controlPartVariable != null) {
-					int transitionValue = termNodeCollector.getTransitionValue(graphVariable, terminalNode);
-					insertTransition(transitions, controlPartVariable, transitionValue);
+					int muxAddrValue = termNodeCollector.getMuxAddrValueFor(terminalNode, graphVariable);
+					insertTransition(transitions, controlPartVariable, muxAddrValue);
 				}
 				/* 3 */
 				controlPartVariable = modelCollector.getVariable(graphVariable.getName() + SUFFIX_RESET);

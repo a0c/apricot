@@ -7,6 +7,8 @@
 #### b00
 test/designs/ITC99/orig/b00/b00_F_FU.agm
 test/designs/ITC99/orig/b00/b00_F_FU_RTL.agm
+test/designs/ITC99/orig/b00/b00_F4_FU.agm
+test/designs/ITC99/orig/b00/b00_F4_FU_RTL.agm
 test/designs/ITC99/orig/b00/b00_M_FU.agm
 test/designs/ITC99/orig/b00/b00_M_FU_RTL.agm
 test/designs/ITC99/orig/b00/b00_R_FU.agm
@@ -45,6 +47,8 @@ test/designs/ITC99/orig/b04/b04_EDITED_R_FU.agm
 test/designs/ITC99/orig/b04/b04_EDITED_R_FU_RTL.agm
 test/designs/ITC99/orig/b04/b04_F_FU.agm
 test/designs/ITC99/orig/b04/b04_F_FU_RTL.agm
+test/designs/ITC99/orig/b04/b04_F4_FU.agm
+test/designs/ITC99/orig/b04/b04_F4_FU_RTL.agm
 test/designs/ITC99/orig/b04/b04_M_FU.agm
 test/designs/ITC99/orig/b04/b04_M_FU_RTL.agm
 test/designs/ITC99/orig/b04/b04_R_FU.agm
@@ -129,4 +133,6 @@ test/designs/uart16750/rtl/uart_transmitter_M_FU.agm
 #### Codec
 
 test/designs/codec/funcmi_edit_F_FU.agm
+test/designs/codec/funcmi_edit_F4_FU.agm
+test/designs/codec/funcmi_edit_F4_FU_RTL.agm
 test/designs/codec/funcmi_edit_M_FU.agm

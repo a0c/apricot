@@ -10,6 +10,7 @@ public class ConsoleWriter {
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	public static final String DONE_TEXT = "\t\tDone.";
 	public static final String FAILED_TEXT = "\t\tFailed." + NEW_LINE;
+	public static final String CANCELLED_TEXT = "\t\tCancelled." + NEW_LINE;
 
 	private static final Logger LOGGER = Logger.getLogger(ConsoleWriter.class.getName());
 
@@ -117,5 +118,9 @@ public class ConsoleWriter {
 
 	public void invalidateWarnings() {
 		hasWarnings = false;
+	}
+
+	public void cancelled() {
+		writeLn(CANCELLED_TEXT);
 	}
 }

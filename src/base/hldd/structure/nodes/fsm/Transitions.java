@@ -10,11 +10,11 @@ public class Transitions {
 		transitions = new Integer[transitionsCount];
 	}
 
-	public void insertTransition(Integer transitionIndex, int transitionValue) throws Exception {
-		if (transitionIndex > transitions.length - 1) {
-			throw new Exception(""); //todo:
+	public void insertTransition(Integer index, int value) throws Exception {
+		if (index > transitions.length - 1) {
+			throw new Exception("Transition index out of bounds: " + index);
 		}
-		transitions[transitionIndex] = transitionValue;
+		transitions[index] = value;
 	}
 
 	public boolean isIdenticalTo(Transitions transitions) {

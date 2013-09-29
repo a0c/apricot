@@ -172,7 +172,10 @@ public class ConverterSettings {
 						+ ": unknown ConditionalStatements mode. Expected: '_FU', '_GR', '_FL' or '_EX'");
 			}
 			// parse Model Compactness
-			if (fileName.endsWith("_F")) {
+			if (fileName.endsWith("_F4")) {
+				hlddType = BusinessLogic.HLDDRepresentationType.FULL_TREE_4_RTL;
+				fileName = cutFromEnd(fileName, "_F4");
+			} else if (fileName.endsWith("_F")) {
 				hlddType = BusinessLogic.HLDDRepresentationType.FULL_TREE;
 				fileName = cutFromEnd(fileName, "_F");
 			} else if (fileName.endsWith("_M")) {
