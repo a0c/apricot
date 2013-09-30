@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.LogManager;
 
 /**
  * @author Anton Chepurov
@@ -122,6 +123,12 @@ public class AutomaticConverterVerifier {
 
 
 	public static void main(String[] args) {
+
+		try {
+			InputStream inputStream = AutomaticConverterVerifier.class.getResourceAsStream("/loggingForTest.properties");
+			LogManager.getLogManager().readConfiguration(inputStream);
+		} catch (IOException e) {
+		}
 
 		AutomaticConverterVerifier converterVerifier = new AutomaticConverterVerifier();
 		converterVerifier.verify(Statistics.createConsoleStatistics());

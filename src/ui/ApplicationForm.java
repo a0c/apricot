@@ -22,10 +22,13 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.LogManager;
 
 import static ui.FileDependencyResolver.*;
 
@@ -893,6 +896,12 @@ public class ApplicationForm implements ActionListener {
 	public static void main(String[] args) {
 
 		new File(System.getProperty("java.io.tmpdir"), "apricotCAD").mkdirs();
+
+		try {
+			InputStream inputStream = ApplicationForm.class.getResourceAsStream("/logging.properties");
+			LogManager.getLogManager().readConfiguration(inputStream);
+		} catch (IOException e) {
+		}
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
