@@ -21,7 +21,7 @@ public class ApricotTest {
 	@Test
 	public void testAssertainExample() throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
 
-		String xmlPath = ".\\classes\\test\\VertigoInterfaceParsers\\ee\\ttu\\pld\\apricot\\cli\\Assertain_example_in.xml";
+		String xmlPath = "./classes/test/apricot/ee/ttu/pld/apricot/cli/Assertain_example_in.xml";
 		File xmlFile = new File(new File(xmlPath).toURI().getPath());
 		File outXmlFile = new File(xmlFile.getParent(), "OUT_Assertain_example_in.xml");
 

@@ -5,7 +5,7 @@
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/SETUP/META-INF CLI/MANIFEST.MF" />
       </element>
-      <element id="module-output" name="VertigoInterfaceParsers" />
+      <element id="module-output" name="apricot" />
       <element id="directory" name="lib">
         <element id="file-copy" path="$PROJECT_DIR$/lib/hlddsim.exe" />
       </element>

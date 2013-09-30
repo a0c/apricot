@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="HLDDTools">
+  <artifact type="jar" name="ApricotCAD">
     <output-path>$PROJECT_DIR$/SETUP</output-path>
-    <root id="archive" name="HLDDTools.jar">
-      <element id="module-output" name="VertigoInterfaceParsers" />
+    <root id="archive" name="ApricotCAD.jar">
+      <element id="module-output" name="apricot" />
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/SETUP/META-INF/MANIFEST.MF" />
       </element>

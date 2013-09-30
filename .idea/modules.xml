@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/VertigoInterfaceParsers.iml" filepath="$PROJECT_DIR$/VertigoInterfaceParsers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apricot.iml" filepath="$PROJECT_DIR$/apricot.iml" />
     </modules>
   </component>
 </project>
