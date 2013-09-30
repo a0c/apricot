@@ -1,0 +1,15 @@
+9: slib_counter.vhd 61
+11: slib_counter.vhd 58
+12: slib_counter.vhd 63
+1 5: slib_counter.vhd 59
+1 6: slib_counter.vhd 61
+1 7: slib_counter.vhd 63
+1 8: slib_counter.vhd 58
+1 9: slib_counter.vhd 53, 56
+2 6: slib_counter.vhd 59
+2 7: slib_counter.vhd 61
+2 8: slib_counter.vhd 63
+2 9: slib_counter.vhd 58
+2 10: slib_counter.vhd 53, 56, 67
+3 0: slib_counter.vhd 75
+4 0: slib_counter.vhd 74

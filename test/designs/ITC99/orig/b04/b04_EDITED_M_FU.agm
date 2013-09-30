@@ -1,0 +1,134 @@
+;  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!
+;
+; SOURCE FILE:
+;        b04_EDITED.vhd
+;
+; CONVERTER:
+;        VhdlBeh2HlddBeh
+;
+; MODEL COMPACTNESS:
+;        MINIMIZED (default)
+;
+; CONDITIONAL STATEMENTS:
+;        Functions (default)
+;
+;  <<<<<<< GENERATOR INFO
+
+STAT#	55 Nods,  25 Vars,  9 Grps,  5 Inps,  1 Outs,  5 Cons,  6 Funs  
+
+MODE#	RTL
+
+;inputs
+VAR#	0:  (i_________)	"AVERAGE"	<0:0>
+VAR#	1:  (i_________)	"DATA_IN"	<7:0>
+VAR#	2:  (i_________)	"ENABLE"	<0:0>
+VAR#	3:  (i_r_______)	"RESET"	<0:0>
+VAR#	4:  (i_________)	"RESTART"	<0:0>
+
+
+;constants
+VAR#	5:  (c_________)	"CONST_0_BW8"	<7:0>	VAL = 0
+VAR#	6:  (c_________)	"CONST_1_BW1"	<0:0>	VAL = 1
+VAR#	7:  (c_________)	"SA"	<1:0>	VAL = 0
+VAR#	8:  (c_________)	"SB"	<1:0>	VAL = 1
+VAR#	9:  (c_________)	"SC"	<1:0>	VAL = 2
+
+
+;functions
+VAR#	10:  (____f_____)	"ADDER____1"	<7:0>
+FUN#	ADDER	(A1<= 21<7:0>,	A2<= 22<7:0>)
+VAR#	11:  (____f_____)	"ADDER____2"	<7:0>
+FUN#	ADDER	(A1<= 1<7:0>,	A2<= 19<7:0>)
+VAR#	12:  (____f_____)	"GT____1"	<0:0>
+FUN#	GT	(A1<= 1<7:0>,	A2<= 21<7:0>)
+VAR#	13:  (____f_____)	"LT____1"	<0:0>
+FUN#	LT	(A1<= 1<7:0>,	A2<= 22<7:0>)
+VAR#	14:  (____f_____)	"SHIFT_RIGHT____1"	<7:0>
+FUN#	SHIFT_RIGHT	(A1<= 10<7:0>,	A2<= 6<0:0>)
+VAR#	15:  (____f_____)	"SHIFT_RIGHT____2"	<7:0>
+FUN#	SHIFT_RIGHT	(A1<= 11<7:0>,	A2<= 6<0:0>)
+
+
+;graphs
+VAR#	16:  (________d_)	"#PROCESS_1#__REG1"	<7:0>
+GRP#	0:  BEG =  0, LEN = 5 -----
+  0	0:  (n___) (0=>1	1=>3	)	V = 3	"RESET"	<0:0>
+  1	1:  (n___) (0=>2 1=>3 2=>4 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  2	2:  (____) (	0	0)	V = 16	"#PROCESS_1#__REG1"	<7:0>
+  3	3:  (____) (	0	0)	V = 5	"CONST_0_BW8"	<7:0>
+  4	4:  (____) (	0	0)	V = 1	"DATA_IN"	<7:0>
+
+VAR#	17:  (________d_)	"#PROCESS_1#__REG2"	<7:0>
+GRP#	1:  BEG =  5, LEN = 5 -----
+  5	0:  (n___) (0=>1	1=>3	)	V = 3	"RESET"	<0:0>
+  6	1:  (n___) (0=>2 1=>3 2=>4 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  7	2:  (____) (	0	0)	V = 17	"#PROCESS_1#__REG2"	<7:0>
+  8	3:  (____) (	0	0)	V = 5	"CONST_0_BW8"	<7:0>
+  9	4:  (____) (	0	0)	V = 16	"#PROCESS_1#__REG1"	<7:0>
+
+VAR#	18:  (________d_)	"#PROCESS_1#__REG3"	<7:0>
+GRP#	2:  BEG =  10, LEN = 5 -----
+  10	0:  (n___) (0=>1	1=>3	)	V = 3	"RESET"	<0:0>
+  11	1:  (n___) (0=>2 1=>3 2=>4 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  12	2:  (____) (	0	0)	V = 18	"#PROCESS_1#__REG3"	<7:0>
+  13	3:  (____) (	0	0)	V = 5	"CONST_0_BW8"	<7:0>
+  14	4:  (____) (	0	0)	V = 17	"#PROCESS_1#__REG2"	<7:0>
+
+VAR#	19:  (________d_)	"#PROCESS_1#__REG4"	<7:0>
+GRP#	3:  BEG =  15, LEN = 5 -----
+  15	0:  (n___) (0=>1	1=>3	)	V = 3	"RESET"	<0:0>
+  16	1:  (n___) (0=>2 1=>3 2=>4 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  17	2:  (____) (	0	0)	V = 19	"#PROCESS_1#__REG4"	<7:0>
+  18	3:  (____) (	0	0)	V = 5	"CONST_0_BW8"	<7:0>
+  19	4:  (____) (	0	0)	V = 18	"#PROCESS_1#__REG3"	<7:0>
+
+VAR#	20:  (________d_)	"#PROCESS_1#__RLAST"	<7:0>
+GRP#	4:  BEG =  20, LEN = 6 -----
+  20	0:  (n___) (0=>1	1=>4	)	V = 3	"RESET"	<0:0>
+  21	1:  (n___) (0=>3 1=>4 2=>2 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  22	2:  (n___) (0=>3	1=>5	)	V = 2	"ENABLE"	<0:0>
+  23	3:  (____) (	0	0)	V = 20	"#PROCESS_1#__RLAST"	<7:0>
+  24	4:  (____) (	0	0)	V = 5	"CONST_0_BW8"	<7:0>
+  25	5:  (____) (	0	0)	V = 1	"DATA_IN"	<7:0>
+
+VAR#	21:  (________d_)	"#PROCESS_1#__RMAX"	<7:0>
+GRP#	5:  BEG =  26, LEN = 6 -----
+  26	0:  (n___) (0=>1	1=>5	)	V = 3	"RESET"	<0:0>
+  27	1:  (n___) (0=>3 1=>4 2=>2 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  28	2:  (n___) (0=>3	1=>4	)	V = 12	"GT____1"	<0:0>
+  29	3:  (____) (	0	0)	V = 21	"#PROCESS_1#__RMAX"	<7:0>
+  30	4:  (____) (	0	0)	V = 1	"DATA_IN"	<7:0>
+  31	5:  (____) (	0	0)	V = 5	"CONST_0_BW8"	<7:0>
+
+VAR#	22:  (________d_)	"#PROCESS_1#__RMIN"	<7:0>
+GRP#	6:  BEG =  32, LEN = 7 -----
+  32	0:  (n___) (0=>1	1=>6	)	V = 3	"RESET"	<0:0>
+  33	1:  (n___) (0=>4 1=>5 2=>2 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  34	2:  (n___) (0=>3	1=>4	)	V = 12	"GT____1"	<0:0>
+  35	3:  (n___) (0=>4	1=>5	)	V = 13	"LT____1"	<0:0>
+  36	4:  (____) (	0	0)	V = 22	"#PROCESS_1#__RMIN"	<7:0>
+  37	5:  (____) (	0	0)	V = 1	"DATA_IN"	<7:0>
+  38	6:  (____) (	0	0)	V = 5	"CONST_0_BW8"	<7:0>
+
+VAR#	23:  (__s_____d_)	"#PROCESS_1#__STATO"	<1:0>
+GRP#	7:  BEG =  39, LEN = 5 -----
+  39	0:  (n___) (0=>1	1=>4	)	V = 3	"RESET"	<0:0>
+  40	1:  (n___) (0=>2 1-2=>3 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  41	2:  (____) (	0	0)	V = 8	"SB"	<1:0>
+  42	3:  (____) (	0	0)	V = 9	"SC"	<1:0>
+  43	4:  (____) (	0	0)	V = 7	"SA"	<1:0>
+
+VAR#	24:  (____o___d_)	"DATA_OUT"	<7:0>
+GRP#	8:  BEG =  44, LEN = 11 -----
+  44	0:  (n___) (0=>1	1=>6	)	V = 3	"RESET"	<0:0>
+  45	1:  (n___) (0=>5 1=>6 2=>2 )	V = 23	"#PROCESS_1#__STATO"	<1:0>
+  46	2:  (n___) (0=>3	1=>10	)	V = 4	"RESTART"	<0:0>
+  47	3:  (n___) (0=>7	1=>4	)	V = 2	"ENABLE"	<0:0>
+  48	4:  (n___) (0=>8	1=>9	)	V = 0	"AVERAGE"	<0:0>
+  49	5:  (____) (	0	0)	V = 24	"DATA_OUT"	<7:0>
+  50	6:  (____) (	0	0)	V = 5	"CONST_0_BW8"	<7:0>
+  51	7:  (____) (	0	0)	V = 20	"#PROCESS_1#__RLAST"	<7:0>
+  52	8:  (____) (	0	0)	V = 15	"SHIFT_RIGHT____2"	<7:0>
+  53	9:  (____) (	0	0)	V = 19	"#PROCESS_1#__REG4"	<7:0>
+  54	10:  (____) (	0	0)	V = 14	"SHIFT_RIGHT____1"	<7:0>
+

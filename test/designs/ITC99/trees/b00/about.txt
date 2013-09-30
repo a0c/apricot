@@ -1,0 +1,5 @@
+Difference in MAP files.
+
+NB! Verifier's main() detects the change. But JUnit test does not!
+
+Change in IF / null... See VHDL.

@@ -16,7 +16,7 @@ import helpers.PSLProperties;
  */
 public class PPGLibraryTest {
 
-	private static final String PPG_LIBRARY_PATH = "test/base/psl/structure/ppg_future.lib"; // todo: see also ppg.lib and ppg.lib_current
+	private static final String PPG_LIBRARY_PATH = "test/base/psl/structure/psl_future.ppg"; // todo: see also psl.ppg and psl_current.ppg
 
 	private PPGLibrary library;
 

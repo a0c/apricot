@@ -1,0 +1,65 @@
+;  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!
+;
+; SOURCE FILE:
+;        slib_clock_div.vhd
+;
+; CONVERTER:
+;        VhdlBeh2HlddBeh
+;
+; MODEL COMPACTNESS:
+;        MINIMIZED (default)
+;
+; CONDITIONAL STATEMENTS:
+;        Functions (default)
+;
+;  <<<<<<< GENERATOR INFO
+
+STAT#	12 Nods,  14 Vars,  3 Grps,  2 Inps,  1 Outs,  6 Cons,  3 Funs  
+
+MODE#	RTL
+
+;inputs
+VAR#	0:  (i_________)	"CE"	<0:0>
+VAR#	1:  (i_r_______)	"RST"	<0:0>
+
+
+;constants
+VAR#	2:  (c_________)	"CONST_0_BW1"	<0:0>	VAL = 0
+VAR#	3:  (c_________)	"CONST_0_BW2"	<1:0>	VAL = 0
+VAR#	4:  (c_________)	"CONST_1_BW1"	<0:0>	VAL = 1
+VAR#	5:  (c_________)	"CONST_1_BW2"	<1:0>	VAL = 1
+VAR#	6:  (c_________)	"CONST_1_BW3"	<2:0>	VAL = 1
+VAR#	7:  (c_________)	"RATIO"	<2:0>	VAL = 4
+
+
+;functions
+VAR#	8:  (____f_____)	"ADDER____1"	<1:0>
+FUN#	ADDER	(A1<= 11<1:0>,	A2<= 5<1:0>)
+VAR#	9:  (____f_____)	"EQ____1"	<0:0>
+FUN#	EQ	(A1<= 11<1:0>,	A2<= 10<2:0>)
+VAR#	10:  (____f_____)	"SUBTR____1"	<2:0>
+FUN#	SUBTR	(A1<= 7<2:0>,	A2<= 6<2:0>)
+
+
+;graphs
+VAR#	11:  (________d_)	"ICOUNTER"	<1:0>
+GRP#	0:  BEG =  0, LEN = 6 -----
+  0	0:  (n___) (0=>1	1=>5	)	V = 1	"RST"	<0:0>
+  1	1:  (n___) (0=>3	1=>2	)	V = 0	"CE"	<0:0>
+  2	2:  (n___) (0=>4	1=>5	)	V = 9	"EQ____1"	<0:0>
+  3	3:  (____) (	0	0)	V = 11	"ICOUNTER"	<1:0>
+  4	4:  (____) (	0	0)	V = 8	"ADDER____1"	<1:0>
+  5	5:  (____) (	0	0)	V = 3	"CONST_0_BW2"	<1:0>
+
+VAR#	12:  (________d_)	"IQ"	<0:0>
+GRP#	1:  BEG =  6, LEN = 5 -----
+  6	0:  (n___) (0=>1	1=>3	)	V = 1	"RST"	<0:0>
+  7	1:  (n___) (0=>3	1=>2	)	V = 0	"CE"	<0:0>
+  8	2:  (n___) (0=>3	1=>4	)	V = 9	"EQ____1"	<0:0>
+  9	3:  (____) (	0	0)	V = 2	"CONST_0_BW1"	<0:0>
+  10	4:  (____) (	0	0)	V = 4	"CONST_1_BW1"	<0:0>
+
+VAR#	13:  (____o_____)	"Q"	<0:0>
+GRP#	2:  BEG =  11, LEN = 1 -----
+  11	0:  (____) (	0	0)	V = 12	"IQ"	<0:0>
+

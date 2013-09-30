@@ -1,0 +1,76 @@
+;  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!
+;
+; SOURCE FILE:
+;        slib_input_filter.vhd
+;
+; CONVERTER:
+;        VhdlBeh2HlddBeh
+;
+; MODEL COMPACTNESS:
+;        MINIMIZED (default)
+;
+; CONDITIONAL STATEMENTS:
+;        Functions (default)
+;
+;  <<<<<<< GENERATOR INFO
+
+STAT#	14 Nods,  19 Vars,  2 Grps,  3 Inps,  1 Outs,  5 Cons,  9 Funs  
+
+MODE#	RTL
+
+;inputs
+VAR#	0:  (i_________)	"CE"	<0:0>
+VAR#	1:  (i_________)	"D"	<0:0>
+VAR#	2:  (i_r_______)	"RST"	<0:0>
+
+
+;constants
+VAR#	3:  (c_________)	"CONST_0_BW1"	<0:0>	VAL = 0
+VAR#	4:  (c_________)	"CONST_0_BW3"	<2:0>	VAL = 0
+VAR#	5:  (c_________)	"CONST_1_BW1"	<0:0>	VAL = 1
+VAR#	6:  (c_________)	"CONST_1_BW3"	<2:0>	VAL = 1
+VAR#	7:  (c_________)	"SIZE"	<2:0>	VAL = 4
+
+
+;functions
+VAR#	8:  (____f_____)	"ADDER____1"	<2:0>
+FUN#	ADDER	(A1<= 17<2:0>,	A2<= 6<2:0>)
+VAR#	9:  (____f_____)	"AND____1"	<0:0>
+FUN#	AND	(A1<= 1<0:0>,	A2<= 14<0:0>)
+VAR#	10:  (____f_____)	"AND____2"	<0:0>
+FUN#	AND	(A1<= 13<0:0>,	A2<= 15<0:0>)
+VAR#	11:  (____f_____)	"EQ____1"	<0:0>
+FUN#	EQ	(A1<= 17<2:0>,	A2<= 7<2:0>)
+VAR#	12:  (____f_____)	"EQ____2"	<0:0>
+FUN#	EQ	(A1<= 17<2:0>,	A2<= 4<2:0>)
+VAR#	13:  (____f_____)	"INV____1"	<0:0>
+FUN#	INV	(A1<= 1<0:0>)
+VAR#	14:  (____f_____)	"NEQ____1"	<0:0>
+FUN#	NEQ	(A1<= 17<2:0>,	A2<= 7<2:0>)
+VAR#	15:  (____f_____)	"NEQ____2"	<0:0>
+FUN#	NEQ	(A1<= 17<2:0>,	A2<= 4<2:0>)
+VAR#	16:  (____f_____)	"SUBTR____1"	<2:0>
+FUN#	SUBTR	(A1<= 17<2:0>,	A2<= 6<2:0>)
+
+
+;graphs
+VAR#	17:  (________d_)	"ICOUNT"	<2:0>
+GRP#	0:  BEG =  0, LEN = 8 -----
+  0	0:  (n___) (0=>1	1=>7	)	V = 2	"RST"	<0:0>
+  1	1:  (n___) (0=>4	1=>2	)	V = 0	"CE"	<0:0>
+  2	2:  (n___) (0=>3	1=>6	)	V = 9	"AND____1"	<0:0>
+  3	3:  (n___) (0=>4	1=>5	)	V = 10	"AND____2"	<0:0>
+  4	4:  (____) (	0	0)	V = 17	"ICOUNT"	<2:0>
+  5	5:  (____) (	0	0)	V = 16	"SUBTR____1"	<2:0>
+  6	6:  (____) (	0	0)	V = 8	"ADDER____1"	<2:0>
+  7	7:  (____) (	0	0)	V = 4	"CONST_0_BW3"	<2:0>
+
+VAR#	18:  (____o___d_)	"Q"	<0:0>
+GRP#	1:  BEG =  8, LEN = 6 -----
+  8	0:  (n___) (0=>1	1=>4	)	V = 2	"RST"	<0:0>
+  9	1:  (n___) (0=>2	1=>5	)	V = 11	"EQ____1"	<0:0>
+  10	2:  (n___) (0=>3	1=>4	)	V = 12	"EQ____2"	<0:0>
+  11	3:  (____) (	0	0)	V = 18	"Q"	<0:0>
+  12	4:  (____) (	0	0)	V = 3	"CONST_0_BW1"	<0:0>
+  13	5:  (____) (	0	0)	V = 5	"CONST_1_BW1"	<0:0>
+

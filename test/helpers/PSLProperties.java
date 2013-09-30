@@ -42,7 +42,7 @@ public interface PSLProperties {
 	};
 
 	/**
-	 * todo: remove this when ppg_future.lib gets taken into use
+	 * todo: remove this when psl_future.ppg gets taken into use
 	 */
 	public static final String[][] EXAMPLE_OPERATOR_ARRAY_OLD = {
 			{"always ( ( ( not ready ) and ( a = b ) ) -> next_e[ 1 to 3 ] ( ready ) )", "always TOP"},

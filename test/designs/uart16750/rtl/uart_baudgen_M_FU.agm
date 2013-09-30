@@ -1,0 +1,59 @@
+;  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!
+;
+; SOURCE FILE:
+;        uart_baudgen.vhd
+;
+; CONVERTER:
+;        VhdlBeh2HlddBeh
+;
+; MODEL COMPACTNESS:
+;        MINIMIZED (default)
+;
+; CONDITIONAL STATEMENTS:
+;        Functions (default)
+;
+;  <<<<<<< GENERATOR INFO
+
+STAT#	11 Nods,  12 Vars,  2 Grps,  4 Inps,  1 Outs,  4 Cons,  2 Funs  
+
+MODE#	RTL
+
+;inputs
+VAR#	0:  (i_________)	"CE"	<0:0>
+VAR#	1:  (i_________)	"CLEAR"	<0:0>
+VAR#	2:  (i_________)	"DIVIDER"	<15:0>
+VAR#	3:  (i_r_______)	"RST"	<0:0>
+
+
+;constants
+VAR#	4:  (c_________)	"CONST_0_BW1"	<0:0>	VAL = 0
+VAR#	5:  (c_________)	"CONST_0_BW16"	<15:0>	VAL = 0
+VAR#	6:  (c_________)	"CONST_1_BW1"	<0:0>	VAL = 1
+VAR#	7:  (c_________)	"CONST_1_BW16"	<15:0>	VAL = 1
+
+
+;functions
+VAR#	8:  (____f_____)	"ADDER____1"	<15:0>
+FUN#	ADDER	(A1<= 10<15:0>,	A2<= 7<15:0>)
+VAR#	9:  (____f_____)	"EQ____1"	<0:0>
+FUN#	EQ	(A1<= 10<15:0>,	A2<= 2<15:0>)
+
+
+;graphs
+VAR#	10:  (________d_)	"ICOUNTER"	<15:0>
+GRP#	0:  BEG =  0, LEN = 7 -----
+  0	0:  (n___) (0=>1	1=>6	)	V = 3	"RST"	<0:0>
+  1	1:  (n___) (0=>2	1=>6	)	V = 9	"EQ____1"	<0:0>
+  2	2:  (n___) (0=>3	1=>6	)	V = 1	"CLEAR"	<0:0>
+  3	3:  (n___) (0=>4	1=>5	)	V = 0	"CE"	<0:0>
+  4	4:  (____) (	0	0)	V = 10	"ICOUNTER"	<15:0>
+  5	5:  (____) (	0	0)	V = 8	"ADDER____1"	<15:0>
+  6	6:  (____) (	0	0)	V = 5	"CONST_0_BW16"	<15:0>
+
+VAR#	11:  (____o___d_)	"BAUDTICK"	<0:0>
+GRP#	1:  BEG =  7, LEN = 4 -----
+  7	0:  (n___) (0=>1	1=>2	)	V = 3	"RST"	<0:0>
+  8	1:  (n___) (0=>2	1=>3	)	V = 9	"EQ____1"	<0:0>
+  9	2:  (____) (	0	0)	V = 4	"CONST_0_BW1"	<0:0>
+  10	3:  (____) (	0	0)	V = 6	"CONST_1_BW1"	<0:0>
+

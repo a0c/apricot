@@ -1,0 +1,233 @@
+operators
+{
+	always TOP;
+	never TOP;
+	BOP -> TOP;
+	BOP1 until BOP2;
+	next TOP;
+	next[n] TOP;
+	next_e[start to end] TOP;
+	next_a[start to end] TOP;
+	BOP or TOP;
+	BOP and TOP;
+	! TOP;
+}
+
+-- !@!@!@!@ PRECEDENCE MUST BE FOLLOWED IN THIS FILE !@!@!@!@
+
+--	always { always TOP; }
+--	next { next TOP; }
+--	and { BOP or TOP; }
+--	or { BOP or TOP; }
+
+--always_temp {
+--	VAR#	0:	(i____)	"TOP"	<1:0>
+--	;terminal node constants
+--	VAR#	1:	(c____)	"CHECKING"	<1:0>	VAL = 0
+--	VAR#	2:	(c____)	"FAIL"	<1:0>	VAL = 1
+--	VAR#	3:	(c____)	"PASS"	<1:0>	VAL = 2
+--	VAR#	4:	(c____)	"WSTART"	<15:0>	VAL = 0
+--	VAR#	5:	(c____)	"WEND"	<15:0>	VAL = END
+--	;property PPG
+--	VAR#	6:	(o____)	"PROPERTY" <1:0>
+--	GRP#	0:	BEG = 0, LEN = 4 -----
+--		0	0:	(n___) (0=>1 1=>2 2=>3)	V = 0 "TOP"	<1:0>
+--		1	1:	(____) (	0	0)	V = 1 "CHECKING"	<1:0>
+--		2	2:	(____) (	0	0)	V = 2 "FAIL"	<1:0>
+--		3	3:	(____) (	0	0)	V = 3 "PASS"	<1:0>
+--}
+
+always TOP {
+	STAT# 4 Nods, 5 Vars, 1 Grps, 1 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	1:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	2:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	3:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	4:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 4 -----
+		0	0:	(n___) (0=>1 1=>2 2=>3)	V = 0 "TOP"	<1:0> [0 to END]
+		1	1:	(____) (	0	0)	V = 1 "FAIL"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "PASS"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "CHECKING"	<1:0>
+}
+
+never TOP {
+	STAT# 4 Nods, 5 Vars, 1 Grps, 1 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	1:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	2:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	3:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	4:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 4 -----
+		0	0:	(n___) (0=>2 1=>1 2=>3)	V = 0 "TOP"	<1:0> [0 to END]
+		1	1:	(____) (	0	0)	V = 1 "FAIL"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "PASS"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "CHECKING"	<1:0>
+}
+
+BOP -> TOP {
+	STAT# 5 Nods, 6 Vars, 1 Grps, 2 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"BOP"	<1:0>
+	VAR#	1:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	2:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	3:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	4:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	5:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 5 -----
+		0	0:	(n___) (0=>4 1=>1)	V = 0 "BOP"	<1:0>
+		1	1:	(n___) (0=>2 1=>3 2=>4)	V = 1 "TOP"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "FAIL"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "PASS"	<1:0>
+		4	4:	(____) (	0	0)	V = 4 "CHECKING"	<1:0>
+}
+
+BOP1 until BOP2 {
+	STAT# 4 Nods, 6 Vars, 1 Grps, 2 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"BOP1"	<1:0>
+	VAR#	1:	(i____)	"BOP2"	<1:0>
+	;terminal node constants
+	VAR#	2:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	3:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	4:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	5:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 4 -----
+		0	0:	(n___) (0=>2 1=>1)	V = 0 "BOP1"	<1:0>
+		1	1:	(n___) (0=>0 1=>3)	V = 1 "BOP2"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "FAIL"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "PASS"	<1:0>
+}
+
+next TOP {
+	STAT# 4 Nods, 5 Vars, 1 Grps, 1 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	1:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	2:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	3:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	4:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 4 -----
+		0	0:	(n___) (0=>1 1=>2 2=>3)	V = 0 "TOP"	<1:0> [1   to   1]
+		1	1:	(____) (	0	0)	V = 1 "FAIL"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "PASS"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "CHECKING"	<1:0>
+}
+
+next[n] TOP {
+	STAT# 4 Nods, 5 Vars, 1 Grps, 1 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	1:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	2:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	3:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	4:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 4 -----
+		0	0:	(n___) (0=>1 1=>2 2=>3)	V = 0 "TOP"	<1:0> [n   to   n]
+		1	1:	(____) (	0	0)	V = 1 "FAIL"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "PASS"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "CHECKING"	<1:0>
+}
+
+next_e[start to end] TOP {
+	STAT# 4 Nods, 5 Vars, 1 Grps, 1 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	1:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	2:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	3:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	4:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 4 -----
+		0	0:	(n___) (0=>1 1=>2 2=>3)	V = 0 "TOP"	<1:0> [start to end]
+		1	1:	(____) (	0	0)	V = 1 "FAIL"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "PASS"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "CHECKING"	<1:0>
+}
+
+next_a[start to end] TOP {
+	STAT# 4 Nods, 5 Vars, 1 Grps, 1 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	1:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	2:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	3:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	4:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 4 -----
+		0	0:	(n___) (0=>1 1=>2 2=>3)	V = 0 "TOP"	<1:0> [start to end]
+		1	1:	(____) (	0	0)	V = 1 "FAIL"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "PASS"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "CHECKING"	<1:0>
+}
+
+BOP or TOP {
+	STAT# 5 Nods, 6 Vars, 1 Grps, 2 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"BOP"	<1:0>
+	VAR#	1:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	2:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	3:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	4:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	5:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 5 -----
+		0	0:	(n___) (0=>1 1=>3)	V = 0 "BOP"	<1:0>
+		1	1:	(n___) (0=>2 1=>3 2=>4)	V = 1 "TOP"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "FAIL"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "PASS"	<1:0>
+		4	4:	(____) (	0	0)	V = 4 "CHECKING"	<1:0>
+}
+
+BOP and TOP {
+	STAT# 5 Nods, 6 Vars, 1 Grps, 2 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"BOP"	<1:0>
+	VAR#	1:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	2:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	3:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	4:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	5:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 5 -----
+		0	0:	(n___) (0=>2 1=>1)	V = 0 "BOP"	<1:0>
+		1	1:	(n___) (0=>2 1=>3 2=>4)	V = 1 "TOP"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "FAIL"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "PASS"	<1:0>
+		4	4:	(____) (	0	0)	V = 4 "CHECKING"	<1:0>
+}
+
+-- Inversion is parsed as BOP (using VHDL parser).
+! TOP {
+	STAT# 4 Nods, 5 Vars, 1 Grps, 1 Inps, 1 Outs, 3 Cons
+
+	VAR#	0:	(i____)	"TOP"	<1:0>
+	;terminal node constants
+	VAR#	1:	(c____)	"FAIL"	<1:0>	VAL = 0
+	VAR#	2:	(c____)	"PASS"	<1:0>	VAL = 1
+	VAR#	3:	(c____)	"CHECKING"	<1:0>	VAL = 2
+	;property PPG
+	VAR#	4:	(o____)	"PROPERTY" <1:0>
+	GRP#	0:	BEG = 0, LEN = 4 -----
+		0	0:	(n___) (0=>2 1=>1 2=>3)	V = 0 "TOP"	<1:0>
+		1	1:	(____) (	0	0)	V = 1 "FAIL"	<1:0>
+		2	2:	(____) (	0	0)	V = 2 "PASS"	<1:0>
+		3	3:	(____) (	0	0)	V = 3 "CHECKING"	<1:0>
+}

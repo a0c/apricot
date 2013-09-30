@@ -1,0 +1,7 @@
+8: uart_baudgen.vhd 54
+9: uart_baudgen.vhd 58
+0 4: uart_baudgen.vhd 53
+0 5: uart_baudgen.vhd 54
+0 6: uart_baudgen.vhd 48, 52, 59
+1 2: uart_baudgen.vhd 49, 57
+1 3: uart_baudgen.vhd 60

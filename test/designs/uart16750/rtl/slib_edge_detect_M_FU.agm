@@ -1,0 +1,60 @@
+;  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!
+;
+; SOURCE FILE:
+;        slib_edge_detect.vhd
+;
+; CONVERTER:
+;        VhdlBeh2HlddBeh
+;
+; MODEL COMPACTNESS:
+;        MINIMIZED (default)
+;
+; CONDITIONAL STATEMENTS:
+;        Functions (default)
+;
+;  <<<<<<< GENERATOR INFO
+
+STAT#	9 Nods,  11 Vars,  3 Grps,  2 Inps,  2 Outs,  2 Cons,  4 Funs  
+
+MODE#	RTL
+
+;inputs
+VAR#	0:  (i_________)	"D"	<0:0>
+VAR#	1:  (i_r_______)	"RST"	<0:0>
+
+
+;constants
+VAR#	2:  (c_________)	"CONST_0_BW1"	<0:0>	VAL = 0
+VAR#	3:  (c_________)	"CONST_1_BW1"	<0:0>	VAL = 1
+
+
+;functions
+VAR#	4:  (____f_____)	"AND____1"	<0:0>
+FUN#	AND	(A1<= 6<0:0>,	A2<= 0<0:0>)
+VAR#	5:  (____f_____)	"AND____2"	<0:0>
+FUN#	AND	(A1<= 8<0:0>,	A2<= 7<0:0>)
+VAR#	6:  (____f_____)	"INV____1"	<0:0>
+FUN#	INV	(A1<= 8<0:0>)
+VAR#	7:  (____f_____)	"INV____2"	<0:0>
+FUN#	INV	(A1<= 0<0:0>)
+
+
+;graphs
+VAR#	8:  (________d_)	"IDD"	<0:0>
+GRP#	0:  BEG =  0, LEN = 3 -----
+  0	0:  (n___) (0=>1	1=>2	)	V = 1	"RST"	<0:0>
+  1	1:  (____) (	0	0)	V = 0	"D"	<0:0>
+  2	2:  (____) (	0	0)	V = 2	"CONST_0_BW1"	<0:0>
+
+VAR#	9:  (____o_____)	"FE"	<0:0>
+GRP#	1:  BEG =  3, LEN = 3 -----
+  3	0:  (n___) (0=>1	1=>2	)	V = 5	"AND____2"	<0:0>
+  4	1:  (____) (	0	0)	V = 2	"CONST_0_BW1"	<0:0>
+  5	2:  (____) (	0	0)	V = 3	"CONST_1_BW1"	<0:0>
+
+VAR#	10:  (____o_____)	"RE"	<0:0>
+GRP#	2:  BEG =  6, LEN = 3 -----
+  6	0:  (n___) (0=>1	1=>2	)	V = 4	"AND____1"	<0:0>
+  7	1:  (____) (	0	0)	V = 2	"CONST_0_BW1"	<0:0>
+  8	2:  (____) (	0	0)	V = 3	"CONST_1_BW1"	<0:0>
+

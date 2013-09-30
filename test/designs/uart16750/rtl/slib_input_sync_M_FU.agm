@@ -1,0 +1,55 @@
+;  >>>>>>> GENERATOR INFO:   DO NOT EDIT text between 'GENERATOR INFO' lines !!!
+;
+; SOURCE FILE:
+;        slib_input_sync.vhd
+;
+; CONVERTER:
+;        VhdlBeh2HlddBeh
+;
+; MODEL COMPACTNESS:
+;        MINIMIZED (default)
+;
+; CONDITIONAL STATEMENTS:
+;        Functions (default)
+;
+;  <<<<<<< GENERATOR INFO
+
+STAT#	8 Nods,  8 Vars,  4 Grps,  2 Inps,  1 Outs,  1 Cons,  1 Funs  
+
+MODE#	RTL
+
+;inputs
+VAR#	0:  (i_________)	"D"	<0:0>
+VAR#	1:  (i_r_______)	"RST"	<0:0>
+
+
+;constants
+VAR#	2:  (c_________)	"CONST_0_BW1"	<0:0>	VAL = 0
+
+
+;functions
+VAR#	3:  (____f_____)	"CAT____1"	<1:0>
+FUN#	CAT	(A1<= 6<0:0>,	A2<= 5<0:0>)
+
+
+;graphs
+VAR#	4:  (__________)	"ID"	<1:0>
+GRP#	0:  BEG =  0, LEN = 1 -----
+  0	0:  (____) (	0	0)	V = 3	"CAT____1"	<1:0>
+
+VAR#	5:  (________d_)	"ID(0)"	<0:0>
+GRP#	1:  BEG =  1, LEN = 3 -----
+  1	0:  (n___) (0=>1	1=>2	)	V = 1	"RST"	<0:0>
+  2	1:  (____) (	0	0)	V = 0	"D"	<0:0>
+  3	2:  (____) (	0	0)	V = 2	"CONST_0_BW1"	<0:0>
+
+VAR#	6:  (________d_)	"ID(1)"	<0:0>
+GRP#	2:  BEG =  4, LEN = 3 -----
+  4	0:  (n___) (0=>1	1=>2	)	V = 1	"RST"	<0:0>
+  5	1:  (____) (	0	0)	V = 4	"ID<0>"	<0:0>
+  6	2:  (____) (	0	0)	V = 2	"CONST_0_BW1"	<0:0>
+
+VAR#	7:  (____o_____)	"Q"	<0:0>
+GRP#	3:  BEG =  7, LEN = 1 -----
+  7	0:  (____) (	0	0)	V = 4	"ID<1>"	<1:1>
+

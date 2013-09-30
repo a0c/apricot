@@ -115,7 +115,7 @@ public class FileDependencyResolver {
 	}
 
 	public static boolean isPPG(File file) {
-		return endsWith(file, ".lib");
+		return endsWith(file, ".ppg");
 	}
 
 	public static boolean isWaveform(File file) {
